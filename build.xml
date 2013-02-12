@@ -1,0 +1,54 @@
+﻿<project name="FormS build script" basedir="." default="run">
+	<property name="SRC_DIR" location="src"/>
+	<property name="LIB_DIR" location="libs"/>
+	<property name="BIN_DIR" location="bin"/>
+	<property name="SERVER_DIR" location="C:/server/Apache2/htdocs/clients/ofirvardi/forms"/>
+	<property name="SERVER_URI" value="http://localhost:8080/clients/ofirvardi/forms"/>
+	
+	<target name="clean">
+		<delete dir="${BIN_DIR}"/>
+		<delete dir="${SERVER_DIR}"/>
+	</target>
+	
+	<target name="init" depends="clean">
+		<mkdir dir="${SERVER_DIR}"/>
+		<mkdir dir="${BIN_DIR}"/>
+		<mkdir dir="${BIN_DIR}/js"/>
+		<mkdir dir="${BIN_DIR}/css"/>
+	</target>
+	
+	<target name="build" depends="init">
+		<concat destfile="${BIN_DIR}/js/main.js" fixlastline="yes">
+			<files includes="${SRC_DIR}/namespaces.js"/>
+			<files includes="${SRC_DIR}/namespaces.js ${SRC_DIR}/events/**/*.js ${SRC_DIR}/mvc/**/*.js ${SRC_DIR}/utils/**/*.js" excludes="${SRC_DIR}/namespaces.js"/>
+			<files includes="${SRC_DIR}/**/*.js" excludes="${SRC_DIR}/namespaces.js ${SRC_DIR}/events/**/*.js ${SRC_DIR}/mvc/**/*.js ${SRC_DIR}/utils/**/*.js ${SRC_DIR}/main.js"/>
+			<files includes="${SRC_DIR}/main.js"/>
+		</concat>
+		
+		<concat destfile="${BIN_DIR}/css/main.css" fixlastline="yes">
+			<files includes="${SRC_DIR}/**/*.css"/>
+		</concat>
+		
+		
+		<copy todir="${BIN_DIR}">
+			<fileset dir="${SRC_DIR}" includes="**/*.*" excludes="**/*.js **/*.css"/>
+		</copy>
+		
+		<copy todir="${BIN_DIR}">
+			<fileset dir="${LIB_DIR}"/>
+		</copy>
+	</target>
+
+	<target name="distribute" depends="build">
+		<copy todir="${SERVER_DIR}">
+			<fileset dir="${BIN_DIR}"/>
+		</copy>
+	</target>
+	
+	<target name="run" depends="distribute">
+		<!--<exec executable="rundll32.exe">
+			<arg line="url.dll, FileProtocolHandler"/>
+			<arg line="${SERVER_URI}"/>
+		</exec>-->
+	</target>
+</project>
