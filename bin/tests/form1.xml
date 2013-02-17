@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form id="form1">
+	<field name="textField" type="text" default="default text" />
+	<field name="passField" type="password" min="5" max="10"/>
+	<field name="checkboxField" type="checkbox" checked="true" value="checkboxValue" enabled="false"/>
+	<field name="radioField" type="radio" checked="true" value="radioValue"/>
+	<field name="fileField" type="file" accept="jpeg,png"/>
+	<field name="hiddenField" type="hidden" value="hiddenVlue"/>
+</form>

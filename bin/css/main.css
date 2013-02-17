@@ -1,7 +1,0 @@
-.form-item { padding: 5px; }
-.login-form { width: 300px; }
-.login-form input[type=text], .login-form input[type=password], .login-form textarea { width: 100%; }
-.login-form .form-footer { text-align: right; }
-body { font-size: 12px; font-family: Arial, Verdama, Helvetica; }
-label { font-weight: bold; }
-.inline { display: inline-block; }

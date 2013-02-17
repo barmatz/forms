@@ -1,7 +1,8 @@
+/** namespaces **/
 window.barmatz = {
-	dom: {},
 	events: {},
 	forms: {},
 	mvc: {},
+	net: {},
 	utils: {}
 };
