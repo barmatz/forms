@@ -8,22 +8,28 @@ window.barmatz.net.Request = function(url)
 		
 	barmatz.mvc.Model.call(this);
 	this.set('url', url);
-	this.set('method', barmatz.net.Request.GET);
+	this.set('method', barmatz.net.Methods.GET);
 	this.set('async', true);
+	this.set('data', null);
 };
 
 barmatz.net.Request.prototype = new barmatz.mvc.Model();
 barmatz.net.Request.prototype.constructor = barmatz.net.Request;
 
-Object.defineProperties(barmatz.net.Request,
-{
-	GET: {value: 'GET'},
-	POST: {value: 'POST'},
-	PUT: {value: 'PUT'},
-	DELETE: {value: 'DELETE'}
-});
 Object.defineProperties(barmatz.net.Request.prototype,
 {
+	data: {get: function()
+	{
+		var data = this.get('data');
+		
+		if(!data)
+		{
+			data = {};
+			this.set('data', data);
+		}
+		
+		return data;
+	}},
 	url: {get: function()
 	{
 		return this.get('url');

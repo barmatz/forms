@@ -15,9 +15,11 @@ window.barmatz.forms.FormField = function(type, name)
 	
 	this.set('type', type);
 	this.set('name', name);
-	this.set('default', null);
-	this.set('value', null);
-	this.set('enabled', null);
+	this.set('label', null);
+	this.set('mandatory', false);
+	this.set('default', '');
+	this.set('value', '');
+	this.set('enabled', true);
 };
 
 barmatz.forms.FormField.prototype = new barmatz.mvc.Model();
@@ -28,31 +30,45 @@ Object.defineProperties(barmatz.forms.FormField.prototype,
 	type: {get: function()
 	{
 		return this.get('type');
-	}},
+	}, enumerable: true},
 	name: {get: function()
 	{
 		return this.get('name');
-	}},
+	}, enumerable: true},
+	label: {get: function()
+	{
+		return this.get('label');
+	}, set: function(value)
+	{
+		this.set('label', value);
+	}, enumerable: true},
+	mandatory: {get: function()
+	{
+		return this.get('mandatory');
+	}, set: function(value)
+	{
+		this.set('mandatory', value);
+	}, enumerable: true},
 	default: {get: function()
 	{
 		return this.get('default');
 	}, set: function(value)
 	{
 		this.set('default', value);
-	}},
+	}, enumerable: true},
 	value: {get: function()
 	{
 		var value = this.get('value');
-		return value == null ? this.default : value;
+		return value == null || value == '' ? this.default : value;
 	}, set: function(value)
 	{
 		this.set('value', value);
-	}},
+	}, enumerable: true},
 	enabled: {get: function()
 	{
 		return this.get('enabled');
 	}, set: function(value)
 	{
-		this.set('enabled', value);
-	}}
+		this.set('enabled', Boolean(value));
+	}, enumerable: true}
 });

@@ -16,10 +16,15 @@
 	
 	<target name="build" depends="init">
 		<concat destfile="${BIN_DIR}/js/main.js" fixlastline="yes">
-			<files includes="${SRC_DIR}/namespaces.js"/>
-			<files includes="${SRC_DIR}/barmatz/events/**/*.js ${SRC_DIR}/barmatz/mvc/**/*.js ${SRC_DIR}/barmatz/utils/**/*.js"/>
-			<files includes="${SRC_DIR}/**/*.js" excludes="${SRC_DIR}/namespaces.js ${SRC_DIR}/main.js ${SRC_DIR}/barmatz/events/**/*.js ${SRC_DIR}/barmatz/mvc/**/*.js ${SRC_DIR}/barmatz/utils/**/*.js"/>
-			<files includes="${SRC_DIR}/main.js"/>
+			<fileset dir="${SRC_DIR}" includes="namespaces.js"/>
+			<fileset dir="${SRC_DIR}/barmatz/utils" includes="**/*.js"/>
+			<fileset dir="${SRC_DIR}/barmatz/events" includes="**/*.js"/>
+			<fileset dir="${SRC_DIR}/barmatz/mvc" includes="**/*.js"/>
+			<fileset dir="${SRC_DIR}/barmatz/forms" includes="FormField.js"/>
+			<fileset dir="${SRC_DIR}/barmatz/forms" includes="FormTextField.js"/>
+			<fileset dir="${SRC_DIR}/barmatz/forms" includes="**/*.js" excludes="FormField.js FormTextField.js"/>
+			<fileset dir="${SRC_DIR}/barmatz/net" includes="**/*.js"/>
+			<fileset dir="${SRC_DIR}" includes="main.js"/>
 		</concat>
 		<concat destfile="${BIN_DIR}/css/main.css" fixlastline="yes">
 			<files includes="${SRC_DIR}/**/*.css"/>

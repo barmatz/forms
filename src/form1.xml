@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form id="form1" uri="formHandler.php" encoding="application/x-www-form-urlencoded" method="get">
+	<field label="My text" name="textField" type="text" default="default text" mandatory="true"/>
+	<field label="My password" name="passField" type="password" min="5" max="10"/>
+	<field label="My checkbox" name="checkboxField" type="checkbox" checked="false" value="checkboxValue" enabled="false"/>
+	<field label="My radio" name="radioField" type="radio" checked="true" value="radioValue"/>
+	<field label="My file" name="fileField" type="file">
+		<accept>jpeg</accept>
+		<accept>png</accept>
+	</field>
+	<field name="hiddenField" type="hidden" value="hiddenVlue"/>
+	<submit label="Submit form"/>
+</form>

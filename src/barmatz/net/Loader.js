@@ -15,7 +15,29 @@ Object.defineProperties(barmatz.net.Loader,
 	OPENED: {value: 'OPENED'},
 	HEADERS_RECEIVED: {value: 'HEADERS_RECEIVED'},
 	LOADING: {value: 'LOADING'},
-	DONE: {value: 'DONE'}
+	DONE: {value: 'DONE'},
+	serialize: {value: function(object)
+	{
+		var params = [], key, value;
+		
+		for(key in object)
+		{
+			value = object[key];
+			key = encodeURIComponent(key);
+			
+			if(typeof value == 'object')
+			{
+				if(value instanceof Array)
+					params.push(key + '=' + value.join('&' + key + '='));
+				else
+					params.push(this.serialize(value));
+			}
+			else
+				params.push(key + '=' + encodeURIComponent(value));
+		}
+		
+		return params.join('&');
+	}}
 }); 
 Object.defineProperties(barmatz.net.Loader.prototype, 
 {
@@ -53,7 +75,10 @@ Object.defineProperties(barmatz.net.Loader.prototype,
 	}},
 	load: {value: function(request)
 	{
-		var _this = this;
+		var _this = this, url = request.url;
+		
+		if(request.data && request.method == barmatz.net.Methods.GET)
+			url += (url.indexOf('?') > -1 ? '&' : '?') + barmatz.net.Loader.serialize(request.data);
 		
 		if(request === undefined)
 			throw new ReferenceError('expected property request is undefiend');
@@ -63,11 +88,14 @@ Object.defineProperties(barmatz.net.Loader.prototype,
 		this._xhr.addEventListener('readystatechange', onReadyStateChange);
 		
 		if(request.credentials)
-			this._xhr.open(request.method, request.url, request.async, request.credentials.user ? request.credentials.user : null, reqeust.credentials.password ? reqeust.credentials.password : null);
+			this._xhr.open(request.method, url, request.async, request.credentials.user ? request.credentials.user : null, reqeust.credentials.password ? reqeust.credentials.password : null);
 		else
-			this._xhr.open(request.method, request.url, request.async);
+			this._xhr.open(request.method, url, request.async);
 		
-		this._xhr.send();
+		if(request.method == barmatz.net.Methods.POST)
+			this._xhr.send(barmatz.net.Loader.serialize(request.data));
+		else
+			this._xhr.send();
 		
 		function onReadyStateChange(event)
 		{

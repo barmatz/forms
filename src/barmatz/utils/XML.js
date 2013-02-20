@@ -20,7 +20,7 @@ Object.defineProperties(barmatz.utils.XML,
 	}},
 	xmlToObject: {value: function(xml)
 	{
-		var obj = {}, attribute, item, nodeName, old, i;
+		var obj = {}, objPropertySet = false, attribute, item, nodeName, i;
 		
 		if(xml.nodeType == 1) 
 		{
@@ -30,6 +30,7 @@ Object.defineProperties(barmatz.utils.XML,
 				{
 					attribute = xml.attributes.item(i);
 					obj[attribute.nodeName] = attribute.nodeValue;
+					objPropertySet = true;
 				}
 			}
 		} 
@@ -44,15 +45,16 @@ Object.defineProperties(barmatz.utils.XML,
 				nodeName = item.nodeName;
 				
 				if(typeof obj[nodeName] == 'undefined') 
-					obj[nodeName == '#text' ? 'content' : nodeName] = this.xmlToObject(item);
+				{
+					if(objPropertySet)
+						obj[nodeName == '#text' ? 'content' : nodeName] = this.xmlToObject(item);
+					else 
+						obj = this.xmlToObject(item);
+				}
 				else 
 				{
-					if(typeof obj[nodeName].length == 'undefined') 
-					{
-						old = obj[nodeName];
-						obj[nodeName] = [];
-						obj[nodeName].push(old);
-					}
+					if(!(obj[nodeName] instanceof Array))
+						obj[nodeName] = [obj[nodeName]];
 		
 					obj[nodeName].push(this.xmlToObject(item));
 				}
