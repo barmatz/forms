@@ -1,11 +1,8 @@
 /** barmatz.events.Event **/
 window.barmatz.events.Event = function(type)
 {
-	if(type === undefined)
-		throw new ReferenceError('expected property type is undefined');
-	else if(type && typeof type != 'string')
-		throw new TypeError('type is not a String');
-	
+	barmatz.utils.DataTypes.isNotUndefined(type);
+	barmatz.utils.DataTypes.isTypeOf(type, 'string', true);
 	this._type = type;
 };
 

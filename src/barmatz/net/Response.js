@@ -1,31 +1,16 @@
 /** barmatz.net.Response **/
 window.barmatz.net.Response = function(url, data, type, status, headers)
 {
-	if(url === undefined)
-		throw new ReferenceError('expected property url is undefined');
-	else if(typeof url != 'string')
-		throw new TypeError('url is not a String');
-
-	if(data === undefined)
-		throw new ReferenceError('expected property data is undefined');
-
-	if(type === undefined)
-		throw new ReferenceError('expected property type is undefined');
-	else if(typeof type != 'string')
-		throw new TypeError('type is not a String');
-	
-	if(status === undefined)
-		throw new ReferenceError('expected property status is undefined');
-	else if(typeof status != 'number')
-		throw new TypeError('status is not a String');
-	
-	if(headers === undefined)
-		throw new ReferenceError('expected property headers is undefined');
-	else if(!(headers instanceof Array))
-		throw new TypeError('headers is not an Array');
-	
+	barmatz.utils.DataTypes.isNotUndefined(url);
+	barmatz.utils.DataTypes.isTypeOf(url, 'string');
+	barmatz.utils.DataTypes.isNotUndefined(data);
+	barmatz.utils.DataTypes.isNotUndefined(type);
+	barmatz.utils.DataTypes.isTypeOf(type, 'string');
+	barmatz.utils.DataTypes.isNotUndefined(status);
+	barmatz.utils.DataTypes.isTypeOf(status, 'number');
+	barmatz.utils.DataTypes.isNotUndefined(headers);
+	barmatz.utils.DataTypes.isInstanceOf(headers, Array);
 	barmatz.mvc.Model.call(this);
-	
 	this.set('url', url);
 	this.set('data', data);
 	this.set('type', type);

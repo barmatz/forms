@@ -9,11 +9,8 @@ Object.defineProperties(barmatz.events.EventDispatcher.prototype,
 {
 	addEventListener: {value: function(type, listener)
 	{
-		if(typeof type != 'string')
-			throw new TypeError('type is not a String');
-		
-		if(typeof listener != 'function')
-			throw new TypeError('listener is not a Function');
+		barmatz.utils.DataTypes.isTypeOf(type, 'string');
+		barmatz.utils.DataTypes.isTypeOf(listener, 'function');
 		
 		if(!this._listeners[type])
 			this._listeners[type] = [];
@@ -24,8 +21,7 @@ Object.defineProperties(barmatz.events.EventDispatcher.prototype,
 	{
 		var i, c;
 		
-		if(!(event instanceof barmatz.events.Event))
-			throw new TypeError('event is not an Event object');
+		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.Event);
 		
 		event._target = this._target;
 		

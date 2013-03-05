@@ -15,20 +15,26 @@
 	</target>
 	
 	<target name="build" depends="init">
-		<concat destfile="${BIN_DIR}/js/main.js" fixlastline="yes">
+		<concat destfile="${BIN_DIR}/js/application.js" fixlastline="yes">
 			<fileset dir="${SRC_DIR}" includes="namespaces.js"/>
 			<fileset dir="${SRC_DIR}/barmatz/utils" includes="**/*.js"/>
-			<fileset dir="${SRC_DIR}/barmatz/events" includes="**/*.js"/>
+			<fileset dir="${SRC_DIR}/barmatz/events" includes="Event.js"/>
+			<fileset dir="${SRC_DIR}/barmatz/events" includes="**/*.js" excludes="Event.js"/>
 			<fileset dir="${SRC_DIR}/barmatz/mvc" includes="**/*.js"/>
-			<fileset dir="${SRC_DIR}/barmatz/forms" includes="FormField.js"/>
-			<fileset dir="${SRC_DIR}/barmatz/forms" includes="FormTextField.js"/>
-			<fileset dir="${SRC_DIR}/barmatz/forms" includes="**/*.js" excludes="FormField.js FormTextField.js"/>
+			<fileset dir="${SRC_DIR}/barmatz/forms" includes="TypeModel.js"/>
+			<fileset dir="${SRC_DIR}/barmatz/forms/fields" includes="FormFieldModel.js"/>
+			<fileset dir="${SRC_DIR}/barmatz/forms/fields" includes="FormTextFieldModel.js"/>
+			<fileset dir="${SRC_DIR}/barmatz/forms/fields" includes="**/*.js" excludes="FormFieldModel.js FormTextFieldModel.js"/>
+			<fileset dir="${SRC_DIR}/barmatz/forms" includes="**/*.js" excludes="TypeModel.js fields/**.js"/>
 			<fileset dir="${SRC_DIR}/barmatz/net" includes="**/*.js"/>
-			<fileset dir="${SRC_DIR}" includes="main.js"/>
 		</concat>
 		<concat destfile="${BIN_DIR}/css/main.css" fixlastline="yes">
-			<files includes="${SRC_DIR}/**/*.css"/>
+			<fileset dir="${SRC_DIR}" includes="reset.css"/>
+			<fileset dir="${SRC_DIR}" includes="**/*.css" excludes="reset.css"/>
 		</concat>
+		<copy todir="${BIN_DIR}/js">
+			<fileset dir="${SRC_DIR}" includes="*.js"/>
+		</copy>
 		<copy todir="${BIN_DIR}">
 			<fileset dir="${SRC_DIR}" includes="**/*.*" excludes="**/*.js **/*.css"/>
 		</copy>

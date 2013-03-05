@@ -77,14 +77,12 @@ Object.defineProperties(barmatz.net.Loader.prototype,
 	{
 		var _this = this, url = request.url;
 		
+		barmatz.utils.DataTypes.isNotUndefined(request);
+		barmatz.utils.DataTypes.isInstanceOf(request, barmatz.net.Request);
+
 		if(request.data && request.method == barmatz.net.Methods.GET)
 			url += (url.indexOf('?') > -1 ? '&' : '?') + barmatz.net.Loader.serialize(request.data);
 		
-		if(request === undefined)
-			throw new ReferenceError('expected property request is undefiend');
-		else if(!(request instanceof barmatz.net.Request))
-			throw new TypeError('request is not a Request object');
-			
 		this._xhr.addEventListener('readystatechange', onReadyStateChange);
 		
 		if(request.credentials)

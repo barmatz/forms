@@ -53,9 +53,8 @@ Object.defineProperties(barmatz.utils.XML,
 				}
 				else 
 				{
-					if(!(obj[nodeName] instanceof Array))
+					if(barmatz.utils.DataTypes.isInstanceOf(obj[nodeName], Array))
 						obj[nodeName] = [obj[nodeName]];
-		
 					obj[nodeName].push(this.xmlToObject(item));
 				}
 			}

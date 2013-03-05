@@ -1,5 +1,5 @@
-/** barmatz.forms.Form **/
-window.barmatz.forms.Form = function()
+/** barmatz.forms.FormModel **/
+window.barmatz.forms.FormModel = function()
 {
 	barmatz.mvc.Model.call(this);
 	
@@ -8,20 +8,18 @@ window.barmatz.forms.Form = function()
 	this.set('method', barmatz.forms.Methods.GET);
 };
 
-barmatz.forms.Form.prototype = new barmatz.mvc.Model();
-barmatz.forms.Form.prototype.constructor = barmatz.forms.Form;
+barmatz.forms.FormModel.prototype = new barmatz.mvc.Model();
+barmatz.forms.FormModel.prototype.constructor = barmatz.forms.FormModel;
 
-Object.defineProperties(barmatz.forms.Form,
+Object.defineProperties(barmatz.forms.FormModel,
 {
 	init: {value: function(ref, target)
 	{
-		if(ref === undefined)
-			throw new ReferenceError('expected property ref is undefined');
+		var form;
 		
-		if(target === undefined)
-			throw new ReferenceError('expected property target is undefined');
-		else if(!(target instanceof HTMLElement))
-			throw new TypeError('target is not an HTMLElement');
+		barmatz.utils.DataTypes.isNotUndefined(ref);
+		barmatz.utils.DataTypes.isNotUndefined(target);
+		barmatz.utils.DataTypes.isInstanceOf(target, HTMLElement);
 		
 		loadForm();
 		
@@ -40,18 +38,22 @@ Object.defineProperties(barmatz.forms.Form,
 		
 		function generateFormFromXML(xml)
 		{
-			var form = new barmatz.forms.Form();
-
+			form = new barmatz.forms.FormModel();
 			form.createFromXML(xml);
 			
 			for(i = 0; i < form.numFields; i++)
-				target.appendChild(barmatz.forms.Factory.createFieldWrapper(form.getFieldAt(i)));
+				target.appendChild(barmatz.forms.factories.DOMFactory.createFieldWrapper(form.getFieldAt(i)).wrapper);
 			
-			target.appendChild(barmatz.forms.Factory.createSubmitButton(form.submitButton));
+			target.appendChild(barmatz.forms.factories.DOMFactory.createSubmitButton(form.submitButtonLabel, onSubmitButtonClick));
+		}
+		
+		function onSubmitButtonClick(event)
+		{
+			form.submit();
 		}
 	}}
 }); 
-Object.defineProperties(barmatz.forms.Form.prototype, 
+Object.defineProperties(barmatz.forms.FormModel.prototype, 
 {
 	id: {get: function()
 	{
@@ -70,9 +72,9 @@ Object.defineProperties(barmatz.forms.Form.prototype,
 		
 		this.set('method', value);
 	}},
-	submitButton: {get: function()
+	submitButtonLabel: {get: function()
 	{
-		return this.get('submitButton');
+		return this.get('submitButtonLabel');
 	}},
 	encoding: {get: function()
 	{
@@ -94,25 +96,19 @@ Object.defineProperties(barmatz.forms.Form.prototype,
 	}},
 	createFromXML: {value: function(xml)
 	{
-		if(xml === undefined)
-			throw new ReferenceError('expected parameter xml is undefined');
-		else if(!(xml instanceof XMLDocument))
-			throw new TypeError('xml is not an XMLDocument object');
-		
+		barmatz.utils.DataTypes.isNotUndefined(xml);
+		barmatz.utils.DataTypes.isInstanceOf(xml, XMLDocument);
 		this.createFromObject(barmatz.utils.XML.xmlToObject(xml));
 	}},
 	createFromObject: {value: function(object)
 	{
 		var _this = this;
 		
-		if(object === undefined)
-			throw new ReferenceError('expected parameter object is undefined');
-		else if(typeof object != 'object')
-			throw new TypeError('object is not an Object');
-		
+		barmatz.utils.DataTypes.isNotUndefined(object);
+		barmatz.utils.DataTypes.isTypeOf(object, 'object');
 		setProperties(object);
 		setFields(object.field instanceof Array ? object.field : [object.field]);
-		setSubmit(object.submit.label);
+		this.set('submitButtonLabel', object.submit.label);
 		
 		function setProperties(form)
 		{
@@ -129,27 +125,22 @@ Object.defineProperties(barmatz.forms.Form.prototype,
 			while(_this.numFields < fields.length)
 			{
 				field = fields[_this.numFields];
-				_this.addField(barmatz.forms.Factory.createFormField(field.type, field.name, field));
+				_this.addField(barmatz.forms.factories.ModelFactory.createFormFieldModel(field.type, field.name, field));
 			}
-		}
-		
-		function setSubmit(label)
-		{
-			_this.set('submitButton', new barmatz.forms.Button(label));
 		}
 	}},
 	addField: {value: function(field)
 	{
-		if(!(field instanceof barmatz.forms.FormField))
-			throw new TypeError('field is not a FormField obejct');
-		
+		barmatz.utils.DataTypes.isNotUndefined(field);
+		barmatz.utils.DataTypes.isInstanceOf(field, barmatz.forms.fields.FormFieldModel);
 		this._fields.push(field);
-		this.dispatchEvent(new barmatz.events.FormEvent(barmatz.events.FormEvent.FIELD_ADDED, field));
+		this.dispatchEvent(new barmatz.events.CollectionEvent(barmatz.events.CollectionEvent.ADDED, field));
 	}},
 	addFieldAt: {value: function(field, index)
 	{
-		if(!(field instanceof barmatz.forms.FormField))
-			throw new TypeError('field is not a FormField obejct');
+		barmatz.utils.DataTypes.isNotUndefined(field);
+		barmatz.utils.DataTypes.isNotUndefined(index);
+		barmatz.utils.DataTypes.isInstanceOf(field, barmatz.forms.fields.FormFieldModel);
 
 		if(index < 0)
 			index = 0;
@@ -157,15 +148,14 @@ Object.defineProperties(barmatz.forms.Form.prototype,
 			index = this.numFields;
 		
 		this._fields.splice(index, 0, field);
-		this.dispatchEvent(new barmatz.events.FormEvent(barmatz.events.FormEvent.FIELD_ADDED, field));
+		this.dispatchEvent(new barmatz.events.CollectionEvent(barmatz.events.CollectionEvent.ADDED, field));
 	}},
 	removeField: {value: function(field)
 	{
-		if(!(field instanceof barmatz.forms.FormField))
-			throw new TypeError('field is not a FormField obejct');
-		
+		barmatz.utils.DataTypes.isNotUndefined(field);
+		barmatz.utils.DataTypes.isInstanceOf(field, barmatz.forms.fields.FormFieldModel);
 		this.removeFieldAt(this._fields.indexOf(field));
-		this.dispatchEvent(new barmatz.events.FormEvent(barmatz.events.FormEvent.FIELD_REMOVED, field));
+		this.dispatchEvent(new barmatz.events.CollectionEvent(barmatz.events.CollectionEvent.REMOVED, field));
 	}},
 	removeFieldAt: {value: function(index)
 	{
@@ -175,7 +165,7 @@ Object.defineProperties(barmatz.forms.Form.prototype,
 			throw new Error('index is out of bounds');
 		
 		field = this._fields.splice(index, 1)[0];
-		this.dispatchEvent(new barmatz.events.FormEvent(barmatz.events.FormEvent.FIELD_REMOVED, field));
+		this.dispatchEvent(new barmatz.events.CollectionEvent(barmatz.events.CollectionEvent.REMOVED, field));
 	}},
 	getFieldAt: {value: function(index)
 	{
@@ -210,6 +200,6 @@ Object.defineProperties(barmatz.forms.Form.prototype,
 			request.data[field.name] = field.value;
 		}
 		
-		loader.send();
+		loader.load(request);
 	}}
 });

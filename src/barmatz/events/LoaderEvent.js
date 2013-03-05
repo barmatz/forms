@@ -40,5 +40,17 @@ Object.defineProperties(barmatz.events.LoaderEvent.prototype,
 	response: {get: function()
 	{
 		return this._response;
+	}},
+	clone: {value: function(type)
+	{
+		var event = new barmatz.events.LoaderEvent(type);
+		event._target = this.target;
+		event._request = this.request;
+		event._response = this.response;
+		return event;
+	}},
+	toString: {value: function()
+	{
+		return this.formatToString('LoaderEvent', 'type', 'request', 'response');
 	}}
 });

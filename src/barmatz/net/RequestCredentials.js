@@ -14,9 +14,7 @@ Object.defineProperties(barmatz.net.RequestCredentials.prototype,
 		return this.get('user');
 	}, set: function(value)
 	{
-		if(typeof value != 'string')
-			throw new TypeError('value is not a String');
-		
+		barmatz.utils.DataTypes.isTypeOf(value, 'string');
 		this.set('user', value);
 	}},
 	password: {get: function()
@@ -24,9 +22,7 @@ Object.defineProperties(barmatz.net.RequestCredentials.prototype,
 		return this.get('password');
 	}, set: function(value)
 	{
-		if(typeof value != 'string')
-			throw new TypeError('value is not a String');
-		
+		barmatz.utils.DataTypes.isTypeOf(value, 'string');
 		this.set('password', value);
 	}}
 });
