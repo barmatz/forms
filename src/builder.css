@@ -13,3 +13,4 @@
 .forms-builder-properties-panel .forms-header { font-weight: bold; }
 .forms-builder-properties-panel .forms-item { padding: .4em; }
 .forms-builder-properties-panel .forms-item label { display: block; }
+.forms-builder-dialog-prompt .ui-dialog-titlebar-close { display: none; }

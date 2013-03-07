@@ -256,6 +256,7 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		var dialog = this.createElementWithContent('div', 'forms-dialog', content);
 		dialog.title = title;
 		(container || this.BODY_ELEMENT).appendChild(dialog);
+		jQuery(dialog).dialog({autoOpen: false});
 		return dialog;
 	}},
 	destroyDialog: {value: function(dialog)
@@ -263,35 +264,29 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		jQuery(dialog).dialog('destroy');
 		dialog.parentElement.removeChild(dialog);
 	}},
-	createNewFieldDialog: {value: function(okHandler)
+	createNewFieldDialogWrapper: {value: function()
 	{
-		var dialog, nameField;
-		
-		barmatz.utils.DataTypes.isNotUndefined(okHandler);
-		barmatz.utils.DataTypes.isTypeOf(okHandler, 'function');
+		var dialog, nameField, wrapper;
 		
 		nameField = this.createElement('input');
 		nameField.type = 'text';
 		
-		dialog = this.createDialog('New Field', this.createElementWithContent('div', '', [
+		wrapper = this.createElementWithContent('div', '', [
 			this.createElementWithContent('label', '', 'Field name'),
 			nameField
-		]));
+		]);
+		
+		dialog = this.createDialog('New Field', wrapper);
+		
+		barmatz.utils.CSS.verticalAlignChildren(wrapper);
 		
 		jQuery(dialog).dialog({
-			buttons: {Ok: function()
-			{
-				okHandler(dialog, nameField);
-			}}, 
-			closeOnEscape: false, 
+			closeOnEscape: false,
+			dialogClass: 'forms-builder-dialog-prompt',
 			draggable: false, 
-			modal: true,
-			open: function(event, ui)
-			{
-				jQuery(event.target.parentElement).find('.ui-dialog-titlebar-close').hide();
-			}
+			modal: true
 		});
 		
-		return dialog;
+		return {wrapper: dialog, nameField: nameField};
 	}}
 });

@@ -22,6 +22,10 @@ Object.defineProperties(barmatz.forms.fields.FormFieldModel.prototype,
 	name: {get: function()
 	{
 		return this.get('name');
+	}, set: function(value)
+	{
+		barmatz.utils.DataTypes.isTypeOf(value, 'string');
+		this.set('name', value);
 	}},
 	label: {get: function()
 	{

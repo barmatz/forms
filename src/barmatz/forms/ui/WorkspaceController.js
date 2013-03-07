@@ -23,16 +23,24 @@ window.barmatz.forms.ui.WorkspaceController = function(model, view)
 	
 	function openNewFieldDialog(model)
 	{
+		var dialogWarpper;
+		
 		barmatz.utils.DataTypes.isNotUndefined(model);
 		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FormFieldModel);
-		barmatz.forms.factories.DOMFactory.createNewFieldDialog(function(dialog, nameField)
+		
+		dialogWarpper = barmatz.forms.factories.DOMFactory.createNewFieldDialogWrapper();
+		jQuery(dialogWarpper.wrapper).dialog('open');
+		
+		barmatz.forms.factories.ControllerFactory.createJQueryPromptDialogController(model, dialogWarpper.wrapper, dialogWarpper.nameField);
+		
+		/*function(dialog, nameField)
 		{
 			if(nameField.value)
 			{
 				model.name = nameField.value;
 				barmatz.forms.factories.DOMFactory.destroyDialog(dialog);
 			}
-		});
+		});*/
 	}
 	
 	function onSortingStart(event, ui)
@@ -62,6 +70,13 @@ barmatz.forms.ui.WorkspaceController.prototype.constructor = barmatz.forms.ui.Wo
 
 Object.defineProperties(barmatz.forms.ui.WorkspaceController.prototype,
 {
+	__addItemModelToView: {value: function(model)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(model);
+		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.mvc.Model);
+		barmatz.forms.CollectionController.__addItemModelToView(model);
+		barmatz.utils.CSS.verticalAlignChildren(this._view);
+	}},
 	_createItemViewFromModel: {value: function(model)
 	{
 		var _this = this, viewWrapper;

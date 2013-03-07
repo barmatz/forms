@@ -48,5 +48,27 @@ Object.defineProperties(barmatz.utils.CSS,
 		barmatz.utils.DataTypes.isNotUndefined(element);
 		barmatz.utils.DataTypes.isInstanceOf(element, HTMLElement);
 		return element.offsetWidth + this.unitToPixal(element, this.getStyle(element).marginLeft) + this.unitToPixal(element, this.getStyle(element).marginRight) + this.unitToPixal(element, this.getStyle(element).borderLeft) + this.unitToPixal(element, this.getStyle(element).borderRight);
+	}},
+	verticalAlign: {value: function(element)
+	{
+		var parent;
+		
+		barmatz.utils.DataTypes.isNotUndefined(element);
+		barmatz.utils.DataTypes.isInstanceOf(element, HTMLElement);
+		
+		parent = element.parentElement;
+		
+		if(parent)
+			element.style.marginTop = ((parent.offsetHeight * .5) - (this.absoluteHeight(element) * .5)) + 'px';
+	}},
+	verticalAlignChildren: {value: function(element)
+	{
+		var i;
+		
+		barmatz.utils.DataTypes.isNotUndefined(element);
+		barmatz.utils.DataTypes.isInstanceOf(element, HTMLElement);
+		
+		for(i = 0; i < element.childNodes.length; i++)
+			this.verticalAlign(element.childNodes[i]);
 	}}
 });

@@ -58,13 +58,10 @@ window.barmatz.forms.ui.BuilderController = function(toolboxModel, toolboxView, 
 		resizeUI();
 	}
 	
-	function onWindowClick(event)
+	function onWorkspaceViewClick(event)
 	{
-		if(!barmatz.utils.DOM.isChildOf(event.target, propertiesPanelView))
-		{
-			propertiesPanelController.model = null;
-			window.removeEventListener('click', onWindowClick);
-		}
+		propertiesPanelController.model = null;
+		workspaceView.removeEventListener('click', onWorkspaceViewClick);
 	}
 	
 	function onToolboxViewItemClick(event)
@@ -73,7 +70,7 @@ window.barmatz.forms.ui.BuilderController = function(toolboxModel, toolboxView, 
 		barmatz.utils.DataTypes.isInstanceOf(event, MouseEvent);
 		workspaceModel.addItem(toolboxModel.getRefItem(toolboxModel.getItemAt(getIndexOfView(event.target))));
 		event.stopImmediatePropagation();
-		window.addEventListener('click', onWindowClick);
+		workspaceView.addEventListener('click', onWorkspaceViewClick);
 	}
 	
 	function onWorkspaceViewItemClick(event)
@@ -81,7 +78,7 @@ window.barmatz.forms.ui.BuilderController = function(toolboxModel, toolboxView, 
 		barmatz.utils.DataTypes.isNotUndefined(event);
 		barmatz.utils.DataTypes.isInstanceOf(event, MouseEvent);
 		event.stopImmediatePropagation();
-		window.addEventListener('click', onWindowClick);
+		workspaceView.addEventListener('click', onWorkspaceViewClick);
 		propertiesPanelController.model = workspaceModel.getItemAt(getIndexOfView(event.currentTarget));
 	}
 	

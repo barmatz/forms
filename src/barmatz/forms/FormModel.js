@@ -42,7 +42,10 @@ Object.defineProperties(barmatz.forms.FormModel,
 			form.createFromXML(xml);
 			
 			for(i = 0; i < form.numFields; i++)
+			{
 				target.appendChild(barmatz.forms.factories.DOMFactory.createFieldWrapper(form.getFieldAt(i)).wrapper);
+				barmatz.utils.CSS.verticalAlignChildren(target);
+			}
 			
 			target.appendChild(barmatz.forms.factories.DOMFactory.createSubmitButton(form.submitButtonLabel, onSubmitButtonClick));
 		}

@@ -8,6 +8,7 @@ window.barmatz.forms.CollectionController = function(model, view)
 	barmatz.mvc.Controller.call(this);
 
 	this._model = model;
+	this._view = view;
 	
 	if(model)
 	{
@@ -15,22 +16,15 @@ window.barmatz.forms.CollectionController = function(model, view)
 		model.addEventListener(barmatz.events.CollectionEvent.REMOVED, onModelRemoved);
 		model.forEach(function(item, index, collection)
 		{
-			addItemModelToView(item);
+			_this._addItemModelToView(item);
 		});
-	}
-	
-	function addItemModelToView(model)
-	{
-		barmatz.utils.DataTypes.isNotUndefined(model);
-		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.mvc.Model);
-		view.appendChild(_this._createItemViewFromModel(model));
 	}
 	
 	function onModelAdded(event)
 	{
 		barmatz.utils.DataTypes.isNotUndefined(event);
 		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.CollectionEvent);
-		addItemModelToView(event.item);
+		_this._addItemModelToView(event.item);
 	}
 	
 	function onModelRemoved(event)
@@ -46,6 +40,12 @@ barmatz.forms.CollectionController.prototype.constructor = barmatz.forms.Collect
 
 Object.defineProperties(barmatz.forms.CollectionController.prototype,
 {
+	_addItemModelToView: {value: function(model)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(model);
+		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.mvc.Model);
+		this._view.appendChild(this._createItemViewFromModel(model));
+	}},
 	_createItemViewFromModel: {value: function(model)
 	{
 		throw new Error('method must be overridden');
