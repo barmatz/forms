@@ -152,7 +152,6 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		
 		deleteButton = this.createElement('span', 'forms-delete ui-icon ui-icon-circle-close');
 		fieldWrapper = this.createFieldWrapper(model, 'forms-workspace-item');
-		fieldWrapper.field.disabled = true;
 		fieldWrapper.wrapper.insertBefore(this.createElement('span', 'forms-grip ui-icon ui-icon-grip-dotted-vertical'), fieldWrapper.wrapper.childNodes[0]);
 		fieldWrapper.wrapper.appendChild(deleteButton);
 		
@@ -261,7 +260,7 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 			case 'string':
 				field = this.createElement('input');
 				field.type = 'text';
-				field.value = isNaN(value) ? '' : value;
+				field.value = value == 'NaN' ? '' : value;
 				break;
 			case 'boolean':
 				field = this.createElement('select');

@@ -1525,7 +1525,7 @@ Object.defineProperties(barmatz.forms.ui.PropertiesPanelController.prototype,
 				case 'mandatory':
 					itemsWrapper.mandatoryField.value = event.value ? 'yes' : 'no';
 					break;
-				case 'defaultValue':
+				case 'default':
 					itemsWrapper.defaultValueField.value = event.value;
 					break;
 				case 'value':
@@ -1706,12 +1706,11 @@ barmatz.forms.ui.WorkspaceController.prototype.constructor = barmatz.forms.ui.Wo
 
 Object.defineProperties(barmatz.forms.ui.WorkspaceController.prototype,
 {
-	__addItemModelToView: {value: function(model)
+	_addItemModelToView: {value: function(model)
 	{
 		barmatz.utils.DataTypes.isNotUndefined(model);
 		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.mvc.Model);
-		barmatz.forms.CollectionController.__addItemModelToView(model);
-		barmatz.utils.CSS.verticalAlignChildren(this._view);
+		barmatz.forms.CollectionController.prototype._addItemModelToView.call(this, model);
 	}},
 	_createItemViewFromModel: {value: function(model)
 	{
@@ -1722,6 +1721,7 @@ Object.defineProperties(barmatz.forms.ui.WorkspaceController.prototype,
 		viewWrapper = barmatz.forms.factories.DOMFactory.createWorkspaceItemWrapper(model);
 		viewWrapper.deleteButton.addEventListener('click', onDeleteButtonClick);
 		barmatz.forms.factories.ControllerFactory.createWorkspaceItemController(model, viewWrapper.label, viewWrapper.field, viewWrapper.mandatory, viewWrapper.deleteButton);
+		barmatz.utils.CSS.verticalAlignChildren(viewWrapper.wrapper);
 		return viewWrapper.wrapper;
 		
 		function onDeleteButtonClick(event)
@@ -1758,6 +1758,9 @@ window.barmatz.forms.ui.WorkspaceItemController = function(model, labelView, fie
 
 		switch(event.key)
 		{
+			default:
+				throw new Error('unknown key');
+				break;
 			case 'name':
 				fieldView.name = event.value;
 				break;
@@ -1767,7 +1770,7 @@ window.barmatz.forms.ui.WorkspaceItemController = function(model, labelView, fie
 			case 'mandatory':
 				mandatoryView.innerHTML = event.value ? '*' : '';
 				break;
-			case 'defaultValue':
+			case 'default':
 				fieldView.defaultValue = event.value;
 				break;
 			case 'value':
@@ -2257,7 +2260,6 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		
 		deleteButton = this.createElement('span', 'forms-delete ui-icon ui-icon-circle-close');
 		fieldWrapper = this.createFieldWrapper(model, 'forms-workspace-item');
-		fieldWrapper.field.disabled = true;
 		fieldWrapper.wrapper.insertBefore(this.createElement('span', 'forms-grip ui-icon ui-icon-grip-dotted-vertical'), fieldWrapper.wrapper.childNodes[0]);
 		fieldWrapper.wrapper.appendChild(deleteButton);
 		
@@ -2366,7 +2368,7 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 			case 'string':
 				field = this.createElement('input');
 				field.type = 'text';
-				field.value = isNaN(value) ? '' : value;
+				field.value = value == 'NaN' ? '' : value;
 				break;
 			case 'boolean':
 				field = this.createElement('select');

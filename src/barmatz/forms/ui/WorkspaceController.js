@@ -61,12 +61,11 @@ barmatz.forms.ui.WorkspaceController.prototype.constructor = barmatz.forms.ui.Wo
 
 Object.defineProperties(barmatz.forms.ui.WorkspaceController.prototype,
 {
-	__addItemModelToView: {value: function(model)
+	_addItemModelToView: {value: function(model)
 	{
 		barmatz.utils.DataTypes.isNotUndefined(model);
 		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.mvc.Model);
-		barmatz.forms.CollectionController.__addItemModelToView(model);
-		barmatz.utils.CSS.verticalAlignChildren(this._view);
+		barmatz.forms.CollectionController.prototype._addItemModelToView.call(this, model);
 	}},
 	_createItemViewFromModel: {value: function(model)
 	{
@@ -77,6 +76,7 @@ Object.defineProperties(barmatz.forms.ui.WorkspaceController.prototype,
 		viewWrapper = barmatz.forms.factories.DOMFactory.createWorkspaceItemWrapper(model);
 		viewWrapper.deleteButton.addEventListener('click', onDeleteButtonClick);
 		barmatz.forms.factories.ControllerFactory.createWorkspaceItemController(model, viewWrapper.label, viewWrapper.field, viewWrapper.mandatory, viewWrapper.deleteButton);
+		barmatz.utils.CSS.verticalAlignChildren(viewWrapper.wrapper);
 		return viewWrapper.wrapper;
 		
 		function onDeleteButtonClick(event)

@@ -22,6 +22,9 @@ window.barmatz.forms.ui.WorkspaceItemController = function(model, labelView, fie
 
 		switch(event.key)
 		{
+			default:
+				throw new Error('unknown key');
+				break;
 			case 'name':
 				fieldView.name = event.value;
 				break;
@@ -31,7 +34,7 @@ window.barmatz.forms.ui.WorkspaceItemController = function(model, labelView, fie
 			case 'mandatory':
 				mandatoryView.innerHTML = event.value ? '*' : '';
 				break;
-			case 'defaultValue':
+			case 'default':
 				fieldView.defaultValue = event.value;
 				break;
 			case 'value':

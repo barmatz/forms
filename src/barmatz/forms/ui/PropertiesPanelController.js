@@ -57,7 +57,7 @@ Object.defineProperties(barmatz.forms.ui.PropertiesPanelController.prototype,
 				case 'mandatory':
 					itemsWrapper.mandatoryField.value = event.value ? 'yes' : 'no';
 					break;
-				case 'defaultValue':
+				case 'default':
 					itemsWrapper.defaultValueField.value = event.value;
 					break;
 				case 'value':
