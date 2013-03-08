@@ -32,5 +32,17 @@ Object.defineProperties(barmatz.forms.fields.FormCheckboxFieldModel.prototype,
 	value: {get: function()
 	{
 		return this.checked ? this.get('value') : null;
+	}},
+	clone: {value: function()
+	{
+		var clone = new barmatz.forms.fields.FormCheckboxFieldModel(this.name);
+		clone.label = this.label;
+		clone.mandatory = this.mandatory;
+		clone.default = this.default;
+		clone.value = this.value;
+		clone.enabled = this.enabled;
+		clone.checked = this.checked;
+		clone.defaultChecked = this.defaultChecked;
+		return clone;
 	}}
 });

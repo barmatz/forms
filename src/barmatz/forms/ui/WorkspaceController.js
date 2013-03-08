@@ -32,15 +32,6 @@ window.barmatz.forms.ui.WorkspaceController = function(model, view)
 		jQuery(dialogWarpper.wrapper).dialog('open');
 		
 		barmatz.forms.factories.ControllerFactory.createJQueryPromptDialogController(model, dialogWarpper.wrapper, dialogWarpper.nameField);
-		
-		/*function(dialog, nameField)
-		{
-			if(nameField.value)
-			{
-				model.name = nameField.value;
-				barmatz.forms.factories.DOMFactory.destroyDialog(dialog);
-			}
-		});*/
 	}
 	
 	function onSortingStart(event, ui)
@@ -59,7 +50,7 @@ window.barmatz.forms.ui.WorkspaceController = function(model, view)
 		barmatz.utils.DataTypes.isNotUndefined(event);
 		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.CollectionEvent);
 		setViewToSortable();
-		
+
 		if(!event.item.name)
 			openNewFieldDialog(event.item);
 	}

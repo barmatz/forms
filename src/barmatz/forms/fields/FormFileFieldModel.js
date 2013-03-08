@@ -21,5 +21,16 @@ Object.defineProperties(barmatz.forms.fields.FormFileFieldModel.prototype,
 	{
 		barmatz.utils.DataTypes.isInstanceOf(value, Array);
 		this.set('accept', value);
+	}},
+	clone: {value: function()
+	{
+		var clone = new barmatz.forms.fields.FormFileFieldModel(this.name);
+		clone.label = this.label;
+		clone.mandatory = this.mandatory;
+		clone.default = this.default;
+		clone.value = this.value;
+		clone.enabled = this.enabled;
+		clone.accept = this.accept;
+		return clone;
 	}}
 });

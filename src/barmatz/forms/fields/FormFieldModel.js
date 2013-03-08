@@ -7,7 +7,7 @@ window.barmatz.forms.fields.FormFieldModel = function(type, name)
 	barmatz.utils.DataTypes.isTypeOf(name, 'string', true);
 	barmatz.forms.TypeModel.call(this, type);
 	this.set('name', name);
-	this.set('label', null);
+	this.set('label', '');
 	this.set('mandatory', false);
 	this.set('default', '');
 	this.set('value', '');
@@ -65,5 +65,15 @@ Object.defineProperties(barmatz.forms.fields.FormFieldModel.prototype,
 	{
 		barmatz.utils.DataTypes.isTypeOf(value, 'boolean');
 		this.set('enabled', Boolean(value));
+	}},
+	clone: {value: function()
+	{
+		var clone = new barmatz.forms.fields.FormFieldModel(this.type, this.name);
+		clone.label = this.label;
+		clone.mandatory = this.mandatory;
+		clone.default = this.default;
+		clone.value = this.value;
+		clone.enabled = this.enabled;
+		return clone;
 	}}
 });

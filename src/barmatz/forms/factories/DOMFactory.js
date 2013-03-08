@@ -158,45 +158,70 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		
 		return {wrapper: fieldWrapper.wrapper, label: fieldWrapper.label, field: fieldWrapper.field, mandatory: fieldWrapper.mandatory, deleteButton: deleteButton};
 	}},
-	createPropertiesPanelItem: {value: function(model)
+	createPropertiesPanelItemWarpper: {value: function(model)
 	{
-		var wrapper;
+		var _this, returnWrapper, wrapper;
 		
 		barmatz.utils.DataTypes.isNotUndefined(model);
 		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FormFieldModel);
 		
+		_this = this;
+		returnWrapper = {};
+		
 		wrapper = this.createElement('div');
 		wrapper.appendChild(this.createElementWithContent('div', 'forms-header', barmatz.utils.String.firstLetterToUpperCase(model.type)));
 		
+		returnWrapper.wrapper = wrapper;
+		
 		if(model instanceof barmatz.forms.fields.FormFieldModel)
 		{
-			wrapper.appendChild(this.createPropertiesPanelItemField('string', 'name', 'name', model.name, onFieldValueChange));
-			wrapper.appendChild(this.createPropertiesPanelItemField('string', 'label', 'label', model.label, onFieldValueChange));
-			wrapper.appendChild(this.createPropertiesPanelItemField('boolean', 'mandatory', 'mandatory', model.mandatory, onFieldValueChange));
-			wrapper.appendChild(this.createPropertiesPanelItemField('string', 'default', 'default value', model.default, onFieldValueChange));
-			wrapper.appendChild(this.createPropertiesPanelItemField('string', 'value', 'value', model.value, onFieldValueChange));
-			wrapper.appendChild(this.createPropertiesPanelItemField('boolean', 'enabled', 'enabled', model.enabled, onFieldValueChange));
+			returnWrapper.nameField = addFieldToWrapper('string', 'name', 'name', model.name);
+			returnWrapper.labelField = addFieldToWrapper('string', 'label', 'label', model.label);
+			returnWrapper.mandatoryField = addFieldToWrapper('boolean', 'mandatory', 'mandatory', model.mandatory);
+			returnWrapper.defaultValueField = addFieldToWrapper('string', 'default', 'default value', model.default);
+			returnWrapper.valueField = addFieldToWrapper('string', 'value', 'value', model.value);
+			returnWrapper.enabledField = addFieldToWrapper('boolean', 'enabled', 'enabled', model.enabled);
 		}
 		
 		if(model instanceof barmatz.forms.fields.FormFileFieldModel)
-			wrapper.appendChild(this.createPropertiesPanelItemField('string', 'accept', 'accept', model.accept, onFieldValueChange));
+			returnWrapper.acceptField = addFieldToWrapper('string', 'accept', 'accept', model.accept);
 
 		if(model instanceof barmatz.forms.fields.FormTextFieldModel)
 		{
-			wrapper.appendChild(this.createPropertiesPanelItemField('string', 'min', 'min', model.min, onFieldValueChange));
-			wrapper.appendChild(this.createPropertiesPanelItemField('string', 'max', 'max', model.max, onFieldValueChange));
+			returnWrapper.minField = addFieldToWrapper('string', 'min', 'min', model.min);
+			returnWrapper.maxField = addFieldToWrapper('string', 'max', 'max', model.max);
 		}
 		
 		if(model instanceof barmatz.forms.fields.FormCheckboxFieldModel)
 		{
-			wrapper.appendChild(this.createPropertiesPanelItemField('boolean', 'checked', 'checked', model.checked, onFieldValueChange));
-			wrapper.appendChild(this.createPropertiesPanelItemField('boolean', 'default checked', 'defaultChecked', model.defaultChecked, onFieldValueChange));
+			returnWrapper.checkedField = addFieldToWrapper('boolean', 'checked', 'checked', model.checked);
+			returnWrapper.defaultCheckedField = addFieldToWrapper('boolean', 'default checked', 'defaultChecked', model.defaultChecked);
 		}
 		
-		return wrapper;
+		return returnWrapper;
+		
+		function addFieldToWrapper(type, name, label, value)
+		{
+			var fieldWrapper;
+			
+			barmatz.utils.DataTypes.isNotUndefined(type);
+			barmatz.utils.DataTypes.isNotUndefined(name);
+			barmatz.utils.DataTypes.isNotUndefined(label);
+			barmatz.utils.DataTypes.isNotUndefined(value);
+			barmatz.utils.DataTypes.isTypeOf(type, 'string');
+			barmatz.utils.DataTypes.isTypeOf(name, 'string');
+			barmatz.utils.DataTypes.isTypeOf(label, 'string');
+
+			fieldWrapper = _this.createPropertiesPanelItemFieldWrapper(type, name, label, value, onFieldValueChange);
+			wrapper.appendChild(fieldWrapper.wrapper);
+			return fieldWrapper.field;
+		}
 		
 		function onFieldValueChange(event)
 		{
+			barmatz.utils.DataTypes.isNotUndefined(event);
+			barmatz.utils.DataTypes.isInstanceOf(event, Event);
+
 			try
 			{
 				model[event.target.name] = event.target.value;
@@ -214,7 +239,7 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 			}
 		}
 	}},
-	createPropertiesPanelItemField: {value: function(type, name, label, value, changeHandler)
+	createPropertiesPanelItemFieldWrapper: {value: function(type, name, label, value, changeHandler)
 	{
 		var field;
 		
@@ -236,7 +261,7 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 			case 'string':
 				field = this.createElement('input');
 				field.type = 'text';
-				field.value = value;
+				field.value = isNaN(value) ? '' : value;
 				break;
 			case 'boolean':
 				field = this.createElement('select');
@@ -249,7 +274,7 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		field.name = name;
 		field.addEventListener('change', changeHandler);
 
-		return this.createElementWithContent('div', 'forms-item', [this.createElementWithContent('label', '', label), field]);
+		return {wrapper: this.createElementWithContent('div', 'forms-item', [this.createElementWithContent('label', '', label), field]), field: field};
 	}},
 	createDialog: {value: function(title, content, container)
 	{

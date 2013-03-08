@@ -68,7 +68,7 @@ window.barmatz.forms.ui.BuilderController = function(toolboxModel, toolboxView, 
 	{
 		barmatz.utils.DataTypes.isNotUndefined(event);
 		barmatz.utils.DataTypes.isInstanceOf(event, MouseEvent);
-		workspaceModel.addItem(toolboxModel.getRefItem(toolboxModel.getItemAt(getIndexOfView(event.target))));
+		workspaceModel.addItem(toolboxModel.getFieldModelAt(getIndexOfView(event.target)).clone());
 		event.stopImmediatePropagation();
 		workspaceView.addEventListener('click', onWorkspaceViewClick);
 	}

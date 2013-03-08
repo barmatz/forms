@@ -2,7 +2,7 @@
 window.barmatz.forms.ui.ToolboxModel = function()
 {
 	barmatz.forms.CollectionModel.call(this);
-	this._refDictionary = new barmatz.utils.Dictionary();
+	this._fieldDictionary = new barmatz.utils.Dictionary();
 };
 
 barmatz.forms.ui.ToolboxModel.prototype = new barmatz.forms.CollectionModel();
@@ -10,21 +10,21 @@ barmatz.forms.ui.ToolboxModel.prototype.constructor = barmatz.forms.ui.ToolboxMo
 
 Object.defineProperties(barmatz.forms.ui.ToolboxModel.prototype,
 {
-	addItem: {value: function(item, ref)
+	addItem: {value: function(item, fieldModel)
 	{
 		barmatz.utils.DataTypes.isNotUndefined(item);
+		barmatz.utils.DataTypes.isNotUndefined(fieldModel);
 		barmatz.utils.DataTypes.isInstanceOf(item, barmatz.forms.ui.ToolboxItemModel);
-		barmatz.utils.DataTypes.isNotUndefined(ref);
-		barmatz.utils.DataTypes.isInstanceOf(ref, barmatz.forms.fields.FormFieldModel);
+		barmatz.utils.DataTypes.isInstanceOf(fieldModel, barmatz.forms.fields.FormFieldModel);
 		barmatz.forms.CollectionModel.prototype.addItem.call(this, item);
-		this._refDictionary.add(item, ref);
+		this._fieldDictionary.add(item, fieldModel);
 	}},
 	removeItem: {value: function(item)
 	{
 		barmatz.utils.DataTypes.isNotUndefined(item);
 		barmatz.utils.DataTypes.isInstanceOf(item, barmatz.forms.ui.ToolboxItemModel);
 		barmatz.forms.CollectionModel.prototype.removeItem.call(this, item);
-		this._refDictionary.remove(item);
+		this._fieldDictionary.remove(item);
 	}},
 	getItemIndex: {value: function(item)
 	{
@@ -32,10 +32,16 @@ Object.defineProperties(barmatz.forms.ui.ToolboxModel.prototype,
 		barmatz.utils.DataTypes.isInstanceOf(item, barmatz.forms.ui.ToolboxItemModel);
 		barmatz.forms.CollectionModel.prototype.getItemIndex.call(this, item);
 	}},
-	getRefItem: {value: function(item)
+	getFieldModel: {value: function(item)
 	{
 		barmatz.utils.DataTypes.isNotUndefined(item);
 		barmatz.utils.DataTypes.isInstanceOf(item, barmatz.forms.ui.ToolboxItemModel);
-		return this._refDictionary.get(item);
+		return this._fieldDictionary.get(item);
+	}},
+	getFieldModelAt: {value: function(index)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(index);
+		barmatz.utils.DataTypes.isTypeOf(index, 'number');
+		return this.getFieldModel(this.getItemAt(index));
 	}}
 });

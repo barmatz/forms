@@ -4,8 +4,8 @@ window.barmatz.forms.fields.FormTextFieldModel = function(name)
 	barmatz.utils.DataTypes.isNotUndefined(name);
 	barmatz.utils.DataTypes.isTypeOf(name, 'string', true);
 	barmatz.forms.fields.FormFieldModel.call(this, barmatz.forms.fields.FormFieldTypes.TEXT, name);
-	this.set('min', null);
-	this.set('max', null);
+	this.set('min', NaN);
+	this.set('max', NaN);
 };
 
 barmatz.forms.fields.FormTextFieldModel.prototype = new barmatz.forms.fields.FormFieldModel(null, null);
@@ -28,5 +28,17 @@ Object.defineProperties(barmatz.forms.fields.FormTextFieldModel.prototype,
 	{
 		barmatz.utils.DataTypes.isTypeOf(value, 'number');
 		this.set('max', value);
+	}},
+	clone: {value: function()
+	{
+		var clone = new barmatz.forms.fields.FormTextFieldModel(this.name);
+		clone.label = this.label;
+		clone.mandatory = this.mandatory;
+		clone.default = this.default;
+		clone.value = this.value;
+		clone.enabled = this.enabled;
+		clone.min = this.min;
+		clone.max = this.max;
+		return clone;
 	}}
 });

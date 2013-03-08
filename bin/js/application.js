@@ -864,7 +864,7 @@ window.barmatz.forms.fields.FormFieldModel = function(type, name)
 	barmatz.utils.DataTypes.isTypeOf(name, 'string', true);
 	barmatz.forms.TypeModel.call(this, type);
 	this.set('name', name);
-	this.set('label', null);
+	this.set('label', '');
 	this.set('mandatory', false);
 	this.set('default', '');
 	this.set('value', '');
@@ -922,6 +922,16 @@ Object.defineProperties(barmatz.forms.fields.FormFieldModel.prototype,
 	{
 		barmatz.utils.DataTypes.isTypeOf(value, 'boolean');
 		this.set('enabled', Boolean(value));
+	}},
+	clone: {value: function()
+	{
+		var clone = new barmatz.forms.fields.FormFieldModel(this.type, this.name);
+		clone.label = this.label;
+		clone.mandatory = this.mandatory;
+		clone.default = this.default;
+		clone.value = this.value;
+		clone.enabled = this.enabled;
+		return clone;
 	}}
 });
 /** barmatz.forms.fields.FormTextFieldModel **/
@@ -930,8 +940,8 @@ window.barmatz.forms.fields.FormTextFieldModel = function(name)
 	barmatz.utils.DataTypes.isNotUndefined(name);
 	barmatz.utils.DataTypes.isTypeOf(name, 'string', true);
 	barmatz.forms.fields.FormFieldModel.call(this, barmatz.forms.fields.FormFieldTypes.TEXT, name);
-	this.set('min', null);
-	this.set('max', null);
+	this.set('min', NaN);
+	this.set('max', NaN);
 };
 
 barmatz.forms.fields.FormTextFieldModel.prototype = new barmatz.forms.fields.FormFieldModel(null, null);
@@ -954,6 +964,18 @@ Object.defineProperties(barmatz.forms.fields.FormTextFieldModel.prototype,
 	{
 		barmatz.utils.DataTypes.isTypeOf(value, 'number');
 		this.set('max', value);
+	}},
+	clone: {value: function()
+	{
+		var clone = new barmatz.forms.fields.FormTextFieldModel(this.name);
+		clone.label = this.label;
+		clone.mandatory = this.mandatory;
+		clone.default = this.default;
+		clone.value = this.value;
+		clone.enabled = this.enabled;
+		clone.min = this.min;
+		clone.max = this.max;
+		return clone;
 	}}
 });
 /** barmatz.forms.fields.FormCheckboxFieldModel **/
@@ -990,6 +1012,18 @@ Object.defineProperties(barmatz.forms.fields.FormCheckboxFieldModel.prototype,
 	value: {get: function()
 	{
 		return this.checked ? this.get('value') : null;
+	}},
+	clone: {value: function()
+	{
+		var clone = new barmatz.forms.fields.FormCheckboxFieldModel(this.name);
+		clone.label = this.label;
+		clone.mandatory = this.mandatory;
+		clone.default = this.default;
+		clone.value = this.value;
+		clone.enabled = this.enabled;
+		clone.checked = this.checked;
+		clone.defaultChecked = this.defaultChecked;
+		return clone;
 	}}
 });
 /** barmatz.forms.fields.FormFieldTypes **/
@@ -1027,6 +1061,17 @@ Object.defineProperties(barmatz.forms.fields.FormFileFieldModel.prototype,
 	{
 		barmatz.utils.DataTypes.isInstanceOf(value, Array);
 		this.set('accept', value);
+	}},
+	clone: {value: function()
+	{
+		var clone = new barmatz.forms.fields.FormFileFieldModel(this.name);
+		clone.label = this.label;
+		clone.mandatory = this.mandatory;
+		clone.default = this.default;
+		clone.value = this.value;
+		clone.enabled = this.enabled;
+		clone.accept = this.accept;
+		return clone;
 	}}
 });
 /** barmatz.forms.fields.FormHiddenFieldModel **/
@@ -1039,6 +1084,20 @@ window.barmatz.forms.fields.FormHiddenFieldModel = function(name)
 
 barmatz.forms.fields.FormHiddenFieldModel.prototype = new barmatz.forms.fields.FormFieldModel(null, null);
 barmatz.forms.fields.FormHiddenFieldModel.prototype.constructor = barmatz.forms.fields.FormHiddenFieldModel;
+
+Object.defineProperties(barmatz.forms.fields.FormHiddenFieldModel.prototype,
+{
+	clone: {value: function()
+	{
+		var clone = new barmatz.forms.fields.FormHiddenFieldModel(this.name);
+		clone.label = this.label;
+		clone.mandatory = this.mandatory;
+		clone.default = this.default;
+		clone.value = this.value;
+		clone.enabled = this.enabled;
+		return clone;
+	}}	
+});
 /** barmatz.forms.fields.FormPasswordFieldModel **/
 window.barmatz.forms.fields.FormPasswordFieldModel = function(name)
 {
@@ -1050,6 +1109,20 @@ window.barmatz.forms.fields.FormPasswordFieldModel = function(name)
 
 barmatz.forms.fields.FormPasswordFieldModel.prototype = new barmatz.forms.fields.FormTextFieldModel(null);
 barmatz.forms.fields.FormPasswordFieldModel.prototype.constructor = barmatz.forms.fields.FormPasswordFieldModel;
+
+Object.defineProperties(barmatz.forms.fields.FormPasswordFieldModel.prototype,
+{
+	clone: {value: function()
+	{
+		var clone = new barmatz.forms.fields.FormPasswordFieldModel(this.name);
+		clone.label = this.label;
+		clone.mandatory = this.mandatory;
+		clone.default = this.default;
+		clone.value = this.value;
+		clone.enabled = this.enabled;
+		return clone;
+	}}
+});
 /** barmatz.forms.fields.FormRadioFieldModel **/
 window.barmatz.forms.fields.FormRadioFieldModel = function(name)
 {
@@ -1061,6 +1134,20 @@ window.barmatz.forms.fields.FormRadioFieldModel = function(name)
 
 barmatz.forms.fields.FormRadioFieldModel.prototype = new barmatz.forms.fields.FormCheckboxFieldModel(null);
 barmatz.forms.fields.FormRadioFieldModel.prototype.constructor = barmatz.forms.fields.FormRadioFieldModel;
+
+Object.defineProperties(barmatz.forms.fields.FormRadioFieldModel.prototype,
+{
+	clone: {value: function()
+	{
+		var clone = new barmatz.forms.fields.FormRadioFieldModel(this.name);
+		clone.label = this.label;
+		clone.mandatory = this.mandatory;
+		clone.default = this.default;
+		clone.value = this.value;
+		clone.enabled = this.enabled;
+		return clone;
+	}}
+});
 /** barmatz.forms.ui.DialogController **/
 window.barmatz.forms.ui.DialogController = function(model, view)
 {
@@ -1221,7 +1308,7 @@ window.barmatz.forms.ui.BuilderController = function(toolboxModel, toolboxView, 
 	{
 		barmatz.utils.DataTypes.isNotUndefined(event);
 		barmatz.utils.DataTypes.isInstanceOf(event, MouseEvent);
-		workspaceModel.addItem(toolboxModel.getRefItem(toolboxModel.getItemAt(getIndexOfView(event.target))));
+		workspaceModel.addItem(toolboxModel.getFieldModelAt(getIndexOfView(event.target)).clone());
 		event.stopImmediatePropagation();
 		workspaceView.addEventListener('click', onWorkspaceViewClick);
 	}
@@ -1399,17 +1486,71 @@ Object.defineProperties(barmatz.forms.ui.PropertiesPanelController.prototype,
 		return this._model;
 	}, set: function(value)
 	{
+		var itemsWrapper;
+		
 		barmatz.utils.DataTypes.isInstanceOf(value, barmatz.forms.fields.FormFieldModel, true);
+		
+		if(this._model)
+			this._model.removeEventListener(barmatz.events.ModelEvent.VALUE_CHANGED, onModelValueChanged);
 		
 		this._model = value;
 		
 		if(this._model)
 		{
+			itemsWrapper = barmatz.forms.factories.DOMFactory.createPropertiesPanelItemWarpper(this._model);
+			
+			this._model.addEventListener(barmatz.events.ModelEvent.VALUE_CHANGED, onModelValueChanged);
 			this._view.innerHTML = '';
-			this._view.appendChild(barmatz.forms.factories.DOMFactory.createPropertiesPanelItem(this._model));
+			this._view.appendChild(itemsWrapper.wrapper);
 		}
 		else
 			this._view.innerHTML = 'No item selected';
+		
+		function onModelValueChanged(event)
+		{
+			barmatz.utils.DataTypes.isNotUndefined(event);
+			barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.ModelEvent);
+			
+			switch(event.key)
+			{
+				default:
+					throw new Error('unknown key');
+					break;
+				case 'name':
+					itemsWrapper.nameField.value = event.value;
+					break;
+				case 'label':
+					itemsWrapper.labelField.value = event.value;
+					break;
+				case 'mandatory':
+					itemsWrapper.mandatoryField.value = event.value ? 'yes' : 'no';
+					break;
+				case 'defaultValue':
+					itemsWrapper.defaultValueField.value = event.value;
+					break;
+				case 'value':
+					itemsWrapper.valueField.value = event.value;
+					break;
+				case 'enabled':
+					itemsWrapper.enabledField.value = event.value ? 'yes' : 'no';
+					break;
+				case 'min':
+					itemsWrapper.minField.value = isNaN(event.value) ? '' : event.value;
+					break;
+				case 'max':
+					itemsWrapper.maxField.value = isNaN(event.value) ? '' : event.value;
+					break;
+				case 'checked':
+					itemsWrapper.checkedField.value = event.value;
+					break;
+				case 'defaultChecked':
+					itemsWrapper.defaultCheckedField.value = event.value;
+					break;
+				case 'accept':
+					itemsWrapper.acceptField.value = event.value;
+					break;
+			}
+		}
 	}}
 });
 /** barmatz.forms.ui.ToolboxController **/
@@ -1459,7 +1600,7 @@ Object.defineProperties(barmatz.forms.ui.ToolboxItemModel.prototype,
 window.barmatz.forms.ui.ToolboxModel = function()
 {
 	barmatz.forms.CollectionModel.call(this);
-	this._refDictionary = new barmatz.utils.Dictionary();
+	this._fieldDictionary = new barmatz.utils.Dictionary();
 };
 
 barmatz.forms.ui.ToolboxModel.prototype = new barmatz.forms.CollectionModel();
@@ -1467,21 +1608,21 @@ barmatz.forms.ui.ToolboxModel.prototype.constructor = barmatz.forms.ui.ToolboxMo
 
 Object.defineProperties(barmatz.forms.ui.ToolboxModel.prototype,
 {
-	addItem: {value: function(item, ref)
+	addItem: {value: function(item, fieldModel)
 	{
 		barmatz.utils.DataTypes.isNotUndefined(item);
+		barmatz.utils.DataTypes.isNotUndefined(fieldModel);
 		barmatz.utils.DataTypes.isInstanceOf(item, barmatz.forms.ui.ToolboxItemModel);
-		barmatz.utils.DataTypes.isNotUndefined(ref);
-		barmatz.utils.DataTypes.isInstanceOf(ref, barmatz.forms.fields.FormFieldModel);
+		barmatz.utils.DataTypes.isInstanceOf(fieldModel, barmatz.forms.fields.FormFieldModel);
 		barmatz.forms.CollectionModel.prototype.addItem.call(this, item);
-		this._refDictionary.add(item, ref);
+		this._fieldDictionary.add(item, fieldModel);
 	}},
 	removeItem: {value: function(item)
 	{
 		barmatz.utils.DataTypes.isNotUndefined(item);
 		barmatz.utils.DataTypes.isInstanceOf(item, barmatz.forms.ui.ToolboxItemModel);
 		barmatz.forms.CollectionModel.prototype.removeItem.call(this, item);
-		this._refDictionary.remove(item);
+		this._fieldDictionary.remove(item);
 	}},
 	getItemIndex: {value: function(item)
 	{
@@ -1489,11 +1630,17 @@ Object.defineProperties(barmatz.forms.ui.ToolboxModel.prototype,
 		barmatz.utils.DataTypes.isInstanceOf(item, barmatz.forms.ui.ToolboxItemModel);
 		barmatz.forms.CollectionModel.prototype.getItemIndex.call(this, item);
 	}},
-	getRefItem: {value: function(item)
+	getFieldModel: {value: function(item)
 	{
 		barmatz.utils.DataTypes.isNotUndefined(item);
 		barmatz.utils.DataTypes.isInstanceOf(item, barmatz.forms.ui.ToolboxItemModel);
-		return this._refDictionary.get(item);
+		return this._fieldDictionary.get(item);
+	}},
+	getFieldModelAt: {value: function(index)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(index);
+		barmatz.utils.DataTypes.isTypeOf(index, 'number');
+		return this.getFieldModel(this.getItemAt(index));
 	}}
 });
 /** barmatz.forms.ui.WorkspaceController **/
@@ -1530,15 +1677,6 @@ window.barmatz.forms.ui.WorkspaceController = function(model, view)
 		jQuery(dialogWarpper.wrapper).dialog('open');
 		
 		barmatz.forms.factories.ControllerFactory.createJQueryPromptDialogController(model, dialogWarpper.wrapper, dialogWarpper.nameField);
-		
-		/*function(dialog, nameField)
-		{
-			if(nameField.value)
-			{
-				model.name = nameField.value;
-				barmatz.forms.factories.DOMFactory.destroyDialog(dialog);
-			}
-		});*/
 	}
 	
 	function onSortingStart(event, ui)
@@ -1557,7 +1695,7 @@ window.barmatz.forms.ui.WorkspaceController = function(model, view)
 		barmatz.utils.DataTypes.isNotUndefined(event);
 		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.CollectionEvent);
 		setViewToSortable();
-		
+
 		if(!event.item.name)
 			openNewFieldDialog(event.item);
 	}
@@ -2125,45 +2263,70 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		
 		return {wrapper: fieldWrapper.wrapper, label: fieldWrapper.label, field: fieldWrapper.field, mandatory: fieldWrapper.mandatory, deleteButton: deleteButton};
 	}},
-	createPropertiesPanelItem: {value: function(model)
+	createPropertiesPanelItemWarpper: {value: function(model)
 	{
-		var wrapper;
+		var _this, returnWrapper, wrapper;
 		
 		barmatz.utils.DataTypes.isNotUndefined(model);
 		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FormFieldModel);
 		
+		_this = this;
+		returnWrapper = {};
+		
 		wrapper = this.createElement('div');
 		wrapper.appendChild(this.createElementWithContent('div', 'forms-header', barmatz.utils.String.firstLetterToUpperCase(model.type)));
 		
+		returnWrapper.wrapper = wrapper;
+		
 		if(model instanceof barmatz.forms.fields.FormFieldModel)
 		{
-			wrapper.appendChild(this.createPropertiesPanelItemField('string', 'name', 'name', model.name, onFieldValueChange));
-			wrapper.appendChild(this.createPropertiesPanelItemField('string', 'label', 'label', model.label, onFieldValueChange));
-			wrapper.appendChild(this.createPropertiesPanelItemField('boolean', 'mandatory', 'mandatory', model.mandatory, onFieldValueChange));
-			wrapper.appendChild(this.createPropertiesPanelItemField('string', 'default', 'default value', model.default, onFieldValueChange));
-			wrapper.appendChild(this.createPropertiesPanelItemField('string', 'value', 'value', model.value, onFieldValueChange));
-			wrapper.appendChild(this.createPropertiesPanelItemField('boolean', 'enabled', 'enabled', model.enabled, onFieldValueChange));
+			returnWrapper.nameField = addFieldToWrapper('string', 'name', 'name', model.name);
+			returnWrapper.labelField = addFieldToWrapper('string', 'label', 'label', model.label);
+			returnWrapper.mandatoryField = addFieldToWrapper('boolean', 'mandatory', 'mandatory', model.mandatory);
+			returnWrapper.defaultValueField = addFieldToWrapper('string', 'default', 'default value', model.default);
+			returnWrapper.valueField = addFieldToWrapper('string', 'value', 'value', model.value);
+			returnWrapper.enabledField = addFieldToWrapper('boolean', 'enabled', 'enabled', model.enabled);
 		}
 		
 		if(model instanceof barmatz.forms.fields.FormFileFieldModel)
-			wrapper.appendChild(this.createPropertiesPanelItemField('string', 'accept', 'accept', model.accept, onFieldValueChange));
+			returnWrapper.acceptField = addFieldToWrapper('string', 'accept', 'accept', model.accept);
 
 		if(model instanceof barmatz.forms.fields.FormTextFieldModel)
 		{
-			wrapper.appendChild(this.createPropertiesPanelItemField('string', 'min', 'min', model.min, onFieldValueChange));
-			wrapper.appendChild(this.createPropertiesPanelItemField('string', 'max', 'max', model.max, onFieldValueChange));
+			returnWrapper.minField = addFieldToWrapper('string', 'min', 'min', model.min);
+			returnWrapper.maxField = addFieldToWrapper('string', 'max', 'max', model.max);
 		}
 		
 		if(model instanceof barmatz.forms.fields.FormCheckboxFieldModel)
 		{
-			wrapper.appendChild(this.createPropertiesPanelItemField('boolean', 'checked', 'checked', model.checked, onFieldValueChange));
-			wrapper.appendChild(this.createPropertiesPanelItemField('boolean', 'default checked', 'defaultChecked', model.defaultChecked, onFieldValueChange));
+			returnWrapper.checkedField = addFieldToWrapper('boolean', 'checked', 'checked', model.checked);
+			returnWrapper.defaultCheckedField = addFieldToWrapper('boolean', 'default checked', 'defaultChecked', model.defaultChecked);
 		}
 		
-		return wrapper;
+		return returnWrapper;
+		
+		function addFieldToWrapper(type, name, label, value)
+		{
+			var fieldWrapper;
+			
+			barmatz.utils.DataTypes.isNotUndefined(type);
+			barmatz.utils.DataTypes.isNotUndefined(name);
+			barmatz.utils.DataTypes.isNotUndefined(label);
+			barmatz.utils.DataTypes.isNotUndefined(value);
+			barmatz.utils.DataTypes.isTypeOf(type, 'string');
+			barmatz.utils.DataTypes.isTypeOf(name, 'string');
+			barmatz.utils.DataTypes.isTypeOf(label, 'string');
+
+			fieldWrapper = _this.createPropertiesPanelItemFieldWrapper(type, name, label, value, onFieldValueChange);
+			wrapper.appendChild(fieldWrapper.wrapper);
+			return fieldWrapper.field;
+		}
 		
 		function onFieldValueChange(event)
 		{
+			barmatz.utils.DataTypes.isNotUndefined(event);
+			barmatz.utils.DataTypes.isInstanceOf(event, Event);
+
 			try
 			{
 				model[event.target.name] = event.target.value;
@@ -2181,7 +2344,7 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 			}
 		}
 	}},
-	createPropertiesPanelItemField: {value: function(type, name, label, value, changeHandler)
+	createPropertiesPanelItemFieldWrapper: {value: function(type, name, label, value, changeHandler)
 	{
 		var field;
 		
@@ -2203,7 +2366,7 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 			case 'string':
 				field = this.createElement('input');
 				field.type = 'text';
-				field.value = value;
+				field.value = isNaN(value) ? '' : value;
 				break;
 			case 'boolean':
 				field = this.createElement('select');
@@ -2216,7 +2379,7 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		field.name = name;
 		field.addEventListener('change', changeHandler);
 
-		return this.createElementWithContent('div', 'forms-item', [this.createElementWithContent('label', '', label), field]);
+		return {wrapper: this.createElementWithContent('div', 'forms-item', [this.createElementWithContent('label', '', label), field]), field: field};
 	}},
 	createDialog: {value: function(title, content, container)
 	{
