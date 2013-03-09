@@ -1846,17 +1846,17 @@ Object.defineProperties(barmatz.forms.ui.PropertiesPanelController.prototype,
 			this._model.removeEventListener(barmatz.events.ModelEvent.VALUE_CHANGED, onModelValueChanged);
 		
 		this._model = value;
+		this._view.innerHTML = '';
 		
 		if(this._model)
 		{
 			itemsWrapper = barmatz.forms.factories.DOMFactory.createPropertiesPanelItemWarpper(this._model);
 			
 			this._model.addEventListener(barmatz.events.ModelEvent.VALUE_CHANGED, onModelValueChanged);
-			this._view.innerHTML = '';
 			this._view.appendChild(itemsWrapper.wrapper);
 		}
 		else
-			this._view.innerHTML = 'No item selected';
+			this._view.appendChild(barmatz.forms.factories.DOMFactory.createElementWithContent('h2', 'forms-filler', 'No item selected'));
 		
 		function onModelValueChanged(event)
 		{
@@ -2616,10 +2616,18 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 	{
 		return this.createElement('ul', 'forms-builder-menu');
 	}},
-	createBuilderWorkspaceWrapper: {value: function()
+	createBuilderWorkspaceWrapper: {value: function(formName, saveStatus)
 	{
-		var workspace = this.createElement('table', 'forms-builder-workspace');
-		return {wrapper: this.createElementWithContent('div', 'forms-builder-workspace-wrapper', workspace), workspace: workspace};
+		var formNameElement, saveStatusElement, workspaceElement;
+		
+		barmatz.utils.DataTypes.isTypeOf(formName, 'string', true);
+		barmatz.utils.DataTypes.isTypeOf(saveStatus, 'string', true);
+		
+		formNameElement = this.createElementWithContent('h1', 'forms-builder-workspace-header-form-name', formName || 'Unnamed form');
+		saveStatusElement = this.createElementWithContent('h3', 'forms-builder-workspace-header-save-status', saveStatus || 'form not saved');
+		workspaceElement = this.createElement('table', 'forms-builder-workspace');
+
+		return {wrapper: this.createElementWithContent('div', 'forms-builder-workspace-wrapper', [this.createElementWithContent('div', 'forms-builder-workspace-header', [formNameElement, saveStatusElement]), workspaceElement]), formName: formNameElement, saveStatus: saveStatusElement, workspace: workspaceElement};
 	}},
 	createBuilderPropertiesPanel: {value: function()
 	{
@@ -2671,6 +2679,7 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		field = this.createFormFieldElement(model);
 		mandatory = this.createElementWithContent('span', 'forms-workspace-item-mandatory', mandatory ? '*' : '');
 		deleteButton = this.createElement('span', 'forms-delete ui-icon ui-icon-circle-close');
+		jQuery(deleteButton).button();
 		
 		addToWrapper('forms-workspace-item-grip', grip);
 		addToWrapper('forms-workspace-item-label', label);
@@ -2698,7 +2707,7 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		returnWrapper = {};
 		
 		wrapper = this.createElement('div');
-		wrapper.appendChild(this.createElementWithContent('div', 'forms-header', barmatz.utils.String.firstLetterToUpperCase(model.type)));
+		wrapper.appendChild(this.createElementWithContent('h2', 'forms-header', barmatz.utils.String.firstLetterToUpperCase(model.type) + ' field'));
 		
 		returnWrapper.wrapper = wrapper;
 		

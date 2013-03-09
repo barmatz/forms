@@ -26,17 +26,17 @@ Object.defineProperties(barmatz.forms.ui.PropertiesPanelController.prototype,
 			this._model.removeEventListener(barmatz.events.ModelEvent.VALUE_CHANGED, onModelValueChanged);
 		
 		this._model = value;
+		this._view.innerHTML = '';
 		
 		if(this._model)
 		{
 			itemsWrapper = barmatz.forms.factories.DOMFactory.createPropertiesPanelItemWarpper(this._model);
 			
 			this._model.addEventListener(barmatz.events.ModelEvent.VALUE_CHANGED, onModelValueChanged);
-			this._view.innerHTML = '';
 			this._view.appendChild(itemsWrapper.wrapper);
 		}
 		else
-			this._view.innerHTML = 'No item selected';
+			this._view.appendChild(barmatz.forms.factories.DOMFactory.createElementWithContent('h2', 'forms-filler', 'No item selected'));
 		
 		function onModelValueChanged(event)
 		{
