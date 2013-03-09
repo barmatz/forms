@@ -1,7 +1,7 @@
 /** barmatz.forms.ui.Builder **/
 window.barmatz.forms.ui.Builder = function(container)
 {
-	var controller, menuModel, menuView, toolboxModel, toolboxView, workspaceModel, workspaceView, propertiesPanelView, propertiesPanelController;
+	var controller, menuModel, menuView, toolboxModel, toolboxView, workspaceModel, workspaceViewWrapper, propertiesPanelView, propertiesPanelController;
 	
 	barmatz.utils.DataTypes.isNotUndefined(container);
 	barmatz.utils.DataTypes.isInstanceOf(container, HTMLElement);
@@ -14,24 +14,25 @@ window.barmatz.forms.ui.Builder = function(container)
 	barmatz.forms.factories.ControllerFactory.createMenuController(menuModel, menuView);
 
 	toolboxModel = barmatz.forms.factories.ModelFactory.createToolboxModel();
-	addItemToToolboxModel(barmatz.forms.fields.FormFieldTypes.TEXT, 'Text field');
-	addItemToToolboxModel(barmatz.forms.fields.FormFieldTypes.PASSWORD, 'Password field');
-	addItemToToolboxModel(barmatz.forms.fields.FormFieldTypes.CHECKBOX, 'Checkbox');
-	addItemToToolboxModel(barmatz.forms.fields.FormFieldTypes.RADIO, 'Radio button');
-	addItemToToolboxModel(barmatz.forms.fields.FormFieldTypes.FILE, 'File field');
-	addItemToToolboxModel(barmatz.forms.fields.FormFieldTypes.HIDDEN, 'Hidden field');
+	addItemToToolboxModel(barmatz.forms.fields.FieldTypes.TEXT, 'Text field');
+	addItemToToolboxModel(barmatz.forms.fields.FieldTypes.PASSWORD, 'Password field');
+	addItemToToolboxModel(barmatz.forms.fields.FieldTypes.CHECKBOX, 'Checkbox');
+	addItemToToolboxModel(barmatz.forms.fields.FieldTypes.RADIO, 'Radio button');
+	addItemToToolboxModel(barmatz.forms.fields.FieldTypes.FILE, 'File field');
+	addItemToToolboxModel(barmatz.forms.fields.FieldTypes.HIDDEN, 'Hidden field');
 	
 	toolboxView = container.appendChild(barmatz.forms.factories.DOMFactory.createBuilderToolbox());
 	barmatz.forms.factories.ControllerFactory.createToolboxController(toolboxModel, toolboxView);
 
 	workspaceModel = barmatz.forms.factories.ModelFactory.createWorkspaceModel();
-	workspaceView = container.appendChild(barmatz.forms.factories.DOMFactory.createBuilderWorkspace());
-	barmatz.forms.factories.ControllerFactory.createWorkspaceController(workspaceModel, workspaceView);
+	workspaceViewWrapper = barmatz.forms.factories.DOMFactory.createBuilderWorkspaceWrapper();
+	container.appendChild(workspaceViewWrapper.wrapper);
+	barmatz.forms.factories.ControllerFactory.createWorkspaceController(workspaceModel, workspaceViewWrapper.workspace);
 	
 	propertiesPanelView = container.appendChild(barmatz.forms.factories.DOMFactory.createBuilderPropertiesPanel());
 	propertiesPanelController = barmatz.forms.factories.ControllerFactory.createPropertiesPanelController(propertiesPanelView);
 	
-	controller = barmatz.forms.factories.ControllerFactory.createBuilderController(toolboxModel, toolboxView, workspaceModel, workspaceView, propertiesPanelController, propertiesPanelView);
+	controller = barmatz.forms.factories.ControllerFactory.createBuilderController(toolboxModel, toolboxView, workspaceModel, workspaceViewWrapper.workspace, propertiesPanelController, propertiesPanelView);
 	
 	function addItemToMenuModel(label)
 	{

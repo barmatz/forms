@@ -15,7 +15,7 @@ Object.defineProperties(barmatz.forms.ui.ToolboxModel.prototype,
 		barmatz.utils.DataTypes.isNotUndefined(item);
 		barmatz.utils.DataTypes.isNotUndefined(fieldModel);
 		barmatz.utils.DataTypes.isInstanceOf(item, barmatz.forms.ui.ToolboxItemModel);
-		barmatz.utils.DataTypes.isInstanceOf(fieldModel, barmatz.forms.fields.FormFieldModel);
+		barmatz.utils.DataTypes.isInstanceOf(fieldModel, barmatz.forms.fields.FieldModel);
 		barmatz.forms.CollectionModel.prototype.addItem.call(this, item);
 		this._fieldDictionary.add(item, fieldModel);
 	}},

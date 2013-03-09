@@ -22,8 +22,8 @@
 			<fileset dir="${SRC_DIR}/barmatz/events" includes="**/*.js" excludes="Event.js"/>
 			<fileset dir="${SRC_DIR}/barmatz/mvc" includes="**/*.js"/>
 			<fileset dir="${SRC_DIR}/barmatz/forms" includes="TypeModel.js CollectionController.js CollectionModel.js"/>
-			<fileset dir="${SRC_DIR}/barmatz/forms/fields" includes="FormFieldModel.js FormTextFieldModel.js"/>
-			<fileset dir="${SRC_DIR}/barmatz/forms/fields" includes="**/*.js" excludes="FormFieldModel.js FormTextFieldModel.js"/>
+			<fileset dir="${SRC_DIR}/barmatz/forms/fields" includes="FieldModel.js TextFieldModel.js"/>
+			<fileset dir="${SRC_DIR}/barmatz/forms/fields" includes="**/*.js" excludes="FieldModel.js TextFieldModel.js"/>
 			<fileset dir="${SRC_DIR}/barmatz/forms/ui" includes="DialogController.js PromptDialogController.js"/>
 			<fileset dir="${SRC_DIR}/barmatz/forms/ui" includes="**/*.js" excludes="DialogController.js PromptDialogController.js"/>
 			<fileset dir="${SRC_DIR}/barmatz/forms" includes="**/*.js" excludes="TypeModel.js CollectionController.js CollectionModel.js fields/**/*.js ui/**/*.js"/>

@@ -56,7 +56,7 @@ Object.defineProperties(barmatz.forms.factories.ControllerFactory,
 		barmatz.utils.DataTypes.isNotUndefined(fieldView);
 		barmatz.utils.DataTypes.isNotUndefined(mandatoryView);
 		barmatz.utils.DataTypes.isNotUndefined(deleteButtonView);
-		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FormFieldModel);
+		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FieldModel);
 		barmatz.utils.DataTypes.isInstanceOf(labelView, HTMLElement);
 		barmatz.utils.DataTypes.isInstanceOf(fieldView, HTMLElement);
 		barmatz.utils.DataTypes.isInstanceOf(mandatoryView, HTMLElement);

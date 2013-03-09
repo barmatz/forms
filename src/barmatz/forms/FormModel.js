@@ -135,7 +135,7 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 	addField: {value: function(field)
 	{
 		barmatz.utils.DataTypes.isNotUndefined(field);
-		barmatz.utils.DataTypes.isInstanceOf(field, barmatz.forms.fields.FormFieldModel);
+		barmatz.utils.DataTypes.isInstanceOf(field, barmatz.forms.fields.FieldModel);
 		this._fields.push(field);
 		this.dispatchEvent(new barmatz.events.CollectionEvent(barmatz.events.CollectionEvent.ADDED, field));
 	}},
@@ -143,7 +143,7 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 	{
 		barmatz.utils.DataTypes.isNotUndefined(field);
 		barmatz.utils.DataTypes.isNotUndefined(index);
-		barmatz.utils.DataTypes.isInstanceOf(field, barmatz.forms.fields.FormFieldModel);
+		barmatz.utils.DataTypes.isInstanceOf(field, barmatz.forms.fields.FieldModel);
 
 		if(index < 0)
 			index = 0;
@@ -156,7 +156,7 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 	removeField: {value: function(field)
 	{
 		barmatz.utils.DataTypes.isNotUndefined(field);
-		barmatz.utils.DataTypes.isInstanceOf(field, barmatz.forms.fields.FormFieldModel);
+		barmatz.utils.DataTypes.isInstanceOf(field, barmatz.forms.fields.FieldModel);
 		this.removeFieldAt(this._fields.indexOf(field));
 		this.dispatchEvent(new barmatz.events.CollectionEvent(barmatz.events.CollectionEvent.REMOVED, field));
 	}},

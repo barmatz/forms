@@ -1,7 +1,7 @@
-/** barmatz.forms.fields.FormFieldTypes **/
-window.barmatz.forms.fields.FormFieldTypes = function(){};
+/** barmatz.forms.fields.FieldTypes **/
+window.barmatz.forms.fields.FieldTypes = function(){};
 
-Object.defineProperties(barmatz.forms.fields.FormFieldTypes,
+Object.defineProperties(barmatz.forms.fields.FieldTypes,
 {
 	TEXT: {value: 'text'},
 	PASSWORD: {value: 'password'},

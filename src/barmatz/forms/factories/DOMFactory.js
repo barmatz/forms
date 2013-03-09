@@ -54,12 +54,35 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		
 		return null;
 	}},
+	createDropboxElement: {value: function(model, selectedIndex)
+	{
+		var _this, dropbox;
+		
+		barmatz.utils.DataTypes.isNotUndefined(model);
+		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.DropboxModel);
+		barmatz.utils.DataTypes.isTypeOf(selectedIndex, 'number', true);
+		
+		_this = this;
+		dropbox = this.createElement('select');
+		
+		model.forEach(function(item, index, collection)
+		{
+			var option =_this.createElementWithContent('option', '', item.label);
+			option.value = item.value;
+			dropbox.appendChild(option);
+		});
+		
+		if(selectedIndex)
+			dropbox.selectedIndex = selectedIndex;
+		
+		return dropbox;
+	}},
 	createFormFieldElement: {value: function(model)
 	{
 		var field, key;
 		
 		barmatz.utils.DataTypes.isNotUndefined(model);
-		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FormFieldModel);
+		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FieldModel);
 		field = this.createElement(getElementTagName(model.type));
 		
 		if(field.tagName.toLowerCase() == 'input')
@@ -75,12 +98,12 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		{
 			switch(type)
 			{
-				case barmatz.forms.fields.FormFieldTypes.TEXT:
-				case barmatz.forms.fields.FormFieldTypes.PASSWORD:
-				case barmatz.forms.fields.FormFieldTypes.CHECKBOX:
-				case barmatz.forms.fields.FormFieldTypes.RADIO:
-				case barmatz.forms.fields.FormFieldTypes.FILE:
-				case barmatz.forms.fields.FormFieldTypes.HIDDEN:
+				case barmatz.forms.fields.FieldTypes.TEXT:
+				case barmatz.forms.fields.FieldTypes.PASSWORD:
+				case barmatz.forms.fields.FieldTypes.CHECKBOX:
+				case barmatz.forms.fields.FieldTypes.RADIO:
+				case barmatz.forms.fields.FieldTypes.FILE:
+				case barmatz.forms.fields.FieldTypes.HIDDEN:
 					return 'input';
 					break;
 			}
@@ -91,7 +114,7 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		var wrapper, label, field, mandatory;
 		
 		barmatz.utils.DataTypes.isNotUndefined(model);
-		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FormFieldModel);
+		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FieldModel);
 		barmatz.utils.DataTypes.isTypeOf(className, 'string', true);
 		
 		wrapper = this.createElement('div', className);
@@ -123,9 +146,10 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 	{
 		return this.createElement('ul', 'forms-builder-menu');
 	}},
-	createBuilderWorkspace: {value: function()
+	createBuilderWorkspaceWrapper: {value: function()
 	{
-		return this.createElement('div', 'forms-builder-workspace');
+		var workspace = this.createElement('table', 'forms-builder-workspace');
+		return {wrapper: this.createElementWithContent('div', 'forms-builder-workspace-wrapper', workspace), workspace: workspace};
 	}},
 	createBuilderPropertiesPanel: {value: function()
 	{
@@ -145,24 +169,40 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 	}},
 	createWorkspaceItemWrapper: {value: function(model)
 	{
-		var fieldWrapper, label, field, mandatory, deleteButton;
+		var _this, wrapper, grip, label, field, mandatory, deleteButton;
 		
 		barmatz.utils.DataTypes.isNotUndefined(model);
-		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FormFieldModel);
+		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FieldModel);
 		
+		_this = this;
+		wrapper = this.createElement('tr', 'forms-workspace-item');
+		grip = this.createElement('span', 'forms-grip ui-icon ui-icon-grip-dotted-vertical');
+		label = this.createElementWithContent('label', '', model.label ? model.label : '');
+		field = this.createFormFieldElement(model);
+		mandatory = this.createElementWithContent('span', 'forms-workspace-item-mandatory', mandatory ? '*' : '');
 		deleteButton = this.createElement('span', 'forms-delete ui-icon ui-icon-circle-close');
-		fieldWrapper = this.createFieldWrapper(model, 'forms-workspace-item');
-		fieldWrapper.wrapper.insertBefore(this.createElement('span', 'forms-grip ui-icon ui-icon-grip-dotted-vertical'), fieldWrapper.wrapper.childNodes[0]);
-		fieldWrapper.wrapper.appendChild(deleteButton);
 		
-		return {wrapper: fieldWrapper.wrapper, label: fieldWrapper.label, field: fieldWrapper.field, mandatory: fieldWrapper.mandatory, deleteButton: deleteButton};
+		addToWrapper('forms-workspace-item-grip', grip);
+		addToWrapper('forms-workspace-item-label', label);
+		addToWrapper('forms-workspace-item-field', [field, mandatory]);
+		addToWrapper('forms-workspace-item-delete-button', deleteButton);
+		
+		return {wrapper: wrapper, label: label, field: field, mandatory: mandatory, deleteButton: deleteButton};
+		
+		function addToWrapper(className, content)
+		{
+			barmatz.utils.DataTypes.isNotUndefined(className);
+			barmatz.utils.DataTypes.isNotUndefined(content);
+			barmatz.utils.DataTypes.isTypeOf(className, 'string');
+			wrapper.appendChild(_this.createElementWithContent('td', className, content));
+		}
 	}},
 	createPropertiesPanelItemWarpper: {value: function(model)
 	{
 		var _this, returnWrapper, wrapper;
 		
 		barmatz.utils.DataTypes.isNotUndefined(model);
-		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FormFieldModel);
+		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FieldModel);
 		
 		_this = this;
 		returnWrapper = {};
@@ -172,26 +212,25 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		
 		returnWrapper.wrapper = wrapper;
 		
-		if(model instanceof barmatz.forms.fields.FormFieldModel)
+		if(model instanceof barmatz.forms.fields.FieldModel)
 		{
 			returnWrapper.nameField = addFieldToWrapper('string', 'name', 'name', model.name);
 			returnWrapper.labelField = addFieldToWrapper('string', 'label', 'label', model.label);
 			returnWrapper.mandatoryField = addFieldToWrapper('boolean', 'mandatory', 'mandatory', model.mandatory);
 			returnWrapper.defaultValueField = addFieldToWrapper('string', 'default', 'default value', model.default);
-			returnWrapper.valueField = addFieldToWrapper('string', 'value', 'value', model.value);
 			returnWrapper.enabledField = addFieldToWrapper('boolean', 'enabled', 'enabled', model.enabled);
 		}
 		
-		if(model instanceof barmatz.forms.fields.FormFileFieldModel)
-			returnWrapper.acceptField = addFieldToWrapper('string', 'accept', 'accept', model.accept);
+		if(model instanceof barmatz.forms.fields.FileFieldModel)
+			returnWrapper.acceptField = addFieldToWrapper('array', 'accept', 'accept', model.accept);
 
-		if(model instanceof barmatz.forms.fields.FormTextFieldModel)
+		if(model instanceof barmatz.forms.fields.TextFieldModel)
 		{
-			returnWrapper.minField = addFieldToWrapper('string', 'min', 'min', model.min);
-			returnWrapper.maxField = addFieldToWrapper('string', 'max', 'max', model.max);
+			returnWrapper.minField = addFieldToWrapper('number', 'min', 'min', model.min);
+			returnWrapper.maxField = addFieldToWrapper('number', 'max', 'max', model.max);
 		}
 		
-		if(model instanceof barmatz.forms.fields.FormCheckboxFieldModel)
+		if(model instanceof barmatz.forms.fields.CheckboxFieldModel)
 		{
 			returnWrapper.checkedField = addFieldToWrapper('boolean', 'checked', 'checked', model.checked);
 			returnWrapper.defaultCheckedField = addFieldToWrapper('boolean', 'default checked', 'defaultChecked', model.defaultChecked);
@@ -223,18 +262,45 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 
 			try
 			{
-				model[event.target.name] = event.target.value;
+				assignString();
 			}
 			catch(error)
 			{
 				try
 				{
-					model[event.target.name] = event.target.value == 'yes' ? true : false;
+					assignArray();
 				}
 				catch(error)
 				{
-					model[event.target.name] = parseFloat(event.target.value);
+					try
+					{
+						assignBoolean();
+					}
+					catch(error)
+					{
+						assignNumber();
+					}
 				}
+			}
+			
+			function assignString()
+			{
+				model[event.target.name] = event.target.value;
+			}
+			
+			function assignArray()
+			{
+				model[event.target.name] = event.target.value.replace(/(^\s+|(,)\s+|\s+$)/g, '$2').split(',');
+			}
+			
+			function assignBoolean()
+			{
+				model[event.target.name] = event.target.value == true || event.target.value == 'true' ? true : false;
+			}
+			
+			function assignNumber()
+			{
+				model[event.target.name] = parseFloat(event.target.value);
 			}
 		}
 	}},
@@ -258,15 +324,28 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 				throw new Error('unknown type');
 				break;
 			case 'string':
+			case 'number':
+			case 'array':
 				field = this.createElement('input');
 				field.type = 'text';
-				field.value = value == 'NaN' ? '' : value;
+				switch(type)
+				{
+					case 'string':
+						field.value = value == 'NaN' ? '' : value;
+						break;
+					case 'number':
+						field.value = isNaN(value) ? '' : value;
+						break;
+					case 'array':
+						field.value = value.join(', ');
+						break;
+				}
 				break;
 			case 'boolean':
-				field = this.createElement('select');
-				field.appendChild(this.createElementWithContent('option', '', 'no'));
-				field.appendChild(this.createElementWithContent('option', '', 'yes'));
-				field.selectedIndex = value ? 1 : 0;
+				field = this.createDropboxElement(barmatz.forms.factories.ModelFactory.createDropboxModel([
+					barmatz.forms.factories.ModelFactory.createDropboxItemModel('No', false),
+					barmatz.forms.factories.ModelFactory.createDropboxItemModel('Yes', true)
+				]), value ? 1 : 0);
 				break;
 		}
 		

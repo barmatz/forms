@@ -20,7 +20,7 @@ Object.defineProperties(barmatz.forms.ui.PropertiesPanelController.prototype,
 	{
 		var itemsWrapper;
 		
-		barmatz.utils.DataTypes.isInstanceOf(value, barmatz.forms.fields.FormFieldModel, true);
+		barmatz.utils.DataTypes.isInstanceOf(value, barmatz.forms.fields.FieldModel, true);
 		
 		if(this._model)
 			this._model.removeEventListener(barmatz.events.ModelEvent.VALUE_CHANGED, onModelValueChanged);
@@ -55,16 +55,13 @@ Object.defineProperties(barmatz.forms.ui.PropertiesPanelController.prototype,
 					itemsWrapper.labelField.value = event.value;
 					break;
 				case 'mandatory':
-					itemsWrapper.mandatoryField.value = event.value ? 'yes' : 'no';
+					itemsWrapper.mandatoryField.value = event.value;
 					break;
 				case 'default':
 					itemsWrapper.defaultValueField.value = event.value;
 					break;
-				case 'value':
-					itemsWrapper.valueField.value = event.value;
-					break;
 				case 'enabled':
-					itemsWrapper.enabledField.value = event.value ? 'yes' : 'no';
+					itemsWrapper.enabledField.value = event.value;
 					break;
 				case 'min':
 					itemsWrapper.minField.value = isNaN(event.value) ? '' : event.value;
@@ -79,7 +76,7 @@ Object.defineProperties(barmatz.forms.ui.PropertiesPanelController.prototype,
 					itemsWrapper.defaultCheckedField.value = event.value;
 					break;
 				case 'accept':
-					itemsWrapper.acceptField.value = event.value;
+					itemsWrapper.acceptField.value = event.value.join(', ');
 					break;
 			}
 		}

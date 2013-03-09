@@ -34,6 +34,6 @@ Object.defineProperties(barmatz.forms.ui.JQueryPromptDialogController.prototype,
 	_submitDialog: {value: function()
 	{
 		this._model.name = this._fieldView.value;
-		jQuery(this._view).dialog('destroy');
+		barmatz.forms.factories.DOMFactory.destroyDialog(this._view);
 	}}
 });

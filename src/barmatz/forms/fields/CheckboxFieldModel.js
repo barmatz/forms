@@ -1,17 +1,17 @@
-/** barmatz.forms.fields.FormCheckboxFieldModel **/
-window.barmatz.forms.fields.FormCheckboxFieldModel = function(name)
+/** barmatz.forms.fields.CheckboxFieldModel **/
+window.barmatz.forms.fields.CheckboxFieldModel = function(name)
 {
 	barmatz.utils.DataTypes.isNotUndefined(name);
 	barmatz.utils.DataTypes.isTypeOf(name, 'string', true);
-	barmatz.forms.fields.FormFieldModel.call(this, barmatz.forms.fields.FormFieldTypes.CHECKBOX, name);
+	barmatz.forms.fields.FieldModel.call(this, barmatz.forms.fields.FieldTypes.CHECKBOX, name);
 	this.set('checked', false);
 	this.set('defaultChecked', false);
 };
 
-barmatz.forms.fields.FormCheckboxFieldModel.prototype = new barmatz.forms.fields.FormFieldModel(null, null);
-barmatz.forms.fields.FormCheckboxFieldModel.prototype.constructor = barmatz.forms.fields.FormCheckboxFieldModel;
+barmatz.forms.fields.CheckboxFieldModel.prototype = new barmatz.forms.fields.FieldModel(null, null);
+barmatz.forms.fields.CheckboxFieldModel.prototype.constructor = barmatz.forms.fields.CheckboxFieldModel;
 
-Object.defineProperties(barmatz.forms.fields.FormCheckboxFieldModel.prototype, 
+Object.defineProperties(barmatz.forms.fields.CheckboxFieldModel.prototype, 
 {
 	checked: {get: function()
 	{
@@ -35,7 +35,7 @@ Object.defineProperties(barmatz.forms.fields.FormCheckboxFieldModel.prototype,
 	}},
 	clone: {value: function()
 	{
-		var clone = new barmatz.forms.fields.FormCheckboxFieldModel(this.name);
+		var clone = new barmatz.forms.fields.CheckboxFieldModel(this.name);
 		clone.label = this.label;
 		clone.mandatory = this.mandatory;
 		clone.default = this.default;

@@ -13,11 +13,30 @@ window.barmatz.forms.ui.WorkspaceController = function(model, view)
 	
 	function setViewToSortable()
 	{
-		jQuery(view).sortable({axis: 'y', containment: 'parent', start: onSortingStart, stop: onSortingStopped});
+		jQuery(view).sortable({axis: 'y', containment: 'parent', helper: getSortableHelper, placeholder: 'sortable-placeholder', start: onSortingStart, stop: onSortingStopped});
+	}
+	
+	function getSortableHelper(event, ui)
+	{
+		var element;
+		
+		barmatz.utils.DataTypes.isNotUndefined(event);
+		barmatz.utils.DataTypes.isNotUndefined(ui);
+		barmatz.utils.DataTypes.isInstanceOf(event, jQuery.Event);
+		barmatz.utils.DataTypes.isInstanceOf(ui, jQuery);
+		
+		ui.children().each(function() {
+			$(this).width($(this).width());
+		});
+		
+		return ui;
+		
 	}
 	
 	function getIndexFromSortEvent(element)
 	{
+		barmatz.utils.DataTypes.isNotUndefined(element);
+		barmatz.utils.DataTypes.isInstanceOf(element, HTMLElement);
 		return Array.prototype.slice.call(element.parentElement.childNodes).indexOf(element);
 	}
 	
@@ -26,7 +45,7 @@ window.barmatz.forms.ui.WorkspaceController = function(model, view)
 		var dialogWarpper;
 		
 		barmatz.utils.DataTypes.isNotUndefined(model);
-		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FormFieldModel);
+		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FieldModel);
 		
 		dialogWarpper = barmatz.forms.factories.DOMFactory.createNewFieldDialogWrapper();
 		jQuery(dialogWarpper.wrapper).dialog('open');
@@ -72,11 +91,10 @@ Object.defineProperties(barmatz.forms.ui.WorkspaceController.prototype,
 		var _this = this, viewWrapper;
 		
 		barmatz.utils.DataTypes.isNotUndefined(model);
-		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FormFieldModel);
+		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FieldModel);
 		viewWrapper = barmatz.forms.factories.DOMFactory.createWorkspaceItemWrapper(model);
 		viewWrapper.deleteButton.addEventListener('click', onDeleteButtonClick);
 		barmatz.forms.factories.ControllerFactory.createWorkspaceItemController(model, viewWrapper.label, viewWrapper.field, viewWrapper.mandatory, viewWrapper.deleteButton);
-		barmatz.utils.CSS.verticalAlignChildren(viewWrapper.wrapper);
 		return viewWrapper.wrapper;
 		
 		function onDeleteButtonClick(event)

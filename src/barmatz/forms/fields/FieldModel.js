@@ -1,5 +1,5 @@
-/** barmatz.forms.fields.FormFieldModel **/
-window.barmatz.forms.fields.FormFieldModel = function(type, name)
+/** barmatz.forms.fields.FieldModel **/
+window.barmatz.forms.fields.FieldModel = function(type, name)
 {
 	barmatz.utils.DataTypes.isNotUndefined(type);
 	barmatz.utils.DataTypes.isNotUndefined(name);
@@ -14,10 +14,10 @@ window.barmatz.forms.fields.FormFieldModel = function(type, name)
 	this.set('enabled', true);
 };
 
-barmatz.forms.fields.FormFieldModel.prototype = new barmatz.forms.TypeModel(null);
-barmatz.forms.fields.FormFieldModel.prototype.constructor = barmatz.forms.fields.FormFieldModel;
+barmatz.forms.fields.FieldModel.prototype = new barmatz.forms.TypeModel(null);
+barmatz.forms.fields.FieldModel.prototype.constructor = barmatz.forms.fields.FieldModel;
 
-Object.defineProperties(barmatz.forms.fields.FormFieldModel.prototype,
+Object.defineProperties(barmatz.forms.fields.FieldModel.prototype,
 {
 	name: {get: function()
 	{
@@ -64,11 +64,11 @@ Object.defineProperties(barmatz.forms.fields.FormFieldModel.prototype,
 	}, set: function(value)
 	{
 		barmatz.utils.DataTypes.isTypeOf(value, 'boolean');
-		this.set('enabled', Boolean(value));
+		this.set('enabled', value);
 	}},
 	clone: {value: function()
 	{
-		var clone = new barmatz.forms.fields.FormFieldModel(this.type, this.name);
+		var clone = new barmatz.forms.fields.FieldModel(this.type, this.name);
 		clone.label = this.label;
 		clone.mandatory = this.mandatory;
 		clone.default = this.default;

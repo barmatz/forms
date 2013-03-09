@@ -13,25 +13,25 @@ Object.defineProperties(barmatz.forms.factories.ModelFactory,
 		switch(type)
 		{
 			default:
-				return new barmatz.forms.fields.FormFieldModel(type, name);
+				return new barmatz.forms.fields.FieldModel(type, name);
 				break;
-			case barmatz.forms.fields.FormFieldTypes.TEXT:
-				return new barmatz.forms.fields.FormTextFieldModel(name);
+			case barmatz.forms.fields.FieldTypes.TEXT:
+				return new barmatz.forms.fields.TextFieldModel(name);
 				break;
-			case barmatz.forms.fields.FormFieldTypes.PASSWORD:
-				return new barmatz.forms.fields.FormPasswordFieldModel(name);
+			case barmatz.forms.fields.FieldTypes.PASSWORD:
+				return new barmatz.forms.fields.PasswordFieldModel(name);
 				break;
-			case barmatz.forms.fields.FormFieldTypes.CHECKBOX:
-				return new barmatz.forms.fields.FormCheckboxFieldModel(name);
+			case barmatz.forms.fields.FieldTypes.CHECKBOX:
+				return new barmatz.forms.fields.CheckboxFieldModel(name);
 				break;
-			case barmatz.forms.fields.FormFieldTypes.RADIO:
-				return new barmatz.forms.fields.FormRadioFieldModel(name);
+			case barmatz.forms.fields.FieldTypes.RADIO:
+				return new barmatz.forms.fields.RadioFieldModel(name);
 				break;
-			case barmatz.forms.fields.FormFieldTypes.FILE:
-				return new barmatz.forms.fields.FormFileFieldModel(name);
+			case barmatz.forms.fields.FieldTypes.FILE:
+				return new barmatz.forms.fields.FileFieldModel(name);
 				break;
-			case barmatz.forms.fields.FormFieldTypes.HIDDEN:
-				return new barmatz.forms.fields.FormHiddenFieldModel(name);
+			case barmatz.forms.fields.FieldTypes.HIDDEN:
+				return new barmatz.forms.fields.HiddenFieldModel(name);
 				break;
 		}
 	}},
@@ -64,5 +64,16 @@ Object.defineProperties(barmatz.forms.factories.ModelFactory,
 	createWorkspaceModel: {value: function()
 	{
 		return new barmatz.forms.ui.WorkspaceModel();
+	}},
+	createDropboxItemModel: {value: function(label, value)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(label);
+		barmatz.utils.DataTypes.isTypeOf(label, 'string');
+		return new barmatz.forms.fields.DropboxItemModel(label, value);
+	}},
+	createDropboxModel: {value: function(items)
+	{
+		barmatz.utils.DataTypes.isInstanceOf(items, Array, true);
+		return new barmatz.forms.fields.DropboxModel(items);
 	}}
 });

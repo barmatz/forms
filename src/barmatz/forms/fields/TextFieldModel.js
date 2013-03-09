@@ -1,17 +1,17 @@
-/** barmatz.forms.fields.FormTextFieldModel **/
-window.barmatz.forms.fields.FormTextFieldModel = function(name)
+/** barmatz.forms.fields.TextFieldModel **/
+window.barmatz.forms.fields.TextFieldModel = function(name)
 {
 	barmatz.utils.DataTypes.isNotUndefined(name);
 	barmatz.utils.DataTypes.isTypeOf(name, 'string', true);
-	barmatz.forms.fields.FormFieldModel.call(this, barmatz.forms.fields.FormFieldTypes.TEXT, name);
+	barmatz.forms.fields.FieldModel.call(this, barmatz.forms.fields.FieldTypes.TEXT, name);
 	this.set('min', NaN);
 	this.set('max', NaN);
 };
 
-barmatz.forms.fields.FormTextFieldModel.prototype = new barmatz.forms.fields.FormFieldModel(null, null);
-barmatz.forms.fields.FormTextFieldModel.prototype.constructor = barmatz.forms.fields.FormTextFieldModel;
+barmatz.forms.fields.TextFieldModel.prototype = new barmatz.forms.fields.FieldModel(null, null);
+barmatz.forms.fields.TextFieldModel.prototype.constructor = barmatz.forms.fields.TextFieldModel;
 
-Object.defineProperties(barmatz.forms.fields.FormTextFieldModel.prototype,
+Object.defineProperties(barmatz.forms.fields.TextFieldModel.prototype,
 {
 	min: {get: function()
 	{
@@ -31,7 +31,7 @@ Object.defineProperties(barmatz.forms.fields.FormTextFieldModel.prototype,
 	}},
 	clone: {value: function()
 	{
-		var clone = new barmatz.forms.fields.FormTextFieldModel(this.name);
+		var clone = new barmatz.forms.fields.TextFieldModel(this.name);
 		clone.label = this.label;
 		clone.mandatory = this.mandatory;
 		clone.default = this.default;
