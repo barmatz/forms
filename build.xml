@@ -34,7 +34,7 @@
 			<fileset dir="${SRC_DIR}" includes="**/*.css" excludes="reset.css"/>
 		</concat>
 		<copy todir="${BIN_DIR}/js">
-			<fileset dir="${SRC_DIR}" includes="*.js"/>
+			<fileset dir="${SRC_DIR}" includes="*.js" excludes="namespaces.js"/>
 		</copy>
 		<copy todir="${BIN_DIR}">
 			<fileset dir="${SRC_DIR}" includes="**/*.*" excludes="**/*.js **/*.css"/>
