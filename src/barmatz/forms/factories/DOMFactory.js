@@ -161,11 +161,31 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		barmatz.utils.DataTypes.isTypeOf(label, 'string');
 		return this.createElementWithContent('li', 'forms-toolbox-item', label);
 	}},
-	createMenuItem: {value: function(label)
+	createMenuItem: {value: function(label, clickHandler)
 	{
+		var item;
+		
 		barmatz.utils.DataTypes.isNotUndefined(label);
 		barmatz.utils.DataTypes.isTypeOf(label, 'string');
-		return this.createElementWithContent('li', 'forms-menu-item rounded-corner', label);
+		barmatz.utils.DataTypes.isTypeOf(clickHandler, 'function');
+		
+		item = this.createElementWithContent('li', 'forms-menu-item rounded-corner', label);
+		
+		if(barmatz.utils.DataTypes.applySilent('isValid', clickHandler))
+			item.addEventListener('click', clickHandler);
+		
+		return item;
+	}},
+	destroyMenuItem: {value: function(item, clickHandler)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(item);
+		barmatz.utils.DataTypes.isInstanceOfOf(item, HTMLElement);
+		barmatz.utils.DataTypes.isTypeOf(clickHandler, 'function');
+		
+		if(barmatz.utils.DataTypes.applySilent('isValid', clickHandler))
+			item.removeEventListener('click', clickHandler);
+		
+		item.parentElement.removeChild(item);
 	}},
 	createWorkspaceItemWrapper: {value: function(model)
 	{

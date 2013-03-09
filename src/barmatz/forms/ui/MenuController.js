@@ -13,6 +13,6 @@ Object.defineProperties(barmatz.forms.ui.MenuController.prototype,
 	{
 		barmatz.utils.DataTypes.isNotUndefined(model);
 		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.ui.MenuItemModel);
-		return barmatz.forms.factories.DOMFactory.createMenuItem(model.label);
+		return barmatz.forms.factories.DOMFactory.createMenuItem(model.label, model.clickHandler);
 	}}
 });

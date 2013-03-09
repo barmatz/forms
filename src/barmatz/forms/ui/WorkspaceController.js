@@ -7,7 +7,7 @@ window.barmatz.forms.ui.WorkspaceController = function(model, view)
 	
 	if(model)
 	{
-		model.addEventListener(barmatz.events.CollectionEvent.ADDED, onModelAdded);
+		model.addEventListener(barmatz.events.CollectionEvent.ITEM_ADDED, onModelItemAdded);
 		setViewToSortable();
 	}
 	
@@ -64,7 +64,7 @@ window.barmatz.forms.ui.WorkspaceController = function(model, view)
 		selectedItemIndex = NaN;
 	}
 	
-	function onModelAdded(event)
+	function onModelItemAdded(event)
 	{
 		barmatz.utils.DataTypes.isNotUndefined(event);
 		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.CollectionEvent);

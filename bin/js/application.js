@@ -478,6 +478,84 @@ Object.defineProperties(barmatz.events.Event.prototype,
 		return this.formatToString('Event', 'type');
 	}}
 });
+/** barmatz.events.BuilderEvent **/
+window.barmatz.events.BuilderEvent = function(type)
+{
+	barmatz.utils.DataTypes.isNotUndefined(type);
+	barmatz.utils.DataTypes.isTypeOf(type, 'string');
+	barmatz.events.Event.call(this, type);
+	
+	this._item = null;
+	this._index = NaN;
+	
+	switch(type)
+	{
+		case barmatz.events.BuilderEvent.TOOLBOX_ITEM_ADDED:
+		case barmatz.events.BuilderEvent.TOOLBOX_ITEM_REMOVE:
+		case barmatz.events.BuilderEvent.WORKSPACE_ITEM_ADDED:
+		case barmatz.events.BuilderEvent.WORKSPACE_ITEM_REMOVE:
+			this._item = arguments[1];
+			this._index = arguments[2];
+			break;
+	}
+};
+
+barmatz.events.BuilderEvent.prototype = new barmatz.events.Event(null);
+barmatz.events.BuilderEvent.prototype.constructor = barmatz.events.BuilderEvent;
+
+Object.defineProperties(barmatz.events.BuilderEvent, 
+{
+	TOOLBOX_ITEM_ADDED: {value: 'toolboxItemAdded'},
+	TOOLBOX_ITEM_REMOVED: {value: 'toolboxItemRemoved'},
+	WORKSPACE_ITEM_ADDED: {value: 'workspaceItemAdded'},
+	WORKSPACE_ITEM_REMOVED: {value: 'workspaceItemRemoved'}
+});
+Object.defineProperties(barmatz.events.BuilderEvent.prototype,
+{
+	item: {get: function()
+	{
+		return this._item;
+	}},
+	index: {get: function()
+	{
+		return this._index;
+	}},
+	clone: {value: function(type)
+	{
+		var event;
+		
+		switch(type)
+		{
+			default:
+				event = new barmatz.events.BuilderEvent(type);
+				break;
+			case barmatz.events.BuilderEvent.TOOLBOX_ITEM_ADDED:
+			case barmatz.events.BuilderEvent.TOOLBOX_ITEM_REMOVE:
+			case barmatz.events.BuilderEvent.WORKSPACE_ITEM_ADDED:
+			case barmatz.events.BuilderEvent.WORKSPACE_ITEM_REMOVE:
+				event = new barmatz.events.BuilderEvent(type, this.item, this.index);
+				break;
+		}
+		
+		event._target = this.target;
+		return event;
+	}},
+	toString: {value: function()
+	{
+		switch(type)
+		{
+			default:
+				return this.formatToString('BuilderEvent', 'type');
+				break;
+			case barmatz.events.BuilderEvent.TOOLBOX_ITEM_ADDED:
+			case barmatz.events.BuilderEvent.TOOLBOX_ITEM_REMOVE:
+			case barmatz.events.BuilderEvent.WORKSPACE_ITEM_ADDED:
+			case barmatz.events.BuilderEvent.WORKSPACE_ITEM_REMOVE:
+				return this.formatToString('BuilderEvent', 'type', 'item', 'index');
+				break;
+		}
+	}}
+});
 /** barmatz.events.CollectionEvent **/
 window.barmatz.events.CollectionEvent = function(type)
 {
@@ -490,8 +568,8 @@ window.barmatz.events.CollectionEvent = function(type)
 	
 	switch(type)
 	{
-		case barmatz.events.CollectionEvent.ADDED:
-		case barmatz.events.CollectionEvent.REMOVED:
+		case barmatz.events.CollectionEvent.ITEM_ADDED:
+		case barmatz.events.CollectionEvent.ITEM_REMOVED:
 			this._item = arguments[1];
 			this._index = arguments[2];
 			break;
@@ -503,8 +581,8 @@ barmatz.events.CollectionEvent.prototype.constructor = barmatz.events.Collection
 
 Object.defineProperties(barmatz.events.CollectionEvent,
 {
-	ADDED: {value: 'added'},
-	REMOVED: {value: 'removed'}
+	ITEM_ADDED: {value: 'itemAdded'},
+	ITEM_REMOVED: {value: 'itemRemoved'}
 });
 Object.defineProperties(barmatz.events.CollectionEvent.prototype,
 {
@@ -720,22 +798,22 @@ window.barmatz.forms.CollectionController = function(model, view)
 	
 	if(model)
 	{
-		model.addEventListener(barmatz.events.CollectionEvent.ADDED, onModelAdded);
-		model.addEventListener(barmatz.events.CollectionEvent.REMOVED, onModelRemoved);
+		model.addEventListener(barmatz.events.CollectionEvent.ITEM_ADDED, onModelItemAdded);
+		model.addEventListener(barmatz.events.CollectionEvent.ITEM_REMOVED, onModelItemRemoved);
 		model.forEach(function(item, index, collection)
 		{
 			_this._addItemModelToView(item);
 		});
 	}
 	
-	function onModelAdded(event)
+	function onModelItemAdded(event)
 	{
 		barmatz.utils.DataTypes.isNotUndefined(event);
 		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.CollectionEvent);
 		_this._addItemModelToView(event.item);
 	}
 	
-	function onModelRemoved(event)
+	function onModelItemRemoved(event)
 	{
 		barmatz.utils.DataTypes.isNotUndefined(event);
 		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.CollectionEvent);
@@ -784,7 +862,7 @@ Object.defineProperties(barmatz.forms.CollectionModel.prototype,
 		
 		items = this.get('items');
 		items.push(item);
-		this.dispatchEvent(new barmatz.events.CollectionEvent(barmatz.events.CollectionEvent.ADDED, item, items.length - 1));
+		this.dispatchEvent(new barmatz.events.CollectionEvent(barmatz.events.CollectionEvent.ITEM_ADDED, item, items.length - 1));
 	}},
 	removeItem: {value: function(item)
 	{
@@ -796,7 +874,7 @@ Object.defineProperties(barmatz.forms.CollectionModel.prototype,
 		items = this.get('items')
 		index = items.indexOf(item);
 		items.splice(index, 1);
-		this.dispatchEvent(new barmatz.events.CollectionEvent(barmatz.events.CollectionEvent.REMOVED, item, index));
+		this.dispatchEvent(new barmatz.events.CollectionEvent(barmatz.events.CollectionEvent.ITEM_REMOVED, item, index));
 	}},
 	getItemAt: {value: function(index)
 	{
@@ -1256,108 +1334,56 @@ Object.defineProperties(barmatz.forms.ui.PromptDialogController.prototype,
 /** barmatz.forms.ui.Builder **/
 window.barmatz.forms.ui.Builder = function(container)
 {
-	var controller, menuModel, menuView, toolboxModel, toolboxView, workspaceModel, workspaceViewWrapper, propertiesPanelView, propertiesPanelController;
-	
 	barmatz.utils.DataTypes.isNotUndefined(container);
 	barmatz.utils.DataTypes.isInstanceOf(container, HTMLElement);
-	
-	menuModel = barmatz.forms.factories.ModelFactory.createMenuModel();
-	addItemToMenuModel('New');
-	addItemToMenuModel('Save');
-	addItemToMenuModel('Export');
-	menuView = container.appendChild(barmatz.forms.factories.DOMFactory.createBuilderMenu());
-	barmatz.forms.factories.ControllerFactory.createMenuController(menuModel, menuView);
-
-	toolboxModel = barmatz.forms.factories.ModelFactory.createToolboxModel();
-	addItemToToolboxModel(barmatz.forms.fields.FieldTypes.TEXT, 'Text field');
-	addItemToToolboxModel(barmatz.forms.fields.FieldTypes.PASSWORD, 'Password field');
-	addItemToToolboxModel(barmatz.forms.fields.FieldTypes.CHECKBOX, 'Checkbox');
-	addItemToToolboxModel(barmatz.forms.fields.FieldTypes.RADIO, 'Radio button');
-	addItemToToolboxModel(barmatz.forms.fields.FieldTypes.FILE, 'File field');
-	addItemToToolboxModel(barmatz.forms.fields.FieldTypes.HIDDEN, 'Hidden field');
-	
-	toolboxView = container.appendChild(barmatz.forms.factories.DOMFactory.createBuilderToolbox());
-	barmatz.forms.factories.ControllerFactory.createToolboxController(toolboxModel, toolboxView);
-
-	workspaceModel = barmatz.forms.factories.ModelFactory.createWorkspaceModel();
-	workspaceViewWrapper = barmatz.forms.factories.DOMFactory.createBuilderWorkspaceWrapper();
-	container.appendChild(workspaceViewWrapper.wrapper);
-	barmatz.forms.factories.ControllerFactory.createWorkspaceController(workspaceModel, workspaceViewWrapper.workspace);
-	
-	propertiesPanelView = container.appendChild(barmatz.forms.factories.DOMFactory.createBuilderPropertiesPanel());
-	propertiesPanelController = barmatz.forms.factories.ControllerFactory.createPropertiesPanelController(propertiesPanelView);
-	
-	controller = barmatz.forms.factories.ControllerFactory.createBuilderController(toolboxModel, toolboxView, workspaceModel, workspaceViewWrapper.workspace, propertiesPanelController, propertiesPanelView);
-	
-	function addItemToMenuModel(label)
-	{
-		barmatz.utils.DataTypes.isNotUndefined(label);
-		barmatz.utils.DataTypes.isTypeOf(label, 'string');
-		menuModel.addItem(barmatz.forms.factories.ModelFactory.createMenuItemModel(label));
-	}
-	
-	function addItemToToolboxModel(type, label)
-	{
-		barmatz.utils.DataTypes.isNotUndefined(type);
-		barmatz.utils.DataTypes.isNotUndefined(label);
-		barmatz.utils.DataTypes.isTypeOf(type, 'string');
-		barmatz.utils.DataTypes.isTypeOf(label, 'string');
-		toolboxModel.addItem(barmatz.forms.factories.ModelFactory.createToolboxItemModel(type, label), barmatz.forms.factories.ModelFactory.createFormFieldModel(type, ''));
-	}
+	barmatz.forms.factories.ControllerFactory.createBuilderController(barmatz.forms.factories.ModelFactory.createBuilderModel(), container);
 };
-window.barmatz.forms.ui.BuilderController = function(toolboxModel, toolboxView, workspaceModel, workspaceView, propertiesPanelController, propertiesPanelView)
+window.barmatz.forms.ui.BuilderController = function(model, view)
 {
-	barmatz.utils.DataTypes.isNotUndefined(toolboxModel);
-	barmatz.utils.DataTypes.isNotUndefined(toolboxView);
-	barmatz.utils.DataTypes.isNotUndefined(workspaceModel);
-	barmatz.utils.DataTypes.isNotUndefined(workspaceView);
-	barmatz.utils.DataTypes.isNotUndefined(propertiesPanelController);
-	barmatz.utils.DataTypes.isNotUndefined(propertiesPanelView);
-	barmatz.utils.DataTypes.isInstanceOf(toolboxModel, barmatz.forms.CollectionModel);
-	barmatz.utils.DataTypes.isInstanceOf(toolboxView, HTMLElement);
-	barmatz.utils.DataTypes.isInstanceOf(workspaceModel, barmatz.forms.ui.WorkspaceModel);
-	barmatz.utils.DataTypes.isInstanceOf(workspaceView, HTMLElement);
-	barmatz.utils.DataTypes.isInstanceOf(propertiesPanelController, barmatz.forms.ui.PropertiesPanelController);
-	barmatz.utils.DataTypes.isInstanceOf(propertiesPanelView, HTMLElement);
+	barmatz.utils.DataTypes.isNotUndefined(model);
+	barmatz.utils.DataTypes.isNotUndefined(view);
+	barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.ui.BuilderModel);
+	barmatz.utils.DataTypes.isInstanceOf(view, HTMLElement);
 	barmatz.mvc.Controller.call(this);
 	
 	window.addEventListener('resize', onWindowResize);
-	workspaceModel.addEventListener(barmatz.events.CollectionEvent.ADDED, onWorkspaceModelAdded);
-	workspaceModel.addEventListener(barmatz.events.CollectionEvent.REMOVED, onWorkspaceModelRemoved);
-	toolboxModel.addEventListener(barmatz.events.CollectionEvent.ADDED, onToolboxModelAdded);
-	toolboxModel.addEventListener(barmatz.events.CollectionEvent.REMOVED, onToolboxModelRemoved);
-	forEachToolboxViewItem();
+	model.addEventListener(barmatz.events.BuilderEvent.WORKSPACE_ITEM_ADDED, onModelWorkspaceItemAdded);
+	model.addEventListener(barmatz.events.BuilderEvent.TOOLBOX_ITEM_ADDED, onModelToolboxItemAdded);
+	model.addEventListener(barmatz.events.BuilderEvent.TOOLBOX_ITEM_REMOVED, onModelToolboxItemRemoved);
+	model.addMenuItem('New', onMenuNewClick);
+	model.addMenuItem('Save', onMenuSaveClick);
+	model.addMenuItem('Export', onMenuExportClick);
+	model.addToolboxItem(barmatz.forms.fields.FieldTypes.TEXT, 'Text field');
+	model.addToolboxItem(barmatz.forms.fields.FieldTypes.PASSWORD, 'Password field');
+	model.addToolboxItem(barmatz.forms.fields.FieldTypes.CHECKBOX, 'Checkbox');
+	model.addToolboxItem(barmatz.forms.fields.FieldTypes.RADIO, 'Radio button');
+	model.addToolboxItem(barmatz.forms.fields.FieldTypes.FILE, 'File field');
+	model.addToolboxItem(barmatz.forms.fields.FieldTypes.HIDDEN, 'Hidden field');
+	view.appendChild(model.menuView);
+	view.appendChild(model.toolboxView);
+	view.appendChild(model.workspaceView);
+	view.appendChild(model.propertiesPanelView);
+
+	
 	resizeUI();
 	
-	function forEachToolboxViewItem()
+	function resizeUI()
 	{
-		var i = 0;
-		for(; i < toolboxView.childNodes.length; i++)
-			addToolboxViewItemListeners(toolboxView.childNodes[i]);
+		model.workspaceView.style.width = (barmatz.utils.Window.width - barmatz.utils.CSS.absoluteWidth(model.toolboxView) - barmatz.utils.CSS.absoluteWidth(model.propertiesPanelView)) + 'px';
 	}
 	
 	function addToolboxViewItemListeners(item)
 	{
 		barmatz.utils.DataTypes.isNotUndefined(item);
 		barmatz.utils.DataTypes.isInstanceOf(item, HTMLElement);
-		item.addEventListener('click', onToolboxViewItemClick);
+		item.addEventListener('click', onModelToolboxViewItemClick);
 	}
 	
 	function removeToolboxViewItemListeners(item)
 	{
 		barmatz.utils.DataTypes.isNotUndefined(item);
 		barmatz.utils.DataTypes.isInstanceOf(item, HTMLElement);
-		item.removeEventListener('click', onToolboxViewItemClick);
-	}
-	
-	function getIndexOfView(view)
-	{
-		return Array.prototype.slice.call(view.parentElement.childNodes).indexOf(view);
-	}
-	
-	function resizeUI()
-	{
-		workspaceView.style.width = (barmatz.utils.Window.width - barmatz.utils.CSS.absoluteWidth(toolboxView) - barmatz.utils.CSS.absoluteWidth(propertiesPanelView)) + 'px';
+		item.removeEventListener('click', onModelToolboxViewItemClick);
 	}
 	
 	function onWindowResize(event)
@@ -1365,65 +1391,315 @@ window.barmatz.forms.ui.BuilderController = function(toolboxModel, toolboxView, 
 		resizeUI();
 	}
 	
-	function onWorkspaceViewClick(event)
-	{
-		propertiesPanelController.model = null;
-		workspaceView.removeEventListener('click', onWorkspaceViewClick);
-	}
-	
-	function onToolboxViewItemClick(event)
+	function onModelToolboxItemAdded(event)
 	{
 		barmatz.utils.DataTypes.isNotUndefined(event);
-		barmatz.utils.DataTypes.isInstanceOf(event, MouseEvent);
-		workspaceModel.addItem(toolboxModel.getFieldModelAt(getIndexOfView(event.target)).clone());
-		event.stopImmediatePropagation();
-		workspaceView.addEventListener('click', onWorkspaceViewClick);
+		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.BuilderEvent);
+		addToolboxViewItemListeners(model.getToolboxItemViewAt(event.index));
 	}
 	
-	function onWorkspaceViewItemClick(event)
+	function onModelToolboxItemRemoved(event)
 	{
 		barmatz.utils.DataTypes.isNotUndefined(event);
-		barmatz.utils.DataTypes.isInstanceOf(event, MouseEvent);
-		event.stopImmediatePropagation();
-		workspaceView.addEventListener('click', onWorkspaceViewClick);
-		propertiesPanelController.model = workspaceModel.getItemAt(getIndexOfView(event.currentTarget));
-	}
-	
-	function onWorkspaceModelAdded(event)
-	{
-		barmatz.utils.DataTypes.isNotUndefined(event);
-		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.CollectionEvent);
-		workspaceView.childNodes[event.index].addEventListener('click', onWorkspaceViewItemClick);
-		propertiesPanelController.model = event.item;
-	}
-	
-	function onWorkspaceModelRemoved(event)
-	{
-		barmatz.utils.DataTypes.isNotUndefined(event);
-		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.CollectionEvent);
-		if(workspaceModel.numItems == 0)
-			propertiesPanelController.model = null;
-	}
-	
-	function onToolboxModelAdded(event)
-	{
-		barmatz.utils.DataTypes.isNotUndefined(event);
-		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.CollectionEvent);
-		addToolboxViewItemListeners(toolboxView.childNodes[event.index]);
-	}
-	
-	function onToolboxModelRemoved(event)
-	{
-		barmatz.utils.DataTypes.isNotUndefined(event);
-		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.CollectionEvent);
+		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.BuilderEvent);
 		removeToolboxViewItemListeners(toolboxView.childNodes[event.index]);
+	}
+
+	function onModelToolboxViewItemClick(event)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(event);
+		barmatz.utils.DataTypes.isInstanceOf(event, MouseEvent);
+		model.workspaceViewClickHandler = onModelWorkspaceViewClick;
+		model.addWorkspaceItemFromToolbox(event.target);
+		event.stopImmediatePropagation();
+	}
+	
+	function onModelWorkspaceItemAdded(event)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(event);
+		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.BuilderEvent);
+		model.workspaceViewItemClickHandler = onModelWorkspaceViewItemClick;
+		model.setWorkspaceViewItemClickHandlerAt(event.index, onModelWorkspaceViewItemClick);
+	}
+	
+	function onModelWorkspaceViewItemClick(event)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(event);
+		barmatz.utils.DataTypes.isInstanceOf(event, MouseEvent);
+		event.stopImmediatePropagation();
+		model.workspaceViewClickHandler = onModelWorkspaceViewClick;
+		model.propertiesPanelControllerModel = model.getWorkspaceModelItemFromView(event.currentTarget);
+	}
+	
+	function onModelWorkspaceViewClick(event)
+	{
+		model.propertiesPanelControllerModel = null;
+		model.workspaceViewClickHandler = null;
+	}
+	
+	function onMenuNewClick(event)
+	{
+		console.log('new');
+	}
+	
+	function onMenuSaveClick(event)
+	{
+		console.log('save');
+	}
+	
+	function onMenuExportClick(event)
+	{
+		console.log('exprot');
 	}
 };
 
 barmatz.forms.ui.BuilderController.prototype = new barmatz.mvc.Controller();
 barmatz.forms.ui.BuilderController.prototype.constructor = barmatz.forms.ui.BuilderController;
+/** barmatz.forms.ui.BuilderModel **/
+window.barmatz.forms.ui.BuilderModel = function()
+{
+	var _this;
+	
+	barmatz.mvc.Model.call(this);
 
-Object.defineProperties(barmatz.forms.ui.BuilderController.prototype, {});
+	_this = this;
+	this.set('menuModel', barmatz.forms.factories.ModelFactory.createMenuModel());
+	this.set('menuView', barmatz.forms.factories.DOMFactory.createBuilderMenu());
+	this.set('toolboxModel', barmatz.forms.factories.ModelFactory.createToolboxModel());
+	this.set('toolboxView', barmatz.forms.factories.DOMFactory.createBuilderToolbox());
+	this.set('workspaceModel', barmatz.forms.factories.ModelFactory.createWorkspaceModel());
+	this.set('workspaceViewWrapper', barmatz.forms.factories.DOMFactory.createBuilderWorkspaceWrapper());
+	this.set('propertiesPanelView', barmatz.forms.factories.DOMFactory.createBuilderPropertiesPanel());
+	this.set('propertiesPanelController', barmatz.forms.factories.ControllerFactory.createPropertiesPanelController(this.propertiesPanelView));
+	
+	barmatz.forms.factories.ControllerFactory.createMenuController(this.get('menuModel'), this.menuView);
+	barmatz.forms.factories.ControllerFactory.createToolboxController(this.get('toolboxModel'), this.toolboxView);
+	barmatz.forms.factories.ControllerFactory.createWorkspaceController(this.get('workspaceModel'), this.get('workspaceViewWrapper').workspace);
+	
+	this.get('toolboxModel').addEventListener(barmatz.events.CollectionEvent.ITEM_ADDED, onModelItemAdded);
+	this.get('toolboxModel').addEventListener(barmatz.events.CollectionEvent.ITEM_REMOVED, onModelItemRemoved);
+	this.get('workspaceModel').addEventListener(barmatz.events.CollectionEvent.ITEM_ADDED, onModelItemAdded);
+	this.get('workspaceModel').addEventListener(barmatz.events.CollectionEvent.ITEM_REMOVED, onModelItemRemoved);
+	
+	function onModelItemAdded(event)
+	{
+		var type;
+		
+		barmatz.utils.DataTypes.isNotUndefined(event);
+		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.CollectionEvent);
+		
+		switch(event.target)
+		{
+			default:
+				throw new Error('unknown target');
+				break;
+			case _this.get('toolboxModel'):
+				type = barmatz.events.BuilderEvent.TOOLBOX_ITEM_ADDED;
+				break;
+			case _this.get('workspaceModel'):
+				type = barmatz.events.BuilderEvent.WORKSPACE_ITEM_ADDED;
+				_this.propertiesPanelControllerModel = event.item;
+				break;
+		}
+		
+		_this.dispatchEvent(new barmatz.events.BuilderEvent(type, event.item, event.index));
+	}
+	
+	function onModelItemRemoved(event)
+	{
+		var type;
+		
+		barmatz.utils.DataTypes.isNotUndefined(event);
+		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.CollectionEvent);
+		
+		switch(event.target)
+		{
+			default:
+				throw new Error('unknown target');
+				break;
+			case _this.get('toolboxModel'):
+				type = barmatz.events.BuilderEvent.TOOLBOX_ITEM_REMOVED;
+				break;
+			case _this.get('workspaceModel'):
+				type = barmatz.events.BuilderEvent.WORKSPACE_ITEM_REMOVED;
+				_this.propertiesPanelControllerModel = _this.numWorkspaceModelItems > 0 ? _this.getWorkspaceModelItemAt(event.index < _this.numWorkspaceModelItems ? event.index : event.index - 1) : null;
+				break;
+		}
+		
+		_this.dispatchEvent(new barmatz.events.BuilderEvent(type, event.item, event.index));
+	}
+};
+
+barmatz.forms.ui.BuilderModel.prototype = new barmatz.mvc.Model();
+barmatz.forms.ui.BuilderModel.prototype.constructor = barmatz.forms.ui.BuilderModel;
+
+Object.defineProperties(barmatz.forms.ui.BuilderModel.prototype, 
+{
+	menuView: {get: function()
+	{
+		return this.get('menuView'); 
+	}},
+	toolboxView: {get: function()
+	{
+		return this.get('toolboxView'); 
+	}},
+	workspaceView: {get: function()
+	{
+		return this.get('workspaceViewWrapper').wrapper; 
+	}},
+	propertiesPanelView: {get: function()
+	{
+		return this.get('propertiesPanelView'); 
+	}},
+	workspaceViewClickHandler: {get: function()
+	{
+		return this.get('workspaceViewClickHandler');
+	}, set: function(value)
+	{
+		barmatz.utils.DataTypes.isTypeOf(value, 'function', true);
+		
+		if(value != this.workspaceViewClickHandler)
+		{
+			if(barmatz.utils.DataTypes.applySilent('isValid', this.workspaceViewClickHandler))
+				this.workspaceView.removeEventListener('click', this.workspaceViewClickHandler);
+			
+			this.set('workspaceViewClickHandler', value);
+			
+			if(barmatz.utils.DataTypes.applySilent('isValid', value))
+				this.workspaceView.addEventListener('click', value);
+		}
+	}},
+	workspaceViewItemClickHandler: {get: function()
+	{
+		return this.get('workspaceViewItemClickHandler');
+	}, set: function(value)
+	{
+		var _this;
+		
+		barmatz.utils.DataTypes.isTypeOf(value, 'function', true);
+		
+		_this = this;
+		
+		if(value != this.workspaceViewItemClickHandler)
+		{
+			if(barmatz.utils.DataTypes.applySilent('isValid', this.workspaceViewItemClickHandler))
+				removeClickHandlerFromItems();
+			
+			this.set('workspaceViewItemClickHandler', value);
+			
+			if(barmatz.utils.DataTypes.applySilent('isValid', value))
+				addClickHandlerFromItems();
+		}
+		
+		function addClickHandlerFromItems()
+		{
+			addOrRemoveClickHandlerFromItems('add');
+		}
+		
+		function removeClickHandlerFromItems()
+		{
+			addOrRemoveClickHandlerFromItems('remove');
+		}
+		
+		function addOrRemoveClickHandlerFromItems(action)
+		{
+			var i;
+			
+			barmatz.utils.DataTypes.isNotUndefined(action);
+			barmatz.utils.DataTypes.isTypeOf(action, 'string');
+			
+			for(; i < _this.workspaceView.childNodes.length; i++)
+				_this.setWorkspaceViewItemClickHandlerAt(i, 'add' ? _this.workspaceViewClickHandler : null);
+		}
+	}},
+	propertiesPanelControllerModel: {get: function()
+	{
+		return this.get('propertiesPanelControllerModel');
+	}, set: function(value)
+	{
+		barmatz.utils.DataTypes.isInstanceOf(value, barmatz.forms.fields.FieldModel, true);
+		this.set('propertiesPanelControllerModel', value);
+		this.get('propertiesPanelController').model = value;
+	}},
+	numWorkspaceModelItems: {get: function()
+	{
+		return this.get('workspaceModel').numItems;
+	}},
+	addMenuItem: {value: function(label, clickHandler)
+	{
+
+		barmatz.utils.DataTypes.isNotUndefined(label);
+		barmatz.utils.DataTypes.isTypeOf(label, 'string');
+		barmatz.utils.DataTypes.isTypeOf(clickHandler, 'function');
+		this.get('menuModel').addItem(barmatz.forms.factories.ModelFactory.createMenuItemModel(label, clickHandler));
+	}},
+	addToolboxItem: {value: function(type, label)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(type);
+		barmatz.utils.DataTypes.isNotUndefined(label);
+		barmatz.utils.DataTypes.isTypeOf(type, 'string');
+		barmatz.utils.DataTypes.isTypeOf(label, 'string');
+		this.get('toolboxModel').addItem(barmatz.forms.factories.ModelFactory.createToolboxItemModel(type, label), barmatz.forms.factories.ModelFactory.createFieldModel(type, ''));
+	}},
+	addWorkspceItem: {value: function(item)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(item);
+		barmatz.utils.DataTypes.isInstanceOf(item, barmatz.mvc.Model);
+		this.get('workspaceModel').addItem(item);
+	}},
+	addWorkspaceItemFromToolbox: {value: function(item)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(item);
+		barmatz.utils.DataTypes.isInstanceOf(item, HTMLElement);
+		this.addWorkspceItem(this.getFieldModelFromToolboxModelAt(this.getIndexOfView(item)).clone());
+	}},
+	getIndexOfView: {value: function(view)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(view);
+		barmatz.utils.DataTypes.isInstanceOf(view, HTMLElement);
+		return Array.prototype.slice.call(view.parentElement.childNodes).indexOf(view);
+	}},
+	getFieldModelFromToolboxModelAt: {value: function(index)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(index);
+		barmatz.utils.DataTypes.isTypeOf(index, 'number');
+		return this.get('toolboxModel').getFieldModelAt(index);
+	}},
+	getToolboxItemViewAt: {value: function(index)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(index);
+		barmatz.utils.DataTypes.isTypeOf(index, 'number');
+		return this.toolboxView.childNodes[index];
+	}},
+	getWorkspaceModelItemAt: {value: function(index)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(index);
+		barmatz.utils.DataTypes.isTypeOf(index, 'number');
+		return this.get('workspaceModel').getItemAt(index);
+	}},
+	getWorkspaceModelItemFromView: {value: function(view)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(view);
+		barmatz.utils.DataTypes.isInstanceOf(view, HTMLElement);
+		return this.getWorkspaceModelItemAt(this.getIndexOfView(view));
+	}},
+	setWorkspaceViewItemClickHandlerAt: {value: function(index, handler)
+	{
+		var element;
+		
+		barmatz.utils.DataTypes.isNotUndefined(index);
+		barmatz.utils.DataTypes.isNotUndefined(handler);
+		barmatz.utils.DataTypes.isTypeOf(index, 'number');
+		barmatz.utils.DataTypes.isTypeOf(handler, 'function', true);
+		
+		element = this.get('workspaceViewWrapper').workspace.childNodes[index];
+		
+		if(barmatz.utils.DataTypes.applySilent('isValid', handler))
+			element.addEventListener('click', handler);
+		else if(element.hasEventListener('click'))
+			element.removeEventListener('click', handler);
+	}}
+});
 /** barmatz.forms.ui.JQueryPromptDialogController **/
 window.barmatz.forms.ui.JQueryPromptDialogController = function(model, view, fieldView)
 {
@@ -1478,7 +1754,7 @@ Object.defineProperties(barmatz.forms.ui.MenuController.prototype,
 	{
 		barmatz.utils.DataTypes.isNotUndefined(model);
 		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.ui.MenuItemModel);
-		return barmatz.forms.factories.DOMFactory.createMenuItem(model.label);
+		return barmatz.forms.factories.DOMFactory.createMenuItem(model.label, model.clickHandler);
 	}}
 });
 /** barmatz.forms.ui.MenuItemModel **/
@@ -1487,6 +1763,7 @@ window.barmatz.forms.ui.MenuItemModel = function(label)
 	barmatz.utils.DataTypes.isTypeOf(label, 'string');
 	barmatz.mvc.Model.call(this);
 	this.set('label', label);
+	this.set('clickHandler', null);
 };
 
 barmatz.forms.ui.MenuItemModel.prototype = new barmatz.mvc.Model();
@@ -1501,6 +1778,14 @@ Object.defineProperties(barmatz.forms.ui.MenuItemModel.prototype,
 	{
 		barmatz.utils.DataTypes.isTypeOf(label, 'string');
 		this._label = value;
+	}},
+	clickHandler: {get: function()
+	{
+		return this.get('clickHandler');
+	}, set: function(value)
+	{
+		barmatz.utils.DataTypes.isTypeOf(value, 'function', true);
+		this.set('clickHandler', value);
 	}}
 });
 /** barmatz.forms.ui.MenuModel **/
@@ -1716,7 +2001,7 @@ window.barmatz.forms.ui.WorkspaceController = function(model, view)
 	
 	if(model)
 	{
-		model.addEventListener(barmatz.events.CollectionEvent.ADDED, onModelAdded);
+		model.addEventListener(barmatz.events.CollectionEvent.ITEM_ADDED, onModelItemAdded);
 		setViewToSortable();
 	}
 	
@@ -1773,7 +2058,7 @@ window.barmatz.forms.ui.WorkspaceController = function(model, view)
 		selectedItemIndex = NaN;
 	}
 	
-	function onModelAdded(event)
+	function onModelItemAdded(event)
 	{
 		barmatz.utils.DataTypes.isNotUndefined(event);
 		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.CollectionEvent);
@@ -2029,7 +2314,7 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 			while(_this.numFields < fields.length)
 			{
 				field = fields[_this.numFields];
-				_this.addField(barmatz.forms.factories.ModelFactory.createFormFieldModel(field.type, field.name, field));
+				_this.addField(barmatz.forms.factories.ModelFactory.createFieldModel(field.type, field.name, field));
 			}
 		}
 	}},
@@ -2038,7 +2323,7 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 		barmatz.utils.DataTypes.isNotUndefined(field);
 		barmatz.utils.DataTypes.isInstanceOf(field, barmatz.forms.fields.FieldModel);
 		this._fields.push(field);
-		this.dispatchEvent(new barmatz.events.CollectionEvent(barmatz.events.CollectionEvent.ADDED, field));
+		this.dispatchEvent(new barmatz.events.CollectionEvent(barmatz.events.CollectionEvent.ITEM_ADDED, field));
 	}},
 	addFieldAt: {value: function(field, index)
 	{
@@ -2052,14 +2337,14 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 			index = this.numFields;
 		
 		this._fields.splice(index, 0, field);
-		this.dispatchEvent(new barmatz.events.CollectionEvent(barmatz.events.CollectionEvent.ADDED, field));
+		this.dispatchEvent(new barmatz.events.CollectionEvent(barmatz.events.CollectionEvent.ITEM_ADDED, field));
 	}},
 	removeField: {value: function(field)
 	{
 		barmatz.utils.DataTypes.isNotUndefined(field);
 		barmatz.utils.DataTypes.isInstanceOf(field, barmatz.forms.fields.FieldModel);
 		this.removeFieldAt(this._fields.indexOf(field));
-		this.dispatchEvent(new barmatz.events.CollectionEvent(barmatz.events.CollectionEvent.REMOVED, field));
+		this.dispatchEvent(new barmatz.events.CollectionEvent(barmatz.events.CollectionEvent.ITEM_REMOVED, field));
 	}},
 	removeFieldAt: {value: function(index)
 	{
@@ -2069,7 +2354,7 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 			throw new Error('index is out of bounds');
 		
 		field = this._fields.splice(index, 1)[0];
-		this.dispatchEvent(new barmatz.events.CollectionEvent(barmatz.events.CollectionEvent.REMOVED, field));
+		this.dispatchEvent(new barmatz.events.CollectionEvent(barmatz.events.CollectionEvent.ITEM_REMOVED, field));
 	}},
 	getFieldAt: {value: function(index)
 	{
@@ -2150,21 +2435,13 @@ Object.defineProperties(barmatz.forms.factories.ControllerFactory,
 		barmatz.utils.DataTypes.isInstanceOf(view, HTMLElement);
 		return new barmatz.forms.ui.PropertiesPanelController(view);
 	}},
-	createBuilderController: {value: function(toolboxModel, toolboxView, workspaceModel, workspaceView, propertiesPanelController, propertiesPanelView)
+	createBuilderController: {value: function(model, view)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(toolboxModel);
-		barmatz.utils.DataTypes.isNotUndefined(toolboxView);
-		barmatz.utils.DataTypes.isNotUndefined(workspaceModel);
-		barmatz.utils.DataTypes.isNotUndefined(workspaceView);
-		barmatz.utils.DataTypes.isNotUndefined(propertiesPanelController);
-		barmatz.utils.DataTypes.isNotUndefined(propertiesPanelView);
-		barmatz.utils.DataTypes.isInstanceOf(toolboxModel, barmatz.forms.CollectionModel);
-		barmatz.utils.DataTypes.isInstanceOf(toolboxView, HTMLElement);
-		barmatz.utils.DataTypes.isInstanceOf(workspaceModel, barmatz.forms.ui.WorkspaceModel);
-		barmatz.utils.DataTypes.isInstanceOf(workspaceView, HTMLElement);
-		barmatz.utils.DataTypes.isInstanceOf(propertiesPanelController, barmatz.forms.ui.PropertiesPanelController);
-		barmatz.utils.DataTypes.isInstanceOf(propertiesPanelView, HTMLElement);
-		return new barmatz.forms.ui.BuilderController(toolboxModel, toolboxView, workspaceModel, workspaceView, propertiesPanelController, propertiesPanelView);
+		barmatz.utils.DataTypes.isNotUndefined(model);
+		barmatz.utils.DataTypes.isNotUndefined(view);
+		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.ui.BuilderModel);
+		barmatz.utils.DataTypes.isInstanceOf(view, HTMLElement);
+		return new barmatz.forms.ui.BuilderController(model, view);
 	}},
 	createWorkspaceItemController: {value: function(model, labelView, fieldView, mandatoryView, deleteButtonView)
 	{
@@ -2354,11 +2631,31 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		barmatz.utils.DataTypes.isTypeOf(label, 'string');
 		return this.createElementWithContent('li', 'forms-toolbox-item', label);
 	}},
-	createMenuItem: {value: function(label)
+	createMenuItem: {value: function(label, clickHandler)
 	{
+		var item;
+		
 		barmatz.utils.DataTypes.isNotUndefined(label);
 		barmatz.utils.DataTypes.isTypeOf(label, 'string');
-		return this.createElementWithContent('li', 'forms-menu-item rounded-corner', label);
+		barmatz.utils.DataTypes.isTypeOf(clickHandler, 'function');
+		
+		item = this.createElementWithContent('li', 'forms-menu-item rounded-corner', label);
+		
+		if(barmatz.utils.DataTypes.applySilent('isValid', clickHandler))
+			item.addEventListener('click', clickHandler);
+		
+		return item;
+	}},
+	destroyMenuItem: {value: function(item, clickHandler)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(item);
+		barmatz.utils.DataTypes.isInstanceOfOf(item, HTMLElement);
+		barmatz.utils.DataTypes.isTypeOf(clickHandler, 'function');
+		
+		if(barmatz.utils.DataTypes.applySilent('isValid', clickHandler))
+			item.removeEventListener('click', clickHandler);
+		
+		item.parentElement.removeChild(item);
 	}},
 	createWorkspaceItemWrapper: {value: function(model)
 	{
@@ -2591,7 +2888,7 @@ window.barmatz.forms.factories.ModelFactory = function(){};
 
 Object.defineProperties(barmatz.forms.factories.ModelFactory,
 {
-	createFormFieldModel: {value: function(type, name)
+	createFieldModel: {value: function(type, name)
 	{
 		barmatz.utils.DataTypes.isNotUndefined(type);
 		barmatz.utils.DataTypes.isNotUndefined(name);
@@ -2623,11 +2920,20 @@ Object.defineProperties(barmatz.forms.factories.ModelFactory,
 				break;
 		}
 	}},
-	createMenuItemModel: {value: function(label)
+	createMenuItemModel: {value: function(label, clickHandler)
 	{
+		var model;
+		
 		barmatz.utils.DataTypes.isNotUndefined(label);
 		barmatz.utils.DataTypes.isTypeOf(label, 'string');
-		return new barmatz.forms.ui.MenuItemModel(label);
+		barmatz.utils.DataTypes.isTypeOf(clickHandler, 'function', true);
+
+		model = new barmatz.forms.ui.MenuItemModel(label);
+		
+		if(barmatz.utils.DataTypes.applySilent('isNotUndefined', clickHandler))
+			model.clickHandler = clickHandler;
+		
+		return model;
 	}},
 	createToolboxItemModel: {value: function(type, label)
 	{
@@ -2663,6 +2969,10 @@ Object.defineProperties(barmatz.forms.factories.ModelFactory,
 	{
 		barmatz.utils.DataTypes.isInstanceOf(items, Array, true);
 		return new barmatz.forms.fields.DropboxModel(items);
+	}},
+	createBuilderModel: {value: function()
+	{
+		return new barmatz.forms.ui.BuilderModel();
 	}}
 });
 /** barmatz.net.Loader **/

@@ -3,7 +3,7 @@ window.barmatz.forms.factories.ModelFactory = function(){};
 
 Object.defineProperties(barmatz.forms.factories.ModelFactory,
 {
-	createFormFieldModel: {value: function(type, name)
+	createFieldModel: {value: function(type, name)
 	{
 		barmatz.utils.DataTypes.isNotUndefined(type);
 		barmatz.utils.DataTypes.isNotUndefined(name);
@@ -35,11 +35,20 @@ Object.defineProperties(barmatz.forms.factories.ModelFactory,
 				break;
 		}
 	}},
-	createMenuItemModel: {value: function(label)
+	createMenuItemModel: {value: function(label, clickHandler)
 	{
+		var model;
+		
 		barmatz.utils.DataTypes.isNotUndefined(label);
 		barmatz.utils.DataTypes.isTypeOf(label, 'string');
-		return new barmatz.forms.ui.MenuItemModel(label);
+		barmatz.utils.DataTypes.isTypeOf(clickHandler, 'function', true);
+
+		model = new barmatz.forms.ui.MenuItemModel(label);
+		
+		if(barmatz.utils.DataTypes.applySilent('isNotUndefined', clickHandler))
+			model.clickHandler = clickHandler;
+		
+		return model;
 	}},
 	createToolboxItemModel: {value: function(type, label)
 	{
@@ -75,5 +84,9 @@ Object.defineProperties(barmatz.forms.factories.ModelFactory,
 	{
 		barmatz.utils.DataTypes.isInstanceOf(items, Array, true);
 		return new barmatz.forms.fields.DropboxModel(items);
+	}},
+	createBuilderModel: {value: function()
+	{
+		return new barmatz.forms.ui.BuilderModel();
 	}}
 });

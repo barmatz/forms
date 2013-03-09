@@ -4,6 +4,7 @@ window.barmatz.forms.ui.MenuItemModel = function(label)
 	barmatz.utils.DataTypes.isTypeOf(label, 'string');
 	barmatz.mvc.Model.call(this);
 	this.set('label', label);
+	this.set('clickHandler', null);
 };
 
 barmatz.forms.ui.MenuItemModel.prototype = new barmatz.mvc.Model();
@@ -18,5 +19,13 @@ Object.defineProperties(barmatz.forms.ui.MenuItemModel.prototype,
 	{
 		barmatz.utils.DataTypes.isTypeOf(label, 'string');
 		this._label = value;
+	}},
+	clickHandler: {get: function()
+	{
+		return this.get('clickHandler');
+	}, set: function(value)
+	{
+		barmatz.utils.DataTypes.isTypeOf(value, 'function', true);
+		this.set('clickHandler', value);
 	}}
 });

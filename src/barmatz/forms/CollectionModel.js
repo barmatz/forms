@@ -23,7 +23,7 @@ Object.defineProperties(barmatz.forms.CollectionModel.prototype,
 		
 		items = this.get('items');
 		items.push(item);
-		this.dispatchEvent(new barmatz.events.CollectionEvent(barmatz.events.CollectionEvent.ADDED, item, items.length - 1));
+		this.dispatchEvent(new barmatz.events.CollectionEvent(barmatz.events.CollectionEvent.ITEM_ADDED, item, items.length - 1));
 	}},
 	removeItem: {value: function(item)
 	{
@@ -35,7 +35,7 @@ Object.defineProperties(barmatz.forms.CollectionModel.prototype,
 		items = this.get('items')
 		index = items.indexOf(item);
 		items.splice(index, 1);
-		this.dispatchEvent(new barmatz.events.CollectionEvent(barmatz.events.CollectionEvent.REMOVED, item, index));
+		this.dispatchEvent(new barmatz.events.CollectionEvent(barmatz.events.CollectionEvent.ITEM_REMOVED, item, index));
 	}},
 	getItemAt: {value: function(index)
 	{

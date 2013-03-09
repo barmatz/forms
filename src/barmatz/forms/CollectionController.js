@@ -12,22 +12,22 @@ window.barmatz.forms.CollectionController = function(model, view)
 	
 	if(model)
 	{
-		model.addEventListener(barmatz.events.CollectionEvent.ADDED, onModelAdded);
-		model.addEventListener(barmatz.events.CollectionEvent.REMOVED, onModelRemoved);
+		model.addEventListener(barmatz.events.CollectionEvent.ITEM_ADDED, onModelItemAdded);
+		model.addEventListener(barmatz.events.CollectionEvent.ITEM_REMOVED, onModelItemRemoved);
 		model.forEach(function(item, index, collection)
 		{
 			_this._addItemModelToView(item);
 		});
 	}
 	
-	function onModelAdded(event)
+	function onModelItemAdded(event)
 	{
 		barmatz.utils.DataTypes.isNotUndefined(event);
 		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.CollectionEvent);
 		_this._addItemModelToView(event.item);
 	}
 	
-	function onModelRemoved(event)
+	function onModelItemRemoved(event)
 	{
 		barmatz.utils.DataTypes.isNotUndefined(event);
 		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.CollectionEvent);

@@ -128,7 +128,7 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 			while(_this.numFields < fields.length)
 			{
 				field = fields[_this.numFields];
-				_this.addField(barmatz.forms.factories.ModelFactory.createFormFieldModel(field.type, field.name, field));
+				_this.addField(barmatz.forms.factories.ModelFactory.createFieldModel(field.type, field.name, field));
 			}
 		}
 	}},
@@ -137,7 +137,7 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 		barmatz.utils.DataTypes.isNotUndefined(field);
 		barmatz.utils.DataTypes.isInstanceOf(field, barmatz.forms.fields.FieldModel);
 		this._fields.push(field);
-		this.dispatchEvent(new barmatz.events.CollectionEvent(barmatz.events.CollectionEvent.ADDED, field));
+		this.dispatchEvent(new barmatz.events.CollectionEvent(barmatz.events.CollectionEvent.ITEM_ADDED, field));
 	}},
 	addFieldAt: {value: function(field, index)
 	{
@@ -151,14 +151,14 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 			index = this.numFields;
 		
 		this._fields.splice(index, 0, field);
-		this.dispatchEvent(new barmatz.events.CollectionEvent(barmatz.events.CollectionEvent.ADDED, field));
+		this.dispatchEvent(new barmatz.events.CollectionEvent(barmatz.events.CollectionEvent.ITEM_ADDED, field));
 	}},
 	removeField: {value: function(field)
 	{
 		barmatz.utils.DataTypes.isNotUndefined(field);
 		barmatz.utils.DataTypes.isInstanceOf(field, barmatz.forms.fields.FieldModel);
 		this.removeFieldAt(this._fields.indexOf(field));
-		this.dispatchEvent(new barmatz.events.CollectionEvent(barmatz.events.CollectionEvent.REMOVED, field));
+		this.dispatchEvent(new barmatz.events.CollectionEvent(barmatz.events.CollectionEvent.ITEM_REMOVED, field));
 	}},
 	removeFieldAt: {value: function(index)
 	{
@@ -168,7 +168,7 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 			throw new Error('index is out of bounds');
 		
 		field = this._fields.splice(index, 1)[0];
-		this.dispatchEvent(new barmatz.events.CollectionEvent(barmatz.events.CollectionEvent.REMOVED, field));
+		this.dispatchEvent(new barmatz.events.CollectionEvent(barmatz.events.CollectionEvent.ITEM_REMOVED, field));
 	}},
 	getFieldAt: {value: function(index)
 	{

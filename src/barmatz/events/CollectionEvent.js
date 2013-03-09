@@ -10,8 +10,8 @@ window.barmatz.events.CollectionEvent = function(type)
 	
 	switch(type)
 	{
-		case barmatz.events.CollectionEvent.ADDED:
-		case barmatz.events.CollectionEvent.REMOVED:
+		case barmatz.events.CollectionEvent.ITEM_ADDED:
+		case barmatz.events.CollectionEvent.ITEM_REMOVED:
 			this._item = arguments[1];
 			this._index = arguments[2];
 			break;
@@ -23,8 +23,8 @@ barmatz.events.CollectionEvent.prototype.constructor = barmatz.events.Collection
 
 Object.defineProperties(barmatz.events.CollectionEvent,
 {
-	ADDED: {value: 'added'},
-	REMOVED: {value: 'removed'}
+	ITEM_ADDED: {value: 'itemAdded'},
+	ITEM_REMOVED: {value: 'itemRemoved'}
 });
 Object.defineProperties(barmatz.events.CollectionEvent.prototype,
 {

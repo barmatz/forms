@@ -33,21 +33,13 @@ Object.defineProperties(barmatz.forms.factories.ControllerFactory,
 		barmatz.utils.DataTypes.isInstanceOf(view, HTMLElement);
 		return new barmatz.forms.ui.PropertiesPanelController(view);
 	}},
-	createBuilderController: {value: function(toolboxModel, toolboxView, workspaceModel, workspaceView, propertiesPanelController, propertiesPanelView)
+	createBuilderController: {value: function(model, view)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(toolboxModel);
-		barmatz.utils.DataTypes.isNotUndefined(toolboxView);
-		barmatz.utils.DataTypes.isNotUndefined(workspaceModel);
-		barmatz.utils.DataTypes.isNotUndefined(workspaceView);
-		barmatz.utils.DataTypes.isNotUndefined(propertiesPanelController);
-		barmatz.utils.DataTypes.isNotUndefined(propertiesPanelView);
-		barmatz.utils.DataTypes.isInstanceOf(toolboxModel, barmatz.forms.CollectionModel);
-		barmatz.utils.DataTypes.isInstanceOf(toolboxView, HTMLElement);
-		barmatz.utils.DataTypes.isInstanceOf(workspaceModel, barmatz.forms.ui.WorkspaceModel);
-		barmatz.utils.DataTypes.isInstanceOf(workspaceView, HTMLElement);
-		barmatz.utils.DataTypes.isInstanceOf(propertiesPanelController, barmatz.forms.ui.PropertiesPanelController);
-		barmatz.utils.DataTypes.isInstanceOf(propertiesPanelView, HTMLElement);
-		return new barmatz.forms.ui.BuilderController(toolboxModel, toolboxView, workspaceModel, workspaceView, propertiesPanelController, propertiesPanelView);
+		barmatz.utils.DataTypes.isNotUndefined(model);
+		barmatz.utils.DataTypes.isNotUndefined(view);
+		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.ui.BuilderModel);
+		barmatz.utils.DataTypes.isInstanceOf(view, HTMLElement);
+		return new barmatz.forms.ui.BuilderController(model, view);
 	}},
 	createWorkspaceItemController: {value: function(model, labelView, fieldView, mandatoryView, deleteButtonView)
 	{
