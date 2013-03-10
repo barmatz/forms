@@ -63,9 +63,6 @@ Object.defineProperties(barmatz.forms.ui.PropertiesPanelController.prototype,
 				case 'enabled':
 					itemsWrapper.enabledField.value = event.value;
 					break;
-				case 'min':
-					itemsWrapper.minField.value = isNaN(event.value) ? '' : event.value;
-					break;
 				case 'max':
 					itemsWrapper.maxField.value = isNaN(event.value) ? '' : event.value;
 					break;

@@ -23,13 +23,13 @@ window.barmatz.forms.ui.BuilderController = function(model, view)
 	view.appendChild(model.toolboxView);
 	view.appendChild(model.workspaceView);
 	view.appendChild(model.propertiesPanelView);
-
 	
 	resizeUI();
 	
 	function resizeUI()
 	{
-		model.workspaceView.style.width = (barmatz.utils.Window.width - barmatz.utils.CSS.absoluteWidth(model.toolboxView) - barmatz.utils.CSS.absoluteWidth(model.propertiesPanelView)) + 'px';
+		var workspaceStyle = barmatz.utils.CSS.getStyle(model.workspaceView);
+		model.workspaceView.style.width = barmatz.utils.Window.width - barmatz.utils.CSS.absoluteWidth(model.toolboxView) - barmatz.utils.CSS.absoluteWidth(model.propertiesPanelView) - barmatz.utils.CSS.unitToPixal(model.workspaceView, workspaceStyle.borderLeft) - barmatz.utils.CSS.unitToPixal(model.workspaceView, workspaceStyle.borderRight) + 'px';
 	}
 	
 	function addToolboxViewItemListeners(item)

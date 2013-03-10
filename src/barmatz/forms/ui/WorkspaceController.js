@@ -101,9 +101,14 @@ Object.defineProperties(barmatz.forms.ui.WorkspaceController.prototype,
 		{
 			barmatz.utils.DataTypes.isNotUndefined(event);
 			barmatz.utils.DataTypes.isInstanceOf(event, MouseEvent);
+			barmatz.forms.factories.DOMFactory.createConfirmPromptDialog('Are you sure you want to delete this item?', onDialogConfirm, true);
+			event.stopImmediatePropagation();
+		}
+		
+		function onDialogConfirm(event)
+		{
 			viewWrapper.deleteButton.removeEventListener('click', onDeleteButtonClick);
 			_this._model.removeItem(model);
-			event.stopImmediatePropagation();
 		}
 	}}
 });

@@ -13,7 +13,6 @@ window.barmatz.forms.ui.WorkspaceItemController = function(model, labelView, fie
 	barmatz.utils.DataTypes.isInstanceOf(deleteButtonView, HTMLElement);
 	barmatz.mvc.Controller.call(this);
 	model.addEventListener(barmatz.events.ModelEvent.VALUE_CHANGED, onModelValueChanged);
-	deleteButtonView.addEventListener('click', onDeleteButtonViewClick);
 	
 	function onModelValueChanged(event)
 	{
@@ -43,11 +42,8 @@ window.barmatz.forms.ui.WorkspaceItemController = function(model, labelView, fie
 			case 'enabled':
 				fieldView.disabled = !event.value;
 				break;
-			case 'min':
-				fieldView.min = event.value;
-				break;
 			case 'max':
-				fieldView.max = event.value;
+				fieldView.maxLength = event.value;
 				break;
 			case 'checked':
 				fieldView.checked = event.value;
@@ -60,16 +56,7 @@ window.barmatz.forms.ui.WorkspaceItemController = function(model, labelView, fie
 				break;
 		}
 	}
-	
-	function onDeleteButtonViewClick(event)
-	{
-		barmatz.utils.DataTypes.isNotUndefined(event);
-		barmatz.utils.DataTypes.isInstanceOf(event, MouseEvent);
-		model.removeEventListener(barmatz.events.ModelEvent.VALUE_CHANGED, onModelValueChanged);
-	}
 };
 
 barmatz.forms.ui.WorkspaceItemController.prototype = new barmatz.mvc.Controller();
 barmatz.forms.ui.WorkspaceItemController.prototype.constructor = barmatz.forms.ui.WorkspaceItemController;
-
-Object.defineProperties(barmatz.forms.ui.WorkspaceItemController.prototype, {});

@@ -11,7 +11,7 @@
 .forms-builder-workspace { width: 100%; }
 .forms-builder-workspace .forms-workspace-item {}
 .forms-builder-workspace .forms-workspace-item:hover, .forms-builder-workspace .sortable-placeholder { background: rgb(255, 255, 255); background: rgba(255, 255, 255, .5); }
-.forms-builder-workspace .forms-workspace-item td, .forms-builder-workspace .sortable-placeholder { height: 2em; vertical-align: middle; }
+.forms-builder-workspace .forms-workspace-item td, .forms-builder-workspace .sortable-placeholder { height: 3em; vertical-align: middle; }
 .forms-builder-workspace .forms-workspace-item .forms-workspace-item-grip { width: 16px; max-width: 16px; cursor: pointer; }
 .forms-builder-workspace .forms-workspace-item .forms-workspace-item-label { width: 100px; max-width: 100%; }
 .forms-builder-workspace .forms-workspace-item .forms-workspace-item-field { width: auto; }

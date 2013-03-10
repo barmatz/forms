@@ -1018,7 +1018,6 @@ window.barmatz.forms.fields.TextFieldModel = function(name)
 	barmatz.utils.DataTypes.isNotUndefined(name);
 	barmatz.utils.DataTypes.isTypeOf(name, 'string', true);
 	barmatz.forms.fields.FieldModel.call(this, barmatz.forms.fields.FieldTypes.TEXT, name);
-	this.set('min', NaN);
 	this.set('max', NaN);
 };
 
@@ -1027,14 +1026,6 @@ barmatz.forms.fields.TextFieldModel.prototype.constructor = barmatz.forms.fields
 
 Object.defineProperties(barmatz.forms.fields.TextFieldModel.prototype,
 {
-	min: {get: function()
-	{
-		return this.get('min');
-	}, set: function(value)
-	{
-		barmatz.utils.DataTypes.isTypeOf(value, 'number');
-		this.set('min', value);
-	}},
 	max: {get: function()
 	{
 		return this.get('max');
@@ -1051,7 +1042,6 @@ Object.defineProperties(barmatz.forms.fields.TextFieldModel.prototype,
 		clone.default = this.default;
 		clone.value = this.value;
 		clone.enabled = this.enabled;
-		clone.min = this.min;
 		clone.max = this.max;
 		return clone;
 	}}
@@ -1393,13 +1383,13 @@ window.barmatz.forms.ui.BuilderController = function(model, view)
 	view.appendChild(model.toolboxView);
 	view.appendChild(model.workspaceView);
 	view.appendChild(model.propertiesPanelView);
-
 	
 	resizeUI();
 	
 	function resizeUI()
 	{
-		model.workspaceView.style.width = (barmatz.utils.Window.width - barmatz.utils.CSS.absoluteWidth(model.toolboxView) - barmatz.utils.CSS.absoluteWidth(model.propertiesPanelView)) + 'px';
+		var workspaceStyle = barmatz.utils.CSS.getStyle(model.workspaceView);
+		model.workspaceView.style.width = barmatz.utils.Window.width - barmatz.utils.CSS.absoluteWidth(model.toolboxView) - barmatz.utils.CSS.absoluteWidth(model.propertiesPanelView) - barmatz.utils.CSS.unitToPixal(model.workspaceView, workspaceStyle.borderLeft) - barmatz.utils.CSS.unitToPixal(model.workspaceView, workspaceStyle.borderRight) + 'px';
 	}
 	
 	function addToolboxViewItemListeners(item)
@@ -1936,9 +1926,6 @@ Object.defineProperties(barmatz.forms.ui.PropertiesPanelController.prototype,
 				case 'enabled':
 					itemsWrapper.enabledField.value = event.value;
 					break;
-				case 'min':
-					itemsWrapper.minField.value = isNaN(event.value) ? '' : event.value;
-					break;
 				case 'max':
 					itemsWrapper.maxField.value = isNaN(event.value) ? '' : event.value;
 					break;
@@ -2148,9 +2135,14 @@ Object.defineProperties(barmatz.forms.ui.WorkspaceController.prototype,
 		{
 			barmatz.utils.DataTypes.isNotUndefined(event);
 			barmatz.utils.DataTypes.isInstanceOf(event, MouseEvent);
+			barmatz.forms.factories.DOMFactory.createConfirmPromptDialog('Are you sure you want to delete this item?', onDialogConfirm, true);
+			event.stopImmediatePropagation();
+		}
+		
+		function onDialogConfirm(event)
+		{
 			viewWrapper.deleteButton.removeEventListener('click', onDeleteButtonClick);
 			_this._model.removeItem(model);
-			event.stopImmediatePropagation();
 		}
 	}}
 });
@@ -2169,7 +2161,6 @@ window.barmatz.forms.ui.WorkspaceItemController = function(model, labelView, fie
 	barmatz.utils.DataTypes.isInstanceOf(deleteButtonView, HTMLElement);
 	barmatz.mvc.Controller.call(this);
 	model.addEventListener(barmatz.events.ModelEvent.VALUE_CHANGED, onModelValueChanged);
-	deleteButtonView.addEventListener('click', onDeleteButtonViewClick);
 	
 	function onModelValueChanged(event)
 	{
@@ -2199,11 +2190,8 @@ window.barmatz.forms.ui.WorkspaceItemController = function(model, labelView, fie
 			case 'enabled':
 				fieldView.disabled = !event.value;
 				break;
-			case 'min':
-				fieldView.min = event.value;
-				break;
 			case 'max':
-				fieldView.max = event.value;
+				fieldView.maxLength = event.value;
 				break;
 			case 'checked':
 				fieldView.checked = event.value;
@@ -2216,19 +2204,10 @@ window.barmatz.forms.ui.WorkspaceItemController = function(model, labelView, fie
 				break;
 		}
 	}
-	
-	function onDeleteButtonViewClick(event)
-	{
-		barmatz.utils.DataTypes.isNotUndefined(event);
-		barmatz.utils.DataTypes.isInstanceOf(event, MouseEvent);
-		model.removeEventListener(barmatz.events.ModelEvent.VALUE_CHANGED, onModelValueChanged);
-	}
 };
 
 barmatz.forms.ui.WorkspaceItemController.prototype = new barmatz.mvc.Controller();
 barmatz.forms.ui.WorkspaceItemController.prototype.constructor = barmatz.forms.ui.WorkspaceItemController;
-
-Object.defineProperties(barmatz.forms.ui.WorkspaceItemController.prototype, {});
 /** barmatz.forms.ui.WorkspaceModel **/
 window.barmatz.forms.ui.WorkspaceModel = function()
 {
@@ -2556,6 +2535,7 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		barmatz.utils.DataTypes.isNotUndefined(tagName);
 		barmatz.utils.DataTypes.isTypeOf(tagName, 'string');
 		barmatz.utils.DataTypes.isTypeOf(className, 'string', true);
+		barmatz.utils.DataTypes.isTypesOrInstances(content, ['string'], [HTMLElement, Array]);
 		
 		if(barmatz.utils.DataTypes.isTypesOrInstances(content, ['string'], [HTMLElement, Array], true))
 		{
@@ -2779,10 +2759,7 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 			returnWrapper.acceptField = addFieldToWrapper('array', 'accept', 'accept', model.accept);
 
 		if(model instanceof barmatz.forms.fields.TextFieldModel)
-		{
-			returnWrapper.minField = addFieldToWrapper('number', 'min', 'min', model.min);
 			returnWrapper.maxField = addFieldToWrapper('number', 'max', 'max', model.max);
-		}
 		
 		if(model instanceof barmatz.forms.fields.CheckboxFieldModel)
 		{
@@ -2910,10 +2887,18 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 	}},
 	createDialog: {value: function(title, content, container)
 	{
-		var dialog = this.createElementWithContent('div', 'forms-dialog', content);
+		var dialog;
+		
+		barmatz.utils.DataTypes.isNotUndefined(title);
+		barmatz.utils.DataTypes.isNotUndefined(content);
+		barmatz.utils.DataTypes.isTypeOf(title, 'string');
+		barmatz.utils.DataTypes.isTypesOrInstances(content, ['string'], [HTMLElement, Array]);
+		barmatz.utils.DataTypes.isInstanceOf(container, HTMLElement, true);
+		
+		dialog = this.createElementWithContent('div', 'forms-dialog', content);
 		dialog.title = title;
 		(container || this.BODY_ELEMENT).appendChild(dialog);
-		jQuery(dialog).dialog({autoOpen: false});
+		jQuery(dialog).dialog({autoOpen: false, draggable: false, modal: true});
 		return dialog;
 	}},
 	destroyDialog: {value: function(dialog)
@@ -2933,9 +2918,7 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		
 		jQuery(dialog).dialog({
 			closeOnEscape: false,
-			dialogClass: 'forms-builder-dialog-prompt',
-			draggable: false, 
-			modal: true
+			dialogClass: 'forms-builder-dialog-prompt'
 		});
 		
 		return {wrapper: dialog, nameField: nameField, labelField: labelField};
@@ -2951,6 +2934,39 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 			field.type = 'text';
 			barmatz.utils.CSS.verticalAlignChildren(form.appendChild(_this.createElementWithContent('tr', '', [_this.createElementWithContent('td', '', _this.createElementWithContent('label', '', label)), _this.createElementWithContent('td', '', field)])));
 			return field;
+		}
+	}},
+	createConfirmPromptDialog: {value: function(message, confirmHandler, open)
+	{
+		var _this;
+		
+		barmatz.utils.DataTypes.isNotUndefined(message);
+		barmatz.utils.DataTypes.isNotUndefined(confirmHandler);
+		barmatz.utils.DataTypes.isTypeOf(message, 'string');
+		barmatz.utils.DataTypes.isTypeOf(confirmHandler, 'function');
+		barmatz.utils.DataTypes.isTypeOf(open, 'boolean', true);
+		
+		_this = this;
+		dialog = this.createDialog('Confirm', message);
+		
+		jQuery(dialog).dialog({
+			buttons: {OK: onOKButtonClick, Cancel: onCancelButtonClick}
+		});
+		
+		if(open)
+			jQuery(dialog).dialog('open');
+		
+		return dialog;
+		
+		function onOKButtonClick(event)
+		{
+			_this.destroyDialog(dialog);
+			confirmHandler(event);
+		}
+		
+		function onCancelButtonClick()
+		{
+			_this.destroyDialog(dialog);
 		}
 	}}
 });

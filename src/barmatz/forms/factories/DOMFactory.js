@@ -31,6 +31,7 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		barmatz.utils.DataTypes.isNotUndefined(tagName);
 		barmatz.utils.DataTypes.isTypeOf(tagName, 'string');
 		barmatz.utils.DataTypes.isTypeOf(className, 'string', true);
+		barmatz.utils.DataTypes.isTypesOrInstances(content, ['string'], [HTMLElement, Array]);
 		
 		if(barmatz.utils.DataTypes.isTypesOrInstances(content, ['string'], [HTMLElement, Array], true))
 		{
@@ -254,10 +255,7 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 			returnWrapper.acceptField = addFieldToWrapper('array', 'accept', 'accept', model.accept);
 
 		if(model instanceof barmatz.forms.fields.TextFieldModel)
-		{
-			returnWrapper.minField = addFieldToWrapper('number', 'min', 'min', model.min);
 			returnWrapper.maxField = addFieldToWrapper('number', 'max', 'max', model.max);
-		}
 		
 		if(model instanceof barmatz.forms.fields.CheckboxFieldModel)
 		{
@@ -385,10 +383,18 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 	}},
 	createDialog: {value: function(title, content, container)
 	{
-		var dialog = this.createElementWithContent('div', 'forms-dialog', content);
+		var dialog;
+		
+		barmatz.utils.DataTypes.isNotUndefined(title);
+		barmatz.utils.DataTypes.isNotUndefined(content);
+		barmatz.utils.DataTypes.isTypeOf(title, 'string');
+		barmatz.utils.DataTypes.isTypesOrInstances(content, ['string'], [HTMLElement, Array]);
+		barmatz.utils.DataTypes.isInstanceOf(container, HTMLElement, true);
+		
+		dialog = this.createElementWithContent('div', 'forms-dialog', content);
 		dialog.title = title;
 		(container || this.BODY_ELEMENT).appendChild(dialog);
-		jQuery(dialog).dialog({autoOpen: false});
+		jQuery(dialog).dialog({autoOpen: false, draggable: false, modal: true});
 		return dialog;
 	}},
 	destroyDialog: {value: function(dialog)
@@ -408,9 +414,7 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		
 		jQuery(dialog).dialog({
 			closeOnEscape: false,
-			dialogClass: 'forms-builder-dialog-prompt',
-			draggable: false, 
-			modal: true
+			dialogClass: 'forms-builder-dialog-prompt'
 		});
 		
 		return {wrapper: dialog, nameField: nameField, labelField: labelField};
@@ -426,6 +430,39 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 			field.type = 'text';
 			barmatz.utils.CSS.verticalAlignChildren(form.appendChild(_this.createElementWithContent('tr', '', [_this.createElementWithContent('td', '', _this.createElementWithContent('label', '', label)), _this.createElementWithContent('td', '', field)])));
 			return field;
+		}
+	}},
+	createConfirmPromptDialog: {value: function(message, confirmHandler, open)
+	{
+		var _this;
+		
+		barmatz.utils.DataTypes.isNotUndefined(message);
+		barmatz.utils.DataTypes.isNotUndefined(confirmHandler);
+		barmatz.utils.DataTypes.isTypeOf(message, 'string');
+		barmatz.utils.DataTypes.isTypeOf(confirmHandler, 'function');
+		barmatz.utils.DataTypes.isTypeOf(open, 'boolean', true);
+		
+		_this = this;
+		dialog = this.createDialog('Confirm', message);
+		
+		jQuery(dialog).dialog({
+			buttons: {OK: onOKButtonClick, Cancel: onCancelButtonClick}
+		});
+		
+		if(open)
+			jQuery(dialog).dialog('open');
+		
+		return dialog;
+		
+		function onOKButtonClick(event)
+		{
+			_this.destroyDialog(dialog);
+			confirmHandler(event);
+		}
+		
+		function onCancelButtonClick()
+		{
+			_this.destroyDialog(dialog);
 		}
 	}}
 });
