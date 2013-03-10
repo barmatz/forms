@@ -141,11 +141,7 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 	}},
 	createBuilderToolbox: {value: function()
 	{
-		return this.createElement('ul', 'forms-builder-toolbox');
-	}},
-	createBuilderMenu: {value: function()
-	{
-		return this.createElement('ul', 'forms-builder-menu');
+		return this.createElement('ul');
 	}},
 	createBuilderWorkspaceWrapper: {value: function(formName, saveStatus)
 	{
@@ -156,45 +152,19 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		
 		formNameElement = this.createElementWithContent('h1', 'forms-builder-workspace-header-form-name', formName || 'Unnamed form');
 		saveStatusElement = this.createElementWithContent('h3', 'forms-builder-workspace-header-save-status', saveStatus || 'form not saved');
-		workspaceElement = this.createElement('table', 'forms-builder-workspace');
+		workspaceElement = this.createElement('table', 'forms-builder-workspace-items');
 
 		return {wrapper: this.createElementWithContent('div', 'forms-builder-workspace-wrapper', [this.createElementWithContent('div', 'forms-builder-workspace-header', [formNameElement, saveStatusElement]), workspaceElement]), formName: formNameElement, saveStatus: saveStatusElement, workspace: workspaceElement};
 	}},
 	createBuilderPropertiesPanel: {value: function()
 	{
-		return this.createElement('div', 'forms-builder-properties-panel');
+		return this.createElement('div');
 	}},
 	createToolboxItem: {value: function(label)
 	{
 		barmatz.utils.DataTypes.isNotUndefined(label);
 		barmatz.utils.DataTypes.isTypeOf(label, 'string');
 		return this.createElementWithContent('li', 'forms-toolbox-item', label);
-	}},
-	createMenuItem: {value: function(label, clickHandler)
-	{
-		var item;
-		
-		barmatz.utils.DataTypes.isNotUndefined(label);
-		barmatz.utils.DataTypes.isTypeOf(label, 'string');
-		barmatz.utils.DataTypes.isTypeOf(clickHandler, 'function');
-		
-		item = this.createElementWithContent('li', 'forms-menu-item rounded-corner', label);
-		
-		if(barmatz.utils.DataTypes.applySilent('isValid', clickHandler))
-			item.addEventListener('click', clickHandler);
-		
-		return item;
-	}},
-	destroyMenuItem: {value: function(item, clickHandler)
-	{
-		barmatz.utils.DataTypes.isNotUndefined(item);
-		barmatz.utils.DataTypes.isInstanceOfOf(item, HTMLElement);
-		barmatz.utils.DataTypes.isTypeOf(clickHandler, 'function');
-		
-		if(barmatz.utils.DataTypes.applySilent('isValid', clickHandler))
-			item.removeEventListener('click', clickHandler);
-		
-		item.parentElement.removeChild(item);
 	}},
 	createWorkspaceItemWrapper: {value: function(model)
 	{
@@ -205,12 +175,11 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		
 		_this = this;
 		wrapper = this.createElement('tr', 'forms-workspace-item');
-		grip = this.createElement('span', 'forms-grip ui-icon ui-icon-grip-dotted-vertical');
+		grip = this.createElement('span', 'forms-grip ui-icon ui-icon-grip-solid-vertical');
 		label = this.createElementWithContent('label', '', model.label ? model.label : '');
 		field = this.createFormFieldElement(model);
 		mandatory = this.createElementWithContent('span', 'forms-workspace-item-mandatory', mandatory ? '*' : '');
-		deleteButton = this.createElement('span', 'forms-delete ui-icon ui-icon-circle-close');
-		jQuery(deleteButton).button();
+		deleteButton = this.createIconButton('circle-close');
 		
 		addToWrapper('forms-workspace-item-grip', grip);
 		addToWrapper('forms-workspace-item-label', label);
@@ -464,5 +433,67 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		{
 			_this.destroyDialog(dialog);
 		}
+	}},
+	createBuilderPanels: {value: function(panels)
+	{
+		var _this, i; 
+		
+		barmatz.utils.DataTypes.isNotUndefined(panels);
+		barmatz.utils.DataTypes.isInstanceOf(panels, Array);
+		
+		_this = this;
+		
+		for(i = 0; i < panels.length; i++)
+			panels[i] = getPanelElement(panels[i]);
+		
+		return this.createElementWithContent('table', 'forms-builder-wrapper', this.createElementWithContent('tr', '', panels));
+		
+		function getPanelElement(model)
+		{
+			barmatz.utils.DataTypes.isNotUndefined(model);
+			barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.ui.PanelModel);
+			return _this.createElementWithContent('td', model.className, model.content);
+		}
+	}},
+	createBuilderMenuWrapper: {value: function()
+	{
+		var icon, menu, wrapper;
+		icon = this.createBuilderMenuIcon();
+		menu = this.createBuilderMenu();
+		wrapper = this.createElementWithContent('div', 'forms-builder-menu', [icon, menu]);
+		return {wrapper: wrapper, icon: icon, menu: menu};
+	}},
+	createBuilderMenuIcon: {value: function()
+	{
+		return this.createIconButton('gear');
+	}},
+	createBuilderMenu: {value: function()
+	{
+		return this.createElement('ul');
+	}},
+	createBuilderMenuItem: {value: function(model)
+	{
+		var anchor;
+
+		barmatz.utils.DataTypes.isNotUndefined(model);
+		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.ui.MenuItemModel);
+
+		anchor = this.createElementWithContent('a', '', model.label);
+		anchor.href = '#';
+		anchor.addEventListener('click', model.clickHandler);
+		
+		return this.createElementWithContent('li', '', anchor);
+	}},
+	createIconButton: {value: function(name)
+	{
+		var button;
+		
+		barmatz.utils.DataTypes.isNotUndefined(name);
+		barmatz.utils.DataTypes.isTypeOf(name, 'string');
+		
+		button = this.createElementWithContent('span', 'ui-icon-wrapper ui-state-default ui-corner-all', this.createElement('span', 'ui-icon ui-icon-' + name));
+		jQuery(button).button();
+		
+		return button;
 	}}
 });

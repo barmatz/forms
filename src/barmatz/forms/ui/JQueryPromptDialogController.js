@@ -29,5 +29,3 @@ window.barmatz.forms.ui.JQueryPromptDialogController = function(model, view)
 
 barmatz.forms.ui.JQueryPromptDialogController.prototype = new barmatz.forms.ui.PromptDialogController(null, null);
 barmatz.forms.ui.JQueryPromptDialogController.prototype.constructor = barmatz.forms.ui.JQueryPromptDialogController;
-
-Object.defineProperties(barmatz.forms.ui.JQueryPromptDialogController.prototype, {});

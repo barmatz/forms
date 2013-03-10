@@ -25,6 +25,8 @@ barmatz.events.BuilderEvent.prototype.constructor = barmatz.events.BuilderEvent;
 
 Object.defineProperties(barmatz.events.BuilderEvent, 
 {
+	MENU_ITEM_ADDED: {value: 'menuItemAdded'},
+	MENU_ITEM_REMOVED: {value: 'menuItemRemoved'},
 	TOOLBOX_ITEM_ADDED: {value: 'toolboxItemAdded'},
 	TOOLBOX_ITEM_REMOVED: {value: 'toolboxItemRemoved'},
 	WORKSPACE_ITEM_ADDED: {value: 'workspaceItemAdded'},
@@ -49,6 +51,8 @@ Object.defineProperties(barmatz.events.BuilderEvent.prototype,
 			default:
 				event = new barmatz.events.BuilderEvent(type);
 				break;
+			case barmatz.events.BuilderEvent.MENU_ITEM_ADDED:
+			case barmatz.events.BuilderEvent.MENU_ITEM_REMOVE:
 			case barmatz.events.BuilderEvent.TOOLBOX_ITEM_ADDED:
 			case barmatz.events.BuilderEvent.TOOLBOX_ITEM_REMOVE:
 			case barmatz.events.BuilderEvent.WORKSPACE_ITEM_ADDED:
@@ -67,6 +71,8 @@ Object.defineProperties(barmatz.events.BuilderEvent.prototype,
 			default:
 				return this.formatToString('BuilderEvent', 'type');
 				break;
+			case barmatz.events.BuilderEvent.MENU_ITEM_ADDED:
+			case barmatz.events.BuilderEvent.MENU_ITEM_REMOVE:
 			case barmatz.events.BuilderEvent.TOOLBOX_ITEM_ADDED:
 			case barmatz.events.BuilderEvent.TOOLBOX_ITEM_REMOVE:
 			case barmatz.events.BuilderEvent.WORKSPACE_ITEM_ADDED:

@@ -6,31 +6,26 @@ window.barmatz.forms.ui.BuilderController = function(model, view)
 	barmatz.utils.DataTypes.isInstanceOf(view, HTMLElement);
 	barmatz.mvc.Controller.call(this);
 	
-	window.addEventListener('resize', onWindowResize);
 	model.addEventListener(barmatz.events.BuilderEvent.WORKSPACE_ITEM_ADDED, onModelWorkspaceItemAdded);
 	model.addEventListener(barmatz.events.BuilderEvent.TOOLBOX_ITEM_ADDED, onModelToolboxItemAdded);
 	model.addEventListener(barmatz.events.BuilderEvent.TOOLBOX_ITEM_REMOVED, onModelToolboxItemRemoved);
-	model.addMenuItem('New', onMenuNewClick);
-	model.addMenuItem('Save', onMenuSaveClick);
-	model.addMenuItem('Export', onMenuExportClick);
+	model.addMenuItem('New', onMenuNewItemClick);
+	model.addMenuItem('Save', onMenuSaveItemClick);
+	model.addMenuItem('Save as', onMenuSaveAsItemClick);
+	model.addMenuItem('Export', onMenuExportItemClick);
 	model.addToolboxItem(barmatz.forms.fields.FieldTypes.TEXT, 'Text field');
 	model.addToolboxItem(barmatz.forms.fields.FieldTypes.PASSWORD, 'Password field');
 	model.addToolboxItem(barmatz.forms.fields.FieldTypes.CHECKBOX, 'Checkbox');
 	model.addToolboxItem(barmatz.forms.fields.FieldTypes.RADIO, 'Radio button');
 	model.addToolboxItem(barmatz.forms.fields.FieldTypes.FILE, 'File field');
 	model.addToolboxItem(barmatz.forms.fields.FieldTypes.HIDDEN, 'Hidden field');
+	
 	view.appendChild(model.menuView);
-	view.appendChild(model.toolboxView);
-	view.appendChild(model.workspaceView);
-	view.appendChild(model.propertiesPanelView);
-	
-	resizeUI();
-	
-	function resizeUI()
-	{
-		var workspaceStyle = barmatz.utils.CSS.getStyle(model.workspaceView);
-		model.workspaceView.style.width = barmatz.utils.Window.width - barmatz.utils.CSS.absoluteWidth(model.toolboxView) - barmatz.utils.CSS.absoluteWidth(model.propertiesPanelView) - barmatz.utils.CSS.unitToPixal(model.workspaceView, workspaceStyle.borderLeft) - barmatz.utils.CSS.unitToPixal(model.workspaceView, workspaceStyle.borderRight) + 'px';
-	}
+	view.appendChild(barmatz.forms.factories.DOMFactory.createBuilderPanels([
+		new barmatz.forms.ui.PanelModel('forms-builder-toolbox-panel', model.toolboxView), 
+		new barmatz.forms.ui.PanelModel('forms-builder-workspace-panel', model.workspaceView), 
+		new barmatz.forms.ui.PanelModel('forms-builder-properties-panel', model.propertiesPanelView)
+	]));
 	
 	function addToolboxViewItemListeners(item)
 	{
@@ -44,11 +39,6 @@ window.barmatz.forms.ui.BuilderController = function(model, view)
 		barmatz.utils.DataTypes.isNotUndefined(item);
 		barmatz.utils.DataTypes.isInstanceOf(item, HTMLElement);
 		item.removeEventListener('click', onModelToolboxViewItemClick);
-	}
-	
-	function onWindowResize(event)
-	{
-		resizeUI();
 	}
 	
 	function onModelToolboxItemAdded(event)
@@ -97,19 +87,24 @@ window.barmatz.forms.ui.BuilderController = function(model, view)
 		model.workspaceViewClickHandler = null;
 	}
 	
-	function onMenuNewClick(event)
+	function onMenuNewItemClick(event)
 	{
 		console.log('new');
 	}
 	
-	function onMenuSaveClick(event)
+	function onMenuSaveItemClick(event)
 	{
 		console.log('save');
 	}
 	
-	function onMenuExportClick(event)
+	function onMenuSaveAsItemClick(event)
 	{
-		console.log('exprot');
+		console.log('save as');
+	}
+	
+	function onMenuExportItemClick(event)
+	{
+		console.log('export');
 	}
 };
 

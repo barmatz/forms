@@ -3,14 +3,6 @@ window.barmatz.forms.factories.ControllerFactory = function(){};
 
 Object.defineProperties(barmatz.forms.factories.ControllerFactory,
 {
-	createMenuController: {value: function(model, view)
-	{
-		barmatz.utils.DataTypes.isNotUndefined(model);
-		barmatz.utils.DataTypes.isNotUndefined(view);
-		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.CollectionModel);
-		barmatz.utils.DataTypes.isInstanceOf(view, HTMLElement);
-		return new barmatz.forms.ui.MenuController(model, view);
-	}},
 	createToolboxController: {value: function(model, view)
 	{
 		barmatz.utils.DataTypes.isNotUndefined(model);
@@ -66,5 +58,15 @@ Object.defineProperties(barmatz.forms.factories.ControllerFactory,
 		barmatz.utils.DataTypes.isInstanceOf(nameFieldView, HTMLInputElement);
 		barmatz.utils.DataTypes.isInstanceOf(labelFieldView, HTMLInputElement);
 		return new barmatz.forms.ui.NewFieldDialogController(model, view, nameFieldView, labelFieldView);
+	}},
+	createBuilderMenuController: {value: function(model, menuView, iconView)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(model);
+		barmatz.utils.DataTypes.isNotUndefined(menuView);
+		barmatz.utils.DataTypes.isNotUndefined(iconView);
+		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.ui.MenuModel);
+		barmatz.utils.DataTypes.isInstanceOf(menuView, HTMLElement);
+		barmatz.utils.DataTypes.isInstanceOf(iconView, HTMLElement);
+		return new barmatz.forms.ui.BuilderMenuController(model, menuView, iconView);
 	}}
 });

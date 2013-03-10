@@ -12,5 +12,3 @@ window.barmatz.forms.ui.DialogController = function(model, view)
 
 barmatz.forms.ui.DialogController.prototype = new barmatz.mvc.Controller();
 barmatz.forms.ui.DialogController.prototype.constructor = barmatz.forms.ui.DialogController;
-
-Object.defineProperties(barmatz.forms.ui.DialogController.prototype, {});

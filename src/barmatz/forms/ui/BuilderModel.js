@@ -7,7 +7,7 @@ window.barmatz.forms.ui.BuilderModel = function()
 
 	_this = this;
 	this.set('menuModel', barmatz.forms.factories.ModelFactory.createMenuModel());
-	this.set('menuView', barmatz.forms.factories.DOMFactory.createBuilderMenu());
+	this.set('menuViewWrapper', barmatz.forms.factories.DOMFactory.createBuilderMenuWrapper());
 	this.set('toolboxModel', barmatz.forms.factories.ModelFactory.createToolboxModel());
 	this.set('toolboxView', barmatz.forms.factories.DOMFactory.createBuilderToolbox());
 	this.set('workspaceModel', barmatz.forms.factories.ModelFactory.createWorkspaceModel());
@@ -15,16 +15,18 @@ window.barmatz.forms.ui.BuilderModel = function()
 	this.set('propertiesPanelView', barmatz.forms.factories.DOMFactory.createBuilderPropertiesPanel());
 	this.set('propertiesPanelController', barmatz.forms.factories.ControllerFactory.createPropertiesPanelController(this.propertiesPanelView));
 	
-	barmatz.forms.factories.ControllerFactory.createMenuController(this.get('menuModel'), this.menuView);
+	barmatz.forms.factories.ControllerFactory.createBuilderMenuController(this.get('menuModel'), this.get('menuViewWrapper').menu, this.get('menuViewWrapper').icon);
 	barmatz.forms.factories.ControllerFactory.createToolboxController(this.get('toolboxModel'), this.toolboxView);
 	barmatz.forms.factories.ControllerFactory.createWorkspaceController(this.get('workspaceModel'), this.get('workspaceViewWrapper').workspace);
 	
-	this.get('toolboxModel').addEventListener(barmatz.events.CollectionEvent.ITEM_ADDED, onModelItemAdded);
-	this.get('toolboxModel').addEventListener(barmatz.events.CollectionEvent.ITEM_REMOVED, onModelItemRemoved);
-	this.get('workspaceModel').addEventListener(barmatz.events.CollectionEvent.ITEM_ADDED, onModelItemAdded);
-	this.get('workspaceModel').addEventListener(barmatz.events.CollectionEvent.ITEM_REMOVED, onModelItemRemoved);
+	this.get('menuModel').addEventListener(barmatz.events.CollectionEvent.ITEM_ADDED, onModelItemAddedOrRemoved);
+	this.get('menuModel').addEventListener(barmatz.events.CollectionEvent.ITEM_REMOVED, onModelItemAddedOrRemoved);
+	this.get('toolboxModel').addEventListener(barmatz.events.CollectionEvent.ITEM_ADDED, onModelItemAddedOrRemoved);
+	this.get('toolboxModel').addEventListener(barmatz.events.CollectionEvent.ITEM_REMOVED, onModelItemAddedOrRemoved);
+	this.get('workspaceModel').addEventListener(barmatz.events.CollectionEvent.ITEM_ADDED, onModelItemAddedOrRemoved);
+	this.get('workspaceModel').addEventListener(barmatz.events.CollectionEvent.ITEM_REMOVED, onModelItemAddedOrRemoved);
 	
-	function onModelItemAdded(event)
+	function onModelItemAddedOrRemoved(event)
 	{
 		var type;
 		
@@ -36,40 +38,54 @@ window.barmatz.forms.ui.BuilderModel = function()
 			default:
 				throw new Error('unknown target');
 				break;
+			case _this.get('menuModel'):
+				applyActionToAddedOrRemovedModelItemFromEvent(event, function()
+				{
+					type = barmatz.events.BuilderEvent.MENU_ITEM_ADDED;
+				}, function()
+				{
+					type = barmatz.events.BuilderEvent.MENU_ITEM_REMOVED;
+				});
+			break;
 			case _this.get('toolboxModel'):
-				type = barmatz.events.BuilderEvent.TOOLBOX_ITEM_ADDED;
+				applyActionToAddedOrRemovedModelItemFromEvent(event, function()
+				{
+					type = barmatz.events.BuilderEvent.TOOLBOX_ITEM_ADDED;
+				}, function()
+				{
+					type = barmatz.events.BuilderEvent.TOOLBOX_ITEM_REMOVED;
+				});
 				break;
 			case _this.get('workspaceModel'):
-				type = barmatz.events.BuilderEvent.WORKSPACE_ITEM_ADDED;
-				_this.propertiesPanelControllerModel = event.item;
+				applyActionToAddedOrRemovedModelItemFromEvent(event, function()
+				{
+					type = barmatz.events.BuilderEvent.WORKSPACE_ITEM_ADDED;
+					_this.propertiesPanelControllerModel = event.item;
+				}, function()
+				{
+					type = barmatz.events.BuilderEvent.WORKSPACE_ITEM_REMOVED;
+					_this.propertiesPanelControllerModel = _this.numWorkspaceModelItems > 0 ? _this.getWorkspaceModelItemAt(event.index < _this.numWorkspaceModelItems ? event.index : event.index - 1) : null;
+				});
 				break;
 		}
 		
 		_this.dispatchEvent(new barmatz.events.BuilderEvent(type, event.item, event.index));
 	}
 	
-	function onModelItemRemoved(event)
+	function applyActionToAddedOrRemovedModelItemFromEvent(event, addedAction, removedAction)
 	{
-		var type;
-		
-		barmatz.utils.DataTypes.isNotUndefined(event);
-		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.CollectionEvent);
-		
-		switch(event.target)
+		switch(event.type)
 		{
 			default:
-				throw new Error('unknown target');
+				throw new Error('unknown event type');
 				break;
-			case _this.get('toolboxModel'):
-				type = barmatz.events.BuilderEvent.TOOLBOX_ITEM_REMOVED;
+			case barmatz.events.CollectionEvent.ITEM_ADDED:
+				addedAction();
 				break;
-			case _this.get('workspaceModel'):
-				type = barmatz.events.BuilderEvent.WORKSPACE_ITEM_REMOVED;
-				_this.propertiesPanelControllerModel = _this.numWorkspaceModelItems > 0 ? _this.getWorkspaceModelItemAt(event.index < _this.numWorkspaceModelItems ? event.index : event.index - 1) : null;
+			case barmatz.events.CollectionEvent.ITEM_REMOVED:
+				removedAction();
 				break;
 		}
-		
-		_this.dispatchEvent(new barmatz.events.BuilderEvent(type, event.item, event.index));
 	}
 };
 
@@ -80,7 +96,7 @@ Object.defineProperties(barmatz.forms.ui.BuilderModel.prototype,
 {
 	menuView: {get: function()
 	{
-		return this.get('menuView'); 
+		return this.get('menuViewWrapper').wrapper; 
 	}},
 	toolboxView: {get: function()
 	{
@@ -170,8 +186,8 @@ Object.defineProperties(barmatz.forms.ui.BuilderModel.prototype,
 	}},
 	addMenuItem: {value: function(label, clickHandler)
 	{
-
 		barmatz.utils.DataTypes.isNotUndefined(label);
+		barmatz.utils.DataTypes.isNotUndefined(clickHandler);
 		barmatz.utils.DataTypes.isTypeOf(label, 'string');
 		barmatz.utils.DataTypes.isTypeOf(clickHandler, 'function');
 		this.get('menuModel').addItem(barmatz.forms.factories.ModelFactory.createMenuItemModel(label, clickHandler));

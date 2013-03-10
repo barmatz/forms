@@ -35,21 +35,6 @@ Object.defineProperties(barmatz.forms.factories.ModelFactory,
 				break;
 		}
 	}},
-	createMenuItemModel: {value: function(label, clickHandler)
-	{
-		var model;
-		
-		barmatz.utils.DataTypes.isNotUndefined(label);
-		barmatz.utils.DataTypes.isTypeOf(label, 'string');
-		barmatz.utils.DataTypes.isTypeOf(clickHandler, 'function', true);
-
-		model = new barmatz.forms.ui.MenuItemModel(label);
-		
-		if(barmatz.utils.DataTypes.applySilent('isNotUndefined', clickHandler))
-			model.clickHandler = clickHandler;
-		
-		return model;
-	}},
 	createToolboxItemModel: {value: function(type, label)
 	{
 		barmatz.utils.DataTypes.isNotUndefined(type);
@@ -61,10 +46,6 @@ Object.defineProperties(barmatz.forms.factories.ModelFactory,
 	createCollectionModel: {value: function()
 	{
 		return new barmatz.forms.CollectionModel();
-	}},
-	createMenuModel: {value: function()
-	{
-		return new barmatz.forms.ui.MenuModel();
 	}},
 	createToolboxModel: {value: function()
 	{
@@ -88,5 +69,17 @@ Object.defineProperties(barmatz.forms.factories.ModelFactory,
 	createBuilderModel: {value: function()
 	{
 		return new barmatz.forms.ui.BuilderModel();
+	}},
+	createMenuModel: {value: function()
+	{
+		return new barmatz.forms.ui.MenuModel();
+	}},
+	createMenuItemModel: {value: function(label, clickHandler)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(label);
+		barmatz.utils.DataTypes.isNotUndefined(clickHandler);
+		barmatz.utils.DataTypes.isTypeOf(label, 'string');
+		barmatz.utils.DataTypes.isTypeOf(clickHandler, 'function');
+		return new barmatz.forms.ui.MenuItemModel(label, clickHandler);
 	}}
 });
