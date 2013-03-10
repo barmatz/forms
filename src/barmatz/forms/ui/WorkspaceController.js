@@ -50,7 +50,7 @@ window.barmatz.forms.ui.WorkspaceController = function(model, view)
 		dialogWarpper = barmatz.forms.factories.DOMFactory.createNewFieldDialogWrapper();
 		jQuery(dialogWarpper.wrapper).dialog('open');
 		
-		barmatz.forms.factories.ControllerFactory.createJQueryPromptDialogController(model, dialogWarpper.wrapper, dialogWarpper.nameField);
+		barmatz.forms.factories.ControllerFactory.createNewFieldDialogController(model, dialogWarpper.wrapper, dialogWarpper.nameField, dialogWarpper.labelField);
 	}
 	
 	function onSortingStart(event, ui)

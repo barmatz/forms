@@ -398,19 +398,13 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 	}},
 	createNewFieldDialogWrapper: {value: function()
 	{
-		var dialog, nameField, wrapper;
+		var _this = this, dialog, nameField, labelField, wrapper, form;
 		
-		nameField = this.createElement('input');
-		nameField.type = 'text';
-		
-		wrapper = this.createElementWithContent('div', '', [
-			this.createElementWithContent('label', '', 'Field name'),
-			nameField
-		]);
-		
+		form = this.createElement('table');
+		nameField = addField('Name');
+		labelField = addField('Label');
+		wrapper = this.createElementWithContent('div', '', form);
 		dialog = this.createDialog('New Field', wrapper);
-		
-		barmatz.utils.CSS.verticalAlignChildren(wrapper);
 		
 		jQuery(dialog).dialog({
 			closeOnEscape: false,
@@ -419,6 +413,19 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 			modal: true
 		});
 		
-		return {wrapper: dialog, nameField: nameField};
+		return {wrapper: dialog, nameField: nameField, labelField: labelField};
+		
+		function addField(label)
+		{
+			var field;
+			
+			barmatz.utils.DataTypes.isNotUndefined(label);
+			barmatz.utils.DataTypes.isTypeOf(label, 'string');
+			
+			field = _this.createElement('input');
+			field.type = 'text';
+			barmatz.utils.CSS.verticalAlignChildren(form.appendChild(_this.createElementWithContent('tr', '', [_this.createElementWithContent('td', '', _this.createElementWithContent('label', '', label)), _this.createElementWithContent('td', '', field)])));
+			return field;
+		}
 	}}
 });

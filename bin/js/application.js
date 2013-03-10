@@ -1309,16 +1309,13 @@ barmatz.forms.ui.DialogController.prototype.constructor = barmatz.forms.ui.Dialo
 
 Object.defineProperties(barmatz.forms.ui.DialogController.prototype, {});
 /** barmatz.forms.ui.PromptDialogController **/
-window.barmatz.forms.ui.PromptDialogController = function(model, view, fieldView)
+window.barmatz.forms.ui.PromptDialogController = function(model, view)
 {
 	barmatz.utils.DataTypes.isNotUndefined(model);
 	barmatz.utils.DataTypes.isNotUndefined(view);
-	barmatz.utils.DataTypes.isNotUndefined(fieldView);
 	barmatz.utils.DataTypes.isInstanceOf(model, barmatz.mvc.Model, true);
 	barmatz.utils.DataTypes.isInstanceOf(view, HTMLElement, true);
-	barmatz.utils.DataTypes.isInstanceOf(fieldView, HTMLInputElement, true);
 	barmatz.forms.ui.DialogController.call(this, model, view);
-	this._fieldView = fieldView;
 };
 
 barmatz.forms.ui.PromptDialogController.prototype = new barmatz.forms.ui.DialogController(null, null);
@@ -1331,6 +1328,39 @@ Object.defineProperties(barmatz.forms.ui.PromptDialogController.prototype,
 		throw new Error('method must be overridden');
 	}}
 });
+/** barmatz.forms.ui.JQueryPromptDialogController **/
+window.barmatz.forms.ui.JQueryPromptDialogController = function(model, view)
+{
+	var _this = this;
+	
+	barmatz.utils.DataTypes.isNotUndefined(model);
+	barmatz.utils.DataTypes.isNotUndefined(view);
+	barmatz.utils.DataTypes.isInstanceOf(model, barmatz.mvc.Model, true);
+	barmatz.utils.DataTypes.isInstanceOf(view, HTMLElement, true);
+	barmatz.forms.ui.PromptDialogController.call(this, model, view);
+	
+	if(view)
+	{
+		view.addEventListener('keydown', onViewKeyDown);
+		jQuery(view).dialog({buttons: {Ok: onViewOk}});
+	}
+	
+	function onViewOk(event)
+	{
+		_this._submitDialog();
+	}
+	
+	function onViewKeyDown(event)
+	{
+		if(event.keyCode == 13)
+			_this._submitDialog();
+	}
+};
+
+barmatz.forms.ui.JQueryPromptDialogController.prototype = new barmatz.forms.ui.PromptDialogController(null, null);
+barmatz.forms.ui.JQueryPromptDialogController.prototype.constructor = barmatz.forms.ui.JQueryPromptDialogController;
+
+Object.defineProperties(barmatz.forms.ui.JQueryPromptDialogController.prototype, {});
 /** barmatz.forms.ui.Builder **/
 window.barmatz.forms.ui.Builder = function(container)
 {
@@ -1701,20 +1731,21 @@ Object.defineProperties(barmatz.forms.ui.BuilderModel.prototype,
 	}}
 });
 /** barmatz.forms.ui.JQueryPromptDialogController **/
-window.barmatz.forms.ui.JQueryPromptDialogController = function(model, view, fieldView)
+window.barmatz.forms.ui.JQueryPromptDialogController = function(model, view)
 {
 	var _this = this;
 	
 	barmatz.utils.DataTypes.isNotUndefined(model);
 	barmatz.utils.DataTypes.isNotUndefined(view);
-	barmatz.utils.DataTypes.isNotUndefined(fieldView);
 	barmatz.utils.DataTypes.isInstanceOf(model, barmatz.mvc.Model, true);
 	barmatz.utils.DataTypes.isInstanceOf(view, HTMLElement, true);
-	barmatz.utils.DataTypes.isInstanceOf(fieldView, HTMLInputElement, true);
-	barmatz.forms.ui.PromptDialogController.call(this, model, view, fieldView);
+	barmatz.forms.ui.PromptDialogController.call(this, model, view);
 	
-	view.addEventListener('keydown', onViewKeyDown);
-	jQuery(view).dialog({buttons: {Ok: onViewOk}});
+	if(view)
+	{
+		view.addEventListener('keydown', onViewKeyDown);
+		jQuery(view).dialog({buttons: {Ok: onViewOk}});
+	}
 	
 	function onViewOk(event)
 	{
@@ -1728,17 +1759,10 @@ window.barmatz.forms.ui.JQueryPromptDialogController = function(model, view, fie
 	}
 };
 
-barmatz.forms.ui.JQueryPromptDialogController.prototype = new barmatz.forms.ui.PromptDialogController(null, null, null);
+barmatz.forms.ui.JQueryPromptDialogController.prototype = new barmatz.forms.ui.PromptDialogController(null, null);
 barmatz.forms.ui.JQueryPromptDialogController.prototype.constructor = barmatz.forms.ui.JQueryPromptDialogController;
 
-Object.defineProperties(barmatz.forms.ui.JQueryPromptDialogController.prototype,
-{
-	_submitDialog: {value: function()
-	{
-		this._model.name = this._fieldView.value;
-		barmatz.forms.factories.DOMFactory.destroyDialog(this._view);
-	}}
-});
+Object.defineProperties(barmatz.forms.ui.JQueryPromptDialogController.prototype, {});
 /** barmatz.forms.ui.MenuController **/
 window.barmatz.forms.ui.MenuController = function(model, view)
 {
@@ -1816,6 +1840,35 @@ Object.defineProperties(barmatz.forms.ui.MenuModel.prototype,
 		barmatz.utils.DataTypes.isNotUndefined(item);
 		barmatz.utils.DataTypes.isInstanceOf(item, barmatz.forms.ui.MenuItemModel);
 		barmatz.forms.CollectionModel.prototype.getItemIndex.call(this, item);
+	}}
+});
+/** barmatz.forms.ui.NewFieldDialogController **/
+window.barmatz.forms.ui.NewFieldDialogController = function(model, view, nameFieldView, labelFieldView)
+{
+	barmatz.utils.DataTypes.isNotUndefined(model);
+	barmatz.utils.DataTypes.isNotUndefined(view);
+	barmatz.utils.DataTypes.isNotUndefined(nameFieldView);
+	barmatz.utils.DataTypes.isNotUndefined(labelFieldView);
+	barmatz.utils.DataTypes.isInstanceOf(model, barmatz.mvc.Model);
+	barmatz.utils.DataTypes.isInstanceOf(view, HTMLElement);
+	barmatz.utils.DataTypes.isInstanceOf(nameFieldView, HTMLInputElement);
+	barmatz.utils.DataTypes.isInstanceOf(labelFieldView, HTMLInputElement);
+	barmatz.forms.ui.JQueryPromptDialogController.call(this, model, view);
+	
+	this._nameFieldView = nameFieldView;
+	this._labelFieldView = labelFieldView;
+};
+
+barmatz.forms.ui.NewFieldDialogController.prototype = new barmatz.forms.ui.JQueryPromptDialogController(null, null);
+barmatz.forms.ui.NewFieldDialogController.prototype.constructor = barmatz.forms.ui.NewFieldDialogController;
+
+Object.defineProperties(barmatz.forms.ui.NewFieldDialogController.prototype, 
+{
+	_submitDialog: {value: function()
+	{
+		this._model.name = this._nameFieldView.value;
+		this._model.label = this._labelFieldView.value;
+		barmatz.forms.factories.DOMFactory.destroyDialog(this._view);
 	}}
 });
 /** barmatz.forms.ui.PropertiesPanelController **/
@@ -2044,7 +2097,7 @@ window.barmatz.forms.ui.WorkspaceController = function(model, view)
 		dialogWarpper = barmatz.forms.factories.DOMFactory.createNewFieldDialogWrapper();
 		jQuery(dialogWarpper.wrapper).dialog('open');
 		
-		barmatz.forms.factories.ControllerFactory.createJQueryPromptDialogController(model, dialogWarpper.wrapper, dialogWarpper.nameField);
+		barmatz.forms.factories.ControllerFactory.createNewFieldDialogController(model, dialogWarpper.wrapper, dialogWarpper.nameField, dialogWarpper.labelField);
 	}
 	
 	function onSortingStart(event, ui)
@@ -2457,15 +2510,17 @@ Object.defineProperties(barmatz.forms.factories.ControllerFactory,
 		barmatz.utils.DataTypes.isInstanceOf(deleteButtonView, HTMLElement);
 		return new barmatz.forms.ui.WorkspaceItemController(model, labelView, fieldView, mandatoryView, deleteButtonView);
 	}},
-	createJQueryPromptDialogController: {value: function(model, view, fieldView)
+	createNewFieldDialogController: {value: function(model, view, nameFieldView, labelFieldView)
 	{
 		barmatz.utils.DataTypes.isNotUndefined(model);
 		barmatz.utils.DataTypes.isNotUndefined(view);
-		barmatz.utils.DataTypes.isNotUndefined(fieldView);
+		barmatz.utils.DataTypes.isNotUndefined(nameFieldView);
+		barmatz.utils.DataTypes.isNotUndefined(labelFieldView);
 		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.mvc.Model);
 		barmatz.utils.DataTypes.isInstanceOf(view, HTMLElement);
-		barmatz.utils.DataTypes.isInstanceOf(fieldView, HTMLInputElement);
-		return new barmatz.forms.ui.JQueryPromptDialogController(model, view, fieldView);
+		barmatz.utils.DataTypes.isInstanceOf(nameFieldView, HTMLInputElement);
+		barmatz.utils.DataTypes.isInstanceOf(labelFieldView, HTMLInputElement);
+		return new barmatz.forms.ui.NewFieldDialogController(model, view, nameFieldView, labelFieldView);
 	}}
 });
 /** barmatz.forms.factories.DOMFactory **/
@@ -2868,19 +2923,13 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 	}},
 	createNewFieldDialogWrapper: {value: function()
 	{
-		var dialog, nameField, wrapper;
+		var _this = this, dialog, nameField, labelField, wrapper, form;
 		
-		nameField = this.createElement('input');
-		nameField.type = 'text';
-		
-		wrapper = this.createElementWithContent('div', '', [
-			this.createElementWithContent('label', '', 'Field name'),
-			nameField
-		]);
-		
+		form = this.createElement('table');
+		nameField = addField('Name');
+		labelField = addField('Label');
+		wrapper = this.createElementWithContent('div', '', form);
 		dialog = this.createDialog('New Field', wrapper);
-		
-		barmatz.utils.CSS.verticalAlignChildren(wrapper);
 		
 		jQuery(dialog).dialog({
 			closeOnEscape: false,
@@ -2889,7 +2938,20 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 			modal: true
 		});
 		
-		return {wrapper: dialog, nameField: nameField};
+		return {wrapper: dialog, nameField: nameField, labelField: labelField};
+		
+		function addField(label)
+		{
+			var field;
+			
+			barmatz.utils.DataTypes.isNotUndefined(label);
+			barmatz.utils.DataTypes.isTypeOf(label, 'string');
+			
+			field = _this.createElement('input');
+			field.type = 'text';
+			barmatz.utils.CSS.verticalAlignChildren(form.appendChild(_this.createElementWithContent('tr', '', [_this.createElementWithContent('td', '', _this.createElementWithContent('label', '', label)), _this.createElementWithContent('td', '', field)])));
+			return field;
+		}
 	}}
 });
 /** barmatz.forms.factories.ModelFactory **/

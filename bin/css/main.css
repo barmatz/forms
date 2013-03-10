@@ -17,11 +17,12 @@ html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abb
 .forms-builder-workspace .forms-workspace-item .forms-workspace-item-grip { width: 16px; max-width: 16px; cursor: pointer; }
 .forms-builder-workspace .forms-workspace-item .forms-workspace-item-label { width: 100px; max-width: 100%; }
 .forms-builder-workspace .forms-workspace-item .forms-workspace-item-field { width: auto; }
-.forms-builder-workspace .forms-workspace-item .forms-workspace-item-delete-button { width: 20px; max-width: 20px; }
+.forms-builder-workspace .forms-workspace-item .forms-workspace-item-delete-button { width: 25px; max-width: 25px; }
 .forms-builder-workspace .forms-workspace-item .forms-workspace-item-mandatory { color: #F00; font-weight: bold; }
 .forms-builder-properties-panel { background: #E9E9E9; width: 232px; height: 100%; display: inline-block; }
-.forms-builder-properties-panel .forms-filler { color: rgba(0,0,0,.2); font-size: 1em; text-align: center; }
-.forms-builder-properties-panel .forms-header { font-weight: bold; color: rgba(0, 0, 0, .1); }
+.forms-builder-properties-panel .forms-filler { font-size: 1em; }
+.forms-builder-properties-panel .forms-filler, .forms-builder-properties-panel .forms-header { text-align: center;  color: rgba(0,0,0,.2); }
+.forms-builder-properties-panel .forms-header { font-weight: bold; }
 .forms-builder-properties-panel .forms-item { padding: .4em; border-top: 1px solid rgba(255, 255, 255, .2); border-bottom: 1px solid rgba(0, 0, 0, .1); }
 .forms-builder-properties-panel .forms-item:hover { background: rgba(255, 255, 255, .2); }
 .forms-builder-properties-panel .forms-item label { display: block; }
@@ -33,4 +34,3 @@ h1 { font-size: 2em; font-weight: bold; }
 h2 { font-size: 1.4em; font-weight: bold; margin: .3em; }
 h3 { font-size: .9em; color: #AAA; }
 label { font-weight: bold; }
-.ui-widget-content { background: rgb(61, 61, 61); }

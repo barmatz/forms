@@ -55,14 +55,16 @@ Object.defineProperties(barmatz.forms.factories.ControllerFactory,
 		barmatz.utils.DataTypes.isInstanceOf(deleteButtonView, HTMLElement);
 		return new barmatz.forms.ui.WorkspaceItemController(model, labelView, fieldView, mandatoryView, deleteButtonView);
 	}},
-	createJQueryPromptDialogController: {value: function(model, view, fieldView)
+	createNewFieldDialogController: {value: function(model, view, nameFieldView, labelFieldView)
 	{
 		barmatz.utils.DataTypes.isNotUndefined(model);
 		barmatz.utils.DataTypes.isNotUndefined(view);
-		barmatz.utils.DataTypes.isNotUndefined(fieldView);
+		barmatz.utils.DataTypes.isNotUndefined(nameFieldView);
+		barmatz.utils.DataTypes.isNotUndefined(labelFieldView);
 		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.mvc.Model);
 		barmatz.utils.DataTypes.isInstanceOf(view, HTMLElement);
-		barmatz.utils.DataTypes.isInstanceOf(fieldView, HTMLInputElement);
-		return new barmatz.forms.ui.JQueryPromptDialogController(model, view, fieldView);
+		barmatz.utils.DataTypes.isInstanceOf(nameFieldView, HTMLInputElement);
+		barmatz.utils.DataTypes.isInstanceOf(labelFieldView, HTMLInputElement);
+		return new barmatz.forms.ui.NewFieldDialogController(model, view, nameFieldView, labelFieldView);
 	}}
 });
