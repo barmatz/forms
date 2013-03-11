@@ -81,5 +81,17 @@ Object.defineProperties(barmatz.forms.factories.ModelFactory,
 		barmatz.utils.DataTypes.isTypeOf(label, 'string');
 		barmatz.utils.DataTypes.isTypeOf(clickHandler, 'function');
 		return new barmatz.forms.ui.MenuItemModel(label, clickHandler);
+	}},
+	createFormModel: {value: function()
+	{
+		return new barmatz.forms.FormModel();
+	}},
+	createPanelModel: {value: function(className, content)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(className);
+		barmatz.utils.DataTypes.isNotUndefined(content);
+		barmatz.utils.DataTypes.isTypeOf(className, 'string');
+		barmatz.utils.DataTypes.isTypesOrInstances(content, ['string'], [HTMLElement, Array]);
+		return new barmatz.forms.ui.PanelModel(className, content);
 	}}
 });

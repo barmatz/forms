@@ -6,6 +6,7 @@ window.barmatz.forms.ui.BuilderModel = function()
 	barmatz.mvc.Model.call(this);
 
 	_this = this;
+	this.set('formModel', barmatz.forms.factories.ModelFactory.createFormModel());
 	this.set('menuModel', barmatz.forms.factories.ModelFactory.createMenuModel());
 	this.set('menuViewWrapper', barmatz.forms.factories.DOMFactory.createBuilderMenuWrapper());
 	this.set('toolboxModel', barmatz.forms.factories.ModelFactory.createToolboxModel());
@@ -19,12 +20,23 @@ window.barmatz.forms.ui.BuilderModel = function()
 	barmatz.forms.factories.ControllerFactory.createToolboxController(this.get('toolboxModel'), this.toolboxView);
 	barmatz.forms.factories.ControllerFactory.createWorkspaceController(this.get('workspaceModel'), this.get('workspaceViewWrapper').workspace);
 	
+	this.get('formModel').addEventListener(barmatz.events.ModelEvent.VALUE_CHANGED, onFormModelValueChanged);
 	this.get('menuModel').addEventListener(barmatz.events.CollectionEvent.ITEM_ADDED, onModelItemAddedOrRemoved);
 	this.get('menuModel').addEventListener(barmatz.events.CollectionEvent.ITEM_REMOVED, onModelItemAddedOrRemoved);
 	this.get('toolboxModel').addEventListener(barmatz.events.CollectionEvent.ITEM_ADDED, onModelItemAddedOrRemoved);
 	this.get('toolboxModel').addEventListener(barmatz.events.CollectionEvent.ITEM_REMOVED, onModelItemAddedOrRemoved);
 	this.get('workspaceModel').addEventListener(barmatz.events.CollectionEvent.ITEM_ADDED, onModelItemAddedOrRemoved);
 	this.get('workspaceModel').addEventListener(barmatz.events.CollectionEvent.ITEM_REMOVED, onModelItemAddedOrRemoved);
+	
+	function onFormModelValueChanged(event)
+	{
+		switch(event.key)
+		{
+			case 'name':
+				_this.get('workspaceViewWrapper').formName.innerHTML = event.value;
+				break;
+		}
+	}
 	
 	function onModelItemAddedOrRemoved(event)
 	{
@@ -94,6 +106,14 @@ barmatz.forms.ui.BuilderModel.prototype.constructor = barmatz.forms.ui.BuilderMo
 
 Object.defineProperties(barmatz.forms.ui.BuilderModel.prototype, 
 {
+	formName: {get: function()
+	{
+		return this.get('formModel').name;
+	}, set: function(value)
+	{
+		barmatz.utils.DataTypes.isTypeOf(value, 'string');
+		this.get('formModel').name = value;
+	}},
 	menuView: {get: function()
 	{
 		return this.get('menuViewWrapper').wrapper; 

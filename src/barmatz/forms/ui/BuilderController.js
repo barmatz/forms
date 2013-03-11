@@ -10,21 +10,25 @@ window.barmatz.forms.ui.BuilderController = function(model, view)
 	model.addEventListener(barmatz.events.BuilderEvent.TOOLBOX_ITEM_ADDED, onModelToolboxItemAdded);
 	model.addEventListener(barmatz.events.BuilderEvent.TOOLBOX_ITEM_REMOVED, onModelToolboxItemRemoved);
 	model.addMenuItem('New', onMenuNewItemClick);
+	model.addMenuItem('Load', onMenuLoadItemClick);
 	model.addMenuItem('Save', onMenuSaveItemClick);
 	model.addMenuItem('Save as', onMenuSaveAsItemClick);
+	model.addMenuItem('Rename', onMenuRenameItemClick);
 	model.addMenuItem('Export', onMenuExportItemClick);
 	model.addToolboxItem(barmatz.forms.fields.FieldTypes.TEXT, 'Text field');
 	model.addToolboxItem(barmatz.forms.fields.FieldTypes.PASSWORD, 'Password field');
 	model.addToolboxItem(barmatz.forms.fields.FieldTypes.CHECKBOX, 'Checkbox');
 	model.addToolboxItem(barmatz.forms.fields.FieldTypes.RADIO, 'Radio button');
-	model.addToolboxItem(barmatz.forms.fields.FieldTypes.FILE, 'File field');
-	model.addToolboxItem(barmatz.forms.fields.FieldTypes.HIDDEN, 'Hidden field');
+	//model.addToolboxItem(barmatz.forms.fields.FieldTypes.FILE, 'File field');
+	//model.addToolboxItem(barmatz.forms.fields.FieldTypes.HIDDEN, 'Hidden field');
+	
+	model.formName = 'Unnamed form';
 	
 	view.appendChild(model.menuView);
 	view.appendChild(barmatz.forms.factories.DOMFactory.createBuilderPanels([
-		new barmatz.forms.ui.PanelModel('forms-builder-toolbox-panel', model.toolboxView), 
-		new barmatz.forms.ui.PanelModel('forms-builder-workspace-panel', model.workspaceView), 
-		new barmatz.forms.ui.PanelModel('forms-builder-properties-panel', model.propertiesPanelView)
+		barmatz.forms.factories.ModelFactory.createPanelModel('forms-builder-toolbox-panel', model.toolboxView), 
+		barmatz.forms.factories.ModelFactory.createPanelModel('forms-builder-workspace-panel', model.workspaceView), 
+		barmatz.forms.factories.ModelFactory.createPanelModel('forms-builder-properties-panel', model.propertiesPanelView)
 	]));
 	
 	function addToolboxViewItemListeners(item)
@@ -92,6 +96,16 @@ window.barmatz.forms.ui.BuilderController = function(model, view)
 		console.log('new');
 	}
 	
+	function onMenuRenameItemClick(event)
+	{
+		var field = barmatz.forms.factories.DOMFactory.createChangePropertyPromptDialog('Rename', 'name', model.formName, onRenameConfirm, true).field;
+		
+		function onRenameConfirm(event)
+		{
+			model.formName = field.value;
+		}
+	}
+	
 	function onMenuSaveItemClick(event)
 	{
 		console.log('save');
@@ -100,6 +114,11 @@ window.barmatz.forms.ui.BuilderController = function(model, view)
 	function onMenuSaveAsItemClick(event)
 	{
 		console.log('save as');
+	}
+	
+	function onMenuLoadItemClick(event)
+	{
+		console.log('load');
 	}
 	
 	function onMenuExportItemClick(event)

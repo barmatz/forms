@@ -150,8 +150,8 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		barmatz.utils.DataTypes.isTypeOf(formName, 'string', true);
 		barmatz.utils.DataTypes.isTypeOf(saveStatus, 'string', true);
 		
-		formNameElement = this.createElementWithContent('h1', 'forms-builder-workspace-header-form-name', formName || 'Unnamed form');
-		saveStatusElement = this.createElementWithContent('h3', 'forms-builder-workspace-header-save-status', saveStatus || 'form not saved');
+		formNameElement = this.createElementWithContent('h1', 'forms-builder-workspace-header-form-name', formName || '');
+		saveStatusElement = this.createElementWithContent('h3', 'forms-builder-workspace-header-save-status', saveStatus || '');
 		workspaceElement = this.createElement('table', 'forms-builder-workspace-items');
 
 		return {wrapper: this.createElementWithContent('div', 'forms-builder-workspace-wrapper', [this.createElementWithContent('div', 'forms-builder-workspace-header', [formNameElement, saveStatusElement]), workspaceElement]), formName: formNameElement, saveStatus: saveStatusElement, workspace: workspaceElement};
@@ -397,22 +397,24 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 			
 			field = _this.createElement('input');
 			field.type = 'text';
-			barmatz.utils.CSS.verticalAlignChildren(form.appendChild(_this.createElementWithContent('tr', '', [_this.createElementWithContent('td', '', _this.createElementWithContent('label', '', label)), _this.createElementWithContent('td', '', field)])));
+			form.appendChild(_this.createElementWithContent('tr', '', [_this.createElementWithContent('td', '', _this.createElementWithContent('label', '', label)), _this.createElementWithContent('td', '', field)]));
 			return field;
 		}
 	}},
-	createConfirmPromptDialog: {value: function(message, confirmHandler, open)
+	createPromptDialog: {value: function(title, content, confirmHandler, open)
 	{
-		var _this;
-		
-		barmatz.utils.DataTypes.isNotUndefined(message);
+		var _this, dialog;
+
+		barmatz.utils.DataTypes.isNotUndefined(title);
+		barmatz.utils.DataTypes.isNotUndefined(content);
 		barmatz.utils.DataTypes.isNotUndefined(confirmHandler);
-		barmatz.utils.DataTypes.isTypeOf(message, 'string');
+		barmatz.utils.DataTypes.isTypeOf(title, 'string');
+		barmatz.utils.DataTypes.isTypesOrInstances(content, ['string'], [HTMLElement, Array]);
 		barmatz.utils.DataTypes.isTypeOf(confirmHandler, 'function');
 		barmatz.utils.DataTypes.isTypeOf(open, 'boolean', true);
 		
 		_this = this;
-		dialog = this.createDialog('Confirm', message);
+		dialog = this.createDialog(title, content);
 		
 		jQuery(dialog).dialog({
 			buttons: {OK: onOKButtonClick, Cancel: onCancelButtonClick}
@@ -433,6 +435,33 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		{
 			_this.destroyDialog(dialog);
 		}
+	}},
+	createChangePropertyPromptDialog: {value: function(title, key, value, confirmHandler, open)
+	{
+		var field;
+
+		barmatz.utils.DataTypes.isNotUndefined(title);
+		barmatz.utils.DataTypes.isNotUndefined(key);
+		barmatz.utils.DataTypes.isNotUndefined(value);
+		barmatz.utils.DataTypes.isNotUndefined(confirmHandler);
+		barmatz.utils.DataTypes.isTypeOf(title, 'string');
+		barmatz.utils.DataTypes.isTypeOf(key, 'string');
+		barmatz.utils.DataTypes.isTypeOf(confirmHandler, 'function');
+		barmatz.utils.DataTypes.isTypeOf(open, 'boolean', true);
+		
+		field = this.createElement('input');
+		field.type = 'text';
+		field.value = value;
+		return {wrapper: this.createElementWithContent('div', '', [this.createElementWithContent('label', '', key), field]), dialog: this.createPromptDialog(title, wrapper, confirmHandler, open), field: field};
+	}},
+	createConfirmPromptDialog: {value: function(message, confirmHandler, open)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(message);
+		barmatz.utils.DataTypes.isNotUndefined(confirmHandler);
+		barmatz.utils.DataTypes.isTypeOf(message, 'string');
+		barmatz.utils.DataTypes.isTypeOf(confirmHandler, 'function');
+		barmatz.utils.DataTypes.isTypeOf(open, 'boolean', true);
+		return this.createPromptDialog('Confirm', message, confirmHandler, open);
 	}},
 	createBuilderPanels: {value: function(panels)
 	{
