@@ -1,5 +1,5 @@
-/** barmatz.forms.ui.PropertiesPanelController **/
-window.barmatz.forms.ui.PropertiesPanelController = function(view)
+/** barmatz.forms.ui.PropertiesController **/
+window.barmatz.forms.ui.PropertiesController = function(view)
 {
 	barmatz.utils.DataTypes.isNotUndefined(view);
 	barmatz.utils.DataTypes.isInstanceOf(view, HTMLElement);
@@ -8,10 +8,10 @@ window.barmatz.forms.ui.PropertiesPanelController = function(view)
 	this.model = null;
 };
 
-barmatz.forms.ui.PropertiesPanelController.prototype = new barmatz.mvc.Controller();
-barmatz.forms.ui.PropertiesPanelController.prototype.constructor = barmatz.forms.ui.PropertiesPanelController;
+barmatz.forms.ui.PropertiesController.prototype = new barmatz.mvc.Controller();
+barmatz.forms.ui.PropertiesController.prototype.constructor = barmatz.forms.ui.PropertiesController;
 
-Object.defineProperties(barmatz.forms.ui.PropertiesPanelController.prototype,
+Object.defineProperties(barmatz.forms.ui.PropertiesController.prototype,
 {
 	model: {get: function()
 	{
@@ -30,7 +30,7 @@ Object.defineProperties(barmatz.forms.ui.PropertiesPanelController.prototype,
 		
 		if(this._model)
 		{
-			itemsWrapper = barmatz.forms.factories.DOMFactory.createPropertiesPanelItemWarpper(this._model);
+			itemsWrapper = barmatz.forms.factories.DOMFactory.createPropertiesItemWarpper(this._model);
 			
 			this._model.addEventListener(barmatz.events.ModelEvent.VALUE_CHANGED, onModelValueChanged);
 			this._view.appendChild(itemsWrapper.wrapper);

@@ -1,0 +1,7 @@
+.forms-properties-panel { background: #E9E9E9; width: 232px; }
+.forms-properties-panel .forms-filler { font-size: 1em; }
+.forms-properties-panel .forms-filler, .forms-properties-panel .forms-header { text-align: center;  color: rgba(0,0,0,.2); }
+.forms-properties-panel .forms-header { font-weight: bold; }
+.forms-properties-panel .forms-item { padding: .4em; border-top: 1px solid rgba(255, 255, 255, .2); border-bottom: 1px solid rgba(0, 0, 0, .1); }
+.forms-properties-panel .forms-item:hover { background: rgba(255, 255, 255, .2); }
+.forms-properties-panel .forms-item label { display: block; }

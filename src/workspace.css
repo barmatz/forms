@@ -1,0 +1,12 @@
+.forms-workspace-panel { background: #F3F3F3; border-left: 1px solid #B2B2B2; border-right: 1px solid #B2B2B2; }
+.forms-workspace-header { background: #FFF; padding: 1em .8em; line-height: 1; overflow: hidden; }
+.forms-workspace-header-form-name { float: left; }
+.forms-workspace-header-save-status { float: right; }
+.forms-workspace-items { width: 100%; }
+.forms-workspace-item:hover, .forms-workspace-items .sortable-placeholder { background: rgb(255, 255, 255); background: rgba(255, 255, 255, .5); }
+.forms-workspace-item td, .forms-workspace-items .sortable-placeholder { height: 3em; vertical-align: middle; }
+.forms-workspace-item .forms-workspace-item-grip { width: 16px; max-width: 16px; cursor: pointer; }
+.forms-workspace-item .forms-workspace-item-label { width: 100px; max-width: 100%; }
+.forms-workspace-item .forms-workspace-item-field { width: auto; }
+.forms-workspace-item .forms-workspace-item-delete-button { width: 25px; max-width: 25px; padding: 0 5px; }
+.forms-workspace-item .forms-workspace-item-mandatory { color: #F00; font-weight: bold; }

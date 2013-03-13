@@ -35,25 +35,23 @@ Object.defineProperties(barmatz.forms.factories.ModelFactory,
 				break;
 		}
 	}},
-	createToolboxItemModel: {value: function(type, label)
-	{
-		barmatz.utils.DataTypes.isNotUndefined(type);
-		barmatz.utils.DataTypes.isNotUndefined(label);
-		barmatz.utils.DataTypes.isTypeOf(type, 'string');
-		barmatz.utils.DataTypes.isTypeOf(label, 'string');
-		return new barmatz.forms.ui.ToolboxItemModel(type, label);
-	}},
-	createCollectionModel: {value: function()
-	{
-		return new barmatz.forms.CollectionModel();
-	}},
 	createToolboxModel: {value: function()
 	{
 		return new barmatz.forms.ui.ToolboxModel();
 	}},
-	createWorkspaceModel: {value: function()
+	createToolboxItemModel: {value: function(type, label, fieldModel)
 	{
-		return new barmatz.forms.ui.WorkspaceModel();
+		barmatz.utils.DataTypes.isNotUndefined(type);
+		barmatz.utils.DataTypes.isNotUndefined(label);
+		barmatz.utils.DataTypes.isNotUndefined(fieldModel);
+		barmatz.utils.DataTypes.isTypeOf(type, 'string');
+		barmatz.utils.DataTypes.isTypeOf(label, 'string');
+		barmatz.utils.DataTypes.isInstanceOf(fieldModel, barmatz.forms.fields.FieldModel);
+		return new barmatz.forms.ui.ToolboxItemModel(type, label, fieldModel);
+	}},
+	createCollectionModel: {value: function()
+	{
+		return new barmatz.forms.CollectionModel();
 	}},
 	createDropboxItemModel: {value: function(label, value)
 	{

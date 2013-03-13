@@ -139,24 +139,24 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		
 		return wrapper;
 	}},
-	createBuilderToolbox: {value: function()
+	createToolbox: {value: function()
 	{
 		return this.createElement('ul');
 	}},
-	createBuilderWorkspaceWrapper: {value: function(formName, saveStatus)
+	createWorkspaceWrapper: {value: function(formName, saveStatus)
 	{
 		var formNameElement, saveStatusElement, workspaceElement;
 		
 		barmatz.utils.DataTypes.isTypeOf(formName, 'string', true);
 		barmatz.utils.DataTypes.isTypeOf(saveStatus, 'string', true);
 		
-		formNameElement = this.createElementWithContent('h1', 'forms-builder-workspace-header-form-name', formName || '');
-		saveStatusElement = this.createElementWithContent('h3', 'forms-builder-workspace-header-save-status', saveStatus || '');
-		workspaceElement = this.createElement('table', 'forms-builder-workspace-items');
+		formNameElement = this.createElementWithContent('h1', 'forms-workspace-header-form-name', formName || '');
+		saveStatusElement = this.createElementWithContent('h3', 'forms-workspace-header-save-status', saveStatus || '');
+		workspaceElement = this.createElement('table', 'forms-workspace-items');
 
-		return {wrapper: this.createElementWithContent('div', 'forms-builder-workspace-wrapper', [this.createElementWithContent('div', 'forms-builder-workspace-header', [formNameElement, saveStatusElement]), workspaceElement]), formName: formNameElement, saveStatus: saveStatusElement, workspace: workspaceElement};
+		return {wrapper: this.createElementWithContent('div', 'forms-workspace-wrapper', [this.createElementWithContent('div', 'forms-workspace-header', [formNameElement, saveStatusElement]), workspaceElement]), formName: formNameElement, saveStatus: saveStatusElement, workspace: workspaceElement};
 	}},
-	createBuilderPropertiesPanel: {value: function()
+	createProperties: {value: function()
 	{
 		return this.createElement('div');
 	}},
@@ -196,7 +196,7 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 			wrapper.appendChild(_this.createElementWithContent('td', className, content));
 		}
 	}},
-	createPropertiesPanelItemWarpper: {value: function(model)
+	createPropertiesItemWarpper: {value: function(model)
 	{
 		var _this, returnWrapper, wrapper;
 		
@@ -246,7 +246,7 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 			barmatz.utils.DataTypes.isTypeOf(name, 'string');
 			barmatz.utils.DataTypes.isTypeOf(label, 'string');
 
-			fieldWrapper = _this.createPropertiesPanelItemFieldWrapper(type, name, label, value, onFieldValueChange);
+			fieldWrapper = _this.createPropertiesItemFieldWrapper(type, name, label, value, onFieldValueChange);
 			wrapper.appendChild(fieldWrapper.wrapper);
 			return fieldWrapper.field;
 		}
@@ -300,7 +300,7 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 			}
 		}
 	}},
-	createPropertiesPanelItemFieldWrapper: {value: function(type, name, label, value, changeHandler)
+	createPropertiesItemFieldWrapper: {value: function(type, name, label, value, changeHandler)
 	{
 		var field;
 		
@@ -383,7 +383,7 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		
 		jQuery(dialog).dialog({
 			closeOnEscape: false,
-			dialogClass: 'forms-builder-dialog-prompt'
+			dialogClass: 'forms-dialog-prompt'
 		});
 		
 		return {wrapper: dialog, nameField: nameField, labelField: labelField};
@@ -438,7 +438,7 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 	}},
 	createChangePropertyPromptDialog: {value: function(title, key, value, confirmHandler, open)
 	{
-		var field;
+		var field, wrapper;
 
 		barmatz.utils.DataTypes.isNotUndefined(title);
 		barmatz.utils.DataTypes.isNotUndefined(key);
@@ -452,7 +452,8 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		field = this.createElement('input');
 		field.type = 'text';
 		field.value = value;
-		return {wrapper: this.createElementWithContent('div', '', [this.createElementWithContent('label', '', key), field]), dialog: this.createPromptDialog(title, wrapper, confirmHandler, open), field: field};
+		wrapper = this.createElementWithContent('div', '', [this.createElementWithContent('label', '', key), field]);
+		return {wrapper: wrapper, dialog: this.createPromptDialog(title, wrapper, confirmHandler, open), field: field};
 	}},
 	createConfirmPromptDialog: {value: function(message, confirmHandler, open)
 	{
@@ -463,7 +464,7 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		barmatz.utils.DataTypes.isTypeOf(open, 'boolean', true);
 		return this.createPromptDialog('Confirm', message, confirmHandler, open);
 	}},
-	createBuilderPanels: {value: function(panels)
+	createPanels: {value: function(panels)
 	{
 		var _this, i; 
 		
@@ -475,7 +476,7 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		for(i = 0; i < panels.length; i++)
 			panels[i] = getPanelElement(panels[i]);
 		
-		return this.createElementWithContent('table', 'forms-builder-wrapper', this.createElementWithContent('tr', '', panels));
+		return this.createElementWithContent('table', 'forms-wrapper', this.createElementWithContent('tr', '', panels));
 		
 		function getPanelElement(model)
 		{
@@ -484,23 +485,23 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 			return _this.createElementWithContent('td', model.className, model.content);
 		}
 	}},
-	createBuilderMenuWrapper: {value: function()
+	createMenuWrapper: {value: function()
 	{
 		var icon, menu, wrapper;
-		icon = this.createBuilderMenuIcon();
-		menu = this.createBuilderMenu();
-		wrapper = this.createElementWithContent('div', 'forms-builder-menu', [icon, menu]);
+		icon = this.createMenuIcon();
+		menu = this.createMenu();
+		wrapper = this.createElementWithContent('div', 'forms-menu', [icon, menu]);
 		return {wrapper: wrapper, icon: icon, menu: menu};
 	}},
-	createBuilderMenuIcon: {value: function()
+	createMenuIcon: {value: function()
 	{
 		return this.createIconButton('gear');
 	}},
-	createBuilderMenu: {value: function()
+	createMenu: {value: function()
 	{
 		return this.createElement('ul');
 	}},
-	createBuilderMenuItem: {value: function(model)
+	createMenuItem: {value: function(model)
 	{
 		var anchor;
 

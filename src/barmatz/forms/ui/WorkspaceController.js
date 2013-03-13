@@ -1,15 +1,16 @@
 /** barmatz.forms.ui.WorkspaceController **/
 window.barmatz.forms.ui.WorkspaceController = function(model, view)
 {
-	var _this = this, selectedItemIndex;
-	
+	var selectedItemIndex;
+
+	barmatz.utils.DataTypes.isNotUndefined(model);
+	barmatz.utils.DataTypes.isNotUndefined(view);
+	barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.CollectionModel);
+	barmatz.utils.DataTypes.isInstanceOf(view, HTMLElement);
 	barmatz.forms.CollectionController.call(this, model, view);
 	
-	if(model)
-	{
-		model.addEventListener(barmatz.events.CollectionEvent.ITEM_ADDED, onModelItemAdded);
-		setViewToSortable();
-	}
+	model.addEventListener(barmatz.events.CollectionEvent.ITEM_ADDED, onModelItemAdded);
+	setViewToSortable();
 	
 	function setViewToSortable()
 	{
@@ -60,7 +61,7 @@ window.barmatz.forms.ui.WorkspaceController = function(model, view)
 	
 	function onSortingStopped(event, ui)
 	{
-		_this._model.setItemIndex(_this._model.getItemAt(selectedItemIndex), getIndexFromSortEvent(ui.item[0]));
+		model.setItemIndex(model.getItemAt(selectedItemIndex), getIndexFromSortEvent(ui.item[0]));
 		selectedItemIndex = NaN;
 	}
 	
@@ -69,9 +70,7 @@ window.barmatz.forms.ui.WorkspaceController = function(model, view)
 		barmatz.utils.DataTypes.isNotUndefined(event);
 		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.CollectionEvent);
 		setViewToSortable();
-
-		if(!event.item.name)
-			openNewFieldDialog(event.item);
+		openNewFieldDialog(event.item);
 	}
 };
 

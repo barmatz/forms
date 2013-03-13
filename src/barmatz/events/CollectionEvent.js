@@ -40,12 +40,27 @@ Object.defineProperties(barmatz.events.CollectionEvent.prototype,
 	{
 		var event = new barmatz.events.CollectionEvent(type);
 		event._target = this.target;
-		event._field = this.field;
-		event._index = this.index;
+		switch(type)
+		{
+			case barmatz.events.CollectionEvent.ITEM_ADDED:
+			case barmatz.events.CollectionEvent.ITEM_REMOVED:
+				event._field = this.field;
+				event._index = this.index;
+				break;
+		}
 		return event;
 	}},
 	toString: {value: function()
 	{
-		return this.formatToString('CollectionEvent', 'type', 'item', 'index');
+		switch(type)
+		{
+			default:
+				return this.formatToString('CollectionEvent', 'type');
+				break;
+			case barmatz.events.CollectionEvent.ITEM_ADDED:
+			case barmatz.events.CollectionEvent.ITEM_REMOVED:
+				return this.formatToString('CollectionEvent', 'type', 'item', 'index');
+				break;
+		}
 	}}
 });

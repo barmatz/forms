@@ -1,0 +1,3 @@
+.forms-toolbox-panel { background: #E9E9E9; width: 150px; }
+.forms-toolbox-item { padding: .3em .4em; cursor: pointer; }
+.forms-toolbox-item:hover { color: #F80; background: rgba(255, 255, 255, .5); border-top: rgba(255, 255, 255, .9); border-bottom: rgba(0, 0, 0, .1); }

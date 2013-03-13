@@ -20,6 +20,14 @@ Object.defineProperties(barmatz.forms.fields.DropboxModel.prototype,
 		barmatz.utils.DataTypes.isInstanceOf(item, barmatz.forms.fields.DropboxItemModel);
 		barmatz.forms.CollectionModel.prototype.addItem.call(this, item);
 	}},
+	addItemAt: {value: function(item, index)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(item);
+		barmatz.utils.DataTypes.isNotUndefined(index);
+		barmatz.utils.DataTypes.isInstanceOf(item, barmatz.forms.fields.DropboxItemModel);
+		barmatz.utils.DataTypes.isTypeOf(index, 'number');
+		barmatz.forms.CollectionModel.prototype.addItemAt.call(this, item, index);
+	}},
 	removeItem: {value: function(item)
 	{
 		barmatz.utils.DataTypes.isNotUndefined(item);

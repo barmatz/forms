@@ -16,26 +16,30 @@ Object.defineProperties(barmatz.forms.CollectionModel.prototype,
 	}},
 	addItem: {value: function(item)
 	{
-		var items;
-		
 		barmatz.utils.DataTypes.isNotUndefined(item);
 		barmatz.utils.DataTypes.isInstanceOf(item, barmatz.mvc.Model);
-		
-		items = this.get('items');
-		items.push(item);
-		this.dispatchEvent(new barmatz.events.CollectionEvent(barmatz.events.CollectionEvent.ITEM_ADDED, item, items.length - 1));
+		this.addItemAt(item, this.get('items').length);
+	}},
+	addItemAt: {value: function(item, index)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(item);
+		barmatz.utils.DataTypes.isNotUndefined(index);
+		barmatz.utils.DataTypes.isInstanceOf(item, barmatz.mvc.Model);
+		barmatz.utils.DataTypes.isTypeOf(index, 'number');
+		this.get('items').splice(index, 0, item);
+		this.dispatchEvent(new barmatz.events.CollectionEvent(barmatz.events.CollectionEvent.ITEM_ADDED, item, index));
 	}},
 	removeItem: {value: function(item)
 	{
-		var items, index;
-		
 		barmatz.utils.DataTypes.isNotUndefined(item);
 		barmatz.utils.DataTypes.isInstanceOf(item, barmatz.mvc.Model);
-		
-		items = this.get('items')
-		index = items.indexOf(item);
-		items.splice(index, 1);
-		this.dispatchEvent(new barmatz.events.CollectionEvent(barmatz.events.CollectionEvent.ITEM_REMOVED, item, index));
+		this.removeItemAt(this.getItemIndex(item));
+	}},
+	removeItemAt: {value: function(index)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(index);
+		barmatz.utils.DataTypes.isTypeOf(index, 'number');
+		this.dispatchEvent(new barmatz.events.CollectionEvent(barmatz.events.CollectionEvent.ITEM_REMOVED, this.get('items').splice(index, 1)[0], index));
 	}},
 	getItemAt: {value: function(index)
 	{
@@ -73,5 +77,12 @@ Object.defineProperties(barmatz.forms.CollectionModel.prototype,
 		
 		for(i = 0; i < items.length; i++)
 			handler(items[i], i, items);
+	}},
+	find: {value: function(filter)
+	{
+		
+		barmatz.utils.DataTypes.isNotUndefined(filter);
+		barmatz.utils.DataTypes.isTypeOf(filter, 'function');
+		return this.get('items').filter(filter);
 	}}
 });
