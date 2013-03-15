@@ -103,12 +103,14 @@ window.barmatz.forms.ui.BuilderController = function(formModel, containerView, p
 		loadingDialog = null;
 	}
 	
-	function removeLoadingViewWithMessage(message)
+	function removeLoadingViewWithMessage(title, message)
 	{
+		barmatz.utils.DataTypes.isNotUndefined(title);
 		barmatz.utils.DataTypes.isNotUndefined(message);
+		barmatz.utils.DataTypes.isTypeOf(title, 'string');
 		barmatz.utils.DataTypes.isTypeOf(message, 'string');
 		removeLoadingView();
-		barmatz.forms.factories.DOMFactory.createAlertPromptDialog(message, true);
+		barmatz.forms.factories.DOMFactory.createAlertPromptDialog(title, message, true);
 	}
 	
 	function onFormModelValueChanged(event)
@@ -154,7 +156,7 @@ window.barmatz.forms.ui.BuilderController = function(formModel, containerView, p
 	{
 		barmatz.utils.DataTypes.isNotUndefined(event);
 		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.FormModelEvent);
-		removeLoadingViewWithMessage('Form saved successfully');
+		removeLoadingViewWithMessage('Success', 'Form saved successfully');
 		saveStatusView.innerHTML = 'last saved at ' + barmatz.utils.Date.toString(new Date(), 'hh:ii dd/mm/yy');
 	}
 	
@@ -162,7 +164,7 @@ window.barmatz.forms.ui.BuilderController = function(formModel, containerView, p
 	{
 		barmatz.utils.DataTypes.isNotUndefined(event);
 		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.FormModelEvent);
-		removeLoadingViewWithMessage('Error saving form');
+		removeLoadingViewWithMessage('Error', 'Error saving form');
 		saveStatusView.innerHTML = 'error saving!';
 	}
 	

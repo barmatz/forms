@@ -436,6 +436,34 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 			_this.destroyDialog(dialog);
 		}
 	}},
+	createExportPromptDialog: {value: function(id, open)
+	{
+		var embedCode, textarea;
+		
+		barmatz.utils.DataTypes.isNotUndefined(id);
+		barmatz.utils.DataTypes.isTypeOf(open, 'boolean', true);
+		
+		embedCode = '(function(d){' +
+					'var a,b,formID="' + id + '";' +
+					'a=d.createElement("script");' +
+					'a.src="myscript.js";' +
+					'b=d.getElementsByTagName("script")[0];' +
+					'b.parentNode.insertBefore(a,b);' +
+					'})(document);';
+		
+		textarea = this.createElementWithContent('textarea', 'forms-dialog-export-embedcode', embedCode);
+		textarea.readOnly = true;
+		textarea.addEventListener('click', function(event)
+		{
+			event.currentTarget.focus();
+			event.currentTarget.select();
+		});
+		
+		return this.createAlertPromptDialog('Export', this.createElementWithContent('div', '', [
+			this.createElementWithContent('div', '', 'Copy past this code into your site:'),
+			textarea
+		]), open);
+	}},
 	createChangePropertyPromptDialog: {value: function(title, key, value, confirmHandler, open)
 	{
 		var field, wrapper;
@@ -455,16 +483,18 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		wrapper = this.createElementWithContent('div', '', [this.createElementWithContent('label', '', key), field]);
 		return {wrapper: wrapper, dialog: this.createPromptDialog(title, wrapper, confirmHandler, open), field: field};
 	}},
-	createAlertPromptDialog: {value: function(message, open)
+	createAlertPromptDialog: {value: function(title, content, open)
 	{
 		var _this, dialog;
 		
-		barmatz.utils.DataTypes.isNotUndefined(message);
-		barmatz.utils.DataTypes.isTypeOf(message, 'string');
+		barmatz.utils.DataTypes.isNotUndefined(title);
+		barmatz.utils.DataTypes.isNotUndefined(content);
+		barmatz.utils.DataTypes.isTypeOf(title, 'string');
+		barmatz.utils.DataTypes.isTypesOrInstances(content, ['string'], [HTMLElement, Array]);
 		barmatz.utils.DataTypes.isTypeOf(open, 'boolean', true);
 		
 		_this = this;
-		dialog = this.createDialog('Alert', message);
+		dialog = this.createDialog(title, content);
 		
 		jQuery(dialog).dialog({
 			buttons: {OK: onOKButtonClick}

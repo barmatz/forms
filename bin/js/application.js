@@ -1595,7 +1595,10 @@ window.barmatz.forms.ui.Builder = function()
 	
 	function onMenuExportClick(event)
 	{
-		debugger;
+		if(barmatz.utils.DataTypes.applySilent('isValid', formModel.id))
+			barmatz.forms.factories.DOMFactory.createExportPromptDialog(formModel.id, true);
+		else
+			barmatz.forms.factories.DOMFactory.createAlertPromptDialog('Failed to export', 'You must save the form before exporting!', true);
 	}
 	
 	function onMenuPropertiesClick(event)
@@ -1724,12 +1727,14 @@ window.barmatz.forms.ui.BuilderController = function(formModel, containerView, p
 		loadingDialog = null;
 	}
 	
-	function removeLoadingViewWithMessage(message)
+	function removeLoadingViewWithMessage(title, message)
 	{
+		barmatz.utils.DataTypes.isNotUndefined(title);
 		barmatz.utils.DataTypes.isNotUndefined(message);
+		barmatz.utils.DataTypes.isTypeOf(title, 'string');
 		barmatz.utils.DataTypes.isTypeOf(message, 'string');
 		removeLoadingView();
-		barmatz.forms.factories.DOMFactory.createAlertPromptDialog(message, true);
+		barmatz.forms.factories.DOMFactory.createAlertPromptDialog(title, message, true);
 	}
 	
 	function onFormModelValueChanged(event)
@@ -1775,7 +1780,7 @@ window.barmatz.forms.ui.BuilderController = function(formModel, containerView, p
 	{
 		barmatz.utils.DataTypes.isNotUndefined(event);
 		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.FormModelEvent);
-		removeLoadingViewWithMessage('Form saved successfully');
+		removeLoadingViewWithMessage('Success', 'Form saved successfully');
 		saveStatusView.innerHTML = 'last saved at ' + barmatz.utils.Date.toString(new Date(), 'hh:ii dd/mm/yy');
 	}
 	
@@ -1783,7 +1788,7 @@ window.barmatz.forms.ui.BuilderController = function(formModel, containerView, p
 	{
 		barmatz.utils.DataTypes.isNotUndefined(event);
 		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.FormModelEvent);
-		removeLoadingViewWithMessage('Error saving form');
+		removeLoadingViewWithMessage('Error', 'Error saving form');
 		saveStatusView.innerHTML = 'error saving!';
 	}
 	
@@ -3455,6 +3460,34 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 			_this.destroyDialog(dialog);
 		}
 	}},
+	createExportPromptDialog: {value: function(id, open)
+	{
+		var embedCode, textarea;
+		
+		barmatz.utils.DataTypes.isNotUndefined(id);
+		barmatz.utils.DataTypes.isTypeOf(open, 'boolean', true);
+		
+		embedCode = '(function(d){' +
+					'var a,b,formID="' + id + '";' +
+					'a=d.createElement("script");' +
+					'a.src="myscript.js";' +
+					'b=d.getElementsByTagName("script")[0];' +
+					'b.parentNode.insertBefore(a,b);' +
+					'})(document);';
+		
+		textarea = this.createElementWithContent('textarea', 'forms-dialog-export-embedcode', embedCode);
+		textarea.readOnly = true;
+		textarea.addEventListener('click', function(event)
+		{
+			event.currentTarget.focus();
+			event.currentTarget.select();
+		});
+		
+		return this.createAlertPromptDialog('Export', this.createElementWithContent('div', '', [
+			this.createElementWithContent('div', '', 'Copy past this code into your site:'),
+			textarea
+		]), open);
+	}},
 	createChangePropertyPromptDialog: {value: function(title, key, value, confirmHandler, open)
 	{
 		var field, wrapper;
@@ -3474,16 +3507,18 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		wrapper = this.createElementWithContent('div', '', [this.createElementWithContent('label', '', key), field]);
 		return {wrapper: wrapper, dialog: this.createPromptDialog(title, wrapper, confirmHandler, open), field: field};
 	}},
-	createAlertPromptDialog: {value: function(message, open)
+	createAlertPromptDialog: {value: function(title, content, open)
 	{
 		var _this, dialog;
 		
-		barmatz.utils.DataTypes.isNotUndefined(message);
-		barmatz.utils.DataTypes.isTypeOf(message, 'string');
+		barmatz.utils.DataTypes.isNotUndefined(title);
+		barmatz.utils.DataTypes.isNotUndefined(content);
+		barmatz.utils.DataTypes.isTypeOf(title, 'string');
+		barmatz.utils.DataTypes.isTypesOrInstances(content, ['string'], [HTMLElement, Array]);
 		barmatz.utils.DataTypes.isTypeOf(open, 'boolean', true);
 		
 		_this = this;
-		dialog = this.createDialog('Alert', message);
+		dialog = this.createDialog(title, content);
 		
 		jQuery(dialog).dialog({
 			buttons: {OK: onOKButtonClick}
