@@ -130,5 +130,13 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 			else
 				_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.ERROR_SAVING));
 		}
+	}},
+	saveAs: {value: function(name)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(name);
+		barmatz.utils.DataTypes.isTypeOf(name, 'string');
+		this.set('id', null);
+		this.set('name', name);
+		this.save();
 	}}
 });

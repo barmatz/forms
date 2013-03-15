@@ -1470,6 +1470,7 @@ window.barmatz.forms.ui.Builder = function()
 		addMenuItem('Load', onMenuLoadClick);
 		addMenuItem('Rename', onMenuRenameClick);
 		addMenuItem('Export', onMenuExportClick);
+		addMenuItem('Properties', onMenuPropertiesClick);
 	}
 	
 	function initToolbox()
@@ -1544,9 +1545,14 @@ window.barmatz.forms.ui.Builder = function()
 		debugger;
 	}
 	
+	function onMenuPropertiesClick(event)
+	{
+		debugger;
+	}
+	
 	function onSaveFromAsConfirm(event)
 	{
-		formModel.saveAs(formModel.name);
+		formModel.saveAs(formRenameField.value);
 	}
 	
 	function onRenameFromConfirm(event)
@@ -2833,6 +2839,14 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 			else
 				_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.ERROR_SAVING));
 		}
+	}},
+	saveAs: {value: function(name)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(name);
+		barmatz.utils.DataTypes.isTypeOf(name, 'string');
+		this.set('id', null);
+		this.set('name', name);
+		this.save();
 	}}
 });
 /** barmatz.forms.Methods **/

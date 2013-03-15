@@ -36,6 +36,7 @@ window.barmatz.forms.ui.Builder = function()
 		addMenuItem('Load', onMenuLoadClick);
 		addMenuItem('Rename', onMenuRenameClick);
 		addMenuItem('Export', onMenuExportClick);
+		addMenuItem('Properties', onMenuPropertiesClick);
 	}
 	
 	function initToolbox()
@@ -110,9 +111,14 @@ window.barmatz.forms.ui.Builder = function()
 		debugger;
 	}
 	
+	function onMenuPropertiesClick(event)
+	{
+		debugger;
+	}
+	
 	function onSaveFromAsConfirm(event)
 	{
-		formModel.saveAs(formModel.name);
+		formModel.saveAs(formRenameField.value);
 	}
 	
 	function onRenameFromConfirm(event)
