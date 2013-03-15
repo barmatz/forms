@@ -138,6 +138,7 @@ window.barmatz.forms.ui.BuilderController = function(formModel, containerView, p
 		barmatz.utils.DataTypes.isNotUndefined(event);
 		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.FormModelEvent);
 		addLoadingView();
+		saveStatusView.innerHTML = 'saving...';
 	}
 	
 	function onFormModelSaved(event)
@@ -145,6 +146,7 @@ window.barmatz.forms.ui.BuilderController = function(formModel, containerView, p
 		barmatz.utils.DataTypes.isNotUndefined(event);
 		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.FormModelEvent);
 		removeLoadingViewWithMessage('Form saved successfully');
+		saveStatusView.innerHTML = 'last saved at ' + barmatz.utils.Date.toString(new Date(), 'hh:ii dd/mm/yy');
 	}
 	
 	function onFormModelErrorSaving(event)
@@ -152,6 +154,7 @@ window.barmatz.forms.ui.BuilderController = function(formModel, containerView, p
 		barmatz.utils.DataTypes.isNotUndefined(event);
 		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.FormModelEvent);
 		removeLoadingViewWithMessage('Error saving form');
+		saveStatusView.innerHTML = 'error saving!';
 	}
 	
 	function onToolboxModelItemAdded(event)
