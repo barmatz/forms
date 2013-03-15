@@ -82,8 +82,7 @@ window.barmatz.forms.ui.Builder = function()
 	
 	function onMenuNewClick(event)
 	{
-		formModel.reset();
-		formRenameField = barmatz.forms.factories.DOMFactory.createChangePropertyPromptDialog('New form', 'Name', formModel.name, onRenameFromConfirm, true).field;
+		formRenameField = barmatz.forms.factories.DOMFactory.createChangePropertyPromptDialog('New form', 'Name', formModel.name, onResetFromConfirm, true).field;
 	}
 	
 	function onMenuSaveClick(event)
@@ -123,6 +122,12 @@ window.barmatz.forms.ui.Builder = function()
 	
 	function onRenameFromConfirm(event)
 	{
+		formModel.name = formRenameField.value;
+	}
+	
+	function onResetFromConfirm(event)
+	{
+		formModel.reset();
 		formModel.name = formRenameField.value;
 	}
 };

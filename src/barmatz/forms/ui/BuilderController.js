@@ -87,9 +87,9 @@ window.barmatz.forms.ui.BuilderController = function(formModel, containerView, p
 	{
 		var title, separator, index;
 		title = document.title;
-		seperator = ' - ';
+		seperator = ' -';
 		index = title.indexOf(seperator);
-		document.title = (title.indexOf(seperator) > -1 ? title.substring(0, title.indexOf(seperator)) : title) + seperator + formModel.name; 
+		document.title = (title.indexOf(seperator) > -1 ? title.substring(0, title.indexOf(seperator)) : title) + seperator + ' ' + formModel.name; 
 	}
 	
 	function addLoadingView()
@@ -115,7 +115,16 @@ window.barmatz.forms.ui.BuilderController = function(formModel, containerView, p
 	{
 		barmatz.utils.DataTypes.isNotUndefined(event);
 		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.ModelEvent);
-		updateFormName();
+		
+		switch(event.key)
+		{
+			case 'name':
+				updateFormName();
+				break;
+			case 'id':
+				saveStatusView.innerHTML = '';
+				break;
+		}
 	}
 	
 	function onFormModelItemAdded(event)

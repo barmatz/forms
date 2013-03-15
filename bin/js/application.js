@@ -1570,8 +1570,7 @@ window.barmatz.forms.ui.Builder = function()
 	
 	function onMenuNewClick(event)
 	{
-		formModel.reset();
-		formRenameField = barmatz.forms.factories.DOMFactory.createChangePropertyPromptDialog('New form', 'Name', formModel.name, onRenameFromConfirm, true).field;
+		formRenameField = barmatz.forms.factories.DOMFactory.createChangePropertyPromptDialog('New form', 'Name', formModel.name, onResetFromConfirm, true).field;
 	}
 	
 	function onMenuSaveClick(event)
@@ -1611,6 +1610,12 @@ window.barmatz.forms.ui.Builder = function()
 	
 	function onRenameFromConfirm(event)
 	{
+		formModel.name = formRenameField.value;
+	}
+	
+	function onResetFromConfirm(event)
+	{
+		formModel.reset();
 		formModel.name = formRenameField.value;
 	}
 };
@@ -1703,9 +1708,9 @@ window.barmatz.forms.ui.BuilderController = function(formModel, containerView, p
 	{
 		var title, separator, index;
 		title = document.title;
-		seperator = ' - ';
+		seperator = ' -';
 		index = title.indexOf(seperator);
-		document.title = (title.indexOf(seperator) > -1 ? title.substring(0, title.indexOf(seperator)) : title) + seperator + formModel.name; 
+		document.title = (title.indexOf(seperator) > -1 ? title.substring(0, title.indexOf(seperator)) : title) + seperator + ' ' + formModel.name; 
 	}
 	
 	function addLoadingView()
@@ -1731,7 +1736,16 @@ window.barmatz.forms.ui.BuilderController = function(formModel, containerView, p
 	{
 		barmatz.utils.DataTypes.isNotUndefined(event);
 		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.ModelEvent);
-		updateFormName();
+		
+		switch(event.key)
+		{
+			case 'name':
+				updateFormName();
+				break;
+			case 'id':
+				saveStatusView.innerHTML = '';
+				break;
+		}
 	}
 	
 	function onFormModelItemAdded(event)
@@ -2859,6 +2873,7 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 	reset: {value: function()
 	{
 		this.set('name', '');
+		this.set('id', null);
 		while(this.numItems > 0)
 			this.removeItemAt(this.numItems - 1);
 	}},

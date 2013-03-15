@@ -93,6 +93,7 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 	reset: {value: function()
 	{
 		this.set('name', '');
+		this.set('id', null);
 		while(this.numItems > 0)
 			this.removeItemAt(this.numItems - 1);
 	}},
