@@ -108,7 +108,10 @@ window.barmatz.forms.ui.Builder = function()
 	function onMenuExportClick(event)
 	{
 		if(barmatz.utils.DataTypes.applySilent('isValid', formModel.id))
-			barmatz.forms.factories.DOMFactory.createExportPromptDialog(formModel.id, true);
+			formModel.getFingerprint(function(fingerprint)
+			{
+				barmatz.forms.factories.DOMFactory.createExportPromptDialog(fingerprint, true);
+			});
 		else
 			barmatz.forms.factories.DOMFactory.createAlertPromptDialog('Failed to export', 'You must save the form before exporting!', true);
 	}

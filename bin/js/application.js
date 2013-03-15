@@ -1596,7 +1596,10 @@ window.barmatz.forms.ui.Builder = function()
 	function onMenuExportClick(event)
 	{
 		if(barmatz.utils.DataTypes.applySilent('isValid', formModel.id))
-			barmatz.forms.factories.DOMFactory.createExportPromptDialog(formModel.id, true);
+			formModel.getFingerprint(function(fingerprint)
+			{
+				barmatz.forms.factories.DOMFactory.createExportPromptDialog(fingerprint, true);
+			});
 		else
 			barmatz.forms.factories.DOMFactory.createAlertPromptDialog('Failed to export', 'You must save the form before exporting!', true);
 	}
@@ -2902,6 +2905,8 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 			barmatz.utils.DataTypes.isNotUndefined(event);
 			barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.LoaderEvent);
 			
+			event.target.removeEventListener(barmatz.events.LoaderEvent.DONE, onLoaderDone);
+			
 			response = event.response;
 			
 			if(response && response.status == 200)
@@ -2924,6 +2929,55 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 		this.set('id', null);
 		this.set('name', name);
 		this.save();
+	}},
+	getFingerprint: {value: function(callback)
+	{
+		var _this, fingerprint;
+		
+		barmatz.utils.DataTypes.isNotUndefined(callback);
+		barmatz.utils.DataTypes.isTypeOf(callback, 'function');
+		
+		_this = this;
+		fingerprint = this.get('fingerprint');
+		
+		if(fingerprint)
+			callback(fingerprint);
+		else
+			loadFingerprint();
+		
+		function loadFingerprint()
+		{
+			var request, loader;
+			request = new barmatz.net.Request('api/form.php');
+			request.method = barmatz.net.Methods.GET;
+			request.data = {i: _this.get('id')};
+			loader = new barmatz.net.Loader();
+			loader.addEventListener(barmatz.events.LoaderEvent.DONE, onLoaderDone);
+			loader.load(request);
+		}
+		
+		function onLoaderDone(event)
+		{
+			var response;
+			
+			barmatz.utils.DataTypes.isNotUndefined(event);
+			barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.LoaderEvent);
+			
+			event.target.removeEventListener(barmatz.events.LoaderEvent.DONE, onLoaderDone);
+
+			response = event.response;
+			
+			if(response && response.status == 200)
+			{
+				data = response.data ? JSON.parse(response.data) : null;
+				
+				if(data && data.fingerprint)
+				{
+					_this.set('fingerprint', data.fingerprint);
+					callback(data.fingerprint);
+				}
+			}
+		}
 	}}
 });
 /** barmatz.forms.Methods **/

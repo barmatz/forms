@@ -3,7 +3,7 @@ require_once 'errors/ServerError.php';
 require_once 'database/Database.php';
 require_once 'database/FormsTable.php';
 
-header('Content-Type', 'application/json');
+header('Content-Type: application/json');
 
 isset($_POST['n']) && isset($_POST['f']) ? processForm() : throwError('Missing variabels');
 

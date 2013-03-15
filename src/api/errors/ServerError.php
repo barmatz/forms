@@ -13,6 +13,6 @@ class ServerError
 	
 	public function output()
 	{
-		echo json_encode(array('error'=>$this->message));
+		die(json_encode(array('error'=>$this->message)));
 	}	
 }
