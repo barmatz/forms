@@ -31,8 +31,8 @@
 			<fileset dir="${SRC_DIR}/barmatz/net" includes="**/*.js"/>
 		</concat>
 		<concat destfile="${BIN_DIR}/css/main.css" fixlastline="yes">
-			<fileset dir="${SRC_DIR}" includes="reset.css"/>
-			<fileset dir="${SRC_DIR}" includes="**/*.css" excludes="reset.css"/>
+			<fileset dir="${SRC_DIR}/css" includes="reset.css"/>
+			<fileset dir="${SRC_DIR}" includes="**/*.css" excludes="css/reset.css"/>
 		</concat>
 		<copy todir="${BIN_DIR}/js">
 			<fileset dir="${SRC_DIR}" includes="*.js" excludes="namespaces.js"/>

@@ -1,6 +1,8 @@
 /** barmatz.forms.ui.BuilderController **/
 window.barmatz.forms.ui.BuilderController = function(formModel, containerView, panelsView, formNameView, saveStatusView, menuView, toolboxModel, toolboxView, workspaceView, propertiesController)
 {
+	var loadingDialog;
+	
 	barmatz.utils.DataTypes.isNotUndefined(formModel);
 	barmatz.utils.DataTypes.isNotUndefined(containerView);
 	barmatz.utils.DataTypes.isNotUndefined(panelsView);
@@ -33,6 +35,9 @@ window.barmatz.forms.ui.BuilderController = function(formModel, containerView, p
 		formModel.addEventListener(barmatz.events.ModelEvent.VALUE_CHANGED, onFormModelValueChanged);
 		formModel.addEventListener(barmatz.events.CollectionEvent.ITEM_ADDED, onFormModelItemAdded);
 		formModel.addEventListener(barmatz.events.CollectionEvent.ITEM_REMOVED, onFormModelItemRemoved);
+		formModel.addEventListener(barmatz.events.FormModelEvent.SAVING, onFormModelSaving);
+		formModel.addEventListener(barmatz.events.FormModelEvent.SAVED, onFormModelSaved);
+		formModel.addEventListener(barmatz.events.FormModelEvent.ERROR_SAVING, onFormModelErrorSaving);
 		updateFormName();
 	}
 	
@@ -75,6 +80,35 @@ window.barmatz.forms.ui.BuilderController = function(formModel, containerView, p
 	function updateFormName()
 	{
 		formNameView.innerHTML = formModel.name;
+		updateDocumentTitle();
+	}
+	
+	function updateDocumentTitle()
+	{
+		var title, separator, index;
+		title = document.title;
+		seperator = ' - ';
+		index = title.indexOf(seperator);
+		document.title = (title.indexOf(seperator) > -1 ? title.substring(0, title.indexOf(seperator)) : title) + seperator + formModel.name; 
+	}
+	
+	function addLoadingView()
+	{
+		loadingDialog = barmatz.forms.factories.DOMFactory.createLoadingDialog();
+	}
+	
+	function removeLoadingView()
+	{
+		barmatz.forms.factories.DOMFactory.destroyLoadingDialog(loadingDialog);
+		loadingDialog = null;
+	}
+	
+	function removeLoadingViewWithMessage(message)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(message);
+		barmatz.utils.DataTypes.isTypeOf(message, 'string');
+		removeLoadingView();
+		barmatz.forms.factories.DOMFactory.createAlertPromptDialog(message, true);
 	}
 	
 	function onFormModelValueChanged(event)
@@ -82,6 +116,42 @@ window.barmatz.forms.ui.BuilderController = function(formModel, containerView, p
 		barmatz.utils.DataTypes.isNotUndefined(event);
 		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.ModelEvent);
 		updateFormName();
+	}
+	
+	function onFormModelItemAdded(event)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(event);
+		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.CollectionEvent);
+		propertiesController.model = event.item;
+		workspaceView.childNodes[event.index].addEventListener('click', onWorkspaceViewItemClick);
+	}
+	
+	function onFormModelItemRemoved(event)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(event);
+		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.CollectionEvent);
+		propertiesController.model = formModel.numItems > 0 ? formModel.getItemAt(event.index - 1) : null;
+	}
+	
+	function onFormModelSaving(event)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(event);
+		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.FormModelEvent);
+		addLoadingView();
+	}
+	
+	function onFormModelSaved(event)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(event);
+		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.FormModelEvent);
+		removeLoadingViewWithMessage('Form saved successfully');
+	}
+	
+	function onFormModelErrorSaving(event)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(event);
+		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.FormModelEvent);
+		removeLoadingViewWithMessage('Error saving form');
 	}
 	
 	function onToolboxModelItemAdded(event)
@@ -110,21 +180,6 @@ window.barmatz.forms.ui.BuilderController = function(formModel, containerView, p
 		barmatz.utils.DataTypes.isNotUndefined(event);
 		barmatz.utils.DataTypes.isInstanceOf(event, MouseEvent);
 		formModel.addItem(toolboxModel.getItemAt(Array.prototype.slice.call(toolboxView.childNodes).indexOf(event.target)).fieldModel.clone());
-	}
-	
-	function onFormModelItemAdded(event)
-	{
-		barmatz.utils.DataTypes.isNotUndefined(event);
-		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.CollectionEvent);
-		propertiesController.model = event.item;
-		workspaceView.childNodes[event.index].addEventListener('click', onWorkspaceViewItemClick);
-	}
-	
-	function onFormModelItemRemoved(event)
-	{
-		barmatz.utils.DataTypes.isNotUndefined(event);
-		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.CollectionEvent);
-		propertiesController.model = formModel.numItems > 0 ? formModel.getItemAt(event.index - 1) : null;
 	}
 	
 	function onWorkspaceViewItemClick(event)

@@ -90,6 +90,8 @@ Object.defineProperties(barmatz.net.Loader.prototype,
 		else
 			this._xhr.open(request.method, url, request.async);
 		
+		this._xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+		
 		if(request.method == barmatz.net.Methods.POST)
 			this._xhr.send(barmatz.net.Loader.serialize(request.data));
 		else

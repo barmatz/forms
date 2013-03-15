@@ -10,6 +10,10 @@ barmatz.forms.FormModel.prototype.constructor = barmatz.forms.FormModel;
 
 Object.defineProperties(barmatz.forms.FormModel.prototype, 
 {
+	id: {get: function()
+	{
+		return this.get('id');
+	}},
 	name: {get: function()
 	{
 		return this.get('name');
@@ -17,12 +21,6 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 	{
 		barmatz.utils.DataTypes.isTypeOf(value, 'string');
 		this.set('name', value);
-	}},
-	reset: {value: function()
-	{
-		this.set('name', '');
-		while(this.numItems > 0)
-			this.removeItemAt(this.numItems - 1);
 	}},
 	addItem: {value: function(item)
 	{
@@ -57,5 +55,80 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 		barmatz.utils.DataTypes.isInstanceOf(item, barmatz.forms.fields.FieldModel);
 		barmatz.utils.DataTypes.isTypeOf(index, 'number');
 		return barmatz.forms.CollectionModel.prototype.setItemIndex.call(this, item, index);
+	}},
+	toJSON: {value: function()
+	{
+		var object = {name: this.name, fields: []};
+		
+		this.forEach(function(item, index, collection)
+		{
+			var field = {};
+			
+			if(item instanceof barmatz.forms.fields.FieldModel)
+			{
+				field.name = item.name;
+				field.label = item.label;
+				field.mandatory = item.mandatory;
+				field.default = item.default;
+				field.enabled = item.enabled;
+			}
+			
+			if(item instanceof barmatz.forms.fields.FileFieldModel)
+				field.accept = item.accept;
+
+			if(item instanceof barmatz.forms.fields.TextFieldModel)
+				field.max = item.max;
+			
+			if(item instanceof barmatz.forms.fields.CheckboxFieldModel)
+			{
+				field.checked = item.checked;
+				field.defaultChecked = item.defaultChecked;
+			}
+			
+			object.fields.push(field);
+		});
+		
+		return JSON.stringify(object);
+	}},
+	reset: {value: function()
+	{
+		this.set('name', '');
+		while(this.numItems > 0)
+			this.removeItemAt(this.numItems - 1);
+	}},
+	save: {value: function()
+	{
+		var _this = this, request, loader;
+		
+		this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.SAVING));
+
+		request = new barmatz.net.Request('api/save.php');
+		request.method = barmatz.net.Methods.POST;
+		request.data = {i: this.id || null, n: this.name, f: this.toJSON()};
+		loader = new barmatz.net.Loader();
+		loader.addEventListener(barmatz.events.LoaderEvent.DONE, onLoaderDone);
+		loader.load(request);
+		
+		function onLoaderDone(event)
+		{
+			var response, data;
+			
+			barmatz.utils.DataTypes.isNotUndefined(event);
+			barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.LoaderEvent);
+			
+			response = event.response;
+			
+			if(response && response.status == 200)
+			{
+				data = response.data ? JSON.parse(response.data) : null;
+				
+				if(data && data.id)
+					_this.set('id', data.id);
+				
+				_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.SAVED));
+			}
+			else
+				_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.ERROR_SAVING));
+		}
 	}}
 });

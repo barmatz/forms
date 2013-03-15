@@ -7,7 +7,7 @@ window.barmatz.net.Request = function(url)
 	this.set('url', url);
 	this.set('method', barmatz.net.Methods.GET);
 	this.set('async', true);
-	this.set('data', null);
+	this.set('data', {});
 };
 
 barmatz.net.Request.prototype = new barmatz.mvc.Model();
@@ -17,15 +17,10 @@ Object.defineProperties(barmatz.net.Request.prototype,
 {
 	data: {get: function()
 	{
-		var data = this.get('data');
-		
-		if(!data)
-		{
-			data = {};
-			this.set('data', data);
-		}
-		
-		return data;
+		return this.get('data');
+	}, set: function(value)
+	{
+		this.set('data', value);
 	}},
 	url: {get: function()
 	{

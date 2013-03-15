@@ -455,6 +455,32 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		wrapper = this.createElementWithContent('div', '', [this.createElementWithContent('label', '', key), field]);
 		return {wrapper: wrapper, dialog: this.createPromptDialog(title, wrapper, confirmHandler, open), field: field};
 	}},
+	createAlertPromptDialog: {value: function(message, open)
+	{
+		var _this, dialog;
+		
+		barmatz.utils.DataTypes.isNotUndefined(message);
+		barmatz.utils.DataTypes.isTypeOf(message, 'string');
+		barmatz.utils.DataTypes.isTypeOf(open, 'boolean', true);
+		
+		_this = this;
+		dialog = this.createDialog('Alert', message);
+		
+		jQuery(dialog).dialog({
+			buttons: {OK: onOKButtonClick}
+		});
+		
+		if(open)
+			jQuery(dialog).dialog('open');
+		
+		function onOKButtonClick(event)
+		{
+			_this.destroyDialog(dialog);
+		}
+		
+		return dialog;
+		
+	}},
 	createConfirmPromptDialog: {value: function(message, confirmHandler, open)
 	{
 		barmatz.utils.DataTypes.isNotUndefined(message);
@@ -525,5 +551,15 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		jQuery(button).button();
 		
 		return button;
+	}},
+	createLoadingDialog: {value: function()
+	{
+		return barmatz.forms.factories.DOMFactory.BODY_ELEMENT.appendChild(this.createElement('div', 'loading-image ui-front'));
+	}},
+	destroyLoadingDialog: {value: function(dialog)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(dialog);
+		barmatz.utils.DataTypes.isInstanceOf(dialog, HTMLElement);
+		dialog.parentElement.removeChild(dialog);
 	}}
 });

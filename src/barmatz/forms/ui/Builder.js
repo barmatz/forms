@@ -92,7 +92,7 @@ window.barmatz.forms.ui.Builder = function()
 	
 	function onMenuSaveAsClick(event)
 	{
-		barmatz.forms.factories.DOMFactory.createChangePropertyPromptDialog('Save as', 'Form name', formModel.name, onSaveFromAsConfirm, true);
+		formRenameField = barmatz.forms.factories.DOMFactory.createChangePropertyPromptDialog('Save as', 'Form name', formModel.name, onSaveFromAsConfirm, true).field;
 	}
 	
 	function onMenuLoadClick(event)
@@ -112,7 +112,7 @@ window.barmatz.forms.ui.Builder = function()
 	
 	function onSaveFromAsConfirm(event)
 	{
-		debugger;
+		formModel.saveAs(formModel.name);
 	}
 	
 	function onRenameFromConfirm(event)
