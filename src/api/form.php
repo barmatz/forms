@@ -6,6 +6,7 @@ if(isset($_GET['i']))
 
 function getFormData()
 {
-	$model = new api\database\FormsModel(new api\database\Database(true));
+	global $db;
+	$model = new api\database\FormsModel($db);
 	echo json_encode($model->selectById($_GET['i']));
 }

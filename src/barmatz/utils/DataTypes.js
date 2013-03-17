@@ -24,7 +24,7 @@ Object.defineProperties(barmatz.utils.DataTypes,
 		{
 			try
 			{
-				method(value, collection[i], allowNull);
+				method.call(this, value, collection[i], allowNull);
 			}
 			catch(error)
 			{
@@ -32,7 +32,7 @@ Object.defineProperties(barmatz.utils.DataTypes,
 			}
 		}
 		
-		if(errors == collection.length - 1)
+		if(errors == collection.length)
 			if(!this.throw(TypeError, errorMessage))
 				return false;
 		
@@ -116,9 +116,9 @@ Object.defineProperties(barmatz.utils.DataTypes,
 				return false;
 		return true;
 	}},
-	isInstacnesOf: {value: function(isntance, objects, allowNull)
+	isInstacnesOf: {value: function(instances, objects, allowNull)
 	{
-		this._recursiveVlidation(isntance, objects, this.isInstanceOf, this.WRONG_INSTANCE, allowNull);
+		this._recursiveVlidation(instances, objects, this.isInstanceOf, this.WRONG_INSTANCE, allowNull);
 		return true;
 	}},
 	isTypeOrInstance: {value: function(value, type, object, allowNull)

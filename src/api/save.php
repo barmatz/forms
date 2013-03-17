@@ -7,7 +7,8 @@ require_once dirname(__FILE__) . '/user/UserModel.php';
 
 function processForm()
 {
-	$model = new \api\database\FormsModel(new api\database\Database(true));
+	global $db;
+	$model = new \api\database\FormsModel($db);
 	
 	if(isset($_POST['i']))
 		$model->update($_POST['i'], $_POST['n'], $_POST['d']);

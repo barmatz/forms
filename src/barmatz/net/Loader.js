@@ -117,7 +117,7 @@ Object.defineProperties(barmatz.net.Loader.prototype,
 				case 4:
 					if(!type)
 						type = barmatz.events.LoaderEvent.DONE;
-					_this.dispatchEvent(new barmatz.events.LoaderEvent(type, new barmatz.net.Response(request.url, _this._xhr.response, _this._xhr.responseType, _this._xhr.status, _this._xhr.getAllResponseHeaders().split('\n'))));
+					_this.dispatchEvent(new barmatz.events.LoaderEvent(type, new barmatz.net.Response(request.url, _this._xhr.responseText, _this._xhr.responseType || '', _this._xhr.status, _this._xhr.getAllResponseHeaders().split('\n'))));
 					break;
 			}
 		}

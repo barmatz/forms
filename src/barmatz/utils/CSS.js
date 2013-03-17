@@ -70,5 +70,24 @@ Object.defineProperties(barmatz.utils.CSS,
 		
 		for(i = 0; i < element.childNodes.length; i++)
 			this.verticalAlign(element.childNodes[i]);
+	}},
+	addClass: {value: function(element, className)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(element);
+		barmatz.utils.DataTypes.isNotUndefined(className);
+		barmatz.utils.DataTypes.isInstanceOf(element, HTMLElement);
+		barmatz.utils.DataTypes.isTypeOf(className, 'string');
+		
+		if(element.className.indexOf(className) == -1)
+			element.className += ' ' + className;
+	}},
+	removeClass: {value: function(element, className)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(element);
+		barmatz.utils.DataTypes.isNotUndefined(className);
+		barmatz.utils.DataTypes.isInstanceOf(element, HTMLElement);
+		barmatz.utils.DataTypes.isTypeOf(className, 'string');
+		
+		element.className = element.className.replace(new RegExp('^' + className + '\\s?|\\s' + className + '[^\\S]?', 'g'), ' ').replace(/\s+/g, ' ').replace(/^\s+|\s+$/, '');
 	}}
 });

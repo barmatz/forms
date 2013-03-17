@@ -3,6 +3,27 @@ window.barmatz.utils.Date = function(){};
 
 Object.defineProperties(barmatz.utils.Date,
 {
+	toDate: {value: function(string)
+	{
+		var isoExp, date, month, parts;
+		
+		barmatz.utils.DataTypes.isNotUndefined(string);
+		barmatz.utils.DataTypes.isTypeOf(string, 'string');
+		
+		isoExp = /^(\d{4})-(\d{2})-(\d{2})\s(\d{2}):(\d{2}):(\d{2})$/;
+        date = new Date(NaN);
+        parts = isoExp.exec(string);
+
+		if(parts)
+		{
+			month = +parts[2];
+			date.setFullYear(parts[1], month - 1, parts[3]);
+			date.setHours(parts[4]);
+			date.setMinutes(parts[5]);
+			date.setSeconds(parts[6]);
+		}
+		return date;
+	}},
 	toString: {value: function(date, format)
 	{
 		barmatz.utils.DataTypes.isNotUndefined(date);

@@ -13,9 +13,25 @@ Object.defineProperties(barmatz.forms.users.UserModel.prototype,
 	{
 		return this.get('id');
 	}},
-	name: {get: function()
+	userName: {get: function()
 	{
-		return this.get('name');
+		return this.get('userName');
+	}},
+	firstName: {get: function()
+	{
+		return this.get('firstName');
+	}},
+	lastName: {get: function()
+	{
+		return this.get('lastName');
+	}},
+	created: {get: function()
+	{
+		return this.get('created');
+	}},
+	active: {get: function()
+	{
+		return this.get('active');
 	}},
 	addItem: {value: function(item)
 	{
@@ -51,32 +67,114 @@ Object.defineProperties(barmatz.forms.users.UserModel.prototype,
 		barmatz.utils.DataTypes.isTypeOf(index, 'number');
 		barmatz.forms.CollectionModel.prototype.setItemIndex.call(this, item, index);
 	}},
-	getForms: {value: function(callback)
+	getForms: {value: function()
 	{
-		var _this;
+		var _this = this;
 		
-		barmatz.utils.DataTypes.isNotUndefined(callback);
-		barmatz.utils.DataTypes.isTypeOf(callback, 'function');
+		this.id == null ? loadUserData() : loadFormsData();
 		
-		_this = this;
+		function loadUserData()
+		{
+			addLoadUserDataListeners();
+			_this.getData();
+		}
 		
-		loadForms();
-		
-		function loadForms()
+		function loadFormsData()
 		{
 			var request, loader;
 			
 			request = new barmatz.net.Request('api/user/forms.php');
 			request.method = barmatz.net.Methods.GET;
+			request.data = {u: _this.id};
 			
 			loader = new barmatz.net.Loader();
-			loader.addEventListener(barmatz.events.LoaderEvent.DONE, onLoaderDone);
+			loader.addEventListener(barmatz.events.LoaderEvent.DONE, onLoadFormsDataDone);
 			loader.load(request);
 		}
 		
+		function addLoadUserDataListeners()
+		{
+			_this.addEventListener(barmatz.events.UserModelEvent.DATA_LOAD_SUCCESS, onLoadUserDataSucces);
+			_this.addEventListener(barmatz.events.UserModelEvent.DATA_LOAD_FAIL, onLoadUserDataFail);
+		}
+		
+		function removeLoadUserDataListeners()
+		{
+			_this.removeEventListener(barmatz.events.UserModelEvent.DATA_LOAD_SUCCESS, onLoadUserDataSucces);
+			_this.removeEventListener(barmatz.events.UserModelEvent.DATA_LOAD_FAIL, onLoadUserDataFail);
+		}
+		
+		function parseFormsData(data)
+		{
+			var form, i;
+			
+			barmatz.utils.DataTypes.isNotUndefined(data);
+			barmatz.utils.DataTypes.isInstanceOf(data, Array);
+			
+			for(i in data)
+			{
+				form = new barmatz.forms.FormModel();
+				form.created = barmatz.utils.Date.toDate(data[i].created);
+				form.fingerprint = data[i].fingerprint;
+				form.id = data[i].id;
+				form.name = data[i].name;
+				data[i] = form;
+			}
+		}
+		
+		function onLoadUserDataSucces(event)
+		{
+			removeLoadUserDataListeners();
+			loadFormsData();
+		}
+		
+		function onLoadUserDataFail(event)
+		{
+			removeLoadUserDataListeners();
+			_this.dispatchEvent(new barmatz.events.UserModelEvent(barmatz.events.UserModelEvent.GET_FORMS_FAIL));
+		}
+		
+		function onLoadFormsDataDone(event)
+		{
+			var response, data;
+			
+			barmatz.utils.DataTypes.isNotUndefined(event);
+			barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.LoaderEvent);
+			
+			event.target.removeEventListener(barmatz.events.LoaderEvent.DONE, onLoadFormsDataDone);
+
+			response = event.response;
+			
+			if(response && response.status == 200)
+			{
+				data = response.data ? JSON.parse(response.data) : null;
+					
+				if(data)
+				{
+					parseFormsData(data);
+					_this.dispatchEvent(new barmatz.events.UserModelEvent(barmatz.events.UserModelEvent.GET_FORMS_SUCCESS, data));
+				}
+				else
+					_this.dispatchEvent(new barmatz.events.UserModelEvent(barmatz.events.UserModelEvent.GET_FORMS_FAIL));
+			}
+			else
+				_this.dispatchEvent(new barmatz.events.UserModelEvent(barmatz.events.UserModelEvent.GET_FORMS_FAIL));
+		}
+	}},
+	getData: {value: function()
+	{
+		var _this = this, request, loader;
+		
+		request = new barmatz.net.Request('api/user/user.php');
+		request.method = barmatz.net.Methods.GET;
+		
+		loader = new barmatz.net.Loader();
+		loader.addEventListener(barmatz.events.LoaderEvent.DONE, onLoaderDone);
+		loader.load(request);
+		
 		function onLoaderDone(event)
 		{
-			var response;
+			var response, data;
 			
 			barmatz.utils.DataTypes.isNotUndefined(event);
 			barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.LoaderEvent);
@@ -89,12 +187,22 @@ Object.defineProperties(barmatz.forms.users.UserModel.prototype,
 			{
 				data = response.data ? JSON.parse(response.data) : null;
 				
-				if(data && data.forms)
+				if(data)
 				{
-					debugger;
-					callback(data.forms);
+					_this.set('id', data.id);
+					_this.set('userName', data.userName);
+					_this.set('firstName', data.first_name);
+					_this.set('lastName', data.last_name);
+					_this.set('created', barmatz.utils.Date.toDate(data.created));
+					_this.set('active', data.active == '1' ? true : false);
+					_this.dispatchEvent(new barmatz.events.UserModelEvent(barmatz.events.UserModelEvent.DATA_LOAD_SUCCESS));
 				}
+				else
+					_this.dispatchEvent(new barmatz.events.UserModelEvent(barmatz.events.UserModelEvent.DATA_LOAD_FAIL));
 			}
+			else
+				_this.dispatchEvent(new barmatz.events.UserModelEvent(barmatz.events.UserModelEvent.DATA_LOAD_FAIL));
+				
 		}
 	}},
 	login: {value: function(userName, password)
@@ -130,6 +238,7 @@ Object.defineProperties(barmatz.forms.users.UserModel.prototype,
 			if(response && response.status == 200)
 			{
 				data = response.data ? JSON.parse(response.data) : null;
+				_this.set('id', data.id);
 				_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.UserModelEvent.LOGIN_SUCCESS));
 			}
 			else

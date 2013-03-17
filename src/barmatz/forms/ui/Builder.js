@@ -23,6 +23,7 @@ window.barmatz.forms.ui.Builder = function()
 	function initUserModel()
 	{
 		userModel = barmatz.forms.factories.ModelFactory.createUserModel();
+		userModel.getData();
 	}
 	
 	function initForm()
@@ -86,6 +87,18 @@ window.barmatz.forms.ui.Builder = function()
 		toolboxModel.addItem(barmatz.forms.factories.ModelFactory.createToolboxItemModel(type, label, barmatz.forms.factories.ModelFactory.createFieldModel(type, '')));
 	}
 	
+	function addUserModelMenuLoadListeners()
+	{
+		userModel.addEventListener(barmatz.events.UserModelEvent.GET_FORMS_SUCCESS, onMenuLoadGetFormsSuccess);
+		userModel.addEventListener(barmatz.events.UserModelEvent.GET_FORMS_FAIL, onMenuLoadGetFormsFail);
+	}
+	
+	function removeUserModelMenuLoadListeners()
+	{
+		userModel.removeEventListener(barmatz.events.UserModelEvent.GET_FORMS_SUCCESS, onMenuLoadGetFormsSuccess);
+		userModel.removeEventListener(barmatz.events.UserModelEvent.GET_FORMS_FAIL, onMenuLoadGetFormsFail);
+	}
+	
 	function onMenuNewClick(event)
 	{
 		formRenameField = barmatz.forms.factories.DOMFactory.createChangePropertyPromptDialog('New form', 'Name', formModel.name, onResetFromConfirm, true).field;
@@ -103,10 +116,22 @@ window.barmatz.forms.ui.Builder = function()
 	
 	function onMenuLoadClick(event)
 	{
-		userModel.getForms(function(forms)
-		{
-			barmatz.forms.factories.DOMFactory.createUserFormsListDialog(forms);
-		});
+		addUserModelMenuLoadListeners();
+		userModel.getForms();
+	}
+	
+	function onMenuLoadGetFormsSuccess(event)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(event);
+		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.UserModelEvent);
+		removeUserModelMenuLoadListeners();
+		barmatz.forms.factories.DOMFactory.createUserFormsListDialog(event.forms);
+	}
+	
+	function onMenuLoadGetFormsFail(event)
+	{
+		removeUserModelMenuLoadListeners();
+		barmatz.forms.factories.DOMFactory.createAlertPromptDialog('Error', 'An error has occured. Please try again later.', true);
 	}
 	
 	function onMenuRenameClick(event)

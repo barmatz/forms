@@ -1,2 +1,10 @@
 .forms-dialog-prompt .ui-dialog-titlebar-close { display: none; }
 .forms-dialog-export-embedcode { width: 100%; height: 5em; }
+.forms-dialog-user-forms { width: 90% !important; }
+.forms-dialog-user-forms table { width: 100%; min-height: 10em; }
+.forms-dialog-user-forms th, .forms-dialog-user-forms td { padding: .4em; }
+.forms-dialog-user-forms th { background: rgba(255, 255, 255, .5); }
+.forms-dialog-user-forms td { border: 1px solid rgba(255, 255, 255, .05); cursor: pointer; }
+.forms-dialog-user-forms tr { font-weight: inherit !important; }
+.forms-dialog-user-forms tr.odd td { background: rgba(255, 255, 255, .3); }
+.forms-dialog-user-forms tr.even td { background: rgba(255, 255, 255, .2); }

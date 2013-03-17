@@ -26,34 +26,39 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 	}},
 	createElementWithContent: {value: function(tagName, className, content, appendChildWrapper)
 	{
-		var element;
+		var _this, element;
 		
 		barmatz.utils.DataTypes.isNotUndefined(tagName);
 		barmatz.utils.DataTypes.isTypeOf(tagName, 'string');
 		barmatz.utils.DataTypes.isTypeOf(className, 'string', true);
 		barmatz.utils.DataTypes.isTypesOrInstances(content, ['string'], [HTMLElement, Array]);
+		barmatz.utils.DataTypes.isTypeOf(appendChildWrapper, 'function', true);
 		
-		if(barmatz.utils.DataTypes.isTypesOrInstances(content, ['string'], [HTMLElement, Array], true))
+		_this = this;
+		element = this.createElement(tagName, className);
+		addContent(content, element);
+		
+		return element;
+		
+		function addContent(content, parent, wrapperTag)
 		{
-			if(barmatz.utils.DataTypes.isTypeOf(appendChildWrapper, 'function', true))
+			var i;
+			
+			if(barmatz.utils.DataTypes.applySilent('isTypeOf', content, 'string'))
 			{
-				element = this.createElement(tagName, className);
-				
-				if(barmatz.utils.DataTypes.applySilent('isTypeOf', content, 'string'))
-					element.innerHTML = content;
-				else if(barmatz.utils.DataTypes.applySilent('isInstanceOf', content, HTMLElement))
-					element.appendChild(content);
-				else if(barmatz.utils.DataTypes.applySilent('isInstanceOf', content, Array))
-				{
-					while(element.childNodes.length < content.length)
-						element.appendChild(appendChildWrapper != null ? appendChildWrapper(content[element.childNodes.length]) : content[element.childNodes.length]);
-				}
-				
-				return element;
+				if(wrapperTag)
+					parent.appendChild(_this.createElementWithContent(wrapperTag, '', content));
+				else
+					parent.innerHTML = content;
+			}
+			else if(barmatz.utils.DataTypes.applySilent('isInstanceOf', content, HTMLElement))
+				parent.appendChild(appendChildWrapper != null ? appendChildWrapper(content) : content);
+			else if(barmatz.utils.DataTypes.applySilent('isInstanceOf', content, Array))
+			{
+				for(i in content)
+					addContent(content[i], parent, 'span');
 			}
 		}
-		
-		return null;
 	}},
 	createDropboxElement: {value: function(model, selectedIndex)
 	{
@@ -648,6 +653,94 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 			barmatz.utils.DataTypes.isNotUndefined(content);
 			barmatz.utils.DataTypes.isTypesOrInstances(content, ['string'], [HTMLElement, Array]);
 			return _this.createElementWithContent('td', '', content);
+		}
+	}},
+	createUserFormsListDialog: {value: function(forms)
+	{
+		var _this, dialog, table, activeRow, i;
+		
+		barmatz.utils.DataTypes.isNotUndefined(forms);
+		barmatz.utils.DataTypes.isInstanceOf(forms, Array);
+		
+		_this = this;
+		table = this.createElement('table');
+		createRow('Name', 'Created', 'Fingerprint', true);
+		
+		for(i in forms)
+			createRow(forms[i].name, barmatz.utils.Date.toString(forms[i].created, 'dd/mm/yyyy hh:ii'), forms[i].fingerprint);
+		
+		dialog = this.createDialog('Your forms', table);
+		jQuery(dialog).dialog({autoOpen: true, dialogClass: 'forms-dialog-user-forms'});
+		
+		function createRow(content1, content2, content3, isHead)
+		{
+			var row, isHead, colTagName;
+			
+			barmatz.utils.DataTypes.isNotUndefined(content1);
+			barmatz.utils.DataTypes.isNotUndefined(content2);
+			barmatz.utils.DataTypes.isNotUndefined(content3);
+			barmatz.utils.DataTypes.isTypesOrInstances(content1, ['string'], [HTMLElement, Array]);
+			barmatz.utils.DataTypes.isTypesOrInstances(content2, ['string'], [HTMLElement, Array]);
+			barmatz.utils.DataTypes.isTypesOrInstances(content3, ['string'], [HTMLElement, Array]);
+			barmatz.utils.DataTypes.isTypeOf(isHead, 'boolean', true);
+			
+			colTagName = isHead ? 'th' : 'td'; 
+			table.appendChild(_this.createElementWithContent('tr', '', [getCollumn(colTagName, content1), getCollumn(colTagName, content2), getCollumn(colTagName, content3)]));
+			
+			if(!isHead)
+			{
+				table.lastChild.className = 'ui-widget ui-state-default ui-corner-all ui-button-text-only ' + (table.childNodes.length % 2 == 0 ? 'even' : 'odd');
+				table.lastChild.addEventListener('mouseover', onRowMouseOver);
+			}
+		}
+		
+		function getCollumn(colTagName, content)
+		{
+			barmatz.utils.DataTypes.isNotUndefined(colTagName);
+			barmatz.utils.DataTypes.isNotUndefined(content);
+			barmatz.utils.DataTypes.isTypeOf(colTagName, 'string');
+			barmatz.utils.DataTypes.isTypesOrInstances(content, ['string'], [HTMLElement, Array]);
+			return _this.createElementWithContent(colTagName, '', content);
+		}
+		
+		function onRowMouseOver(event)
+		{
+			barmatz.utils.DataTypes.isNotUndefined(event);
+			barmatz.utils.DataTypes.isInstanceOf(event, MouseEvent);
+			barmatz.utils.CSS.addClass(event.currentTarget, 'ui-state-hover');
+			event.currentTarget.removeEventListener('mouseover', onRowMouseOver);
+			event.currentTarget.addEventListener('mouseout', onRowMouseOut);
+			event.currentTarget.addEventListener('mousedown', onRowMouseDown);
+		}
+		
+		function onRowMouseOut(event)
+		{
+			barmatz.utils.DataTypes.isNotUndefined(event);
+			barmatz.utils.DataTypes.isInstanceOf(event, MouseEvent);
+			barmatz.utils.CSS.removeClass(event.currentTarget, 'ui-state-hover');
+			event.currentTarget.addEventListener('mouseover', onRowMouseOver);
+			event.currentTarget.removeEventListener('mouseout', onRowMouseOut);
+			event.currentTarget.removeEventListener('mousedown', onRowMouseDown);
+		}
+		
+		function onRowMouseDown(event)
+		{
+			barmatz.utils.DataTypes.isNotUndefined(event);
+			barmatz.utils.DataTypes.isInstanceOf(event, MouseEvent);
+			activeRow = event.currentTarget;
+			barmatz.utils.CSS.addClass(activeRow, 'ui-state-active');
+			activeRow.removeEventListener('mousedown', onRowMouseDown);
+			window.addEventListener('mouseup', onRowMouseUp);
+		}
+		
+		function onRowMouseUp(event)
+		{
+			barmatz.utils.DataTypes.isNotUndefined(event);
+			barmatz.utils.DataTypes.isInstanceOf(event, MouseEvent);
+			barmatz.utils.CSS.removeClass(activeRow, 'ui-state-active');
+			activeRow.addEventListener('mousedown', onRowMouseDown);
+			window.removeEventListener('mouseup', onRowMouseUp);
+			activeRow = null;
 		}
 	}}
 });

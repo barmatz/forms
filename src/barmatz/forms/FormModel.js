@@ -22,6 +22,22 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 		barmatz.utils.DataTypes.isTypeOf(value, 'string');
 		this.set('name', value);
 	}},
+	created: {get: function()
+	{
+		return this.get('created');
+	}, set: function(value)
+	{
+		barmatz.utils.DataTypes.isInstanceOf(value, Date);
+		this.set('created', value);
+	}},
+	fingerprint: {get: function()
+	{
+		return this.get('fingerprint');
+	}, set: function(value)
+	{
+		barmatz.utils.DataTypes.isTypeOf(value, 'string');
+		this.set('fingerprint', value);
+	}},
 	addItem: {value: function(item)
 	{
 		barmatz.utils.DataTypes.isNotUndefined(item);
