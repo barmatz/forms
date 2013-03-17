@@ -1,14 +1,15 @@
 /** barmatz.forms.ui.Builder **/
 window.barmatz.forms.ui.Builder = function()
 {
-	var formModel, formRenameField, menuModel, menuViewWrapper, toolboxModel, toolboxView, workspaceViewWrapper, propertiesView, propertiesController;
+	var userModel, formModel, formRenameField, menuModel, menuViewWrapper, toolboxModel, toolboxView, workspaceViewWrapper, propertiesView, propertiesController;
 	
+	initUserModel();
 	initForm();
 	initMenu();
 	initToolbox();
 	initWorkspace();
 	initProperties();
-	
+
 	barmatz.forms.factories.ControllerFactory.createBuilderController(
 		formModel, barmatz.forms.factories.DOMFactory.BODY_ELEMENT, 
 		barmatz.forms.factories.DOMFactory.createPanels([
@@ -18,6 +19,11 @@ window.barmatz.forms.ui.Builder = function()
 		]),
 		workspaceViewWrapper.formName, workspaceViewWrapper.saveStatus, menuViewWrapper.wrapper, toolboxModel, toolboxView, workspaceViewWrapper.workspace, propertiesController
 	);
+	
+	function initUserModel()
+	{
+		userModel = barmatz.forms.factories.ModelFactory.createUserModel();
+	}
 	
 	function initForm()
 	{
@@ -87,7 +93,7 @@ window.barmatz.forms.ui.Builder = function()
 	
 	function onMenuSaveClick(event)
 	{
-		formModel.save();
+		formModel.save(userModel);
 	}
 	
 	function onMenuSaveAsClick(event)
@@ -97,7 +103,10 @@ window.barmatz.forms.ui.Builder = function()
 	
 	function onMenuLoadClick(event)
 	{
-		debugger;
+		userModel.getForms(function(forms)
+		{
+			barmatz.forms.factories.DOMFactory.createUserFormsListDialog(forms);
+		});
 	}
 	
 	function onMenuRenameClick(event)
@@ -123,7 +132,7 @@ window.barmatz.forms.ui.Builder = function()
 	
 	function onSaveFromAsConfirm(event)
 	{
-		formModel.saveAs(formRenameField.value);
+		formModel.saveAs(userModel, formRenameField.value);
 	}
 	
 	function onRenameFromConfirm(event)

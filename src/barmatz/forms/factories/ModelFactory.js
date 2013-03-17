@@ -3,6 +3,10 @@ window.barmatz.forms.factories.ModelFactory = function(){};
 
 Object.defineProperties(barmatz.forms.factories.ModelFactory,
 {
+	createUserModel: {value: function()
+	{
+		return new barmatz.forms.users.UserModel();
+	}},
 	createFieldModel: {value: function(type, name)
 	{
 		barmatz.utils.DataTypes.isNotUndefined(type);

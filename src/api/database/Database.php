@@ -1,5 +1,5 @@
 <?php
-namespace barmatz\forms\database;
+namespace api\database;
 
 class Database
 {
@@ -18,10 +18,9 @@ class Database
 	private function throwError()
 	{
 		if($this->link)
-			$error = new \barmatz\forms\errors\ServerError(mysql_error($this->link));
+			\api\errors\Errors::internalServerError(mysql_error($this->link));
 		else
-			$error = new \barmatz\forms\errors\ServerError(mysql_error());
-		$error->output();
+			\api\errors\Errors::internalServerError(mysql_error());
 	}
 	
 	public function connect()

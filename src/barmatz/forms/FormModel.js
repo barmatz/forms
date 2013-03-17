@@ -97,15 +97,18 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 		while(this.numItems > 0)
 			this.removeItemAt(this.numItems - 1);
 	}},
-	save: {value: function()
+	save: {value: function(model)
 	{
 		var _this = this, request, loader;
+
+		barmatz.utils.DataTypes.isNotUndefined(model);
+		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.users.UserModel);
 		
 		this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.SAVING));
 
 		request = new barmatz.net.Request('api/save.php');
 		request.method = barmatz.net.Methods.POST;
-		request.data = {i: this.id || null, n: this.name, f: this.toJSON()};
+		request.data = {i: this.id || null, n: this.name, d: this.toJSON()};
 		loader = new barmatz.net.Loader();
 		loader.addEventListener(barmatz.events.LoaderEvent.DONE, onLoaderDone);
 		loader.load(request);
@@ -134,13 +137,15 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 				_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.ERROR_SAVING));
 		}
 	}},
-	saveAs: {value: function(name)
+	saveAs: {value: function(model, name)
 	{
+		barmatz.utils.DataTypes.isNotUndefined(model);
+		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.users.UserModel);
 		barmatz.utils.DataTypes.isNotUndefined(name);
 		barmatz.utils.DataTypes.isTypeOf(name, 'string');
 		this.set('id', null);
 		this.set('name', name);
-		this.save();
+		this.save(model);
 	}},
 	getFingerprint: {value: function(callback)
 	{
@@ -160,9 +165,11 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 		function loadFingerprint()
 		{
 			var request, loader;
+			
 			request = new barmatz.net.Request('api/form.php');
 			request.method = barmatz.net.Methods.GET;
 			request.data = {i: _this.get('id')};
+			
 			loader = new barmatz.net.Loader();
 			loader.addEventListener(barmatz.events.LoaderEvent.DONE, onLoaderDone);
 			loader.load(request);

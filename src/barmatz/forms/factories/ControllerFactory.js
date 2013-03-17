@@ -3,6 +3,20 @@ window.barmatz.forms.factories.ControllerFactory = function(){};
 
 Object.defineProperties(barmatz.forms.factories.ControllerFactory,
 {
+	createLoginController: {value: function(model, userNameFieldView, passwordFieldView, submitButtonView, errorFieldView)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(model);
+		barmatz.utils.DataTypes.isNotUndefined(userNameFieldView);
+		barmatz.utils.DataTypes.isNotUndefined(passwordFieldView);
+		barmatz.utils.DataTypes.isNotUndefined(submitButtonView);
+		barmatz.utils.DataTypes.isNotUndefined(errorFieldView);
+		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.users.UserModel);
+		barmatz.utils.DataTypes.isInstanceOf(userNameFieldView, HTMLElement);
+		barmatz.utils.DataTypes.isInstanceOf(passwordFieldView, HTMLElement);
+		barmatz.utils.DataTypes.isInstanceOf(submitButtonView, HTMLElement);
+		barmatz.utils.DataTypes.isInstanceOf(errorFieldView, HTMLElement);
+		return new barmatz.forms.users.LogingController(model, userNameFieldView, passwordFieldView, submitButtonView, errorFieldView);
+	}},
 	createToolboxController: {value: function(model, view)
 	{
 		barmatz.utils.DataTypes.isNotUndefined(model);

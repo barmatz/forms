@@ -1,26 +1,16 @@
 <?php
-require_once 'errors/ServerError.php';
-require_once 'database/Database.php';
-require_once 'database/FormsTable.php';
+require_once dirname(__FILE__) . '/api.php';
+require_once dirname(__FILE__) . '/database/FormsModel.php';
+require_once dirname(__FILE__) . '/user/UserModel.php';
 
-header('Content-Type: application/json');
-
-isset($_POST['n']) && isset($_POST['f']) ? processForm() : throwError('Missing variabels');
+\api\user\UserModel::isAuthenticated() ? isset($_POST['n']) && isset($_POST['d']) ? processForm() : \api\errors\Errors::notImplemented('Missing variabels') : \api\errors\Errors::unauthorized('user not logged in');
 
 function processForm()
 {
-	$table = new barmatz\forms\database\FormsTable(new barmatz\forms\database\Database(true));
+	$model = new \api\database\FormsModel(new api\database\Database(true));
+	
 	if(isset($_POST['i']))
-		$table->update($_POST['i'], $_POST['n'], $_POST['f']);
+		$model->update($_POST['i'], $_POST['n'], $_POST['d']);
 	else
-	{
-		$id = $table->insert($_POST['n'], $_POST['f']);
-		echo json_encode(array("id"=>$id));
-	}
+		echo json_encode(array("id"=>$model->insert($_SESSION['userId'], $_POST['n'], $_POST['d'])));
 } 
-
-function throwError($message)
-{
-	$error = new \barmatz\forms\errors\ServerError($message);
-	$error->output();
-}

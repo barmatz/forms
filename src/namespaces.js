@@ -4,7 +4,8 @@ window.barmatz = {
 	forms: {
 		factories: {},
 		fields: {},
-		ui: {}
+		ui: {},
+		users: {}
 	},
 	mvc: {},
 	net: {},

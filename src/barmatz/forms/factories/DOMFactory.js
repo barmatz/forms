@@ -565,7 +565,7 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.ui.MenuItemModel);
 
 		anchor = this.createElementWithContent('a', '', model.label);
-		anchor.href = '#';
+		anchor.href = 'javascript:void(0);';
 		anchor.addEventListener('click', model.clickHandler);
 		
 		return this.createElementWithContent('li', '', anchor);
@@ -591,5 +591,63 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		barmatz.utils.DataTypes.isNotUndefined(dialog);
 		barmatz.utils.DataTypes.isInstanceOf(dialog, HTMLElement);
 		dialog.parentElement.removeChild(dialog);
+	}},
+	createLoginFormDialogWrapper: {value: function()
+	{
+		var _this, dialog, wrapper, userNameField, passwordField, errorField;
+		_this = this;
+		wrapper = this.createElement('table');
+		userNameField = addField('username', 'User', 'text');
+		passwordField = addField('password', 'Password', 'password');
+		errorField = this.createElementWithContent('div', 'forms-error-wrapper ui-state-error ui-corner-all', [this.createElement('span', 'ui-icon ui-icon-alert'), this.createElementWithContent('span', '', 'Username and/or password are incorrect')]);
+		addRow(errorField);
+		
+		dialog = this.createDialog('Login', wrapper);
+		jQuery(dialog).dialog({autoOpen: true, dialogClass: 'forms-dialog-prompt', buttons: {Submit: function(){}}});
+		return {dialog: dialog, userNameField: userNameField, passwordField: passwordField, submitButton: dialog.parentElement.getElementsByTagName('button')[1], errorField: errorField};
+
+		function addField(name, label, type)
+		{
+			var field;
+			
+			barmatz.utils.DataTypes.isNotUndefined(name);
+			barmatz.utils.DataTypes.isNotUndefined(label);
+			barmatz.utils.DataTypes.isNotUndefined(type);
+			barmatz.utils.DataTypes.isTypeOf(name, 'string');
+			barmatz.utils.DataTypes.isTypeOf(label, 'string');
+			barmatz.utils.DataTypes.isTypeOf(type, 'string');
+			
+			field = _this.createElement('input');
+			field.name = name;
+			field.type = type;
+			addRow(_this.createElementWithContent('label', '', label), field);
+			
+			return field;
+		}
+		
+		function addRow(content1, content2)
+		{
+			var cells;
+
+			barmatz.utils.DataTypes.isNotUndefined(content1);
+			barmatz.utils.DataTypes.isTypesOrInstances(content1, ['string'], [HTMLElement, Array]);
+			barmatz.utils.DataTypes.isTypesOrInstances(content2, ['string'], [HTMLElement, Array], true);
+			
+			cells = [getColumn(content1)];
+			
+			if(content2)
+				cells.push(getColumn(content2));
+			else
+				cells[0].colSpan = 2;
+			
+			wrapper.appendChild(_this.createElementWithContent('tr', '', cells));
+		}
+		
+		function getColumn(content)
+		{
+			barmatz.utils.DataTypes.isNotUndefined(content);
+			barmatz.utils.DataTypes.isTypesOrInstances(content, ['string'], [HTMLElement, Array]);
+			return _this.createElementWithContent('td', '', content);
+		}
 	}}
 });
