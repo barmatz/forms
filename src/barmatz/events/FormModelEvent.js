@@ -14,6 +14,9 @@ Object.defineProperties(barmatz.events.FormModelEvent,
 	SAVING: {value: 'saving'},
 	SAVED: {value: 'saved'},
 	ERROR_SAVING: {value: 'errorSaving'},
+	LOADING_FORM: {value: 'loadingForm'},
+	LOADING_FORM_COMPLETE: {value: 'loadingFormComplete'},
+	LOADING_FORM_ERROR: {value: 'loadingFormError'}
 }); 
 Object.defineProperties(barmatz.events.FormModelEvent.prototype, 
 {

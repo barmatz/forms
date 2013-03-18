@@ -22,5 +22,12 @@ Object.defineProperties(barmatz.utils.DOM,
 		}
 		
 		return false;
+	}},
+	removeAllChildren: {value: function(element)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(element);
+		barmatz.utils.DataTypes.isInstanceOf(element, HTMLElement);
+		while(element.childNodes.length > 0)
+			element.removeChild(element.lastChild);
 	}}
 });

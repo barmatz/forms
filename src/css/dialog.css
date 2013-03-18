@@ -1,6 +1,6 @@
 .forms-dialog-prompt .ui-dialog-titlebar-close { display: none; }
 .forms-dialog-export-embedcode { width: 100%; height: 5em; }
-.forms-dialog-user-forms { width: 90% !important; }
+.forms-dialog-user-forms { max-width: 90%; min-width: 600px; }
 .forms-dialog-user-forms table { width: 100%; min-height: 10em; }
 .forms-dialog-user-forms th, .forms-dialog-user-forms td { padding: .4em; }
 .forms-dialog-user-forms th { background: rgba(255, 255, 255, .5); }

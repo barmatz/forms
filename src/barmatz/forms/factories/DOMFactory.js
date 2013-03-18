@@ -655,92 +655,24 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 			return _this.createElementWithContent('td', '', content);
 		}
 	}},
-	createUserFormsListDialog: {value: function(forms)
+	createUserFormsListDialog: {value: function()
 	{
-		var _this, dialog, table, activeRow, i;
-		
-		barmatz.utils.DataTypes.isNotUndefined(forms);
-		barmatz.utils.DataTypes.isInstanceOf(forms, Array);
-		
-		_this = this;
-		table = this.createElement('table');
-		createRow('Name', 'Created', 'Fingerprint', true);
-		
-		for(i in forms)
-			createRow(forms[i].name, barmatz.utils.Date.toString(forms[i].created, 'dd/mm/yyyy hh:ii'), forms[i].fingerprint);
-		
-		dialog = this.createDialog('Your forms', table);
+		var dialog = this.createDialog('Your forms', this.createUserFormsList());
 		jQuery(dialog).dialog({autoOpen: true, dialogClass: 'forms-dialog-user-forms'});
-		
-		function createRow(content1, content2, content3, isHead)
-		{
-			var row, isHead, colTagName;
-			
-			barmatz.utils.DataTypes.isNotUndefined(content1);
-			barmatz.utils.DataTypes.isNotUndefined(content2);
-			barmatz.utils.DataTypes.isNotUndefined(content3);
-			barmatz.utils.DataTypes.isTypesOrInstances(content1, ['string'], [HTMLElement, Array]);
-			barmatz.utils.DataTypes.isTypesOrInstances(content2, ['string'], [HTMLElement, Array]);
-			barmatz.utils.DataTypes.isTypesOrInstances(content3, ['string'], [HTMLElement, Array]);
-			barmatz.utils.DataTypes.isTypeOf(isHead, 'boolean', true);
-			
-			colTagName = isHead ? 'th' : 'td'; 
-			table.appendChild(_this.createElementWithContent('tr', '', [getCollumn(colTagName, content1), getCollumn(colTagName, content2), getCollumn(colTagName, content3)]));
-			
-			if(!isHead)
-			{
-				table.lastChild.className = 'ui-widget ui-state-default ui-corner-all ui-button-text-only ' + (table.childNodes.length % 2 == 0 ? 'even' : 'odd');
-				table.lastChild.addEventListener('mouseover', onRowMouseOver);
-			}
-		}
-		
-		function getCollumn(colTagName, content)
-		{
-			barmatz.utils.DataTypes.isNotUndefined(colTagName);
-			barmatz.utils.DataTypes.isNotUndefined(content);
-			barmatz.utils.DataTypes.isTypeOf(colTagName, 'string');
-			barmatz.utils.DataTypes.isTypesOrInstances(content, ['string'], [HTMLElement, Array]);
-			return _this.createElementWithContent(colTagName, '', content);
-		}
-		
-		function onRowMouseOver(event)
-		{
-			barmatz.utils.DataTypes.isNotUndefined(event);
-			barmatz.utils.DataTypes.isInstanceOf(event, MouseEvent);
-			barmatz.utils.CSS.addClass(event.currentTarget, 'ui-state-hover');
-			event.currentTarget.removeEventListener('mouseover', onRowMouseOver);
-			event.currentTarget.addEventListener('mouseout', onRowMouseOut);
-			event.currentTarget.addEventListener('mousedown', onRowMouseDown);
-		}
-		
-		function onRowMouseOut(event)
-		{
-			barmatz.utils.DataTypes.isNotUndefined(event);
-			barmatz.utils.DataTypes.isInstanceOf(event, MouseEvent);
-			barmatz.utils.CSS.removeClass(event.currentTarget, 'ui-state-hover');
-			event.currentTarget.addEventListener('mouseover', onRowMouseOver);
-			event.currentTarget.removeEventListener('mouseout', onRowMouseOut);
-			event.currentTarget.removeEventListener('mousedown', onRowMouseDown);
-		}
-		
-		function onRowMouseDown(event)
-		{
-			barmatz.utils.DataTypes.isNotUndefined(event);
-			barmatz.utils.DataTypes.isInstanceOf(event, MouseEvent);
-			activeRow = event.currentTarget;
-			barmatz.utils.CSS.addClass(activeRow, 'ui-state-active');
-			activeRow.removeEventListener('mousedown', onRowMouseDown);
-			window.addEventListener('mouseup', onRowMouseUp);
-		}
-		
-		function onRowMouseUp(event)
-		{
-			barmatz.utils.DataTypes.isNotUndefined(event);
-			barmatz.utils.DataTypes.isInstanceOf(event, MouseEvent);
-			barmatz.utils.CSS.removeClass(activeRow, 'ui-state-active');
-			activeRow.addEventListener('mousedown', onRowMouseDown);
-			window.removeEventListener('mouseup', onRowMouseUp);
-			activeRow = null;
-		}
+		return dialog;
+	}},
+	createUserFormsList: {value: function()
+	{
+		return this.createElementWithContent('table', '', [this.createElementWithContent('thead', '', [
+			this.createElementWithContent('th', '', 'Name'),
+			this.createElementWithContent('th', '', 'Created'),
+			this.createElementWithContent('th', '', 'Fingerprint')
+		]), this.createElement('tbody')]);
+	}},
+	createUserFormsListItem: {value: function(index)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(index);
+		barmatz.utils.DataTypes.isTypeOf(index, 'number');
+		return this.createElementWithContent('tr', 'ui-widget ui-state-default ui-corner-all ui-button-text-only ' + (index % 2 == 0 ? 'even' : 'odd'), [this.createElement('td'), this.createElement('td'), this.createElement('td')]);
 	}}
 });

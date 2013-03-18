@@ -9,16 +9,20 @@ window.barmatz.forms.ui.Builder = function()
 	initToolbox();
 	initWorkspace();
 	initProperties();
-
-	barmatz.forms.factories.ControllerFactory.createBuilderController(
-		formModel, barmatz.forms.factories.DOMFactory.BODY_ELEMENT, 
-		barmatz.forms.factories.DOMFactory.createPanels([
-			barmatz.forms.factories.ModelFactory.createPanelModel('forms-toolbox-panel', toolboxView),
-			barmatz.forms.factories.ModelFactory.createPanelModel('forms-workspace-panel', workspaceViewWrapper.wrapper),
-			barmatz.forms.factories.ModelFactory.createPanelModel('forms-properties-panel', propertiesView)
-		]),
-		workspaceViewWrapper.formName, workspaceViewWrapper.saveStatus, menuViewWrapper.wrapper, toolboxModel, toolboxView, workspaceViewWrapper.workspace, propertiesController
-	);
+	initController();
+	
+	function initController()
+	{
+		barmatz.forms.factories.ControllerFactory.createBuilderController(
+			formModel, barmatz.forms.factories.DOMFactory.BODY_ELEMENT, 
+			barmatz.forms.factories.DOMFactory.createPanels([
+				barmatz.forms.factories.ModelFactory.createPanelModel('forms-toolbox-panel', toolboxView),
+				barmatz.forms.factories.ModelFactory.createPanelModel('forms-workspace-panel', workspaceViewWrapper.wrapper),
+				barmatz.forms.factories.ModelFactory.createPanelModel('forms-properties-panel', propertiesView)
+			]),
+			workspaceViewWrapper.formName, workspaceViewWrapper.saveStatus, menuViewWrapper.wrapper, toolboxModel, toolboxView, workspaceViewWrapper.workspace, propertiesController
+		);
+	}
 	
 	function initUserModel()
 	{
@@ -87,18 +91,6 @@ window.barmatz.forms.ui.Builder = function()
 		toolboxModel.addItem(barmatz.forms.factories.ModelFactory.createToolboxItemModel(type, label, barmatz.forms.factories.ModelFactory.createFieldModel(type, '')));
 	}
 	
-	function addUserModelMenuLoadListeners()
-	{
-		userModel.addEventListener(barmatz.events.UserModelEvent.GET_FORMS_SUCCESS, onMenuLoadGetFormsSuccess);
-		userModel.addEventListener(barmatz.events.UserModelEvent.GET_FORMS_FAIL, onMenuLoadGetFormsFail);
-	}
-	
-	function removeUserModelMenuLoadListeners()
-	{
-		userModel.removeEventListener(barmatz.events.UserModelEvent.GET_FORMS_SUCCESS, onMenuLoadGetFormsSuccess);
-		userModel.removeEventListener(barmatz.events.UserModelEvent.GET_FORMS_FAIL, onMenuLoadGetFormsFail);
-	}
-	
 	function onMenuNewClick(event)
 	{
 		formRenameField = barmatz.forms.factories.DOMFactory.createChangePropertyPromptDialog('New form', 'Name', formModel.name, onResetFromConfirm, true).field;
@@ -116,22 +108,8 @@ window.barmatz.forms.ui.Builder = function()
 	
 	function onMenuLoadClick(event)
 	{
-		addUserModelMenuLoadListeners();
-		userModel.getForms();
-	}
-	
-	function onMenuLoadGetFormsSuccess(event)
-	{
-		barmatz.utils.DataTypes.isNotUndefined(event);
-		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.UserModelEvent);
-		removeUserModelMenuLoadListeners();
-		barmatz.forms.factories.DOMFactory.createUserFormsListDialog(event.forms);
-	}
-	
-	function onMenuLoadGetFormsFail(event)
-	{
-		removeUserModelMenuLoadListeners();
-		barmatz.forms.factories.DOMFactory.createAlertPromptDialog('Error', 'An error has occured. Please try again later.', true);
+		var dialog = barmatz.forms.factories.DOMFactory.createUserFormsListDialog();
+		barmatz.forms.factories.ControllerFactory.createUserFormsListController(formModel, userModel, dialog.getElementsByTagName('tbody')[0], dialog);
 	}
 	
 	function onMenuRenameClick(event)

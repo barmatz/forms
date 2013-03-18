@@ -1,5 +1,6 @@
 <?php
 require_once dirname(__FILE__) . '/api.php';
+require_once dirname(__FILE__) . '/database/FormsModel.php';
 
 if(isset($_GET['i']))
 	getFormData();

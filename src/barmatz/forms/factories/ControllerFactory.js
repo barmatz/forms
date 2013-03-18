@@ -98,5 +98,31 @@ Object.defineProperties(barmatz.forms.factories.ControllerFactory,
 		barmatz.utils.DataTypes.isInstanceOf(iconView, HTMLElement);
 		barmatz.utils.DataTypes.isInstanceOf(itemsView, HTMLElement);
 		return new barmatz.forms.ui.MenuController(model, iconView, itemsView);
+	}},
+	createUserFormsListController: {value: function(formModel, userModel, view, dialogView)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(formModel);
+		barmatz.utils.DataTypes.isNotUndefined(userModel);
+		barmatz.utils.DataTypes.isNotUndefined(view);
+		barmatz.utils.DataTypes.isNotUndefined(dialogView);
+		barmatz.utils.DataTypes.isInstanceOf(formModel, barmatz.forms.FormModel);
+		barmatz.utils.DataTypes.isInstanceOf(userModel, barmatz.forms.users.UserModel);
+		barmatz.utils.DataTypes.isInstanceOf(view, HTMLElement);
+		barmatz.utils.DataTypes.isInstanceOf(dialogView, HTMLElement);
+		return new barmatz.forms.ui.UserFormsListController(formModel, userModel, view, dialogView);
+	}},
+	createUserFormsListItemController: {value: function(model, view, nameView, createdView, fingerprintView)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(model);
+		barmatz.utils.DataTypes.isNotUndefined(view);
+		barmatz.utils.DataTypes.isNotUndefined(nameView);
+		barmatz.utils.DataTypes.isNotUndefined(createdView);
+		barmatz.utils.DataTypes.isNotUndefined(fingerprintView);
+		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.FormModel);
+		barmatz.utils.DataTypes.isInstanceOf(view, HTMLElement);
+		barmatz.utils.DataTypes.isInstanceOf(nameView, HTMLElement);
+		barmatz.utils.DataTypes.isInstanceOf(createdView, HTMLElement);
+		barmatz.utils.DataTypes.isInstanceOf(fingerprintView, HTMLElement);
+		return new barmatz.forms.ui.UserFormsListItemController(model, view, nameView, createdView, fingerprintView);
 	}}
 });

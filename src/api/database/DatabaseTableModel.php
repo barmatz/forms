@@ -60,7 +60,7 @@ class DatabaseTableModel
 	public function selectById()
 	{
 		$this->selectDatabse();
-		call_user_func_array(array($this, 'doSelectById'), func_get_args());
+		return call_user_func_array(array($this, 'doSelectById'), func_get_args());
 	}
 	
 	protected function doInsert()

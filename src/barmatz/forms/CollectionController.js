@@ -31,7 +31,9 @@ window.barmatz.forms.CollectionController = function(model, view)
 	{
 		barmatz.utils.DataTypes.isNotUndefined(event);
 		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.CollectionEvent);
-		view.removeChild(view.childNodes[event.index]);
+		
+		if(view.childNodes[event.index])
+			view.removeChild(view.childNodes[event.index]);
 	}
 };
 
