@@ -1,23 +1,27 @@
 /** barmatz.forms.ui.BuilderController **/
-window.barmatz.forms.ui.BuilderController = function(formModel, containerView, panelsView, formNameView, saveStatusView, menuView, toolboxModel, toolboxView, workspaceView, propertiesController)
+window.barmatz.forms.ui.BuilderController = function(formModel, userModel, containerView, panelsView, formNameView, saveStatusView, menuModel, menuView, toolboxModel, toolboxView, workspaceView, propertiesController)
 {
 	var loadingDialog;
 	
 	barmatz.utils.DataTypes.isNotUndefined(formModel);
+	barmatz.utils.DataTypes.isNotUndefined(userModel);
 	barmatz.utils.DataTypes.isNotUndefined(containerView);
 	barmatz.utils.DataTypes.isNotUndefined(panelsView);
 	barmatz.utils.DataTypes.isNotUndefined(formNameView);
 	barmatz.utils.DataTypes.isNotUndefined(saveStatusView);
+	barmatz.utils.DataTypes.isNotUndefined(menuModel);
 	barmatz.utils.DataTypes.isNotUndefined(menuView);
 	barmatz.utils.DataTypes.isNotUndefined(toolboxModel);
 	barmatz.utils.DataTypes.isNotUndefined(toolboxView);
 	barmatz.utils.DataTypes.isNotUndefined(workspaceView);
 	barmatz.utils.DataTypes.isNotUndefined(propertiesController);
 	barmatz.utils.DataTypes.isInstanceOf(formModel, barmatz.forms.FormModel);
+	barmatz.utils.DataTypes.isInstanceOf(userModel, barmatz.forms.users.UserModel);
 	barmatz.utils.DataTypes.isInstanceOf(containerView, HTMLElement);
 	barmatz.utils.DataTypes.isInstanceOf(panelsView, HTMLElement);
 	barmatz.utils.DataTypes.isInstanceOf(formNameView, HTMLElement);
 	barmatz.utils.DataTypes.isInstanceOf(saveStatusView, HTMLElement);
+	barmatz.utils.DataTypes.isInstanceOf(menuModel, barmatz.forms.ui.MenuModel);
 	barmatz.utils.DataTypes.isInstanceOf(menuView, HTMLElement);
 	barmatz.utils.DataTypes.isInstanceOf(toolboxModel, barmatz.forms.ui.ToolboxModel);
 	barmatz.utils.DataTypes.isInstanceOf(toolboxView, HTMLElement);
@@ -43,6 +47,16 @@ window.barmatz.forms.ui.BuilderController = function(formModel, containerView, p
 	
 	function initMenu()
 	{
+		menuModel.addEventListener(barmatz.events.CollectionEvent.ITEM_ADDED, onMenuModelItemAdded);
+		menuModel.addEventListener(barmatz.events.CollectionEvent.ITEM_REMOVED, onMenuModelItemRemoved);
+		addMenuItem('New', onMenuNewClick);
+		addMenuItem('Save', onMenuSaveClick);
+		addMenuItem('Save as', onMenuSaveAsClick);
+		addMenuItem('Load', onMenuLoadClick);
+		addMenuItem('Rename', onMenuRenameClick);
+		addMenuItem('Export', onMenuExportClick);
+		addMenuItem('Delete', onMenuDeleteClick);
+		addMenuItem('Properties', onMenuPropertiesClick);
 		containerView.appendChild(menuView);
 	}
 	
@@ -55,26 +69,29 @@ window.barmatz.forms.ui.BuilderController = function(formModel, containerView, p
 	{
 		toolboxModel.addEventListener(barmatz.events.CollectionEvent.ITEM_ADDED, onToolboxModelItemAdded);
 		toolboxModel.addEventListener(barmatz.events.CollectionEvent.ITEM_REMOVED, onToolboxModelItemRemoved);
-		toolboxModel.forEach(iterateToolboxModelItems);
+		addToolboxItem(barmatz.forms.fields.FieldTypes.TEXT, 'Text field');
+		addToolboxItem(barmatz.forms.fields.FieldTypes.PASSWORD, 'Password field');
+		addToolboxItem(barmatz.forms.fields.FieldTypes.CHECKBOX, 'Checkbox field');
+		addToolboxItem(barmatz.forms.fields.FieldTypes.RADIO, 'Radio field');
 	}
 	
-	function iterateToolboxModelItems(item, index, collection)
+	function addMenuItem(label, clickHandler)
 	{
-		addToolboxItemListeners(index);
+		barmatz.utils.DataTypes.isNotUndefined(label);
+		barmatz.utils.DataTypes.isNotUndefined(clickHandler);
+		barmatz.utils.DataTypes.isTypeOf(label, 'string');
+		barmatz.utils.DataTypes.isTypeOf(clickHandler, 'function');
+		menuModel.addItem(barmatz.forms.factories.ModelFactory.createMenuItemModel(label, clickHandler));
 	}
 	
-	function addToolboxItemListeners(index)
+	function addToolboxItem(type, label)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(index);
-		barmatz.utils.DataTypes.isTypeOf(index, 'number');
-		toolboxView.childNodes[index].addEventListener('click', onToolboxItemViewClick);
-	}
-	
-	function removeToolboxItemListeners(index)
-	{
-		barmatz.utils.DataTypes.isNotUndefined(index);
-		barmatz.utils.DataTypes.isTypeOf(index, 'number');
-		toolboxView.childNodes[index].removeEventListener('click', onToolboxItemViewClick);
+		barmatz.utils.DataTypes.isNotUndefined(type);
+		barmatz.utils.DataTypes.isNotUndefined(label);
+		barmatz.utils.DataTypes.isTypeOf(type, 'string');
+		barmatz.utils.DataTypes.isTypeOf(label, 'string');
+		toolboxModel.addItem(barmatz.forms.factories.ModelFactory.createToolboxItemModel(type, label, barmatz.forms.factories.ModelFactory.createFieldModel(type, '')));
+		toolboxView.childNodes[toolboxModel.numItems - 1].addEventListener('click', onToolboxItemViewClick);
 	}
 	
 	function updateFormName()
@@ -111,6 +128,44 @@ window.barmatz.forms.ui.BuilderController = function(formModel, containerView, p
 		barmatz.utils.DataTypes.isTypeOf(message, 'string');
 		removeLoadingView();
 		barmatz.forms.factories.DOMFactory.createAlertPromptDialog(title, message, true);
+	}
+	
+	function addFromModelDeleteEventListeners()
+	{
+		formModel.addEventListener(barmatz.events.FormModelEvent.DELETING, onFormModelDeleting);
+		formModel.addEventListener(barmatz.events.FormModelEvent.DELETED, onFormModelDeleted);
+		formModel.addEventListener(barmatz.events.FormModelEvent.DELETION_FAIL, onFormModelDeletionFail);
+	}
+	
+	function removeFromModelDeleteEventListeners()
+	{
+		formModel.removeEventListener(barmatz.events.FormModelEvent.DELETING, onFormModelDeleting);
+		formModel.removeEventListener(barmatz.events.FormModelEvent.DELETED, onFormModelDeleted);
+		formModel.removeEventListener(barmatz.events.FormModelEvent.DELETION_FAIL, onFormModelDeletionFail);
+	}
+	
+	function onMenuModelItemAdded(event)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(event);
+		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.CollectionEvent);
+	}
+	
+	function onMenuModelItemRemoved(event)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(event);
+		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.CollectionEvent);
+	}
+	
+	function onToolboxModelItemAdded(event)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(event);
+		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.CollectionEvent);
+	}
+
+	function onToolboxModelItemRemoved(event)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(event);
+		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.CollectionEvent);
 	}
 	
 	function onFormModelValueChanged(event)
@@ -168,27 +223,6 @@ window.barmatz.forms.ui.BuilderController = function(formModel, containerView, p
 		saveStatusView.innerHTML = 'error saving!';
 	}
 	
-	function onToolboxModelItemAdded(event)
-	{
-		barmatz.utils.DataTypes.isNotUndefined(event);
-		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.CollectionEvent);
-		addToolboxItemListeners(event.item);
-	}
-	
-	function onToolboxModelItemAdded(event)
-	{
-		barmatz.utils.DataTypes.isNotUndefined(event);
-		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.CollectionEvent);
-		addToolboxItemListeners(event.index);
-	}
-	
-	function onToolboxModelItemRemoved(event)
-	{
-		barmatz.utils.DataTypes.isNotUndefined(event);
-		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.CollectionEvent);
-		removeToolboxItemListeners(event.index);
-	}
-	
 	function onToolboxItemViewClick(event)
 	{
 		barmatz.utils.DataTypes.isNotUndefined(event);
@@ -201,6 +235,94 @@ window.barmatz.forms.ui.BuilderController = function(formModel, containerView, p
 		barmatz.utils.DataTypes.isNotUndefined(event);
 		barmatz.utils.DataTypes.isInstanceOf(event, MouseEvent);
 		propertiesController.model = formModel.getItemAt(Array.prototype.slice.call(workspaceView.childNodes).indexOf(event.currentTarget));
+	}
+	
+	function onFormModelDeleting(event) 
+	{
+		barmatz.utils.DataTypes.isNotUndefined(event);
+		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.FormModelEvent);
+		addLoadingView();
+	}
+	
+	function onFormModelDeleted(event) 
+	{
+		barmatz.utils.DataTypes.isNotUndefined(event);
+		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.FormModelEvent);
+		removeLoadingViewWithMessage('Success', 'Form deleted.');
+		removeFromModelDeleteEventListeners();
+		formModel.reset();
+	}
+	
+	function onFormModelDeletionFail(event) 
+	{
+		barmatz.utils.DataTypes.isNotUndefined(event);
+		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.FormModelEvent);
+		removeLoadingViewWithMessage('Error', 'Error deleting form. Try again.');
+		removeFromModelDeleteEventListeners();
+	}
+	
+	function onMenuNewClick(event)
+	{
+		formRenameField = barmatz.forms.factories.DOMFactory.createChangePropertyPromptDialog('New form', 'Name', formModel.name, onResetFromConfirm, true).field;
+	}
+	
+	function onMenuSaveClick(event)
+	{
+		formModel.save(userModel);
+	}
+	
+	function onMenuSaveAsClick(event)
+	{
+		formRenameField = barmatz.forms.factories.DOMFactory.createChangePropertyPromptDialog('Save as', 'Form name', formModel.name, onSaveFromAsConfirm, true).field;
+	}
+	
+	function onMenuLoadClick(event)
+	{
+		var dialog = barmatz.forms.factories.DOMFactory.createUserFormsListDialog();
+		barmatz.forms.factories.ControllerFactory.createUserFormsListController(formModel, userModel, dialog.getElementsByTagName('tbody')[0], dialog);
+	}
+	
+	function onMenuRenameClick(event)
+	{
+		formRenameField = barmatz.forms.factories.DOMFactory.createChangePropertyPromptDialog('Rename form', 'Name', formModel.name, onRenameFromConfirm, true).field;
+	}
+	
+	function onMenuExportClick(event)
+	{
+		if(barmatz.utils.DataTypes.applySilent('isValid', formModel.id))
+			formModel.getFingerprint(function(fingerprint)
+			{
+				barmatz.forms.factories.DOMFactory.createExportPromptDialog(fingerprint, true);
+			});
+		else
+			barmatz.forms.factories.DOMFactory.createAlertPromptDialog('Failed to export', 'You must save the form before exporting!', true);
+	}
+	
+	function onMenuDeleteClick(event)
+	{
+		addFromModelDeleteEventListeners();
+		formModel.delete();
+	}
+	
+	function onMenuPropertiesClick(event)
+	{
+		debugger;
+	}
+	
+	function onSaveFromAsConfirm(event)
+	{
+		formModel.saveAs(userModel, formRenameField.value);
+	}
+	
+	function onRenameFromConfirm(event)
+	{
+		formModel.name = formRenameField.value;
+	}
+	
+	function onResetFromConfirm(event)
+	{
+		formModel.reset();
+		formModel.name = formRenameField.value;
 	}
 };
 

@@ -126,7 +126,7 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 		
 		this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.SAVING));
 
-		request = new barmatz.net.Request('api/save.php');
+		request = new barmatz.net.Request('api/form/save.php');
 		request.method = barmatz.net.Methods.POST;
 		request.data = {i: this.id || null, n: this.name, d: this.toJSON()};
 		loader = new barmatz.net.Loader();
@@ -197,7 +197,7 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 		
 		function onLoaderDone(event)
 		{
-			var response;
+			var response, data;
 			
 			barmatz.utils.DataTypes.isNotUndefined(event);
 			barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.LoaderEvent);
@@ -299,7 +299,7 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 		
 		function onLoaderDone(event)
 		{
-			var response;
+			var response, data;
 
 			barmatz.utils.DataTypes.isNotUndefined(event);
 			barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.LoaderEvent);
@@ -325,6 +325,38 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 			}
 			else
 				_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.LOADING_FORM_ERROR));
+		}
+	}},
+	delete: {value: function()
+	{
+		var _this, request, loader;
+		
+		_this = this;
+		
+		this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.DELETING));
+
+		request = new barmatz.net.Request('api/form/delete.php');
+		request.method = barmatz.net.Methods.POST;
+		request.data = {i: this.get('id')};
+		
+		loader = new barmatz.net.Loader();
+		loader.addEventListener(barmatz.events.LoaderEvent.DONE, onLoaderDone);
+		loader.load(request);
+		
+		function onLoaderDone(event)
+		{
+			var response;
+
+			barmatz.utils.DataTypes.isNotUndefined(event);
+			barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.LoaderEvent);
+			event.target.addEventListener(barmatz.events.LoaderEvent.DONE, onLoaderDone);
+			
+			response = event.response;
+			
+			if(response && response.status == 200)
+				_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.DELETED));
+			else
+				_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.DELETION_FAIL));
 		}
 	}}
 });

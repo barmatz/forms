@@ -76,4 +76,12 @@ class FormsModel extends DatabaseTableModel
 		else
 			\api\errors\Errors::internalServerError('Cannot get forms by user');
 	}
+	
+	public function deleteForm($id)
+	{
+		$success = $this->query("delete from `" . $this->name . "` where id=$id limit 1");
+		
+		if(!$success)
+			\api\errors\Errors::internalServerError('Cannot delete formdeleteForm');
+	}
 }

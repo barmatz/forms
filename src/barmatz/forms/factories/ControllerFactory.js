@@ -39,29 +39,33 @@ Object.defineProperties(barmatz.forms.factories.ControllerFactory,
 		barmatz.utils.DataTypes.isInstanceOf(view, HTMLElement);
 		return new barmatz.forms.ui.PropertiesController(view);
 	}},
-	createBuilderController: {value: function(formModel, containerView, panelsView, formNameView, saveStatusView, menuView, toolboxModel, toolboxView, workspaceView, propertiesController)
+	createBuilderController: {value: function(formModel, userModel, containerView, panelsView, formNameView, saveStatusView, menuModel, menuView, toolboxModel, toolboxView, workspaceView, propertiesController)
 	{
 		barmatz.utils.DataTypes.isNotUndefined(formModel);
+		barmatz.utils.DataTypes.isNotUndefined(userModel);
 		barmatz.utils.DataTypes.isNotUndefined(containerView);
 		barmatz.utils.DataTypes.isNotUndefined(panelsView);
 		barmatz.utils.DataTypes.isNotUndefined(formNameView);
 		barmatz.utils.DataTypes.isNotUndefined(saveStatusView);
+		barmatz.utils.DataTypes.isNotUndefined(menuModel);
 		barmatz.utils.DataTypes.isNotUndefined(menuView);
 		barmatz.utils.DataTypes.isNotUndefined(toolboxModel);
 		barmatz.utils.DataTypes.isNotUndefined(toolboxView);
 		barmatz.utils.DataTypes.isNotUndefined(workspaceView);
 		barmatz.utils.DataTypes.isNotUndefined(propertiesController);
 		barmatz.utils.DataTypes.isInstanceOf(formModel, barmatz.forms.FormModel);
+		barmatz.utils.DataTypes.isInstanceOf(userModel, barmatz.forms.users.UserModel);
 		barmatz.utils.DataTypes.isInstanceOf(containerView, HTMLElement);
 		barmatz.utils.DataTypes.isInstanceOf(panelsView, HTMLElement);
 		barmatz.utils.DataTypes.isInstanceOf(formNameView, HTMLElement);
 		barmatz.utils.DataTypes.isInstanceOf(saveStatusView, HTMLElement);
+		barmatz.utils.DataTypes.isInstanceOf(menuModel, barmatz.forms.ui.MenuModel);
 		barmatz.utils.DataTypes.isInstanceOf(menuView, HTMLElement);
 		barmatz.utils.DataTypes.isInstanceOf(toolboxModel, barmatz.forms.ui.ToolboxModel);
 		barmatz.utils.DataTypes.isInstanceOf(toolboxView, HTMLElement);
 		barmatz.utils.DataTypes.isInstanceOf(workspaceView, HTMLElement);
 		barmatz.utils.DataTypes.isInstanceOf(propertiesController, barmatz.forms.ui.PropertiesController);
-		return new barmatz.forms.ui.BuilderController(formModel, containerView, panelsView, formNameView, saveStatusView, menuView, toolboxModel, toolboxView, workspaceView, propertiesController);
+		return new barmatz.forms.ui.BuilderController(formModel, userModel, containerView, panelsView, formNameView, saveStatusView, menuModel, menuView, toolboxModel, toolboxView, workspaceView, propertiesController);
 	}},
 	createWorkspaceItemController: {value: function(model, labelView, fieldView, mandatoryView, deleteButtonView)
 	{
