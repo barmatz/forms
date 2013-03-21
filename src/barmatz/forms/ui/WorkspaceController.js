@@ -70,7 +70,9 @@ window.barmatz.forms.ui.WorkspaceController = function(model, view)
 		barmatz.utils.DataTypes.isNotUndefined(event);
 		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.CollectionEvent);
 		setViewToSortable();
-		openNewFieldDialog(event.item);
+		
+		if(!event.item.name)
+			openNewFieldDialog(event.item);
 	}
 };
 
