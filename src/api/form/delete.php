@@ -8,6 +8,6 @@ require_once dirname(__FILE__) . '/FormsModel.php';
 function deleteForm()
 {
 	global $db;
-	$model = new \api\database\FormsModel($db);
+	$model = new \api\form\FormsModel($db);
 	$model->deleteForm($_POST['i']);
 } 
