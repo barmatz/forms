@@ -104,13 +104,19 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		{
 			switch(type)
 			{
-				case barmatz.forms.fields.FieldTypes.TEXT:
+				case barmatz.forms.fields.FieldTypes.TEXT_FIELD:
 				case barmatz.forms.fields.FieldTypes.PASSWORD:
 				case barmatz.forms.fields.FieldTypes.CHECKBOX:
 				case barmatz.forms.fields.FieldTypes.RADIO:
 				case barmatz.forms.fields.FieldTypes.FILE:
 				case barmatz.forms.fields.FieldTypes.HIDDEN:
 					return 'input';
+					break;
+				case barmatz.forms.fields.FieldTypes.TEXT_AREA:
+					return 'textarea';
+					break;
+				case barmatz.forms.fields.FieldTypes.DROPBOX:
+					return 'select';
 					break;
 			}
 		}
@@ -203,7 +209,7 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 	}},
 	createPropertiesItemWarpper: {value: function(model)
 	{
-		var _this, returnWrapper, wrapper;
+		var _this, returnWrapper, wrapper, value;
 		
 		barmatz.utils.DataTypes.isNotUndefined(model);
 		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FieldModel);
@@ -221,7 +227,10 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 			returnWrapper.nameField = addFieldToWrapper('string', 'name', 'name', model.name);
 			returnWrapper.labelField = addFieldToWrapper('string', 'label', 'label', model.label);
 			returnWrapper.mandatoryField = addFieldToWrapper('boolean', 'mandatory', 'mandatory', model.mandatory);
-			returnWrapper.defaultValueField = addFieldToWrapper('string', 'default', 'default value', model.default);
+			
+			if(!(model instanceof barmatz.forms.fields.DropboxModel))
+				returnWrapper.defaultValueField = addFieldToWrapper('string', 'default', 'default value', model.default);
+			
 			returnWrapper.enabledField = addFieldToWrapper('boolean', 'enabled', 'enabled', model.enabled);
 		}
 		
@@ -235,6 +244,13 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		{
 			returnWrapper.checkedField = addFieldToWrapper('boolean', 'checked', 'checked', model.checked);
 			returnWrapper.defaultCheckedField = addFieldToWrapper('boolean', 'default checked', 'defaultChecked', model.defaultChecked);
+		}
+		
+		if(model instanceof barmatz.forms.fields.DropboxModel)
+		{
+			value = model.toString();
+			returnWrapper.itemsField = addFieldToWrapper('array', 'items', 'items', ['add item...']);
+			returnWrapper.itemsField.selectedIndex = null;
 		}
 		
 		return returnWrapper;
@@ -307,7 +323,7 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 	}},
 	createPropertiesItemFieldWrapper: {value: function(type, name, label, value, changeHandler)
 	{
-		var field;
+		var field, i;
 		
 		barmatz.utils.DataTypes.isNotUndefined(type);
 		barmatz.utils.DataTypes.isNotUndefined(name);
@@ -326,7 +342,6 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 				break;
 			case 'string':
 			case 'number':
-			case 'array':
 				field = this.createElement('input');
 				field.type = 'text';
 				switch(type)
@@ -342,8 +357,14 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 						break;
 				}
 				break;
+			case 'array':
+				field = this.createElement('select');
+				
+				for(i in value)
+					field.appendChild(this.createElement('option')).innerHTML = value[i];
+				break;
 			case 'boolean':
-				field = this.createDropboxElement(barmatz.forms.factories.ModelFactory.createDropboxModel([
+				field = this.createDropboxElement(barmatz.forms.factories.ModelFactory.createDropboxModel(name, [
 					barmatz.forms.factories.ModelFactory.createDropboxItemModel('No', false),
 					barmatz.forms.factories.ModelFactory.createDropboxItemModel('Yes', true)
 				]), value ? 1 : 0);
@@ -378,11 +399,17 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 	}},
 	createNewFieldDialogWrapper: {value: function()
 	{
-		var _this = this, dialog, nameField, labelField, wrapper, form;
+		var _this, dialog, nameField, labelField, wrapper, form, formTableOptions;
 		
-		form = this.createElement('table');
-		nameField = addField('Name');
-		labelField = addField('Label');
+		_this = this;
+		nameField = getField();
+		labelField = getField();
+		
+		formTableOptions = new barmatz.forms.ui.TableOptions();
+		formTableOptions.bodyRows.push(getRowContent('Name', nameField));
+		formTableOptions.bodyRows.push(getRowContent('Label', labelField));
+		
+		form = this.createTable(formTableOptions);
 		wrapper = this.createElementWithContent('div', '', form);
 		dialog = this.createDialog('New Field', wrapper);
 		
@@ -393,16 +420,19 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		
 		return {wrapper: dialog, nameField: nameField, labelField: labelField};
 		
-		function addField(label)
+		function getRowContent(label, field)
 		{
-			var field;
-			
 			barmatz.utils.DataTypes.isNotUndefined(label);
+			barmatz.utils.DataTypes.isNotUndefined(field);
 			barmatz.utils.DataTypes.isTypeOf(label, 'string');
-			
-			field = _this.createElement('input');
+			barmatz.utils.DataTypes.isInstanceOf(field, HTMLElement);
+			return [_this.createElementWithContent('label', '', label), field];
+		}
+		
+		function getField()
+		{
+			var field = _this.createElement('input');
 			field.type = 'text';
-			form.appendChild(_this.createElementWithContent('tr', '', [_this.createElementWithContent('td', '', _this.createElementWithContent('label', '', label)), _this.createElementWithContent('td', '', field)]));
 			return field;
 		}
 	}},
@@ -527,24 +557,23 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 	}},
 	createPanels: {value: function(panels)
 	{
-		var _this, i; 
+		var options, model, i; 
 		
 		barmatz.utils.DataTypes.isNotUndefined(panels);
 		barmatz.utils.DataTypes.isInstanceOf(panels, Array);
 		
-		_this = this;
+		options = new barmatz.forms.ui.TableOptions();
+		options.className = 'forms-wrapper';
+		options.bodyRows.push([]);
 		
 		for(i = 0; i < panels.length; i++)
-			panels[i] = getPanelElement(panels[i]);
-		
-		return this.createElementWithContent('table', 'forms-wrapper', this.createElementWithContent('tr', '', panels));
-		
-		function getPanelElement(model)
 		{
-			barmatz.utils.DataTypes.isNotUndefined(model);
-			barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.ui.PanelModel);
-			return _this.createElementWithContent('td', model.className, model.content);
+			model = panels[i];
+			options.bodyRows[0].push(model.content);
+			options.bodyColumnsClassNames.push(model.className);
 		}
+		
+		return this.createTable(options);
 	}},
 	createMenuWrapper: {value: function()
 	{
@@ -599,16 +628,18 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 	}},
 	createLoginFormDialogWrapper: {value: function()
 	{
-		var _this, dialog, wrapper, userNameField, passwordField, errorField;
+		var _this, dialog, wrapper, wrapperOptions, userNameField, passwordField, errorField;
+		
 		_this = this;
-		wrapper = this.createElement('table');
+		wrapperOptions = new barmatz.forms.ui.TableOptions();
 		userNameField = addField('username', 'User', 'text');
 		passwordField = addField('password', 'Password', 'password');
+		wrapper = this.createTable(wrapperOptions);
 		errorField = this.createElementWithContent('div', 'forms-error-wrapper ui-state-error ui-corner-all', [this.createElement('span', 'ui-icon ui-icon-alert'), this.createElementWithContent('span', '', 'Username and/or password are incorrect')]);
-		addRow(errorField);
-		
-		dialog = this.createDialog('Login', wrapper);
+		dialog = this.createDialog('Login', [wrapper, errorField]);
+
 		jQuery(dialog).dialog({autoOpen: true, dialogClass: 'forms-dialog-prompt', buttons: {Submit: function(){}}});
+		
 		return {dialog: dialog, userNameField: userNameField, passwordField: passwordField, submitButton: dialog.parentElement.getElementsByTagName('button')[1], errorField: errorField};
 
 		function addField(name, label, type)
@@ -625,34 +656,9 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 			field = _this.createElement('input');
 			field.name = name;
 			field.type = type;
-			addRow(_this.createElementWithContent('label', '', label), field);
+			wrapperOptions.bodyRows.push([_this.createElementWithContent('label', '', label), field]);
 			
 			return field;
-		}
-		
-		function addRow(content1, content2)
-		{
-			var cells;
-
-			barmatz.utils.DataTypes.isNotUndefined(content1);
-			barmatz.utils.DataTypes.isTypesOrInstances(content1, ['string'], [HTMLElement, Array]);
-			barmatz.utils.DataTypes.isTypesOrInstances(content2, ['string'], [HTMLElement, Array], true);
-			
-			cells = [getColumn(content1)];
-			
-			if(content2)
-				cells.push(getColumn(content2));
-			else
-				cells[0].colSpan = 2;
-			
-			wrapper.appendChild(_this.createElementWithContent('tr', '', cells));
-		}
-		
-		function getColumn(content)
-		{
-			barmatz.utils.DataTypes.isNotUndefined(content);
-			barmatz.utils.DataTypes.isTypesOrInstances(content, ['string'], [HTMLElement, Array]);
-			return _this.createElementWithContent('td', '', content);
 		}
 	}},
 	createUserFormsListDialog: {value: function()
@@ -663,16 +669,68 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 	}},
 	createUserFormsList: {value: function()
 	{
-		return this.createElementWithContent('table', '', [this.createElementWithContent('thead', '', [
-			this.createElementWithContent('th', '', 'Name'),
-			this.createElementWithContent('th', '', 'Created'),
-			this.createElementWithContent('th', '', 'Fingerprint')
-		]), this.createElement('tbody')]);
+		var options = new barmatz.forms.ui.TableOptions();
+		options.headColumns.push('Name');
+		options.headColumns.push('Created');
+		options.headColumns.push('Fingerprint');
+		return this.createTable(options);
 	}},
 	createUserFormsListItem: {value: function(index)
 	{
 		barmatz.utils.DataTypes.isNotUndefined(index);
 		barmatz.utils.DataTypes.isTypeOf(index, 'number');
 		return this.createElementWithContent('tr', 'ui-widget ui-state-default ui-corner-all ui-button-text-only ' + (index % 2 == 0 ? 'even' : 'odd'), [this.createElement('td'), this.createElement('td'), this.createElement('td')]);
+	}},
+	createTable: {value: function(options)
+	{
+		var _this, content;
+		
+		barmatz.utils.DataTypes.isNotUndefined(options);
+		barmatz.utils.DataTypes.isInstanceOf(options, barmatz.forms.ui.TableOptions);
+		
+		_this = this;
+		content = [];
+		
+		if(options.headColumns && options.headColumns.length > 0)
+			content.push(this.createElementWithContent('thead', options.headClassName, this.createTableRow(options.headColumns, options.headColumnsClassNames, options.headRowClassName, true)));
+		
+		content.push(this.createElementWithContent('tbody', options.bodyClassName, getBodyRows()));
+		
+		return this.createElementWithContent('table', options.className, content);
+		
+		function getBodyRows()
+		{
+			var rows = [], i;
+			
+			for(i = 0; i < options.bodyRows.length; i++)
+				rows.push(_this.createTableRow(options.bodyRows[i], options.bodyColumnsClassNames, options.bodyRowsClassNames[i % options.bodyRowsClassNames.length]));
+			
+			return rows;
+		}
+	}},
+	createTableRow: {value: function(content, contentClassNames, className, isHead)
+	{
+		var columns, i;
+		
+		barmatz.utils.DataTypes.isNotUndefined(content);
+		barmatz.utils.DataTypes.isInstanceOf(content, Array);
+		barmatz.utils.DataTypes.isInstanceOf(contentClassNames, Array, true);
+		barmatz.utils.DataTypes.isTypeOf(className, 'string', true);
+		barmatz.utils.DataTypes.isTypeOf(isHead, 'boolean', true);
+		
+		columns = [];
+		
+		for(i = 0; i < content.length; i++)
+			columns.push(this.createTableColumn(content[i], contentClassNames[i % contentClassNames.length], isHead)); 
+		
+		return this.createElementWithContent('tr', className, columns);
+	}},
+	createTableColumn: {value: function(content, className, isHead)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(content);
+		barmatz.utils.DataTypes.isTypesOrInstances(content, ['string'], [HTMLElement, Array]);
+		barmatz.utils.DataTypes.isTypeOf(className, 'string', true);
+		barmatz.utils.DataTypes.isTypeOf(isHead, 'boolean', true);
+		return this.createElementWithContent(isHead ? 'th' : 'td', className, content);
 	}}
 });

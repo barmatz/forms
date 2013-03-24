@@ -128,5 +128,13 @@ Object.defineProperties(barmatz.forms.factories.ControllerFactory,
 		barmatz.utils.DataTypes.isInstanceOf(createdView, HTMLElement);
 		barmatz.utils.DataTypes.isInstanceOf(fingerprintView, HTMLElement);
 		return new barmatz.forms.ui.UserFormsListItemController(model, view, nameView, createdView, fingerprintView);
+	}},
+	createCollectionDialogController: {value: function(model, view)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(model);
+		barmatz.utils.DataTypes.isNotUndefined(view);
+		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.CollectionModel);
+		barmatz.utils.DataTypes.isInstanceOf(view, HTMLTableElement);
+		return new barmatz.forms.ui.CollectionDialogController(model, view);
 	}}
 });

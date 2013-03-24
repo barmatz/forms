@@ -19,8 +19,14 @@ Object.defineProperties(barmatz.forms.factories.ModelFactory,
 			default:
 				return new barmatz.forms.fields.FieldModel(type, name);
 				break;
-			case barmatz.forms.fields.FieldTypes.TEXT:
+			case barmatz.forms.fields.FieldTypes.TEXT_AREA:
+				return new barmatz.forms.fields.TextAreaFieldModel(name);
+				break;
+			case barmatz.forms.fields.FieldTypes.TEXT_FIELD:
 				return new barmatz.forms.fields.TextFieldModel(name);
+				break;
+			case barmatz.forms.fields.FieldTypes.DROPBOX:
+				return new barmatz.forms.fields.DropboxModel(name);
 				break;
 			case barmatz.forms.fields.FieldTypes.PASSWORD:
 				return new barmatz.forms.fields.PasswordFieldModel(name);
@@ -63,10 +69,12 @@ Object.defineProperties(barmatz.forms.factories.ModelFactory,
 		barmatz.utils.DataTypes.isTypeOf(label, 'string');
 		return new barmatz.forms.fields.DropboxItemModel(label, value);
 	}},
-	createDropboxModel: {value: function(items)
+	createDropboxModel: {value: function(name, items)
 	{
+		barmatz.utils.DataTypes.isNotUndefined(name);
+		barmatz.utils.DataTypes.isTypeOf(name, 'string', true);
 		barmatz.utils.DataTypes.isInstanceOf(items, Array, true);
-		return new barmatz.forms.fields.DropboxModel(items);
+		return new barmatz.forms.fields.DropboxModel(name, items);
 	}},
 	createBuilderModel: {value: function()
 	{

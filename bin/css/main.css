@@ -3,7 +3,7 @@ html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abb
 .forms-dialog-prompt .ui-dialog-titlebar-close { display: none; }
 .forms-dialog-export-embedcode { width: 100%; height: 5em; }
 .forms-dialog-user-forms { max-width: 90%; min-width: 600px; }
-.forms-dialog-user-forms table { width: 100%; min-height: 10em; }
+.forms-dialog-user-forms table { width: 100%; }
 .forms-dialog-user-forms th, .forms-dialog-user-forms td { padding: .4em; }
 .forms-dialog-user-forms th { background: rgba(255, 255, 255, .5); }
 .forms-dialog-user-forms td { border: 1px solid rgba(255, 255, 255, .05); cursor: pointer; }

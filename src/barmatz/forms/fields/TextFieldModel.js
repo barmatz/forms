@@ -3,7 +3,7 @@ window.barmatz.forms.fields.TextFieldModel = function(name)
 {
 	barmatz.utils.DataTypes.isNotUndefined(name);
 	barmatz.utils.DataTypes.isTypeOf(name, 'string', true);
-	barmatz.forms.fields.FieldModel.call(this, barmatz.forms.fields.FieldTypes.TEXT, name);
+	barmatz.forms.fields.FieldModel.call(this, barmatz.forms.fields.FieldTypes.TEXT_FIELD, name);
 	this.set('max', NaN);
 };
 

@@ -18,7 +18,7 @@ Object.defineProperties(barmatz.forms.ui.PropertiesController.prototype,
 		return this._model;
 	}, set: function(value)
 	{
-		var itemsWrapper;
+		var _this, itemsWrapper;
 		
 		barmatz.utils.DataTypes.isInstanceOf(value, barmatz.forms.fields.FieldModel, true);
 		
@@ -32,11 +32,41 @@ Object.defineProperties(barmatz.forms.ui.PropertiesController.prototype,
 		{
 			itemsWrapper = barmatz.forms.factories.DOMFactory.createPropertiesItemWarpper(this._model);
 			
+			if(itemsWrapper.itemsField)
+				itemsWrapper.itemsField.addEventListener('focus', onItemsFieldFocus);
+			
 			this._model.addEventListener(barmatz.events.ModelEvent.VALUE_CHANGED, onModelValueChanged);
 			this._view.appendChild(itemsWrapper.wrapper);
 		}
 		else
 			this._view.appendChild(barmatz.forms.factories.DOMFactory.createElementWithContent('h2', 'forms-filler', 'No item selected'));
+		
+		function onItemsFieldFocus(event)
+		{
+			var model;
+			
+			barmatz.utils.DataTypes.isNotUndefined(event);
+			barmatz.utils.DataTypes.isInstanceOf(event, Event);
+
+			model = barmatz.forms.factories.ModelFactory.createCollectionModel();
+			model.addEventListener(barmatz.events.CollectionEvent.ITEM_ADDED, onModeItemAdded);
+			model.addEventListener(barmatz.events.CollectionEvent.ITEM_REMOVED, onModeItemRemoved);
+			barmatz.forms.factories.ControllerFactory.createCollectionDialogController(model, barmatz.forms.factories.DOMFactory.createCollectionDialog());
+			
+			function onModeItemAdded(event)
+			{
+				barmatz.utils.DataTypes.isNotUndefined(event);
+				barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.CollectionEvent);
+				_this._model.addItemAt(event.item, event.index);
+			}
+			
+			function onModeItemRemoved(event)
+			{
+				barmatz.utils.DataTypes.isNotUndefined(event);
+				barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.CollectionEvent);
+				_this._model.removeItemAt(event.item, event.index);
+			}
+		}
 		
 		function onModelValueChanged(event)
 		{

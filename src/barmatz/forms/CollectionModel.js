@@ -12,7 +12,8 @@ Object.defineProperties(barmatz.forms.CollectionModel.prototype,
 {
 	numItems: {get: function()
 	{
-		return this.get('items').length;
+		var items = this.get('items');
+		return items ? items.length : 0;
 	}},
 	addItem: {value: function(item)
 	{
@@ -84,5 +85,20 @@ Object.defineProperties(barmatz.forms.CollectionModel.prototype,
 		barmatz.utils.DataTypes.isNotUndefined(filter);
 		barmatz.utils.DataTypes.isTypeOf(filter, 'function');
 		return this.get('items').filter(filter);
+	}},
+	toString: {value: function()
+	{
+		var values = [];
+		
+		this.forEach(function(item, index, collection)
+		{
+			values.push(item.toString());
+		});
+		
+		return values.join(', ');
+	}},
+	toArray: {value: function()
+	{
+		return this.get('items').slice(0);
 	}}
 });

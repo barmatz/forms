@@ -246,54 +246,64 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 			
 			for(i in data)
 			{
-				name = data[i].name;
-				
-				switch(data[i].type)
+				try
 				{
-					default:
-						field = new barmatz.forms.fields.FieldModel(type, name);
-						break;
-					case barmatz.forms.fields.FieldTypes.TEXT:
-						field = new barmatz.forms.fields.TextFieldModel(name);
-						break;
-					case barmatz.forms.fields.FieldTypes.PASSWORD:
-						field = new barmatz.forms.fields.PasswordFieldModel(name);
-						break;
-					case barmatz.forms.fields.FieldTypes.CHECKBOX:
-						field = new barmatz.forms.fields.CheckboxFieldModel(name);
-						break;
-					case barmatz.forms.fields.FieldTypes.RADIO:
-						field = new barmatz.forms.fields.RadioFieldModel(name);
-						break;
-					case barmatz.forms.fields.FieldTypes.FILE:
-						field = new barmatz.forms.fields.FileFieldModel(name);
-						break;
-					case barmatz.forms.fields.FieldTypes.HIDDEN:
-						field = new barmatz.forms.fields.HiddenFieldModel(name);
-						break;
+					name = data[i].name;
+					
+					switch(data[i].type)
+					{
+						default:
+							throw new Error('Unknown type');
+							break;
+						case barmatz.forms.fields.FieldTypes.TEXT_AREA:
+							field = new barmatz.forms.fields.TextAreaFieldModel(name);
+							break;
+						case barmatz.forms.fields.FieldTypes.TEXT_FIELD:
+							field = new barmatz.forms.fields.TextFieldModel(name);
+							break;
+						case barmatz.forms.fields.FieldTypes.DROPBOX:
+							field = new barmatz.forms.fields.DropboxModel(name);
+							break;
+						case barmatz.forms.fields.FieldTypes.PASSWORD:
+							field = new barmatz.forms.fields.PasswordFieldModel(name);
+							break;
+						case barmatz.forms.fields.FieldTypes.CHECKBOX:
+							field = new barmatz.forms.fields.CheckboxFieldModel(name);
+							break;
+						case barmatz.forms.fields.FieldTypes.RADIO:
+							field = new barmatz.forms.fields.RadioFieldModel(name);
+							break;
+						case barmatz.forms.fields.FieldTypes.FILE:
+							field = new barmatz.forms.fields.FileFieldModel(name);
+							break;
+						case barmatz.forms.fields.FieldTypes.HIDDEN:
+							field = new barmatz.forms.fields.HiddenFieldModel(name);
+							break;
+					}
+					
+					if(field instanceof barmatz.forms.fields.FieldModel)
+					{
+						field.label = data[i].label;
+						field.mandatory = data[i].mandatory;
+						field.default = data[i].default;
+						field.enabled = data[i].enabled;
+					}
+					
+					if(field instanceof barmatz.forms.fields.FileFieldModel)
+						field.accept = data[i].accept;
+	
+					if(field instanceof barmatz.forms.fields.TextFieldModel)
+						field.max = parseInt(data[i].max);
+					
+					if(field instanceof barmatz.forms.fields.CheckboxFieldModel)
+					{
+						field.checked = data[i].checked;
+						field.defaultChecked = data[i].defaultChecked;
+					}
+					
+					_this.addItem(field);
 				}
-				
-				if(field instanceof barmatz.forms.fields.FieldModel)
-				{
-					field.label = data[i].label;
-					field.mandatory = data[i].mandatory;
-					field.default = data[i].default;
-					field.enabled = data[i].enabled;
-				}
-				
-				if(field instanceof barmatz.forms.fields.FileFieldModel)
-					field.accept = data[i].accept;
-
-				if(field instanceof barmatz.forms.fields.TextFieldModel)
-					field.max = parseInt(data[i].max);
-				
-				if(field instanceof barmatz.forms.fields.CheckboxFieldModel)
-				{
-					field.checked = data[i].checked;
-					field.defaultChecked = data[i].defaultChecked;
-				}
-				
-				_this.addItem(field);
+				catch(error){}
 			}
 		}
 		

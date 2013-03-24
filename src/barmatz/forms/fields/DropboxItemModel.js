@@ -27,5 +27,9 @@ Object.defineProperties(barmatz.forms.fields.DropboxItemModel.prototype,
 	}, set: function(value)
 	{
 		this.set('value', value);
+	}},
+	toString: {value: function()
+	{
+		return this.label + '=' + this.value;
 	}}
 });
