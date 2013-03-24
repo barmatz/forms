@@ -1,11 +1,13 @@
 <?php
 namespace api\database;
 
+require_once dirname(__FILE__) . '/../config.php';
+
 class Database
 {
-	const SERVER = 'localhost',
-		  USERNAME = 'root',
-		  PASSWORD = '';
+	const SERVER = CONF_MYSQL_SERVER,
+		  USERNAME = CONF_MYSQL_USERNAME,
+		  PASSWORD = CONF_MYSQL_PASSWORD;
 	
 	private $link;
 	
@@ -70,5 +72,15 @@ class Database
 	public function query($sql)
 	{
 		return mysql_query($sql);
+	}
+	
+	public function escape($value)
+	{
+		return mysql_real_escape_string($value, $this->link);
+	}
+	
+	public function unescape($value)
+	{
+		return preg_replace('/\\\\([\'"])/', '$1', $value);
 	}
 }

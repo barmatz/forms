@@ -1,9 +1,9 @@
 <?php
-namespace api\database;
+namespace api\form;
 
-require_once dirname(__FILE__) . '/DatabaseTableModel.php';
+require_once dirname(__FILE__) . '/../database/DatabaseTableModel.php';
 
-class FormsModel extends DatabaseTableModel
+class FormsModel extends \api\database\DatabaseTableModel
 {
 	function __construct($db)
 	{
@@ -29,22 +29,22 @@ class FormsModel extends DatabaseTableModel
 	
 	public function getFingerprint($id)
 	{
-		return $this->query("select fingerprint from `" . $this->name . "` where `id`=$id");
+		return $this->query("select fingerprint from `{$this->name}` where `id`=$id");
 	}
 	
 	protected function doInsert($userId, $name, $data)
 	{
-		$success = $this->query("insert into `" . $this->name . "`(`user`, `name`, `data`, `fingerprint`) values($userId, '" . mysql_real_escape_string($name) . "', '" . mysql_real_escape_string($data) . "', '" . $this->createFingerprint() . "')");
+		$success = $this->query("insert into `{$this->name}`(`user`, `name`, `data`, `fingerprint`) values($userId, '{$this->encodeString($name)}', '{$this->encodeString($data)}', '{$this->createFingerprint()}')");
 		
 		if($success)
-			return mysql_fetch_object($this->query("select id from `" . $this->name . "` order by id desc"))->id;
+			return mysql_fetch_object($this->query("select id from `{$this->name}` order by id desc"))->id;
 		else
 			\api\errors\Errors::internalServerError('Cannot insert data.');
 	}
 	
 	protected function doUpdate($id, $name, $data)
 	{
-		$success = $this->query("update `" . $this->name . "` set `name`='" . mysql_real_escape_string($name) . "', `data`='" . mysql_real_escape_string($data) . "' where `id`=$id");
+		$success = $this->query("update `{$this->name}` set `name`='{$this->encodeString($name)}', `data`='{$this->encodeString($data)}' where `id`=$id");
 		
 		if(!$success)
 			\api\errors\Errors::internalServerError('Cannot update data');
@@ -52,24 +52,33 @@ class FormsModel extends DatabaseTableModel
 	
 	protected function doSelectById($id)
 	{
-		$result = $this->query("select * from `" . $this->name . "` where `id`=$id");
+		$result = $this->query("select * from `{$this->name}` where `id`=$id");
 		
 		if($result && mysql_num_rows($result) > 0)
-			return mysql_fetch_object($result);
+		{
+			$data = mysql_fetch_object($result);
+			$data->name = $this->decodeString($data->name);
+			$data->data = $this->decodeString($data->data);
+			$data->fingerprint = $this->decodeString($data->fingerprint);
+			return $data;
+		}
 		else
 			\api\errors\Errors::internalServerError('Cannot select by id');
 	}
 	
 	public function getFormsByUser($id)
 	{
-		$result = $this->query("select `id`, `name`, `created`, `fingerprint` from `" . $this->name . "` where `user`=$id");
+		$result = $this->query("select `id`, `name`, `created`, `fingerprint` from `{$this->name}` where `user`=$id");
 
 		if($result)
 		{
 			$forms = array();
 			
 			while($row = mysql_fetch_object($result))
+			{
+				$row->name = $this->decodeString($row->name);
 				$forms[] = $row;
+			}
 			
 			return $forms;
 		}
@@ -79,7 +88,7 @@ class FormsModel extends DatabaseTableModel
 	
 	public function deleteForm($id)
 	{
-		$success = $this->query("delete from `" . $this->name . "` where id=$id limit 1");
+		$success = $this->query("delete from `{$this->name}` where id=$id limit 1");
 		
 		if(!$success)
 			\api\errors\Errors::internalServerError('Cannot delete formdeleteForm');

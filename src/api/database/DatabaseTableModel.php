@@ -1,9 +1,11 @@
 <?php
 namespace api\database;
 
+require_once dirname(__FILE__) . '/../config.php';
+
 class DatabaseTableModel
 {
-	const SCHEMA_NAME = 'barmatz-forms';
+	const SCHEMA_NAME = CONF_MYSQL_DATABASE;
 	private $db, $dbSelected;
 	protected $name;
 
@@ -61,6 +63,17 @@ class DatabaseTableModel
 	{
 		$this->selectDatabse();
 		return call_user_func_array(array($this, 'doSelectById'), func_get_args());
+	}
+	
+	protected function encodeString($string)
+	{
+		$encodedString = $this->db->escape($string);
+		return $encodedString == false ? $string : $encodedString;
+	}
+	
+	protected function decodeString($string)
+	{
+		return $this->db->unescape($string);
 	}
 	
 	protected function doInsert()

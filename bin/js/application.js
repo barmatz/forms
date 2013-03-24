@@ -5149,9 +5149,16 @@ Object.defineProperties(barmatz.forms.users.UserModel.prototype,
 			
 			if(response && response.status == 200)
 			{
-				data = response.data ? JSON.parse(response.data) : null;
-				_this.set('id', data.id);
-				_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.UserModelEvent.LOGIN_SUCCESS));
+				try
+				{
+					data = response.data ? JSON.parse(response.data) : null;
+					_this.set('id', data.id);
+					_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.UserModelEvent.LOGIN_SUCCESS));
+				}
+				catch(error)
+				{
+					_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.UserModelEvent.LOGIN_FAIL));
+				}
 			}
 			else
 				_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.UserModelEvent.LOGIN_FAIL));

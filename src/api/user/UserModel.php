@@ -33,7 +33,7 @@ class UserModel extends \api\database\DatabaseTableModel
 		{
 			$this->userName = $userName;	
 			$this->password = $password;
-			$success = $this->query("insert into `" . $this->name . "`(`username`, `password`, `first_name`, `last_name`) values('$userName', unhex(sha1('$password')), '$firstName', '$lastName')");
+			$success = $this->query("insert into `{$this->name}`(`username`, `password`, `first_name`, `last_name`) values('{$this->encodeString($userName)}', unhex(sha1('{$this->encodeString($password)}')), '{$this->encodeString($firstName)}', '{$this->encodeString($lastName)}')");
 
 			if(!$success)
 				\api\errors\Errors::internalServerError('Cannot create new user');
@@ -42,7 +42,7 @@ class UserModel extends \api\database\DatabaseTableModel
 	
 	public function exsits()
 	{
-		$result = $this->query("select count(`id`) as `count` from `" . $this->name . "` where `username`='" . $this->userName . "' and `password`=unhex(sha1('" . $this->password . "'))");
+		$result = $this->query("select count(`id`) as `count` from `{$this->name}` where `username`='{$this->userName}' and `password`=unhex(sha1('{$this->password}'))");
 		
 		if($result && mysql_num_rows($result) > 0)
 			return mysql_fetch_object($result)->count > 0 ? true : false;
@@ -69,7 +69,7 @@ class UserModel extends \api\database\DatabaseTableModel
 	{
 		if(!isset($this->id) && isset($this->userName) && isset($this->password))
 		{
-			$result = $this->query("select `id` from `" . $this->name . "` where `username`='" . $this->userName . "' and `password`=unhex(sha1('" . $this->password . "'))");
+			$result = $this->query("select `id` from `{$this->name}` where `username`='{$this->userName}' and `password`=unhex(sha1('{$this->password}'))");
 			
 			if($result && mysql_num_rows($result) > 0)
 				$this->id = mysql_fetch_object($result)->id;
@@ -86,7 +86,7 @@ class UserModel extends \api\database\DatabaseTableModel
 	
 	public function getData()
 	{
-		$result = $this->query("select `id`, `username`, `first_name`, `last_name`, `created`, `active` from `" . $this->name . "` where `id`=" . $this->getId());
+		$result = $this->query("select `id`, `username`, `first_name`, `last_name`, `created`, `active` from `{$this->name}` where `id`={$this->getId()}");
 		
 		if($result && mysql_num_rows($result) > 0)
 			return mysql_fetch_object($result);
@@ -98,7 +98,7 @@ class UserModel extends \api\database\DatabaseTableModel
 	{
 		if(!isset($this->userName) && isset($this->id))
 		{
-			$result = $this->query("select `username` from `" . $this->name . "` where `id`=" . $this->id);
+			$result = $this->query("select `username` from `{$this->name}` where `id`={$this->id}");
 				
 			if($result && mysql_num_rows($result) > 0)
 				$this->userName = mysql_fetch_object($result)->username;
@@ -118,7 +118,7 @@ class UserModel extends \api\database\DatabaseTableModel
 	{
 		if(!isset($this->password) && isset($this->id))
 		{
-			$result = $this->query("select `password` from `" . $this->name . "` where `id`=" . $this->id);
+			$result = $this->query("select `password` from `{$this->name}` where `id`={$this->id}");
 		
 			if($result && mysql_num_rows($result) > 0)
 				$this->password = mysql_fetch_object($result)->password;
