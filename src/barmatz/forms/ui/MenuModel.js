@@ -2,7 +2,7 @@
 window.barmatz.forms.ui.MenuModel = function()
 {
 	barmatz.forms.CollectionModel.call(this);
-	this.set('open', false);
+	this.set('opened', false);
 };
 
 barmatz.forms.ui.MenuModel.prototype = new barmatz.forms.CollectionModel();
@@ -10,9 +10,9 @@ barmatz.forms.ui.MenuModel.prototype.constructor = barmatz.forms.ui.MenuModel;
 
 Object.defineProperties(barmatz.forms.ui.MenuModel.prototype,
 {
-	open: {get: function()
+	opened: {get: function()
 	{
-		return this.get('open');
+		return this.get('opened');
 	}},
 	addItem: {value: function(item)
 	{
@@ -42,14 +42,14 @@ Object.defineProperties(barmatz.forms.ui.MenuModel.prototype,
 	}},
 	toggle: {value: function()
 	{
-		this.open ? this.hide() : this.show();
+		this.opened ? this.hide() : this.show();
 	}},
 	show: {value: function()
 	{
-		this.set('open', true);
+		this.set('opened', true);
 	}},
 	hide: {value: function()
 	{
-		this.set('open', false);
+		this.set('opened', false);
 	}}
 });

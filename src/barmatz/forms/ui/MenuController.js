@@ -52,8 +52,7 @@ window.barmatz.forms.ui.MenuController = function(model, iconView, itemsView)
 	{
 		barmatz.utils.DataTypes.isNotUndefined(model);
 		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.ui.MenuItemModel);
-		model.view = itemsView.appendChild(barmatz.forms.factories.DOMFactory.createMenuItem(model));
-		model.view.addEventListener('click', model.clickHandler);
+		itemsView.appendChild(barmatz.forms.factories.DOMFactory.createMenuItem(model)).addEventListener('click', model.clickHandler);
 		
 		if(menuInitiated)
 			jQuery(itemsView).menu('destroy');
@@ -74,7 +73,7 @@ window.barmatz.forms.ui.MenuController = function(model, iconView, itemsView)
 	
 	function showOrHideItems()
 	{
-		model.open ? showItems() : hideItems();
+		model.opened ? showItems() : hideItems();
 	}
 	
 	function onModelValueChanged(event)
@@ -84,7 +83,7 @@ window.barmatz.forms.ui.MenuController = function(model, iconView, itemsView)
 		
 		switch(event.key)
 		{
-			case 'open':
+			case 'opened':
 				showOrHideItems();
 				break;
 		}

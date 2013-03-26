@@ -2523,8 +2523,7 @@ window.barmatz.forms.ui.MenuController = function(model, iconView, itemsView)
 	{
 		barmatz.utils.DataTypes.isNotUndefined(model);
 		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.ui.MenuItemModel);
-		model.view = itemsView.appendChild(barmatz.forms.factories.DOMFactory.createMenuItem(model));
-		model.view.addEventListener('click', model.clickHandler);
+		itemsView.appendChild(barmatz.forms.factories.DOMFactory.createMenuItem(model)).addEventListener('click', model.clickHandler);
 		
 		if(menuInitiated)
 			jQuery(itemsView).menu('destroy');
@@ -2545,7 +2544,7 @@ window.barmatz.forms.ui.MenuController = function(model, iconView, itemsView)
 	
 	function showOrHideItems()
 	{
-		model.open ? showItems() : hideItems();
+		model.opened ? showItems() : hideItems();
 	}
 	
 	function onModelValueChanged(event)
@@ -2555,7 +2554,7 @@ window.barmatz.forms.ui.MenuController = function(model, iconView, itemsView)
 		
 		switch(event.key)
 		{
-			case 'open':
+			case 'opened':
 				showOrHideItems();
 				break;
 		}
@@ -2626,28 +2625,20 @@ Object.defineProperties(barmatz.forms.ui.MenuItemModel.prototype,
 		var _this = this;
 		return function(event)
 		{
-			event.stopImmediatePropagation();
-			_this.get('clickHandler').call(_this, event);
+			if(event.target === event.currentTarget)
+				_this.get('clickHandler').call(_this, event);
 		};
 	}, set: function(value)
 	{
 		barmatz.utils.DataTypes.isTypeOf(label, 'function');
 		this.set('clickHandler', value);
-	}},
-	view: {get: function()
-	{
-		return this.get('view');
-	}, set: function(value)
-	{
-		barmatz.utils.DataTypes.isInstanceOf(value, HTMLElement, true);
-		this.set('view', value);
 	}}
 });
 /** barmatz.forms.ui.MenuModel **/
 window.barmatz.forms.ui.MenuModel = function()
 {
 	barmatz.forms.CollectionModel.call(this);
-	this.set('open', false);
+	this.set('opened', false);
 };
 
 barmatz.forms.ui.MenuModel.prototype = new barmatz.forms.CollectionModel();
@@ -2655,9 +2646,9 @@ barmatz.forms.ui.MenuModel.prototype.constructor = barmatz.forms.ui.MenuModel;
 
 Object.defineProperties(barmatz.forms.ui.MenuModel.prototype,
 {
-	open: {get: function()
+	opened: {get: function()
 	{
-		return this.get('open');
+		return this.get('opened');
 	}},
 	addItem: {value: function(item)
 	{
@@ -2687,15 +2678,15 @@ Object.defineProperties(barmatz.forms.ui.MenuModel.prototype,
 	}},
 	toggle: {value: function()
 	{
-		this.open ? this.hide() : this.show();
+		this.opened ? this.hide() : this.show();
 	}},
 	show: {value: function()
 	{
-		this.set('open', true);
+		this.set('opened', true);
 	}},
 	hide: {value: function()
 	{
-		this.set('open', false);
+		this.set('opened', false);
 	}}
 });
 /** barmatz.forms.ui.NewFieldDialogController **/
@@ -4808,7 +4799,7 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		barmatz.utils.DataTypes.isTypeOf(open, 'boolean', true);
 		
 		properties = this.createFormPropertiesWrapper(model);
-		dialog = this.createPromptDialog(model.name + ' properties', properties.wrapper, confirmHandler, open);
+		dialog = this.createPromptDialog('Properties', properties.wrapper, confirmHandler, open);
 		
 		jQuery(dialog).dialog({dialogClass: 'forms-dialog-form-properties'});
 		

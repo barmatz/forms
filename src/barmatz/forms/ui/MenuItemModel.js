@@ -28,20 +28,12 @@ Object.defineProperties(barmatz.forms.ui.MenuItemModel.prototype,
 		var _this = this;
 		return function(event)
 		{
-			event.stopImmediatePropagation();
-			_this.get('clickHandler').call(_this, event);
+			if(event.target === event.currentTarget)
+				_this.get('clickHandler').call(_this, event);
 		};
 	}, set: function(value)
 	{
 		barmatz.utils.DataTypes.isTypeOf(label, 'function');
 		this.set('clickHandler', value);
-	}},
-	view: {get: function()
-	{
-		return this.get('view');
-	}, set: function(value)
-	{
-		barmatz.utils.DataTypes.isInstanceOf(value, HTMLElement, true);
-		this.set('view', value);
 	}}
 });
