@@ -4,9 +4,39 @@ window.barmatz.forms.fields.TextAreaFieldModel = function(name)
 	barmatz.utils.DataTypes.isNotUndefined(name);
 	barmatz.utils.DataTypes.isTypeOf(name, 'string', true);
 	barmatz.forms.fields.FieldModel.call(this, barmatz.forms.fields.FieldTypes.TEXT_AREA, name);
+	this.set('rows', 2);
+	this.set('cols', 20);
 };
 
 barmatz.forms.fields.TextAreaFieldModel.prototype = new barmatz.forms.fields.FieldModel(null, null);
 barmatz.forms.fields.TextAreaFieldModel.prototype.constructor = barmatz.forms.fields.TextAreaFieldModel;
 
-Object.defineProperties(barmatz.forms.fields.TextAreaFieldModel.prototype, {});
+Object.defineProperties(barmatz.forms.fields.TextAreaFieldModel.prototype,
+{
+	rows: {get: function()
+	{
+		return this.get('rows');
+	}, set: function(value)
+	{
+		this.set('rows', value);
+	}},
+	cols: {get: function()
+	{
+		return this.get('cols');
+	}, set: function(value)
+	{
+		this.set('cols', value);
+	}},
+	clone: {value: function()
+	{
+		var clone = new barmatz.forms.fields.TextAreaFieldModel(this.name);
+		clone.label = this.label;
+		clone.mandatory = this.mandatory;
+		clone.default = this.default;
+		clone.value = this.value;
+		clone.enabled = this.enabled;
+		clone.rows = this.rows;
+		clone.cols = this.cols;
+		return clone;
+	}}
+});

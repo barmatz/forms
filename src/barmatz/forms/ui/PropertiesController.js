@@ -105,6 +105,12 @@ Object.defineProperties(barmatz.forms.ui.PropertiesController.prototype,
 				case 'accept':
 					itemsWrapper.acceptField.value = event.value.join(', ');
 					break;
+				case 'rows':
+					itemsWrapper.rowsField.value = event.value;
+					break;
+				case 'cols':
+					itemsWrapper.colsField.value = event.value;
+					break;
 			}
 		}
 	}}

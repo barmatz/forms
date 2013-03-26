@@ -8,3 +8,4 @@
 .forms-dialog-user-forms tr { font-weight: inherit !important; }
 .forms-dialog-user-forms tr.odd td { background: rgba(255, 255, 255, .3); }
 .forms-dialog-user-forms tr.even td { background: rgba(255, 255, 255, .2); }
+.forms-dialog-form-properties { min-width: 360px; }

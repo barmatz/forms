@@ -54,6 +54,12 @@ window.barmatz.forms.ui.WorkspaceItemController = function(model, labelView, fie
 			case 'accept':
 				fieldView.accept = event.value;
 				break;
+			case 'rows':
+				fieldView.rows = event.value;
+				break;
+			case 'cols':
+				fieldView.cols = event.value;
+				break;
 		}
 	}
 };

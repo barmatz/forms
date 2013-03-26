@@ -10,6 +10,7 @@ html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abb
 .forms-dialog-user-forms tr { font-weight: inherit !important; }
 .forms-dialog-user-forms tr.odd td { background: rgba(255, 255, 255, .3); }
 .forms-dialog-user-forms tr.even td { background: rgba(255, 255, 255, .2); }
+.forms-dialog-form-properties { min-width: 360px; }
 .rounded-corner { -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; }
 .forms-error-wrapper { padding: .2em; }
 .forms-error-wrapper .ui-icon-alert:first-child { float: left; margin-right: .3em; }
@@ -45,10 +46,11 @@ label { font-weight: bold; }
 .forms-workspace-header-save-status { float: right; }
 .forms-workspace-items { width: 100%; }
 .forms-workspace-item:hover, .forms-workspace-items .sortable-placeholder { background: rgb(255, 255, 255); background: rgba(255, 255, 255, .5); }
-.forms-workspace-item td, .forms-workspace-items .sortable-placeholder { height: 3em; vertical-align: middle; }
-.forms-workspace-item .forms-workspace-item-grip { width: 16px; max-width: 16px; cursor: pointer; }
-.forms-workspace-item .forms-workspace-item-label { width: 100px; max-width: 100%; }
-.forms-workspace-item .forms-workspace-item-field { width: auto; }
-.forms-workspace-item .forms-workspace-item-delete-button { width: 25px; max-width: 25px; padding: 0 5px; }
-.forms-workspace-item .forms-workspace-item-mandatory { color: #F00; font-weight: bold; }
+.forms-workspace-item td { padding: .3em 0; vertical-align: top; }
+.forms-workspace-items .sortable-placeholder { height: 3em; }
+.forms-workspace-item .forms-workspace-item-grip { width: 16px; max-width: 16px; cursor: pointer; vertical-align: middle; }
+.forms-workspace-item .forms-workspace-item-label { width: 100px; max-width: 100%; padding-top: .7em; }
+.forms-workspace-item .forms-workspace-item-field { width: auto; position: relative; }
+.forms-workspace-item .forms-workspace-item-delete-button { width: 25px; max-width: 25px; padding: 0 5px; vertical-align: middle; }
+.forms-workspace-item .forms-workspace-item-mandatory { color: #F00; font-weight: bold; position: absolute; top: .5em; }
 .forms-wrapper { width: 100%; height: 100%; }

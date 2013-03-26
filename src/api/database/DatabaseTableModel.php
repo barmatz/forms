@@ -44,7 +44,7 @@ class DatabaseTableModel
 		if(!$this->db->hasTable($this->name))
 			$this->create();
 		
-		call_user_func_array(array($this, 'doInsert'), func_get_args());
+		return call_user_func_array(array($this, 'doInsert'), func_get_args());
 	}
 	
 	public function update()

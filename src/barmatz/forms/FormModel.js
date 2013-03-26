@@ -3,6 +3,8 @@ window.barmatz.forms.FormModel = function()
 {
 	barmatz.forms.CollectionModel.call(this);
 	this.set('name', '');
+	this.set('method', barmatz.forms.Methods.GET);
+	this.set('encoding', barmatz.net.Encoding.FORM);
 };
 
 barmatz.forms.FormModel.prototype = new barmatz.forms.CollectionModel();
@@ -25,6 +27,22 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 	{
 		barmatz.utils.DataTypes.isTypeOf(value, 'string');
 		this.set('name', value);
+	}},
+	method: {get: function()
+	{
+		return this.get('method');
+	}, set: function(value)
+	{
+		barmatz.utils.DataTypes.isTypeOf(value, 'string');
+		this.set('method', value);
+	}},
+	encoding: {get: function()
+	{
+		return this.get('encoding');
+	}, set: function(value)
+	{
+		barmatz.utils.DataTypes.isTypeOf(value, 'string');
+		this.set('encoding', value);
 	}},
 	created: {get: function()
 	{
@@ -78,7 +96,7 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 	}},
 	toJSON: {value: function()
 	{
-		var object = {fields: []};
+		var object = {name: this.name, method: this.method, encoding: this.encoding, created: this.created ? this.created.valueOf() : NaN, fingerprint: this.fingerprint, fields: []};
 		
 		this.forEach(function(item, index, collection)
 		{
@@ -98,6 +116,12 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 
 			if(item instanceof barmatz.forms.fields.TextFieldModel)
 				field.max = item.max;
+			
+			if(item instanceof barmatz.forms.fields.TextAreaFieldModel)
+			{
+				field.rows = item.rows;
+				field.cols = item.cols;
+			}
 			
 			if(item instanceof barmatz.forms.fields.CheckboxFieldModel)
 			{
@@ -309,7 +333,7 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 		
 		function onLoaderDone(event)
 		{
-			var response, data;
+			var response, data, parsedData;
 
 			barmatz.utils.DataTypes.isNotUndefined(event);
 			barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.LoaderEvent);
@@ -323,11 +347,14 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 				
 				if(data)
 				{
+					parsedData = JSON.parse(data.data);
 					_this.id = parseInt(data.id);
-					_this.name = data.name;
 					_this.fingerprint = data.fingerprint;
-					_this.created = barmatz.utils.Date.toDate(data.created);
-					parseFieldsData(JSON.parse(data.data).fields);
+					_this.name = parsedData.name;
+					_this.created = new Date(parsedData.created);
+					_this.method = parsedData.method;
+					_this.encoding = parsedData.encoding;
+					parseFieldsData(parsedData.fields);
 					_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.LOADING_FORM_COMPLETE));
 				}
 				else

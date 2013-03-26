@@ -1619,12 +1619,42 @@ window.barmatz.forms.fields.TextAreaFieldModel = function(name)
 	barmatz.utils.DataTypes.isNotUndefined(name);
 	barmatz.utils.DataTypes.isTypeOf(name, 'string', true);
 	barmatz.forms.fields.FieldModel.call(this, barmatz.forms.fields.FieldTypes.TEXT_AREA, name);
+	this.set('rows', 2);
+	this.set('cols', 20);
 };
 
 barmatz.forms.fields.TextAreaFieldModel.prototype = new barmatz.forms.fields.FieldModel(null, null);
 barmatz.forms.fields.TextAreaFieldModel.prototype.constructor = barmatz.forms.fields.TextAreaFieldModel;
 
-Object.defineProperties(barmatz.forms.fields.TextAreaFieldModel.prototype, {});
+Object.defineProperties(barmatz.forms.fields.TextAreaFieldModel.prototype,
+{
+	rows: {get: function()
+	{
+		return this.get('rows');
+	}, set: function(value)
+	{
+		this.set('rows', value);
+	}},
+	cols: {get: function()
+	{
+		return this.get('cols');
+	}, set: function(value)
+	{
+		this.set('cols', value);
+	}},
+	clone: {value: function()
+	{
+		var clone = new barmatz.forms.fields.TextAreaFieldModel(this.name);
+		clone.label = this.label;
+		clone.mandatory = this.mandatory;
+		clone.default = this.default;
+		clone.value = this.value;
+		clone.enabled = this.enabled;
+		clone.rows = this.rows;
+		clone.cols = this.cols;
+		return clone;
+	}}
+});
 /** barmatz.forms.ui.DialogController **/
 window.barmatz.forms.ui.DialogController = function(model, view)
 {
@@ -2058,13 +2088,27 @@ window.barmatz.forms.ui.BuilderController = function(formModel, userModel, conta
 	
 	function onMenuDeleteClick(event)
 	{
-		addFromModelDeleteEventListeners();
-		formModel.delete();
+		barmatz.forms.factories.DOMFactory.createConfirmPromptDialog('Are you sure you want to delete this form?', onDeleteFormConfirm, true);
 	}
 	
 	function onMenuPropertiesClick(event)
 	{
-		debugger;
+		var wrapper = barmatz.forms.factories.DOMFactory.createFormPropertiesDialogWrapper(formModel, onChangeFormPropertiesConfirm, true);
+		
+		function onChangeFormPropertiesConfirm(event)
+		{
+			formModel.name = wrapper.nameField.value;
+			formModel.method = wrapper.methodField.value;
+			formModel.encoding = wrapper.encodingField.value;
+		}
+	}
+	
+	function onDeleteFormConfirm(event)
+	{
+		addFromModelDeleteEventListeners();
+		formModel.delete();
+		formModel.reset();
+		formModel.name = 'Unnamed form';
 	}
 	
 	function onSaveFromAsConfirm(event)
@@ -2824,6 +2868,12 @@ Object.defineProperties(barmatz.forms.ui.PropertiesController.prototype,
 				case 'accept':
 					itemsWrapper.acceptField.value = event.value.join(', ');
 					break;
+				case 'rows':
+					itemsWrapper.rowsField.value = event.value;
+					break;
+				case 'cols':
+					itemsWrapper.colsField.value = event.value;
+					break;
 			}
 		}
 	}}
@@ -3443,6 +3493,12 @@ window.barmatz.forms.ui.WorkspaceItemController = function(model, labelView, fie
 			case 'accept':
 				fieldView.accept = event.value;
 				break;
+			case 'rows':
+				fieldView.rows = event.value;
+				break;
+			case 'cols':
+				fieldView.cols = event.value;
+				break;
 		}
 	}
 };
@@ -3454,6 +3510,8 @@ window.barmatz.forms.FormModel = function()
 {
 	barmatz.forms.CollectionModel.call(this);
 	this.set('name', '');
+	this.set('method', barmatz.forms.Methods.GET);
+	this.set('encoding', barmatz.net.Encoding.FORM);
 };
 
 barmatz.forms.FormModel.prototype = new barmatz.forms.CollectionModel();
@@ -3476,6 +3534,22 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 	{
 		barmatz.utils.DataTypes.isTypeOf(value, 'string');
 		this.set('name', value);
+	}},
+	method: {get: function()
+	{
+		return this.get('method');
+	}, set: function(value)
+	{
+		barmatz.utils.DataTypes.isTypeOf(value, 'string');
+		this.set('method', value);
+	}},
+	encoding: {get: function()
+	{
+		return this.get('encoding');
+	}, set: function(value)
+	{
+		barmatz.utils.DataTypes.isTypeOf(value, 'string');
+		this.set('encoding', value);
 	}},
 	created: {get: function()
 	{
@@ -3529,7 +3603,7 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 	}},
 	toJSON: {value: function()
 	{
-		var object = {fields: []};
+		var object = {name: this.name, method: this.method, encoding: this.encoding, created: this.created ? this.created.valueOf() : NaN, fingerprint: this.fingerprint, fields: []};
 		
 		this.forEach(function(item, index, collection)
 		{
@@ -3549,6 +3623,12 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 
 			if(item instanceof barmatz.forms.fields.TextFieldModel)
 				field.max = item.max;
+			
+			if(item instanceof barmatz.forms.fields.TextAreaFieldModel)
+			{
+				field.rows = item.rows;
+				field.cols = item.cols;
+			}
 			
 			if(item instanceof barmatz.forms.fields.CheckboxFieldModel)
 			{
@@ -3760,7 +3840,7 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 		
 		function onLoaderDone(event)
 		{
-			var response, data;
+			var response, data, parsedData;
 
 			barmatz.utils.DataTypes.isNotUndefined(event);
 			barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.LoaderEvent);
@@ -3774,11 +3854,14 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 				
 				if(data)
 				{
+					parsedData = JSON.parse(data.data);
 					_this.id = parseInt(data.id);
-					_this.name = data.name;
 					_this.fingerprint = data.fingerprint;
-					_this.created = barmatz.utils.Date.toDate(data.created);
-					parseFieldsData(JSON.parse(data.data).fields);
+					_this.name = parsedData.name;
+					_this.created = new Date(parsedData.created);
+					_this.method = parsedData.method;
+					_this.encoding = parsedData.encoding;
+					parseFieldsData(parsedData.fields);
 					_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.LOADING_FORM_COMPLETE));
 				}
 				else
@@ -4211,6 +4294,12 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		if(model instanceof barmatz.forms.fields.TextFieldModel)
 			returnWrapper.maxField = addFieldToWrapper('number', 'max', 'max', model.max);
 		
+		if(model instanceof barmatz.forms.fields.TextAreaFieldModel)
+		{
+			returnWrapper.rowsField = addFieldToWrapper('number', 'rows', 'rows', model.rows);
+			returnWrapper.colsField = addFieldToWrapper('number', 'cols', 'columns', model.cols);
+		}
+		
 		if(model instanceof barmatz.forms.fields.CheckboxFieldModel)
 		{
 			returnWrapper.checkedField = addFieldToWrapper('boolean', 'checked', 'checked', model.checked);
@@ -4347,7 +4436,7 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 
 		return {wrapper: this.createElementWithContent('div', 'forms-item', [this.createElementWithContent('label', '', label), field]), field: field};
 	}},
-	createDialog: {value: function(title, content, container)
+	createDialog: {value: function(title, content, open, container)
 	{
 		var dialog;
 		
@@ -4355,12 +4444,13 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		barmatz.utils.DataTypes.isNotUndefined(content);
 		barmatz.utils.DataTypes.isTypeOf(title, 'string');
 		barmatz.utils.DataTypes.isTypesOrInstances(content, ['string'], [HTMLElement, Array]);
+		barmatz.utils.DataTypes.isTypeOf(open, 'boolean', true);
 		barmatz.utils.DataTypes.isInstanceOf(container, HTMLElement, true);
 		
 		dialog = this.createElementWithContent('div', 'forms-dialog', content);
 		dialog.title = title;
 		(container || this.BODY_ELEMENT).appendChild(dialog);
-		jQuery(dialog).dialog({autoOpen: false, draggable: false, modal: true});
+		jQuery(dialog).dialog({autoOpen: open || false, draggable: false, modal: true});
 		return dialog;
 	}},
 	destroyDialog: {value: function(dialog)
@@ -4420,14 +4510,11 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		barmatz.utils.DataTypes.isTypeOf(open, 'boolean', true);
 		
 		_this = this;
-		dialog = this.createDialog(title, content);
+		dialog = this.createDialog(title, content, open);
 		
 		jQuery(dialog).dialog({
 			buttons: {OK: onOKButtonClick, Cancel: onCancelButtonClick}
 		});
-		
-		if(open)
-			jQuery(dialog).dialog('open');
 		
 		return dialog;
 		
@@ -4444,18 +4531,27 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 	}},
 	createExportPromptDialog: {value: function(id, open)
 	{
-		var embedCode, textarea;
+		var dir, embedCode, textarea;
 		
 		barmatz.utils.DataTypes.isNotUndefined(id);
 		barmatz.utils.DataTypes.isTypeOf(open, 'boolean', true);
 		
-		embedCode = '(function(d){' +
-					'var a,b,formID="' + id + '";' +
-					'a=d.createElement("script");' +
-					'a.src="myscript.js";' +
-					'b=d.getElementsByTagName("script")[0];' +
-					'b.parentNode.insertBefore(a,b);' +
-					'})(document);';
+		dir = location.href.replace(location.hash, '').replace(location.search, '').replace(/(^\w+:\/\/.+)\/.+\..+$/, '$1') + '/js'; 
+		embedCode = "(function(w,d)" +
+					"{" +
+						"w.formID='" + id + "';" +
+						"if(!w.barmatz.forms)" +
+						"l('" + dir + "/application.js');" +
+						"if(!w.barmatz.forms.Embed)" +
+						"l('" + dir + "/embed.js');" +
+						"function l(s)" +
+						"{" +
+							"a=d.createElement('script');" +
+							"a.src=s;" +
+							"b=d.getElementsByTagName('script')[0];" +
+							"b.parentNode.insertBefore(a,b);" +
+						"}" +
+					"})(window,document)";
 		
 		textarea = this.createElementWithContent('textarea', 'forms-dialog-export-embedcode', embedCode);
 		textarea.readOnly = true;
@@ -4500,14 +4596,11 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		barmatz.utils.DataTypes.isTypeOf(open, 'boolean', true);
 		
 		_this = this;
-		dialog = this.createDialog(title, content);
+		dialog = this.createDialog(title, content, open);
 		
 		jQuery(dialog).dialog({
 			buttons: {OK: onOKButtonClick}
 		});
-		
-		if(open)
-			jQuery(dialog).dialog('open');
 		
 		function onOKButtonClick(event)
 		{
@@ -4703,6 +4796,78 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		barmatz.utils.DataTypes.isTypeOf(className, 'string', true);
 		barmatz.utils.DataTypes.isTypeOf(isHead, 'boolean', true);
 		return this.createElementWithContent(isHead ? 'th' : 'td', className, content);
+	}},
+	createFormPropertiesDialogWrapper: {value: function(model, confirmHandler, open)
+	{
+		var properties, dialog;
+
+		barmatz.utils.DataTypes.isNotUndefined(model);
+		barmatz.utils.DataTypes.isNotUndefined(confirmHandler);
+		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.FormModel);
+		barmatz.utils.DataTypes.isTypeOf(confirmHandler, 'function');
+		barmatz.utils.DataTypes.isTypeOf(open, 'boolean', true);
+		
+		properties = this.createFormPropertiesWrapper(model);
+		dialog = this.createPromptDialog(model.name + ' properties', properties.wrapper, confirmHandler, open);
+		
+		jQuery(dialog).dialog({dialogClass: 'forms-dialog-form-properties'});
+		
+		return {dialog: dialog, nameField: properties.nameField, methodField: properties.methodField, encodingField: properties.encodingField};
+	}},
+	createFormPropertiesWrapper: {value: function(model)
+	{
+		var _this, options, nameField, methodField, encodingField;
+		
+		barmatz.utils.DataTypes.isNotUndefined(model);
+		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.FormModel);
+
+		_this = this;
+		
+		options = new barmatz.forms.ui.TableOptions();
+		options.bodyRows = [];
+		
+		nameField = createField('Name');
+		nameField.value = model.name;
+		
+		methodField = createDropbox('Method', 'formMethod', ['GET', 'POST']);
+		methodField.value = model.method;
+		
+		encodingField = createDropbox('Encoding', 'formEncoding', [barmatz.net.Encoding.FORM, barmatz.net.Encoding.FILES]);
+		encodingField.value = model.encoding;
+		
+		return {wrapper: this.createTable(options), nameField: nameField, methodField: methodField, encodingField: encodingField};
+		
+		function createField(label, content)
+		{
+			var field, row;
+			
+			barmatz.utils.DataTypes.isNotUndefined(label);
+			barmatz.utils.DataTypes.isTypeOf(label, 'string');
+			
+			field = content || _this.createElement('input');
+			row = [_this.createElementWithContent('label', '', label), field];
+			options.bodyRows.push(row);
+			return field;
+		}
+		
+		function createDropbox(label, name, values)
+		{
+			var model, key;
+			
+			barmatz.utils.DataTypes.isNotUndefined(label);
+			barmatz.utils.DataTypes.isNotUndefined(name);
+			barmatz.utils.DataTypes.isNotUndefined(values);
+			barmatz.utils.DataTypes.isTypeOf(label, 'string');
+			barmatz.utils.DataTypes.isTypeOf(name, 'string');
+			barmatz.utils.DataTypes.isTypesOrInstances(values, ['object'], [Array]);
+			
+			model = barmatz.forms.factories.ModelFactory.createDropboxModel(name);
+			
+			for(key in values)
+				model.addItem(barmatz.forms.factories.ModelFactory.createDropboxItemModel(values instanceof Array ? values[key] : key, values[key]));
+
+			return createField(label, _this.createDropboxElement(model));
+		}
 	}}
 });
 /** barmatz.forms.factories.ModelFactory **/
@@ -5165,6 +5330,15 @@ Object.defineProperties(barmatz.forms.users.UserModel.prototype,
 		}
 	}}
 });
+/** barmatz.net.Encoding **/
+window.barmatz.net.Encoding = function(){};
+
+Object.defineProperties(barmatz.net.Encoding,
+{
+	HTML5: {value: 'text/plain'},
+	FORM: {value: 'application/x-www-form-urlencoded'},
+	FILES: {value: 'multipart/form-data'}
+});
 /** barmatz.net.Loader **/
 window.barmatz.net.Loader = function()
 {
@@ -5257,7 +5431,7 @@ Object.defineProperties(barmatz.net.Loader.prototype,
 		else
 			this._xhr.open(request.method, url, request.async);
 		
-		this._xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+		this._xhr.setRequestHeader('Content-Type', barmatz.net.Encoding.FORM);
 		
 		if(request.method == barmatz.net.Methods.POST)
 			this._xhr.send(barmatz.net.Loader.serialize(request.data));

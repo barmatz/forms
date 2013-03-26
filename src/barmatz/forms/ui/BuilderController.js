@@ -302,13 +302,27 @@ window.barmatz.forms.ui.BuilderController = function(formModel, userModel, conta
 	
 	function onMenuDeleteClick(event)
 	{
-		addFromModelDeleteEventListeners();
-		formModel.delete();
+		barmatz.forms.factories.DOMFactory.createConfirmPromptDialog('Are you sure you want to delete this form?', onDeleteFormConfirm, true);
 	}
 	
 	function onMenuPropertiesClick(event)
 	{
-		debugger;
+		var wrapper = barmatz.forms.factories.DOMFactory.createFormPropertiesDialogWrapper(formModel, onChangeFormPropertiesConfirm, true);
+		
+		function onChangeFormPropertiesConfirm(event)
+		{
+			formModel.name = wrapper.nameField.value;
+			formModel.method = wrapper.methodField.value;
+			formModel.encoding = wrapper.encodingField.value;
+		}
+	}
+	
+	function onDeleteFormConfirm(event)
+	{
+		addFromModelDeleteEventListeners();
+		formModel.delete();
+		formModel.reset();
+		formModel.name = 'Unnamed form';
 	}
 	
 	function onSaveFromAsConfirm(event)

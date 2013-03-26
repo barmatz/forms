@@ -91,6 +91,6 @@ class FormsModel extends \api\database\DatabaseTableModel
 		$success = $this->query("delete from `{$this->name}` where id=$id limit 1");
 		
 		if(!$success)
-			\api\errors\Errors::internalServerError('Cannot delete formdeleteForm');
+			\api\errors\Errors::internalServerError('Cannot delete form');
 	}
 }

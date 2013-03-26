@@ -3,9 +3,14 @@ namespace api\errors;
 
 class Errors
 {
-	private static function output($message)
+	private static function output($message, $data=null)
 	{
-		die(json_encode(array('error'=>$message)));
+		$json = array('error'=>$message);
+		
+		if(isset($data))
+			array_merge($json, $data);
+		
+		die(json_encode($json));
 	}
 	
 	public static function unauthorized($message)

@@ -240,6 +240,12 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		if(model instanceof barmatz.forms.fields.TextFieldModel)
 			returnWrapper.maxField = addFieldToWrapper('number', 'max', 'max', model.max);
 		
+		if(model instanceof barmatz.forms.fields.TextAreaFieldModel)
+		{
+			returnWrapper.rowsField = addFieldToWrapper('number', 'rows', 'rows', model.rows);
+			returnWrapper.colsField = addFieldToWrapper('number', 'cols', 'columns', model.cols);
+		}
+		
 		if(model instanceof barmatz.forms.fields.CheckboxFieldModel)
 		{
 			returnWrapper.checkedField = addFieldToWrapper('boolean', 'checked', 'checked', model.checked);
@@ -376,7 +382,7 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 
 		return {wrapper: this.createElementWithContent('div', 'forms-item', [this.createElementWithContent('label', '', label), field]), field: field};
 	}},
-	createDialog: {value: function(title, content, container)
+	createDialog: {value: function(title, content, open, container)
 	{
 		var dialog;
 		
@@ -384,12 +390,13 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		barmatz.utils.DataTypes.isNotUndefined(content);
 		barmatz.utils.DataTypes.isTypeOf(title, 'string');
 		barmatz.utils.DataTypes.isTypesOrInstances(content, ['string'], [HTMLElement, Array]);
+		barmatz.utils.DataTypes.isTypeOf(open, 'boolean', true);
 		barmatz.utils.DataTypes.isInstanceOf(container, HTMLElement, true);
 		
 		dialog = this.createElementWithContent('div', 'forms-dialog', content);
 		dialog.title = title;
 		(container || this.BODY_ELEMENT).appendChild(dialog);
-		jQuery(dialog).dialog({autoOpen: false, draggable: false, modal: true});
+		jQuery(dialog).dialog({autoOpen: open || false, draggable: false, modal: true});
 		return dialog;
 	}},
 	destroyDialog: {value: function(dialog)
@@ -449,14 +456,11 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		barmatz.utils.DataTypes.isTypeOf(open, 'boolean', true);
 		
 		_this = this;
-		dialog = this.createDialog(title, content);
+		dialog = this.createDialog(title, content, open);
 		
 		jQuery(dialog).dialog({
 			buttons: {OK: onOKButtonClick, Cancel: onCancelButtonClick}
 		});
-		
-		if(open)
-			jQuery(dialog).dialog('open');
 		
 		return dialog;
 		
@@ -473,18 +477,27 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 	}},
 	createExportPromptDialog: {value: function(id, open)
 	{
-		var embedCode, textarea;
+		var dir, embedCode, textarea;
 		
 		barmatz.utils.DataTypes.isNotUndefined(id);
 		barmatz.utils.DataTypes.isTypeOf(open, 'boolean', true);
 		
-		embedCode = '(function(d){' +
-					'var a,b,formID="' + id + '";' +
-					'a=d.createElement("script");' +
-					'a.src="myscript.js";' +
-					'b=d.getElementsByTagName("script")[0];' +
-					'b.parentNode.insertBefore(a,b);' +
-					'})(document);';
+		dir = location.href.replace(location.hash, '').replace(location.search, '').replace(/(^\w+:\/\/.+)\/.+\..+$/, '$1') + '/js'; 
+		embedCode = "(function(w,d)" +
+					"{" +
+						"w.formID='" + id + "';" +
+						"if(!w.barmatz.forms)" +
+						"l('" + dir + "/application.js');" +
+						"if(!w.barmatz.forms.Embed)" +
+						"l('" + dir + "/embed.js');" +
+						"function l(s)" +
+						"{" +
+							"a=d.createElement('script');" +
+							"a.src=s;" +
+							"b=d.getElementsByTagName('script')[0];" +
+							"b.parentNode.insertBefore(a,b);" +
+						"}" +
+					"})(window,document)";
 		
 		textarea = this.createElementWithContent('textarea', 'forms-dialog-export-embedcode', embedCode);
 		textarea.readOnly = true;
@@ -529,14 +542,11 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		barmatz.utils.DataTypes.isTypeOf(open, 'boolean', true);
 		
 		_this = this;
-		dialog = this.createDialog(title, content);
+		dialog = this.createDialog(title, content, open);
 		
 		jQuery(dialog).dialog({
 			buttons: {OK: onOKButtonClick}
 		});
-		
-		if(open)
-			jQuery(dialog).dialog('open');
 		
 		function onOKButtonClick(event)
 		{
@@ -732,5 +742,77 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		barmatz.utils.DataTypes.isTypeOf(className, 'string', true);
 		barmatz.utils.DataTypes.isTypeOf(isHead, 'boolean', true);
 		return this.createElementWithContent(isHead ? 'th' : 'td', className, content);
+	}},
+	createFormPropertiesDialogWrapper: {value: function(model, confirmHandler, open)
+	{
+		var properties, dialog;
+
+		barmatz.utils.DataTypes.isNotUndefined(model);
+		barmatz.utils.DataTypes.isNotUndefined(confirmHandler);
+		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.FormModel);
+		barmatz.utils.DataTypes.isTypeOf(confirmHandler, 'function');
+		barmatz.utils.DataTypes.isTypeOf(open, 'boolean', true);
+		
+		properties = this.createFormPropertiesWrapper(model);
+		dialog = this.createPromptDialog('Properties', properties.wrapper, confirmHandler, open);
+		
+		jQuery(dialog).dialog({dialogClass: 'forms-dialog-form-properties'});
+		
+		return {dialog: dialog, nameField: properties.nameField, methodField: properties.methodField, encodingField: properties.encodingField};
+	}},
+	createFormPropertiesWrapper: {value: function(model)
+	{
+		var _this, options, nameField, methodField, encodingField;
+		
+		barmatz.utils.DataTypes.isNotUndefined(model);
+		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.FormModel);
+
+		_this = this;
+		
+		options = new barmatz.forms.ui.TableOptions();
+		options.bodyRows = [];
+		
+		nameField = createField('Name');
+		nameField.value = model.name;
+		
+		methodField = createDropbox('Method', 'formMethod', ['GET', 'POST']);
+		methodField.value = model.method;
+		
+		encodingField = createDropbox('Encoding', 'formEncoding', [barmatz.net.Encoding.FORM, barmatz.net.Encoding.FILES]);
+		encodingField.value = model.encoding;
+		
+		return {wrapper: this.createTable(options), nameField: nameField, methodField: methodField, encodingField: encodingField};
+		
+		function createField(label, content)
+		{
+			var field, row;
+			
+			barmatz.utils.DataTypes.isNotUndefined(label);
+			barmatz.utils.DataTypes.isTypeOf(label, 'string');
+			
+			field = content || _this.createElement('input');
+			row = [_this.createElementWithContent('label', '', label), field];
+			options.bodyRows.push(row);
+			return field;
+		}
+		
+		function createDropbox(label, name, values)
+		{
+			var model, key;
+			
+			barmatz.utils.DataTypes.isNotUndefined(label);
+			barmatz.utils.DataTypes.isNotUndefined(name);
+			barmatz.utils.DataTypes.isNotUndefined(values);
+			barmatz.utils.DataTypes.isTypeOf(label, 'string');
+			barmatz.utils.DataTypes.isTypeOf(name, 'string');
+			barmatz.utils.DataTypes.isTypesOrInstances(values, ['object'], [Array]);
+			
+			model = barmatz.forms.factories.ModelFactory.createDropboxModel(name);
+			
+			for(key in values)
+				model.addItem(barmatz.forms.factories.ModelFactory.createDropboxItemModel(values instanceof Array ? values[key] : key, values[key]));
+
+			return createField(label, _this.createDropboxElement(model));
+		}
 	}}
 });
