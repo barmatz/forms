@@ -11,56 +11,74 @@ window.barmatz.forms.ui.WorkspaceItemController = function(model, labelView, fie
 	barmatz.utils.DataTypes.isInstanceOf(fieldView, HTMLElement);
 	barmatz.utils.DataTypes.isInstanceOf(mandatoryView, HTMLElement);
 	barmatz.utils.DataTypes.isInstanceOf(deleteButtonView, HTMLElement);
+	
 	barmatz.mvc.Controller.call(this);
+	
 	model.addEventListener(barmatz.events.ModelEvent.VALUE_CHANGED, onModelValueChanged);
+	
+	setViewValue('name', model.name);
+	setViewValue('label', model.label);
+	setViewValue('mandatory', model.mandatory);
+	setViewValue('default', model.default);
+	setViewValue('value', model.value);
+	setViewValue('enabled', model.enabled);
+	setViewValue('max', model.max);
+	setViewValue('checked', model.checked);
+	setViewValue('defaultChecked', model.defaultChecked);
+	setViewValue('accept', model.accept);
+	setViewValue('rows', model.rows);
+	
+	function setViewValue(key, value)
+	{
+		switch(key)
+		{
+			default:
+				throw new Error('unknown key');
+			break;
+			case 'name':
+				fieldView.name = value;
+				break;
+			case 'label':
+				labelView.innerHTML = value;
+				break;
+			case 'mandatory':
+				mandatoryView.innerHTML = value ? '*' : '';
+				break;
+			case 'default':
+				fieldView.defaultValue = value;
+				break;
+			case 'value':
+				fieldView.value = value;
+				break;
+			case 'enabled':
+				fieldView.disabled = !value;
+				break;
+			case 'max':
+				fieldView.maxLength = value;
+				break;
+			case 'checked':
+				fieldView.checked = value;
+				break;
+			case 'defaultChecked':
+				fieldView.defaultChecked = value;
+				break;
+			case 'accept':
+				fieldView.accept = value;
+				break;
+			case 'rows':
+				fieldView.rows = value;
+				break;
+			case 'cols':
+				fieldView.cols = value;
+				break;
+		}
+	}
 	
 	function onModelValueChanged(event)
 	{
 		barmatz.utils.DataTypes.isNotUndefined(event);
 		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.ModelEvent);
-
-		switch(event.key)
-		{
-			default:
-				throw new Error('unknown key');
-				break;
-			case 'name':
-				fieldView.name = event.value;
-				break;
-			case 'label':
-				labelView.innerHTML = event.value;
-				break;
-			case 'mandatory':
-				mandatoryView.innerHTML = event.value ? '*' : '';
-				break;
-			case 'default':
-				fieldView.defaultValue = event.value;
-				break;
-			case 'value':
-				fieldView.value = event.value;
-				break;
-			case 'enabled':
-				fieldView.disabled = !event.value;
-				break;
-			case 'max':
-				fieldView.maxLength = event.value;
-				break;
-			case 'checked':
-				fieldView.checked = event.value;
-				break;
-			case 'defaultChecked':
-				fieldView.defaultChecked = event.value;
-				break;
-			case 'accept':
-				fieldView.accept = event.value;
-				break;
-			case 'rows':
-				fieldView.rows = event.value;
-				break;
-			case 'cols':
-				fieldView.cols = event.value;
-				break;
-		}
+		setViewValue(event.key, event.value);
 	}
 };
 
