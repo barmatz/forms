@@ -27,10 +27,13 @@ Object.defineProperties(barmatz.forms.fields.FileFieldModel.prototype,
 		var clone = new barmatz.forms.fields.FileFieldModel(this.name);
 		clone.label = this.label;
 		clone.mandatory = this.mandatory;
-		clone.default = this.default;
 		clone.value = this.value;
 		clone.enabled = this.enabled;
 		clone.accept = this.accept;
 		return clone;
+	}},
+	toHTML: {value: function()
+	{
+		return barmatz.forms.fields.FieldModel.prototype.toHTML.call(this).replace(/(\<input)\s/, '$1 accept="' + this.accept.join(',') + '"');
 	}}
 });

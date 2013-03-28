@@ -49,5 +49,13 @@ Object.defineProperties(barmatz.net.Request.prototype,
 	{
 		barmatz.utils.DataTypes.isInstanceOf(value, barmatz.net.RequestCredentils);
 		this.set('credentials', value);
+	}},
+	headers: {get: function()
+	{
+		return this.get('headers');
+	}, set: function(value)
+	{
+		barmatz.utils.DataTypes.isInstanceOf(value, Array);
+		this.set('headers', value);
 	}}
 });

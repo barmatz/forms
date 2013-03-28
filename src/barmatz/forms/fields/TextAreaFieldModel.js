@@ -32,11 +32,14 @@ Object.defineProperties(barmatz.forms.fields.TextAreaFieldModel.prototype,
 		var clone = new barmatz.forms.fields.TextAreaFieldModel(this.name);
 		clone.label = this.label;
 		clone.mandatory = this.mandatory;
-		clone.default = this.default;
 		clone.value = this.value;
 		clone.enabled = this.enabled;
 		clone.rows = this.rows;
 		clone.cols = this.cols;
 		return clone;
+	}},
+	toHTML: {value: function()
+	{
+		return barmatz.forms.fields.FieldModel.prototype.toHTML.call(this).replace(/(\<input.*\/\>)/, '<textarea cols="' + this.cols + '"' + (this.enabled ? '' : ' disabled="disabled"') + ' name="' + this.name + '"  rows="' + this.rows + '">' + this.value + '</textarea>');
 	}}
 });

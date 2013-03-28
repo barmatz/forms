@@ -2,9 +2,13 @@
 window.barmatz.forms.FormModel = function()
 {
 	barmatz.forms.CollectionModel.call(this);
+	this.set('id', '');
 	this.set('name', '');
+	this.set('submitButtonLabel', 'Submit');
 	this.set('method', barmatz.forms.Methods.GET);
 	this.set('encoding', barmatz.net.Encoding.FORM);
+	this.set('created', null);
+	this.set('fingerprint', null);
 };
 
 barmatz.forms.FormModel.prototype = new barmatz.forms.CollectionModel();
@@ -12,14 +16,6 @@ barmatz.forms.FormModel.prototype.constructor = barmatz.forms.FormModel;
 
 Object.defineProperties(barmatz.forms.FormModel.prototype, 
 {
-	id: {get: function()
-	{
-		return this.get('id');
-	}, set: function(value)
-	{
-		barmatz.utils.DataTypes.isTypeOf(value, 'number');
-		this.set('id', value);
-	}},
 	name: {get: function()
 	{
 		return this.get('name');
@@ -27,6 +23,14 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 	{
 		barmatz.utils.DataTypes.isTypeOf(value, 'string');
 		this.set('name', value);
+	}},
+	submitButtonLabel: {get: function()
+	{
+		return this.get('submitButtonLabel');
+	}, set: function(value)
+	{
+		barmatz.utils.DataTypes.isTypeOf(value, 'string');
+		this.set('submitButtonLabel', value);
 	}},
 	method: {get: function()
 	{
@@ -58,7 +62,9 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 	}, set: function(value)
 	{
 		barmatz.utils.DataTypes.isTypeOf(value, 'string');
-		this.set('fingerprint', value);
+
+		if(!this.fingerprint)
+			this.set('fingerprint', value);
 	}},
 	addItem: {value: function(item)
 	{
@@ -94,9 +100,28 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 		barmatz.utils.DataTypes.isTypeOf(index, 'number');
 		return barmatz.forms.CollectionModel.prototype.setItemIndex.call(this, item, index);
 	}},
+	toHTML: {value: function()
+	{
+		var fields = '';
+		
+		this.forEach(function(item, index, collection)
+		{
+			fields += item.toHTML();
+		});
+		
+		return '<link rel="stylesheet" type="text/css" href="http://www.quiz.co.il/css/form.css"/>' +
+			   '<div class="forms-form-wrapper">' +
+				   '<form onsubmit="return false;">' + 
+					   fields + 
+					   '<div class="forms-form-item forms-form-submit">' +
+					   		'<input type="submit" value="' + this.submitButtonLabel + '"/>' +
+					   '</div>' +
+				   '</form>' +
+			   '</div>';
+	}},
 	toJSON: {value: function()
 	{
-		var object = {name: this.name, method: this.method, encoding: this.encoding, created: this.created ? this.created.valueOf() : NaN, fingerprint: this.fingerprint, fields: []};
+		var object = {name: this.name, submitButtonLabel: this.submitButtonLabel, method: this.method, encoding: this.encoding, created: this.created ? this.created.valueOf() : NaN, fingerprint: this.fingerprint, fields: []};
 		
 		this.forEach(function(item, index, collection)
 		{
@@ -107,7 +132,6 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 				field.name = item.name;
 				field.label = item.label;
 				field.mandatory = item.mandatory;
-				field.default = item.default;
 				field.enabled = item.enabled;
 			}
 			
@@ -124,10 +148,7 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 			}
 			
 			if(item instanceof barmatz.forms.fields.CheckboxFieldModel)
-			{
 				field.checked = item.checked;
-				field.defaultChecked = item.defaultChecked;
-			}
 			
 			object.fields.push(field);
 		});
@@ -136,8 +157,12 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 	}},
 	reset: {value: function()
 	{
+		this.set('id', '');
 		this.set('name', '');
-		this.set('id', null);
+		this.set('method', barmatz.forms.Methods.GET);
+		this.set('encoding', barmatz.net.Encoding.FORM);
+		this.set('created', null);
+		this.set('fingerprint', null);
 		while(this.numItems > 0)
 			this.removeItemAt(this.numItems - 1);
 	}},
@@ -150,9 +175,9 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 		
 		this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.SAVING));
 
-		request = new barmatz.net.Request('api/form/save.php');
+		request = new barmatz.net.Request('http://quiz.co.il/api/form/save.php');
 		request.method = barmatz.net.Methods.POST;
-		request.data = {i: this.id || null, n: this.name, d: this.toJSON()};
+		request.data = {f: this.fingerprint || null, n: this.name, d: this.toJSON()};
 		loader = new barmatz.net.Loader();
 		loader.addEventListener(barmatz.events.LoaderEvent.DONE, onLoaderDone);
 		loader.load(request);
@@ -172,8 +197,8 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 			{
 				data = response.data ? JSON.parse(response.data) : null;
 				
-				if(data && data.id)
-					_this.set('id', data.id);
+				if(data && data.fingerprint)
+					_this.set('fingerprint', data.fingerprint);
 				
 				_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.SAVED));
 			}
@@ -191,71 +216,20 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 		this.set('name', name);
 		this.save(model);
 	}},
-	getFingerprint: {value: function(callback)
-	{
-		var _this, fingerprint;
-		
-		barmatz.utils.DataTypes.isNotUndefined(callback);
-		barmatz.utils.DataTypes.isTypeOf(callback, 'function');
-		
-		_this = this;
-		fingerprint = this.get('fingerprint');
-		
-		if(fingerprint)
-			callback(fingerprint);
-		else
-			loadFingerprint();
-		
-		function loadFingerprint()
-		{
-			var request, loader;
-			
-			request = new barmatz.net.Request('api/form.php');
-			request.method = barmatz.net.Methods.GET;
-			request.data = {i: _this.get('id')};
-			
-			loader = new barmatz.net.Loader();
-			loader.addEventListener(barmatz.events.LoaderEvent.DONE, onLoaderDone);
-			loader.load(request);
-		}
-		
-		function onLoaderDone(event)
-		{
-			var response, data;
-			
-			barmatz.utils.DataTypes.isNotUndefined(event);
-			barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.LoaderEvent);
-			
-			event.target.removeEventListener(barmatz.events.LoaderEvent.DONE, onLoaderDone);
-
-			response = event.response;
-			
-			if(response && response.status == 200)
-			{
-				data = response.data ? JSON.parse(response.data) : null;
-				
-				if(data && data.fingerprint)
-				{
-					_this.set('fingerprint', data.fingerprint);
-					callback(data.fingerprint);
-				}
-			}
-		}
-	}},
-	loadById: {value: function(id)
+	loadByFingerprint: {value: function(fingerprint)
 	{
 		var _this, request, loader;
 		
-		barmatz.utils.DataTypes.isNotUndefined(id);	
-		barmatz.utils.DataTypes.isTypeOf(id, 'number');
+		barmatz.utils.DataTypes.isNotUndefined(fingerprint);	
+		barmatz.utils.DataTypes.isTypeOf(fingerprint, 'string');
 		
 		_this = this;
 		
 		this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.LOADING_FORM));
 		
-		request = new barmatz.net.Request('api/form.php');
+		request = new barmatz.net.Request('http://quiz.co.il/api/form.php');
 		request.method = barmatz.net.Methods.GET;
-		request.data = {i: id};
+		request.data = {f: fingerprint};
 		
 		loader = new barmatz.net.Loader();
 		loader.addEventListener(barmatz.events.LoaderEvent.DONE, onLoaderDone);
@@ -270,64 +244,56 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 			
 			for(i in data)
 			{
-				try
+				name = data[i].name;
+				
+				switch(data[i].type)
 				{
-					name = data[i].name;
-					
-					switch(data[i].type)
-					{
-						default:
-							throw new Error('Unknown type');
-							break;
-						case barmatz.forms.fields.FieldTypes.TEXT_AREA:
-							field = new barmatz.forms.fields.TextAreaFieldModel(name);
-							break;
-						case barmatz.forms.fields.FieldTypes.TEXT_FIELD:
-							field = new barmatz.forms.fields.TextFieldModel(name);
-							break;
-						case barmatz.forms.fields.FieldTypes.DROPBOX:
-							field = new barmatz.forms.fields.DropboxModel(name);
-							break;
-						case barmatz.forms.fields.FieldTypes.PASSWORD:
-							field = new barmatz.forms.fields.PasswordFieldModel(name);
-							break;
-						case barmatz.forms.fields.FieldTypes.CHECKBOX:
-							field = new barmatz.forms.fields.CheckboxFieldModel(name);
-							break;
-						case barmatz.forms.fields.FieldTypes.RADIO:
-							field = new barmatz.forms.fields.RadioFieldModel(name);
-							break;
-						case barmatz.forms.fields.FieldTypes.FILE:
-							field = new barmatz.forms.fields.FileFieldModel(name);
-							break;
-						case barmatz.forms.fields.FieldTypes.HIDDEN:
-							field = new barmatz.forms.fields.HiddenFieldModel(name);
-							break;
-					}
-					
-					if(field instanceof barmatz.forms.fields.FieldModel)
-					{
-						field.label = data[i].label;
-						field.mandatory = data[i].mandatory;
-						field.default = data[i].default;
-						field.enabled = data[i].enabled;
-					}
-					
-					if(field instanceof barmatz.forms.fields.FileFieldModel)
-						field.accept = data[i].accept;
-	
-					if(field instanceof barmatz.forms.fields.TextFieldModel)
-						field.max = parseInt(data[i].max);
-					
-					if(field instanceof barmatz.forms.fields.CheckboxFieldModel)
-					{
-						field.checked = data[i].checked;
-						field.defaultChecked = data[i].defaultChecked;
-					}
-					
-					_this.addItem(field);
+					default:
+						throw new Error('Unknown type');
+						break;
+					case barmatz.forms.fields.FieldTypes.TEXT_AREA:
+						field = new barmatz.forms.fields.TextAreaFieldModel(name);
+						break;
+					case barmatz.forms.fields.FieldTypes.TEXT_FIELD:
+						field = new barmatz.forms.fields.TextFieldModel(name);
+						break;
+					case barmatz.forms.fields.FieldTypes.DROPBOX:
+						field = new barmatz.forms.fields.DropboxModel(name);
+						break;
+					case barmatz.forms.fields.FieldTypes.PASSWORD:
+						field = new barmatz.forms.fields.PasswordFieldModel(name);
+						break;
+					case barmatz.forms.fields.FieldTypes.CHECKBOX:
+						field = new barmatz.forms.fields.CheckboxFieldModel(name);
+						break;
+					case barmatz.forms.fields.FieldTypes.RADIO:
+						field = new barmatz.forms.fields.RadioFieldModel(name);
+						break;
+					case barmatz.forms.fields.FieldTypes.FILE:
+						field = new barmatz.forms.fields.FileFieldModel(name);
+						break;
+					case barmatz.forms.fields.FieldTypes.HIDDEN:
+						field = new barmatz.forms.fields.HiddenFieldModel(name);
+						break;
 				}
-				catch(error){}
+				
+				if(field instanceof barmatz.forms.fields.FieldModel)
+				{
+					field.label = data[i].label;
+					field.mandatory = data[i].mandatory;
+					field.enabled = data[i].enabled;
+				}
+				
+				if(field instanceof barmatz.forms.fields.FileFieldModel)
+					field.accept = data[i].accept;
+
+				if(field instanceof barmatz.forms.fields.TextFieldModel)
+					field.max = parseInt(data[i].max);
+				
+				if(field instanceof barmatz.forms.fields.CheckboxFieldModel)
+					field.checked = data[i].checked;
+				
+				_this.addItem(field);
 			}
 		}
 		
@@ -347,14 +313,16 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 				
 				if(data)
 				{
-					parsedData = JSON.parse(data.data);
-					_this.id = parseInt(data.id);
-					_this.fingerprint = data.fingerprint;
-					_this.name = parsedData.name;
-					_this.created = new Date(parsedData.created);
-					_this.method = parsedData.method;
-					_this.encoding = parsedData.encoding;
-					parseFieldsData(parsedData.fields);
+					_this.set('fingerprint', data.fingerprint);
+					
+					data = data.data;
+					
+					_this.name = data.name;
+					_this.submitButtonLabel = data.submitButtonLabel;
+					_this.created = new Date(data.created);
+					_this.method = data.method;
+					_this.encoding = data.encoding;
+					parseFieldsData(data.fields);
 					_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.LOADING_FORM_COMPLETE));
 				}
 				else
@@ -372,9 +340,9 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 		
 		this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.DELETING));
 
-		request = new barmatz.net.Request('api/form/delete.php');
+		request = new barmatz.net.Request('http://quiz.co.il/api/form/delete.php');
 		request.method = barmatz.net.Methods.POST;
-		request.data = {i: this.get('id')};
+		request.data = {f: this.fingerprint};
 		
 		loader = new barmatz.net.Loader();
 		loader.addEventListener(barmatz.events.LoaderEvent.DONE, onLoaderDone);
@@ -386,7 +354,7 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 
 			barmatz.utils.DataTypes.isNotUndefined(event);
 			barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.LoaderEvent);
-			event.target.addEventListener(barmatz.events.LoaderEvent.DONE, onLoaderDone);
+			event.target.removeEventListener(barmatz.events.LoaderEvent.DONE, onLoaderDone);
 			
 			response = event.response;
 			
@@ -394,6 +362,43 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 				_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.DELETED));
 			else
 				_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.DELETION_FAIL));
+		}
+	}},
+	submit: {value: function(data)
+	{
+		var _this, request, loader;
+		
+		barmatz.utils.DataTypes.isNotUndefined(data);
+		barmatz.utils.DataTypes.isTypeOf(data, 'object');
+		
+		_this = this;
+		
+		_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.SUBMITTING));
+
+		request = new barmatz.net.Request('http://www.quiz.co.il/api/form/submit.php');
+		request.method = this.method;
+		request.data = {f: this.fingerprint, d: JSON.stringify(data)};
+		request.headers = [new barmatz.net.RequestHeader('Content-Type', this.encoding)];
+		
+		loader = new barmatz.net.Loader();
+		loader.addEventListener(barmatz.events.LoaderEvent.DONE, onLoaderDone);
+		loader.load(request);
+		
+		function onLoaderDone(event)
+		{
+			var response;
+			
+			barmatz.utils.DataTypes.isNotUndefined(event);
+			barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.LoaderEvent);
+			event.target.removeEventListener(barmatz.events.LoaderEvent.DONE, onLoaderDone);
+			
+			response = event.response;
+			
+			if(response && response.status == 200)
+				_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.SUBMITTED));
+			else
+				_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.SUBMISSION_FAILED));
+			
 		}
 	}}
 });

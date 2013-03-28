@@ -209,7 +209,7 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 	}},
 	createPropertiesItemWarpper: {value: function(model)
 	{
-		var _this, returnWrapper, wrapper, value;
+		var _this, returnWrapper, wrapper;
 		
 		barmatz.utils.DataTypes.isNotUndefined(model);
 		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FieldModel);
@@ -227,10 +227,6 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 			returnWrapper.nameField = addFieldToWrapper('string', 'name', 'name', model.name);
 			returnWrapper.labelField = addFieldToWrapper('string', 'label', 'label', model.label);
 			returnWrapper.mandatoryField = addFieldToWrapper('boolean', 'mandatory', 'mandatory', model.mandatory);
-			
-			if(!(model instanceof barmatz.forms.fields.DropboxModel))
-				returnWrapper.defaultValueField = addFieldToWrapper('string', 'default', 'default value', model.default);
-			
 			returnWrapper.enabledField = addFieldToWrapper('boolean', 'enabled', 'enabled', model.enabled);
 		}
 		
@@ -247,14 +243,11 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		}
 		
 		if(model instanceof barmatz.forms.fields.CheckboxFieldModel)
-		{
 			returnWrapper.checkedField = addFieldToWrapper('boolean', 'checked', 'checked', model.checked);
-			returnWrapper.defaultCheckedField = addFieldToWrapper('boolean', 'default checked', 'defaultChecked', model.defaultChecked);
-		}
 		
 		if(model instanceof barmatz.forms.fields.DropboxModel)
 		{
-			value = model.toString();
+			returnWrapper.multipleField = addFieldToWrapper('boolean', 'multiple', 'multiple', model.multiple);
 			returnWrapper.itemsField = addFieldToWrapper('array', 'items', 'items', ['add item...']);
 			returnWrapper.itemsField.selectedIndex = null;
 		}
@@ -475,21 +468,21 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 			_this.destroyDialog(dialog);
 		}
 	}},
-	createExportPromptDialog: {value: function(id, open)
+	createExportPromptDialog: {value: function(fingerprint, open)
 	{
 		var dir, embedCode, textarea;
 		
-		barmatz.utils.DataTypes.isNotUndefined(id);
+		barmatz.utils.DataTypes.isNotUndefined(fingerprint);
 		barmatz.utils.DataTypes.isTypeOf(open, 'boolean', true);
 		
 		dir = location.href.replace(location.hash, '').replace(location.search, '').replace(/(^\w+:\/\/.+)\/.+\..+$/, '$1') + '/js'; 
-		embedCode = "(function(w,d)" +
+		embedCode = "<div name=\"formContainer\" fingerprint=\"" + fingerprint + "\">Loading...</div>" +
+					"<script type=\"text/javascript\">" +
+					"(function(w,d)" +
 					"{" +
-						"w.formID='" + id + "';" +
-						"if(!w.barmatz.forms)" +
-						"l('" + dir + "/application.js');" +
-						"if(!w.barmatz.forms.Embed)" +
-						"l('" + dir + "/embed.js');" +
+						"w.barmatz && w.barmatz.forms && !w.barmatz.forms.embed" +
+						" ? barmatz.forms.embed('" + fingerprint + "')" +
+						" : l('" + dir + "/embed.js');" +
 						"function l(s)" +
 						"{" +
 							"a=d.createElement('script');" +
@@ -497,7 +490,8 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 							"b=d.getElementsByTagName('script')[0];" +
 							"b.parentNode.insertBefore(a,b);" +
 						"}" +
-					"})(window,document)";
+					"})(window,document)" +
+					"</script>";
 		
 		textarea = this.createElementWithContent('textarea', 'forms-dialog-export-embedcode', embedCode);
 		textarea.readOnly = true;
@@ -508,7 +502,7 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		});
 		
 		return this.createAlertPromptDialog('Export', this.createElementWithContent('div', '', [
-			this.createElementWithContent('div', '', 'Copy past this code into your site:'),
+			this.createElementWithContent('div', '', 'Copy past this code into your site inside the body tag where you want the form to appear:'),
 			textarea
 		]), open);
 	}},
@@ -626,9 +620,10 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		
 		return button;
 	}},
-	createLoadingDialog: {value: function()
+	createLoadingDialog: {value: function(container)
 	{
-		return barmatz.forms.factories.DOMFactory.BODY_ELEMENT.appendChild(this.createElement('div', 'loading-image ui-front'));
+		barmatz.utils.DataTypes.isInstanceOf(container, HTMLElement, true);
+		return (container || barmatz.forms.factories.DOMFactory.BODY_ELEMENT).appendChild(this.createElement('div', 'loading-image ui-front'));
 	}},
 	destroyLoadingDialog: {value: function(dialog)
 	{
@@ -758,11 +753,11 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		
 		jQuery(dialog).dialog({dialogClass: 'forms-dialog-form-properties'});
 		
-		return {dialog: dialog, nameField: properties.nameField, methodField: properties.methodField, encodingField: properties.encodingField};
+		return {dialog: dialog, nameField: properties.nameField, submitButtonLabelField: properties.submitButtonLabelField, methodField: properties.methodField, encodingField: properties.encodingField};
 	}},
 	createFormPropertiesWrapper: {value: function(model)
 	{
-		var _this, options, nameField, methodField, encodingField;
+		var _this, options, nameField, methodField, encodingField, submitButtonLabelField;
 		
 		barmatz.utils.DataTypes.isNotUndefined(model);
 		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.FormModel);
@@ -775,13 +770,16 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		nameField = createField('Name');
 		nameField.value = model.name;
 		
+		submitButtonLabelField = createField('Submit button label');
+		submitButtonLabelField.value = model.submitButtonLabel;
+		
 		methodField = createDropbox('Method', 'formMethod', ['GET', 'POST']);
 		methodField.value = model.method;
 		
 		encodingField = createDropbox('Encoding', 'formEncoding', [barmatz.net.Encoding.FORM, barmatz.net.Encoding.FILES]);
 		encodingField.value = model.encoding;
 		
-		return {wrapper: this.createTable(options), nameField: nameField, methodField: methodField, encodingField: encodingField};
+		return {wrapper: this.createTable(options), nameField: nameField, submitButtonLabelField: submitButtonLabelField, methodField: methodField, encodingField: encodingField};
 		
 		function createField(label, content)
 		{

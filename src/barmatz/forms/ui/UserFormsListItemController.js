@@ -52,7 +52,7 @@ window.barmatz.forms.ui.UserFormsListItemController = function(model, view, name
 	{
 		barmatz.utils.DataTypes.isNotUndefined(event);
 		barmatz.utils.DataTypes.isInstanceOf(event, MouseEvent);
-		model.loadById(model.id);
+		model.loadByFingerprint(model.fingerprint);
 	}
 	
 	function onViewMouseOver(event)

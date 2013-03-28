@@ -9,7 +9,6 @@ window.barmatz.forms.fields.FieldModel = function(type, name)
 	this.set('name', name);
 	this.set('label', '');
 	this.set('mandatory', false);
-	this.set('default', '');
 	this.set('value', '');
 	this.set('enabled', true);
 };
@@ -43,17 +42,9 @@ Object.defineProperties(barmatz.forms.fields.FieldModel.prototype,
 		barmatz.utils.DataTypes.isTypeOf(value, 'boolean');
 		this.set('mandatory', value);
 	}},
-	default: {get: function()
-	{
-		return this.get('default');
-	}, set: function(value)
-	{
-		this.set('default', value);
-	}},
 	value: {get: function()
 	{
-		var value = this.get('value');
-		return value == null || value == '' ? this.default : value;
+		return this.get('value');
 	}, set: function(value)
 	{
 		this.set('value', value);
@@ -71,9 +62,12 @@ Object.defineProperties(barmatz.forms.fields.FieldModel.prototype,
 		var clone = new barmatz.forms.fields.FieldModel(this.type, this.name);
 		clone.label = this.label;
 		clone.mandatory = this.mandatory;
-		clone.default = this.default;
 		clone.value = this.value;
 		clone.enabled = this.enabled;
 		return clone;
+	}},
+	toHTML: {value: function()
+	{
+		return '<div class="forms-form-item"><label>' + this.label + '</label><input type="' + this.type + '"' + (this.enabled ? '' : ' disabled="disabled"') + ' name="' + this.name + '" value="' + this.value + '"/></div>';
 	}}
 });

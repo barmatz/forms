@@ -136,5 +136,13 @@ Object.defineProperties(barmatz.forms.factories.ControllerFactory,
 		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.CollectionModel);
 		barmatz.utils.DataTypes.isInstanceOf(view, HTMLTableElement);
 		return new barmatz.forms.ui.CollectionDialogController(model, view);
+	}},
+	createFormController: {value: function(model, view)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(model);
+		barmatz.utils.DataTypes.isNotUndefined(view);
+		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.FormModel);
+		barmatz.utils.DataTypes.isInstanceOf(view, HTMLFormElement);
+		return new barmatz.forms.FormController(model, view);
 	}}
 });

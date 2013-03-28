@@ -75,10 +75,13 @@ Object.defineProperties(barmatz.net.Loader.prototype,
 	}},
 	load: {value: function(request)
 	{
-		var _this = this, url = request.url;
+		var _this, url, contentTypeSet, i;
 		
 		barmatz.utils.DataTypes.isNotUndefined(request);
 		barmatz.utils.DataTypes.isInstanceOf(request, barmatz.net.Request);
+		
+		_this = this;
+		url = request.url;
 
 		if(request.data && request.method == barmatz.net.Methods.GET)
 			url += (url.indexOf('?') > -1 ? '&' : '?') + barmatz.net.Loader.serialize(request.data);
@@ -90,7 +93,16 @@ Object.defineProperties(barmatz.net.Loader.prototype,
 		else
 			this._xhr.open(request.method, url, request.async);
 		
-		this._xhr.setRequestHeader('Content-Type', barmatz.net.Encoding.FORM);
+		if(request.headers)
+			for(i in request.headers)
+			{
+				this._xhr.setRequestHeader(request.headers[i].header, request.headers[i].value);
+				if(request.headers[i].header.toLowerCase() == 'content-type')
+					contentTypeSet = true;
+			}
+		
+		if(!contentTypeSet)
+			this._xhr.setRequestHeader('Content-Type', barmatz.net.Encoding.FORM);
 		
 		if(request.method == barmatz.net.Methods.POST)
 			this._xhr.send(barmatz.net.Loader.serialize(request.data));

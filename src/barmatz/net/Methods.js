@@ -3,8 +3,8 @@ window.barmatz.net.Methods = function(){};
 
 Object.defineProperties(barmatz.net.Methods,
 {
-	GET: {value: 'get'},
-	POST: {value: 'post'},
-	PUT: {value: 'put'},
-	DELETE: {value: 'delete'}	
+	GET: {value: 'GET'},
+	POST: {value: 'POST'},
+	PUT: {value: 'PUT'},
+	DELETE: {value: 'DELETE'}	
 });

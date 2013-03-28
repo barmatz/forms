@@ -19,12 +19,10 @@ window.barmatz.forms.ui.WorkspaceItemController = function(model, labelView, fie
 	setViewValue('name', model.name);
 	setViewValue('label', model.label);
 	setViewValue('mandatory', model.mandatory);
-	setViewValue('default', model.default);
 	setViewValue('value', model.value);
 	setViewValue('enabled', model.enabled);
 	setViewValue('max', model.max);
 	setViewValue('checked', model.checked);
-	setViewValue('defaultChecked', model.defaultChecked);
 	setViewValue('accept', model.accept);
 	setViewValue('rows', model.rows);
 	
@@ -44,9 +42,6 @@ window.barmatz.forms.ui.WorkspaceItemController = function(model, labelView, fie
 			case 'mandatory':
 				mandatoryView.innerHTML = value ? '*' : '';
 				break;
-			case 'default':
-				fieldView.defaultValue = value;
-				break;
 			case 'value':
 				fieldView.value = value;
 				break;
@@ -59,9 +54,6 @@ window.barmatz.forms.ui.WorkspaceItemController = function(model, labelView, fie
 			case 'checked':
 				fieldView.checked = value;
 				break;
-			case 'defaultChecked':
-				fieldView.defaultChecked = value;
-				break;
 			case 'accept':
 				fieldView.accept = value;
 				break;
@@ -70,6 +62,9 @@ window.barmatz.forms.ui.WorkspaceItemController = function(model, labelView, fie
 				break;
 			case 'cols':
 				fieldView.cols = value;
+				break;
+			case 'multiple':
+				fieldView.multiple = value;
 				break;
 		}
 	}

@@ -31,5 +31,9 @@ Object.defineProperties(barmatz.forms.fields.DropboxItemModel.prototype,
 	toString: {value: function()
 	{
 		return this.label + '=' + this.value;
+	}},
+	toHTML: {value: function()
+	{
+		return '<option value="' + this.value + '">' + this.label + '</option>';
 	}}
 });

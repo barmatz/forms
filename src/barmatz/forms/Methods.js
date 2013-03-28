@@ -3,6 +3,6 @@ window.barmatz.forms.Methods = function(){};
 
 Object.defineProperties(barmatz.forms.Methods,
 {
-	GET: {value: 'get'},
-	POST: {value: 'post'}
+	GET: {value: 'GET'},
+	POST: {value: 'POST'}
 });

@@ -50,7 +50,7 @@ class DatabaseTableModel
 	public function update()
 	{
 		$this->selectDatabse();
-		call_user_func_array(array($this, 'doUpdate'), func_get_args());
+		return call_user_func_array(array($this, 'doUpdate'), func_get_args());
 	}
 	
 	public function query($sql)

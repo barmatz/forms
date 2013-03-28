@@ -6,6 +6,7 @@ window.barmatz.forms.fields.DropboxModel = function(name, items)
 	barmatz.utils.DataTypes.isInstanceOf(items, Array, true);
 	barmatz.forms.fields.FieldModel.call(this, barmatz.forms.fields.FieldTypes.DROPBOX, name);
 	
+	this.set('multiple', false);
 	this.set('items', new barmatz.forms.CollectionModel());
 	
 	if(items)
@@ -18,6 +19,14 @@ barmatz.forms.fields.DropboxModel.prototype.constructor = barmatz.forms.fields.D
 
 Object.defineProperties(barmatz.forms.fields.DropboxModel.prototype,
 {
+	multiple: {get: function()
+	{
+		return this.get('multiple');
+	}, set: function(value)
+	{
+		barmatz.utils.DataTypes.isTypeOf(value, 'boolean');
+		this.set('multiple', value);
+	}},
 	numItems: {get: function()
 	{
 		return this.get('items').numItems;
@@ -83,13 +92,24 @@ Object.defineProperties(barmatz.forms.fields.DropboxModel.prototype,
 		var clone = new barmatz.forms.fields.DropboxModel(this.name, this.get('items').toArray());
 		clone.label = this.label;
 		clone.mandatory = this.mandatory;
-		clone.default = this.default;
 		clone.value = this.value;
 		clone.enabled = this.enabled;
+		clone.multiple = this.multiple;
 		return clone;
 	}},
 	toString: {value: function()
 	{
 		return this.get('items').toString();
+	}},
+	toHTML: {value: function()
+	{
+		var items = '';
+		
+		this.forEach(function(item, index, collection)
+		{
+			items += item.toHTML();
+		});
+		
+		return barmatz.forms.fields.FieldModel.prototype.toHTML.call(this).replace(/(\<input.*\/\>)/, '<select' + (this.enabled ? '' : ' disbaled="disbaled"') + (this.multiple ? ' multiple="multiple"' : '') + ' name="' + this.name + '">' + items + '</select>');
 	}}
 });

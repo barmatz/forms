@@ -17,7 +17,6 @@ Object.defineProperties(barmatz.forms.fields.PasswordFieldModel.prototype,
 		var clone = new barmatz.forms.fields.PasswordFieldModel(this.name);
 		clone.label = this.label;
 		clone.mandatory = this.mandatory;
-		clone.default = this.default;
 		clone.value = this.value;
 		clone.enabled = this.enabled;
 		return clone;

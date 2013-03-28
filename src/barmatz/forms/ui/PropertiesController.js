@@ -87,9 +87,6 @@ Object.defineProperties(barmatz.forms.ui.PropertiesController.prototype,
 				case 'mandatory':
 					itemsWrapper.mandatoryField.value = event.value;
 					break;
-				case 'default':
-					itemsWrapper.defaultValueField.value = event.value;
-					break;
 				case 'enabled':
 					itemsWrapper.enabledField.value = event.value;
 					break;
@@ -99,9 +96,6 @@ Object.defineProperties(barmatz.forms.ui.PropertiesController.prototype,
 				case 'checked':
 					itemsWrapper.checkedField.value = event.value;
 					break;
-				case 'defaultChecked':
-					itemsWrapper.defaultCheckedField.value = event.value;
-					break;
 				case 'accept':
 					itemsWrapper.acceptField.value = event.value.join(', ');
 					break;
@@ -110,6 +104,9 @@ Object.defineProperties(barmatz.forms.ui.PropertiesController.prototype,
 					break;
 				case 'cols':
 					itemsWrapper.colsField.value = event.value;
+					break;
+				case 'multiple':
+					itemsWrapper.multipleField.value = event.value;
 					break;
 			}
 		}

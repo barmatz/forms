@@ -815,7 +815,10 @@ Object.defineProperties(barmatz.events.FormModelEvent,
 	LOADING_FORM_ERROR: {value: 'loadingFormError'},
 	DELETING: {value: 'deleting'},
 	DELETED: {value: 'deleted'},
-	DELETION_FAIL: {value: 'deletionFail'}
+	DELETION_FAIL: {value: 'deletionFail'},
+	SUBMITTING: {value: 'submitting'},
+	SUBMITTED: {value: 'submitted'},
+	SUBMITION_FAILED: {value: 'submitionFailed'}
 }); 
 Object.defineProperties(barmatz.events.FormModelEvent.prototype, 
 {
@@ -1209,7 +1212,6 @@ window.barmatz.forms.fields.FieldModel = function(type, name)
 	this.set('name', name);
 	this.set('label', '');
 	this.set('mandatory', false);
-	this.set('default', '');
 	this.set('value', '');
 	this.set('enabled', true);
 };
@@ -1243,17 +1245,9 @@ Object.defineProperties(barmatz.forms.fields.FieldModel.prototype,
 		barmatz.utils.DataTypes.isTypeOf(value, 'boolean');
 		this.set('mandatory', value);
 	}},
-	default: {get: function()
-	{
-		return this.get('default');
-	}, set: function(value)
-	{
-		this.set('default', value);
-	}},
 	value: {get: function()
 	{
-		var value = this.get('value');
-		return value == null || value == '' ? this.default : value;
+		return this.get('value');
 	}, set: function(value)
 	{
 		this.set('value', value);
@@ -1271,10 +1265,13 @@ Object.defineProperties(barmatz.forms.fields.FieldModel.prototype,
 		var clone = new barmatz.forms.fields.FieldModel(this.type, this.name);
 		clone.label = this.label;
 		clone.mandatory = this.mandatory;
-		clone.default = this.default;
 		clone.value = this.value;
 		clone.enabled = this.enabled;
 		return clone;
+	}},
+	toHTML: {value: function()
+	{
+		return '<div class="forms-form-item"><label>' + this.label + '</label><input type="' + this.type + '"' + (this.enabled ? '' : ' disabled="disabled"') + ' name="' + this.name + '" value="' + this.value + '"/></div>';
 	}}
 });
 /** barmatz.forms.fields.TextFieldModel **/
@@ -1304,11 +1301,14 @@ Object.defineProperties(barmatz.forms.fields.TextFieldModel.prototype,
 		var clone = new barmatz.forms.fields.TextFieldModel(this.name);
 		clone.label = this.label;
 		clone.mandatory = this.mandatory;
-		clone.default = this.default;
 		clone.value = this.value;
 		clone.enabled = this.enabled;
 		clone.max = this.max;
 		return clone;
+	}},
+	toHTML: {value: function()
+	{
+		return barmatz.forms.fields.FieldModel.prototype.toHTML.call(this).replace(/(\<input)\s/, '$1 ' + (isNaN(this.max) ? '' : 'maxlength="' + this.max + '"') + ' ');
 	}}
 });
 /** barmatz.forms.fields.CheckboxFieldModel **/
@@ -1318,7 +1318,6 @@ window.barmatz.forms.fields.CheckboxFieldModel = function(name)
 	barmatz.utils.DataTypes.isTypeOf(name, 'string', true);
 	barmatz.forms.fields.FieldModel.call(this, barmatz.forms.fields.FieldTypes.CHECKBOX, name);
 	this.set('checked', false);
-	this.set('defaultChecked', false);
 };
 
 barmatz.forms.fields.CheckboxFieldModel.prototype = new barmatz.forms.fields.FieldModel(null, null);
@@ -1334,14 +1333,6 @@ Object.defineProperties(barmatz.forms.fields.CheckboxFieldModel.prototype,
 		barmatz.utils.DataTypes.isTypeOf(value, 'boolean');
 		this.set('checked', value);
 	}},
-	defaultChecked: {get: function()
-	{
-		return this.get('defaultChecked');
-	}, set: function(value)
-	{
-		barmatz.utils.DataTypes.isTypeOf(value, 'boolean');
-		this.set('defaultChecked', value);
-	}},
 	value: {get: function()
 	{
 		return this.checked ? this.get('value') : null;
@@ -1351,12 +1342,14 @@ Object.defineProperties(barmatz.forms.fields.CheckboxFieldModel.prototype,
 		var clone = new barmatz.forms.fields.CheckboxFieldModel(this.name);
 		clone.label = this.label;
 		clone.mandatory = this.mandatory;
-		clone.default = this.default;
 		clone.value = this.value;
 		clone.enabled = this.enabled;
 		clone.checked = this.checked;
-		clone.defaultChecked = this.defaultChecked;
 		return clone;
+	}},
+	toHTML: {value: function()
+	{
+		return barmatz.forms.fields.FieldModel.prototype.toHTML.call(this).replace(/(\<input)\s/, '$1 ' + (this.checked ? 'checked="checked"' : ''));
 	}}
 });
 /** barmatz.forms.fields.DropboxItemModel **/
@@ -1392,6 +1385,10 @@ Object.defineProperties(barmatz.forms.fields.DropboxItemModel.prototype,
 	toString: {value: function()
 	{
 		return this.label + '=' + this.value;
+	}},
+	toHTML: {value: function()
+	{
+		return '<option value="' + this.value + '">' + this.label + '</option>';
 	}}
 });
 /** barmatz.forms.fields.DropboxModel **/
@@ -1402,6 +1399,7 @@ window.barmatz.forms.fields.DropboxModel = function(name, items)
 	barmatz.utils.DataTypes.isInstanceOf(items, Array, true);
 	barmatz.forms.fields.FieldModel.call(this, barmatz.forms.fields.FieldTypes.DROPBOX, name);
 	
+	this.set('multiple', false);
 	this.set('items', new barmatz.forms.CollectionModel());
 	
 	if(items)
@@ -1414,6 +1412,14 @@ barmatz.forms.fields.DropboxModel.prototype.constructor = barmatz.forms.fields.D
 
 Object.defineProperties(barmatz.forms.fields.DropboxModel.prototype,
 {
+	multiple: {get: function()
+	{
+		return this.get('multiple');
+	}, set: function(value)
+	{
+		barmatz.utils.DataTypes.isTypeOf(value, 'boolean');
+		this.set('multiple', value);
+	}},
 	numItems: {get: function()
 	{
 		return this.get('items').numItems;
@@ -1479,14 +1485,25 @@ Object.defineProperties(barmatz.forms.fields.DropboxModel.prototype,
 		var clone = new barmatz.forms.fields.DropboxModel(this.name, this.get('items').toArray());
 		clone.label = this.label;
 		clone.mandatory = this.mandatory;
-		clone.default = this.default;
 		clone.value = this.value;
 		clone.enabled = this.enabled;
+		clone.multiple = this.multiple;
 		return clone;
 	}},
 	toString: {value: function()
 	{
 		return this.get('items').toString();
+	}},
+	toHTML: {value: function()
+	{
+		var items = '';
+		
+		this.forEach(function(item, index, collection)
+		{
+			items += item.toHTML();
+		});
+		
+		return barmatz.forms.fields.FieldModel.prototype.toHTML.call(this).replace(/(\<input.*\/\>)/, '<select' + (this.enabled ? '' : ' disbaled="disbaled"') + (this.multiple ? ' multiple="multiple"' : '') + ' name="' + this.name + '">' + items + '</select>');
 	}}
 });
 /** barmatz.forms.fields.FieldTypes **/
@@ -1532,11 +1549,14 @@ Object.defineProperties(barmatz.forms.fields.FileFieldModel.prototype,
 		var clone = new barmatz.forms.fields.FileFieldModel(this.name);
 		clone.label = this.label;
 		clone.mandatory = this.mandatory;
-		clone.default = this.default;
 		clone.value = this.value;
 		clone.enabled = this.enabled;
 		clone.accept = this.accept;
 		return clone;
+	}},
+	toHTML: {value: function()
+	{
+		return barmatz.forms.fields.FieldModel.prototype.toHTML.call(this).replace(/(\<input)\s/, '$1 accept="' + this.accept.join(',') + '"');
 	}}
 });
 /** barmatz.forms.fields.HiddenFieldModel **/
@@ -1557,7 +1577,6 @@ Object.defineProperties(barmatz.forms.fields.HiddenFieldModel.prototype,
 		var clone = new barmatz.forms.fields.HiddenFieldModel(this.name);
 		clone.label = this.label;
 		clone.mandatory = this.mandatory;
-		clone.default = this.default;
 		clone.value = this.value;
 		clone.enabled = this.enabled;
 		return clone;
@@ -1582,7 +1601,6 @@ Object.defineProperties(barmatz.forms.fields.PasswordFieldModel.prototype,
 		var clone = new barmatz.forms.fields.PasswordFieldModel(this.name);
 		clone.label = this.label;
 		clone.mandatory = this.mandatory;
-		clone.default = this.default;
 		clone.value = this.value;
 		clone.enabled = this.enabled;
 		return clone;
@@ -1607,7 +1625,6 @@ Object.defineProperties(barmatz.forms.fields.RadioFieldModel.prototype,
 		var clone = new barmatz.forms.fields.RadioFieldModel(this.name);
 		clone.label = this.label;
 		clone.mandatory = this.mandatory;
-		clone.default = this.default;
 		clone.value = this.value;
 		clone.enabled = this.enabled;
 		return clone;
@@ -1647,12 +1664,15 @@ Object.defineProperties(barmatz.forms.fields.TextAreaFieldModel.prototype,
 		var clone = new barmatz.forms.fields.TextAreaFieldModel(this.name);
 		clone.label = this.label;
 		clone.mandatory = this.mandatory;
-		clone.default = this.default;
 		clone.value = this.value;
 		clone.enabled = this.enabled;
 		clone.rows = this.rows;
 		clone.cols = this.cols;
 		return clone;
+	}},
+	toHTML: {value: function()
+	{
+		return barmatz.forms.fields.FieldModel.prototype.toHTML.call(this).replace(/(\<input.*\/\>)/, '<textarea cols="' + this.cols + '"' + (this.enabled ? '' : ' disabled="disabled"') + ' name="' + this.name + '"  rows="' + this.rows + '">' + this.value + '</textarea>');
 	}}
 });
 /** barmatz.forms.ui.DialogController **/
@@ -2077,11 +2097,8 @@ window.barmatz.forms.ui.BuilderController = function(formModel, userModel, conta
 	
 	function onMenuExportClick(event)
 	{
-		if(barmatz.utils.DataTypes.applySilent('isValid', formModel.id))
-			formModel.getFingerprint(function(fingerprint)
-			{
-				barmatz.forms.factories.DOMFactory.createExportPromptDialog(fingerprint, true);
-			});
+		if(barmatz.utils.DataTypes.applySilent('isValid', formModel.fingerprint))
+			barmatz.forms.factories.DOMFactory.createExportPromptDialog(formModel.fingerprint, true);
 		else
 			barmatz.forms.factories.DOMFactory.createAlertPromptDialog('Failed to export', 'You must save the form before exporting!', true);
 	}
@@ -2100,6 +2117,7 @@ window.barmatz.forms.ui.BuilderController = function(formModel, userModel, conta
 			formModel.name = wrapper.nameField.value;
 			formModel.method = wrapper.methodField.value;
 			formModel.encoding = wrapper.encodingField.value;
+			formModel.submitButtonLabel = wrapper.submitButtonLabelField.value;
 		}
 	}
 	
@@ -2841,9 +2859,6 @@ Object.defineProperties(barmatz.forms.ui.PropertiesController.prototype,
 				case 'mandatory':
 					itemsWrapper.mandatoryField.value = event.value;
 					break;
-				case 'default':
-					itemsWrapper.defaultValueField.value = event.value;
-					break;
 				case 'enabled':
 					itemsWrapper.enabledField.value = event.value;
 					break;
@@ -2853,9 +2868,6 @@ Object.defineProperties(barmatz.forms.ui.PropertiesController.prototype,
 				case 'checked':
 					itemsWrapper.checkedField.value = event.value;
 					break;
-				case 'defaultChecked':
-					itemsWrapper.defaultCheckedField.value = event.value;
-					break;
 				case 'accept':
 					itemsWrapper.acceptField.value = event.value.join(', ');
 					break;
@@ -2864,6 +2876,9 @@ Object.defineProperties(barmatz.forms.ui.PropertiesController.prototype,
 					break;
 				case 'cols':
 					itemsWrapper.colsField.value = event.value;
+					break;
+				case 'multiple':
+					itemsWrapper.multipleField.value = event.value;
 					break;
 			}
 		}
@@ -3265,7 +3280,7 @@ window.barmatz.forms.ui.UserFormsListItemController = function(model, view, name
 	{
 		barmatz.utils.DataTypes.isNotUndefined(event);
 		barmatz.utils.DataTypes.isInstanceOf(event, MouseEvent);
-		model.loadById(model.id);
+		model.loadByFingerprint(model.fingerprint);
 	}
 	
 	function onViewMouseOver(event)
@@ -3449,12 +3464,10 @@ window.barmatz.forms.ui.WorkspaceItemController = function(model, labelView, fie
 	setViewValue('name', model.name);
 	setViewValue('label', model.label);
 	setViewValue('mandatory', model.mandatory);
-	setViewValue('default', model.default);
 	setViewValue('value', model.value);
 	setViewValue('enabled', model.enabled);
 	setViewValue('max', model.max);
 	setViewValue('checked', model.checked);
-	setViewValue('defaultChecked', model.defaultChecked);
 	setViewValue('accept', model.accept);
 	setViewValue('rows', model.rows);
 	
@@ -3474,9 +3487,6 @@ window.barmatz.forms.ui.WorkspaceItemController = function(model, labelView, fie
 			case 'mandatory':
 				mandatoryView.innerHTML = value ? '*' : '';
 				break;
-			case 'default':
-				fieldView.defaultValue = value;
-				break;
 			case 'value':
 				fieldView.value = value;
 				break;
@@ -3489,9 +3499,6 @@ window.barmatz.forms.ui.WorkspaceItemController = function(model, labelView, fie
 			case 'checked':
 				fieldView.checked = value;
 				break;
-			case 'defaultChecked':
-				fieldView.defaultChecked = value;
-				break;
 			case 'accept':
 				fieldView.accept = value;
 				break;
@@ -3500,6 +3507,9 @@ window.barmatz.forms.ui.WorkspaceItemController = function(model, labelView, fie
 				break;
 			case 'cols':
 				fieldView.cols = value;
+				break;
+			case 'multiple':
+				fieldView.multiple = value;
 				break;
 		}
 	}
@@ -3514,13 +3524,107 @@ window.barmatz.forms.ui.WorkspaceItemController = function(model, labelView, fie
 
 barmatz.forms.ui.WorkspaceItemController.prototype = new barmatz.mvc.Controller();
 barmatz.forms.ui.WorkspaceItemController.prototype.constructor = barmatz.forms.ui.WorkspaceItemController;
+/** barmatz.forms.FormController **/
+window.barmatz.forms.FormController = function(model, view)
+{
+	var submittingForm, loadingDialog;
+	
+	barmatz.utils.DataTypes.isNotUndefined(model);
+	barmatz.utils.DataTypes.isNotUndefined(view);
+	barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.FormModel);
+	barmatz.utils.DataTypes.isInstanceOf(view, HTMLFormElement);
+	barmatz.mvc.Controller.call(this);
+	
+	 view.name = model.name;
+	 view.method = model.method;
+	 view.encoding = model.encoding;
+	 view.addEventListener('submit', onViewSubmit);
+	
+	 function addModelListeners()
+	 {
+		 model.addEventListener(barmatz.events.FormModelEvent.SUBMITTING, onModelSubmitting);
+		 model.addEventListener(barmatz.events.FormModelEvent.SUBMITTED, onModelSubmitted);
+		 model.addEventListener(barmatz.events.FormModelEvent.SUBMITION_FAILED, onModelSubmitionFailed);
+	 }
+	 
+	 function removeModelListeners()
+	 {
+		 model.removeEventListener(barmatz.events.FormModelEvent.SUBMITTING, onModelSubmitting);
+		 model.removeEventListener(barmatz.events.FormModelEvent.SUBMITTED, onModelSubmitted);
+		 model.removeEventListener(barmatz.events.FormModelEvent.SUBMITION_FAILED, onModelSubmitionFailed);
+	 }
+	 
+	 function getViewData()
+	 {
+		 var data = {}, elements = Array.prototype.slice.call(view.elements), element, i;
+		 
+		 for(i = 0; i < elements.length; i++)
+		 {
+			 element = elements[i];
+
+			 if(element.tagName.toLowerCase() != 'button' && element.type != 'button' && element.type != 'submit')
+				 data[element.name] = element.value;
+		 }
+		 
+		 return data;
+	 }
+	 
+	 function addLoadingDialog()
+	 {
+		 loadingDialog = barmatz.forms.factories.DOMFactory.createLoadingDialog(view);
+	 }
+	 
+	 function removeLoadingDialog()
+	 {
+		 barmatz.forms.factories.DOMFactory.destroyLoadingDialog(loadingDialog);
+		 loadingDialog = null;
+	 }
+	 
+	 function onViewSubmit(event)
+	 {
+		 if(!submittingForm)
+		 {
+			 addModelListeners();
+			 model.submit(getViewData());
+		 }
+	 }
+	 
+	 function onModelSubmitting(event)
+	 {
+		 submittingForm = true;
+		 addLoadingDialog();
+	 }
+	 
+	 function onModelSubmitted(event)
+	 {
+		 submittingForm = false;
+		 removeModelListeners(); 
+		 removeLoadingDialog();
+	 }
+	 
+	 function onModelSubmitionFailed(event)
+	 {
+		 submittingForm = false;
+		 removeModelListeners();
+		 removeLoadingDialog();
+	 }
+};
+
+barmatz.forms.FormController.prototype = new barmatz.mvc.Controller();
+barmatz.forms.FormController.prototype.constructor = barmatz.forms.FormController;
+
+Object.defineProperties(barmatz.forms.FormController.prototype, {});
 /** barmatz.forms.FormModel **/
 window.barmatz.forms.FormModel = function()
 {
 	barmatz.forms.CollectionModel.call(this);
+	this.set('id', '');
 	this.set('name', '');
+	this.set('submitButtonLabel', 'Submit');
 	this.set('method', barmatz.forms.Methods.GET);
 	this.set('encoding', barmatz.net.Encoding.FORM);
+	this.set('created', null);
+	this.set('fingerprint', null);
 };
 
 barmatz.forms.FormModel.prototype = new barmatz.forms.CollectionModel();
@@ -3528,14 +3632,6 @@ barmatz.forms.FormModel.prototype.constructor = barmatz.forms.FormModel;
 
 Object.defineProperties(barmatz.forms.FormModel.prototype, 
 {
-	id: {get: function()
-	{
-		return this.get('id');
-	}, set: function(value)
-	{
-		barmatz.utils.DataTypes.isTypeOf(value, 'number');
-		this.set('id', value);
-	}},
 	name: {get: function()
 	{
 		return this.get('name');
@@ -3543,6 +3639,14 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 	{
 		barmatz.utils.DataTypes.isTypeOf(value, 'string');
 		this.set('name', value);
+	}},
+	submitButtonLabel: {get: function()
+	{
+		return this.get('submitButtonLabel');
+	}, set: function(value)
+	{
+		barmatz.utils.DataTypes.isTypeOf(value, 'string');
+		this.set('submitButtonLabel', value);
 	}},
 	method: {get: function()
 	{
@@ -3574,7 +3678,9 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 	}, set: function(value)
 	{
 		barmatz.utils.DataTypes.isTypeOf(value, 'string');
-		this.set('fingerprint', value);
+
+		if(!this.fingerprint)
+			this.set('fingerprint', value);
 	}},
 	addItem: {value: function(item)
 	{
@@ -3610,9 +3716,28 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 		barmatz.utils.DataTypes.isTypeOf(index, 'number');
 		return barmatz.forms.CollectionModel.prototype.setItemIndex.call(this, item, index);
 	}},
+	toHTML: {value: function()
+	{
+		var fields = '';
+		
+		this.forEach(function(item, index, collection)
+		{
+			fields += item.toHTML();
+		});
+		
+		return '<link rel="stylesheet" type="text/css" href="http://www.quiz.co.il/css/form.css"/>' +
+			   '<div class="forms-form-wrapper">' +
+				   '<form onsubmit="return false;">' + 
+					   fields + 
+					   '<div class="forms-form-item forms-form-submit">' +
+					   		'<input type="submit" value="' + this.submitButtonLabel + '"/>' +
+					   '</div>' +
+				   '</form>' +
+			   '</div>';
+	}},
 	toJSON: {value: function()
 	{
-		var object = {name: this.name, method: this.method, encoding: this.encoding, created: this.created ? this.created.valueOf() : NaN, fingerprint: this.fingerprint, fields: []};
+		var object = {name: this.name, submitButtonLabel: this.submitButtonLabel, method: this.method, encoding: this.encoding, created: this.created ? this.created.valueOf() : NaN, fingerprint: this.fingerprint, fields: []};
 		
 		this.forEach(function(item, index, collection)
 		{
@@ -3623,7 +3748,6 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 				field.name = item.name;
 				field.label = item.label;
 				field.mandatory = item.mandatory;
-				field.default = item.default;
 				field.enabled = item.enabled;
 			}
 			
@@ -3640,10 +3764,7 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 			}
 			
 			if(item instanceof barmatz.forms.fields.CheckboxFieldModel)
-			{
 				field.checked = item.checked;
-				field.defaultChecked = item.defaultChecked;
-			}
 			
 			object.fields.push(field);
 		});
@@ -3652,8 +3773,12 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 	}},
 	reset: {value: function()
 	{
+		this.set('id', '');
 		this.set('name', '');
-		this.set('id', null);
+		this.set('method', barmatz.forms.Methods.GET);
+		this.set('encoding', barmatz.net.Encoding.FORM);
+		this.set('created', null);
+		this.set('fingerprint', null);
 		while(this.numItems > 0)
 			this.removeItemAt(this.numItems - 1);
 	}},
@@ -3666,9 +3791,9 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 		
 		this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.SAVING));
 
-		request = new barmatz.net.Request('api/form/save.php');
+		request = new barmatz.net.Request('http://quiz.co.il/api/form/save.php');
 		request.method = barmatz.net.Methods.POST;
-		request.data = {i: this.id || null, n: this.name, d: this.toJSON()};
+		request.data = {f: this.fingerprint || null, n: this.name, d: this.toJSON()};
 		loader = new barmatz.net.Loader();
 		loader.addEventListener(barmatz.events.LoaderEvent.DONE, onLoaderDone);
 		loader.load(request);
@@ -3688,8 +3813,8 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 			{
 				data = response.data ? JSON.parse(response.data) : null;
 				
-				if(data && data.id)
-					_this.set('id', data.id);
+				if(data && data.fingerprint)
+					_this.set('fingerprint', data.fingerprint);
 				
 				_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.SAVED));
 			}
@@ -3707,71 +3832,20 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 		this.set('name', name);
 		this.save(model);
 	}},
-	getFingerprint: {value: function(callback)
-	{
-		var _this, fingerprint;
-		
-		barmatz.utils.DataTypes.isNotUndefined(callback);
-		barmatz.utils.DataTypes.isTypeOf(callback, 'function');
-		
-		_this = this;
-		fingerprint = this.get('fingerprint');
-		
-		if(fingerprint)
-			callback(fingerprint);
-		else
-			loadFingerprint();
-		
-		function loadFingerprint()
-		{
-			var request, loader;
-			
-			request = new barmatz.net.Request('api/form.php');
-			request.method = barmatz.net.Methods.GET;
-			request.data = {i: _this.get('id')};
-			
-			loader = new barmatz.net.Loader();
-			loader.addEventListener(barmatz.events.LoaderEvent.DONE, onLoaderDone);
-			loader.load(request);
-		}
-		
-		function onLoaderDone(event)
-		{
-			var response, data;
-			
-			barmatz.utils.DataTypes.isNotUndefined(event);
-			barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.LoaderEvent);
-			
-			event.target.removeEventListener(barmatz.events.LoaderEvent.DONE, onLoaderDone);
-
-			response = event.response;
-			
-			if(response && response.status == 200)
-			{
-				data = response.data ? JSON.parse(response.data) : null;
-				
-				if(data && data.fingerprint)
-				{
-					_this.set('fingerprint', data.fingerprint);
-					callback(data.fingerprint);
-				}
-			}
-		}
-	}},
-	loadById: {value: function(id)
+	loadByFingerprint: {value: function(fingerprint)
 	{
 		var _this, request, loader;
 		
-		barmatz.utils.DataTypes.isNotUndefined(id);	
-		barmatz.utils.DataTypes.isTypeOf(id, 'number');
+		barmatz.utils.DataTypes.isNotUndefined(fingerprint);	
+		barmatz.utils.DataTypes.isTypeOf(fingerprint, 'string');
 		
 		_this = this;
 		
 		this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.LOADING_FORM));
 		
-		request = new barmatz.net.Request('api/form.php');
+		request = new barmatz.net.Request('http://quiz.co.il/api/form.php');
 		request.method = barmatz.net.Methods.GET;
-		request.data = {i: id};
+		request.data = {f: fingerprint};
 		
 		loader = new barmatz.net.Loader();
 		loader.addEventListener(barmatz.events.LoaderEvent.DONE, onLoaderDone);
@@ -3786,64 +3860,56 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 			
 			for(i in data)
 			{
-				try
+				name = data[i].name;
+				
+				switch(data[i].type)
 				{
-					name = data[i].name;
-					
-					switch(data[i].type)
-					{
-						default:
-							throw new Error('Unknown type');
-							break;
-						case barmatz.forms.fields.FieldTypes.TEXT_AREA:
-							field = new barmatz.forms.fields.TextAreaFieldModel(name);
-							break;
-						case barmatz.forms.fields.FieldTypes.TEXT_FIELD:
-							field = new barmatz.forms.fields.TextFieldModel(name);
-							break;
-						case barmatz.forms.fields.FieldTypes.DROPBOX:
-							field = new barmatz.forms.fields.DropboxModel(name);
-							break;
-						case barmatz.forms.fields.FieldTypes.PASSWORD:
-							field = new barmatz.forms.fields.PasswordFieldModel(name);
-							break;
-						case barmatz.forms.fields.FieldTypes.CHECKBOX:
-							field = new barmatz.forms.fields.CheckboxFieldModel(name);
-							break;
-						case barmatz.forms.fields.FieldTypes.RADIO:
-							field = new barmatz.forms.fields.RadioFieldModel(name);
-							break;
-						case barmatz.forms.fields.FieldTypes.FILE:
-							field = new barmatz.forms.fields.FileFieldModel(name);
-							break;
-						case barmatz.forms.fields.FieldTypes.HIDDEN:
-							field = new barmatz.forms.fields.HiddenFieldModel(name);
-							break;
-					}
-					
-					if(field instanceof barmatz.forms.fields.FieldModel)
-					{
-						field.label = data[i].label;
-						field.mandatory = data[i].mandatory;
-						field.default = data[i].default;
-						field.enabled = data[i].enabled;
-					}
-					
-					if(field instanceof barmatz.forms.fields.FileFieldModel)
-						field.accept = data[i].accept;
-	
-					if(field instanceof barmatz.forms.fields.TextFieldModel)
-						field.max = parseInt(data[i].max);
-					
-					if(field instanceof barmatz.forms.fields.CheckboxFieldModel)
-					{
-						field.checked = data[i].checked;
-						field.defaultChecked = data[i].defaultChecked;
-					}
-					
-					_this.addItem(field);
+					default:
+						throw new Error('Unknown type');
+						break;
+					case barmatz.forms.fields.FieldTypes.TEXT_AREA:
+						field = new barmatz.forms.fields.TextAreaFieldModel(name);
+						break;
+					case barmatz.forms.fields.FieldTypes.TEXT_FIELD:
+						field = new barmatz.forms.fields.TextFieldModel(name);
+						break;
+					case barmatz.forms.fields.FieldTypes.DROPBOX:
+						field = new barmatz.forms.fields.DropboxModel(name);
+						break;
+					case barmatz.forms.fields.FieldTypes.PASSWORD:
+						field = new barmatz.forms.fields.PasswordFieldModel(name);
+						break;
+					case barmatz.forms.fields.FieldTypes.CHECKBOX:
+						field = new barmatz.forms.fields.CheckboxFieldModel(name);
+						break;
+					case barmatz.forms.fields.FieldTypes.RADIO:
+						field = new barmatz.forms.fields.RadioFieldModel(name);
+						break;
+					case barmatz.forms.fields.FieldTypes.FILE:
+						field = new barmatz.forms.fields.FileFieldModel(name);
+						break;
+					case barmatz.forms.fields.FieldTypes.HIDDEN:
+						field = new barmatz.forms.fields.HiddenFieldModel(name);
+						break;
 				}
-				catch(error){}
+				
+				if(field instanceof barmatz.forms.fields.FieldModel)
+				{
+					field.label = data[i].label;
+					field.mandatory = data[i].mandatory;
+					field.enabled = data[i].enabled;
+				}
+				
+				if(field instanceof barmatz.forms.fields.FileFieldModel)
+					field.accept = data[i].accept;
+
+				if(field instanceof barmatz.forms.fields.TextFieldModel)
+					field.max = parseInt(data[i].max);
+				
+				if(field instanceof barmatz.forms.fields.CheckboxFieldModel)
+					field.checked = data[i].checked;
+				
+				_this.addItem(field);
 			}
 		}
 		
@@ -3863,14 +3929,16 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 				
 				if(data)
 				{
-					parsedData = JSON.parse(data.data);
-					_this.id = parseInt(data.id);
-					_this.fingerprint = data.fingerprint;
-					_this.name = parsedData.name;
-					_this.created = new Date(parsedData.created);
-					_this.method = parsedData.method;
-					_this.encoding = parsedData.encoding;
-					parseFieldsData(parsedData.fields);
+					_this.set('fingerprint', data.fingerprint);
+					
+					data = data.data;
+					
+					_this.name = data.name;
+					_this.submitButtonLabel = data.submitButtonLabel;
+					_this.created = new Date(data.created);
+					_this.method = data.method;
+					_this.encoding = data.encoding;
+					parseFieldsData(data.fields);
 					_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.LOADING_FORM_COMPLETE));
 				}
 				else
@@ -3888,9 +3956,9 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 		
 		this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.DELETING));
 
-		request = new barmatz.net.Request('api/form/delete.php');
+		request = new barmatz.net.Request('http://quiz.co.il/api/form/delete.php');
 		request.method = barmatz.net.Methods.POST;
-		request.data = {i: this.get('id')};
+		request.data = {f: this.fingerprint};
 		
 		loader = new barmatz.net.Loader();
 		loader.addEventListener(barmatz.events.LoaderEvent.DONE, onLoaderDone);
@@ -3902,7 +3970,7 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 
 			barmatz.utils.DataTypes.isNotUndefined(event);
 			barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.LoaderEvent);
-			event.target.addEventListener(barmatz.events.LoaderEvent.DONE, onLoaderDone);
+			event.target.removeEventListener(barmatz.events.LoaderEvent.DONE, onLoaderDone);
 			
 			response = event.response;
 			
@@ -3911,6 +3979,43 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 			else
 				_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.DELETION_FAIL));
 		}
+	}},
+	submit: {value: function(data)
+	{
+		var _this, request, loader;
+		
+		barmatz.utils.DataTypes.isNotUndefined(data);
+		barmatz.utils.DataTypes.isTypeOf(data, 'object');
+		
+		_this = this;
+		
+		_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.SUBMITTING));
+
+		request = new barmatz.net.Request('http://www.quiz.co.il/api/form/submit.php');
+		request.method = this.method;
+		request.data = {f: this.fingerprint, d: JSON.stringify(data)};
+		request.headers = [new barmatz.net.RequestHeader('Content-Type', this.encoding)];
+		
+		loader = new barmatz.net.Loader();
+		loader.addEventListener(barmatz.events.LoaderEvent.DONE, onLoaderDone);
+		loader.load(request);
+		
+		function onLoaderDone(event)
+		{
+			var response;
+			
+			barmatz.utils.DataTypes.isNotUndefined(event);
+			barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.LoaderEvent);
+			event.target.removeEventListener(barmatz.events.LoaderEvent.DONE, onLoaderDone);
+			
+			response = event.response;
+			
+			if(response && response.status == 200)
+				_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.SUBMITTED));
+			else
+				_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.SUBMITION_FAILED));
+			
+		}
 	}}
 });
 /** barmatz.forms.Methods **/
@@ -3918,8 +4023,8 @@ window.barmatz.forms.Methods = function(){};
 
 Object.defineProperties(barmatz.forms.Methods,
 {
-	GET: {value: 'get'},
-	POST: {value: 'post'}
+	GET: {value: 'GET'},
+	POST: {value: 'POST'}
 });
 /** barmatz.forms.factories.ControllerFactory **/
 window.barmatz.forms.factories.ControllerFactory = function(){};
@@ -4059,6 +4164,14 @@ Object.defineProperties(barmatz.forms.factories.ControllerFactory,
 		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.CollectionModel);
 		barmatz.utils.DataTypes.isInstanceOf(view, HTMLTableElement);
 		return new barmatz.forms.ui.CollectionDialogController(model, view);
+	}},
+	createFormController: {value: function(model, view)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(model);
+		barmatz.utils.DataTypes.isNotUndefined(view);
+		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.FormModel);
+		barmatz.utils.DataTypes.isInstanceOf(view, HTMLFormElement);
+		return new barmatz.forms.FormController(model, view);
 	}}
 });
 /** barmatz.forms.factories.DOMFactory **/
@@ -4272,7 +4385,7 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 	}},
 	createPropertiesItemWarpper: {value: function(model)
 	{
-		var _this, returnWrapper, wrapper, value;
+		var _this, returnWrapper, wrapper;
 		
 		barmatz.utils.DataTypes.isNotUndefined(model);
 		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FieldModel);
@@ -4290,10 +4403,6 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 			returnWrapper.nameField = addFieldToWrapper('string', 'name', 'name', model.name);
 			returnWrapper.labelField = addFieldToWrapper('string', 'label', 'label', model.label);
 			returnWrapper.mandatoryField = addFieldToWrapper('boolean', 'mandatory', 'mandatory', model.mandatory);
-			
-			if(!(model instanceof barmatz.forms.fields.DropboxModel))
-				returnWrapper.defaultValueField = addFieldToWrapper('string', 'default', 'default value', model.default);
-			
 			returnWrapper.enabledField = addFieldToWrapper('boolean', 'enabled', 'enabled', model.enabled);
 		}
 		
@@ -4310,14 +4419,11 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		}
 		
 		if(model instanceof barmatz.forms.fields.CheckboxFieldModel)
-		{
 			returnWrapper.checkedField = addFieldToWrapper('boolean', 'checked', 'checked', model.checked);
-			returnWrapper.defaultCheckedField = addFieldToWrapper('boolean', 'default checked', 'defaultChecked', model.defaultChecked);
-		}
 		
 		if(model instanceof barmatz.forms.fields.DropboxModel)
 		{
-			value = model.toString();
+			returnWrapper.multipleField = addFieldToWrapper('boolean', 'multiple', 'multiple', model.multiple);
 			returnWrapper.itemsField = addFieldToWrapper('array', 'items', 'items', ['add item...']);
 			returnWrapper.itemsField.selectedIndex = null;
 		}
@@ -4538,21 +4644,21 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 			_this.destroyDialog(dialog);
 		}
 	}},
-	createExportPromptDialog: {value: function(id, open)
+	createExportPromptDialog: {value: function(fingerprint, open)
 	{
 		var dir, embedCode, textarea;
 		
-		barmatz.utils.DataTypes.isNotUndefined(id);
+		barmatz.utils.DataTypes.isNotUndefined(fingerprint);
 		barmatz.utils.DataTypes.isTypeOf(open, 'boolean', true);
 		
 		dir = location.href.replace(location.hash, '').replace(location.search, '').replace(/(^\w+:\/\/.+)\/.+\..+$/, '$1') + '/js'; 
-		embedCode = "(function(w,d)" +
+		embedCode = "<div name=\"formContainer\" fingerprint=\"" + fingerprint + "\">Loading...</div>" +
+					"<script type=\"text/javascript\">" +
+					"(function(w,d)" +
 					"{" +
-						"w.formID='" + id + "';" +
-						"if(!w.barmatz.forms)" +
-						"l('" + dir + "/application.js');" +
-						"if(!w.barmatz.forms.Embed)" +
-						"l('" + dir + "/embed.js');" +
+						"w.barmatz && w.barmatz.forms && !w.barmatz.forms.embed" +
+						" ? barmatz.forms.embed('" + fingerprint + "')" +
+						" : l('" + dir + "/embed.js');" +
 						"function l(s)" +
 						"{" +
 							"a=d.createElement('script');" +
@@ -4560,7 +4666,8 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 							"b=d.getElementsByTagName('script')[0];" +
 							"b.parentNode.insertBefore(a,b);" +
 						"}" +
-					"})(window,document)";
+					"})(window,document)" +
+					"</script>";
 		
 		textarea = this.createElementWithContent('textarea', 'forms-dialog-export-embedcode', embedCode);
 		textarea.readOnly = true;
@@ -4571,7 +4678,7 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		});
 		
 		return this.createAlertPromptDialog('Export', this.createElementWithContent('div', '', [
-			this.createElementWithContent('div', '', 'Copy past this code into your site:'),
+			this.createElementWithContent('div', '', 'Copy past this code into your site inside the body tag where you want the form to appear:'),
 			textarea
 		]), open);
 	}},
@@ -4689,9 +4796,10 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		
 		return button;
 	}},
-	createLoadingDialog: {value: function()
+	createLoadingDialog: {value: function(container)
 	{
-		return barmatz.forms.factories.DOMFactory.BODY_ELEMENT.appendChild(this.createElement('div', 'loading-image ui-front'));
+		barmatz.utils.DataTypes.isInstanceOf(container, HTMLElement, true);
+		return (container || barmatz.forms.factories.DOMFactory.BODY_ELEMENT).appendChild(this.createElement('div', 'loading-image ui-front'));
 	}},
 	destroyLoadingDialog: {value: function(dialog)
 	{
@@ -4821,11 +4929,11 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		
 		jQuery(dialog).dialog({dialogClass: 'forms-dialog-form-properties'});
 		
-		return {dialog: dialog, nameField: properties.nameField, methodField: properties.methodField, encodingField: properties.encodingField};
+		return {dialog: dialog, nameField: properties.nameField, submitButtonLabelField: properties.submitButtonLabelField, methodField: properties.methodField, encodingField: properties.encodingField};
 	}},
 	createFormPropertiesWrapper: {value: function(model)
 	{
-		var _this, options, nameField, methodField, encodingField;
+		var _this, options, nameField, methodField, encodingField, submitButtonLabelField;
 		
 		barmatz.utils.DataTypes.isNotUndefined(model);
 		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.FormModel);
@@ -4838,13 +4946,16 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		nameField = createField('Name');
 		nameField.value = model.name;
 		
+		submitButtonLabelField = createField('Submit button label');
+		submitButtonLabelField.value = model.submitButtonLabel;
+		
 		methodField = createDropbox('Method', 'formMethod', ['GET', 'POST']);
 		methodField.value = model.method;
 		
 		encodingField = createDropbox('Encoding', 'formEncoding', [barmatz.net.Encoding.FORM, barmatz.net.Encoding.FILES]);
 		encodingField.value = model.encoding;
 		
-		return {wrapper: this.createTable(options), nameField: nameField, methodField: methodField, encodingField: encodingField};
+		return {wrapper: this.createTable(options), nameField: nameField, submitButtonLabelField: submitButtonLabelField, methodField: methodField, encodingField: encodingField};
 		
 		function createField(label, content)
 		{
@@ -5169,7 +5280,7 @@ Object.defineProperties(barmatz.forms.users.UserModel.prototype,
 		{
 			var request, loader;
 			
-			request = new barmatz.net.Request('api/user/forms.php');
+			request = new barmatz.net.Request('http://quiz.co.il/api/user/forms.php');
 			request.method = barmatz.net.Methods.GET;
 			request.data = {u: _this.id};
 			
@@ -5202,7 +5313,6 @@ Object.defineProperties(barmatz.forms.users.UserModel.prototype,
 				form = new barmatz.forms.FormModel();
 				form.created = barmatz.utils.Date.toDate(data[i].created);
 				form.fingerprint = data[i].fingerprint;
-				form.id = parseInt(data[i].id);
 				form.name = data[i].name;
 				data[i] = form;
 			}
@@ -5251,7 +5361,7 @@ Object.defineProperties(barmatz.forms.users.UserModel.prototype,
 	{
 		var _this = this, request, loader;
 		
-		request = new barmatz.net.Request('api/user/user.php');
+		request = new barmatz.net.Request('http://quiz.co.il/api/user/user.php');
 		request.method = barmatz.net.Methods.GET;
 		
 		loader = new barmatz.net.Loader();
@@ -5302,7 +5412,7 @@ Object.defineProperties(barmatz.forms.users.UserModel.prototype,
 		
 		_this = this;
 		
-		request = new barmatz.net.Request('api/user/login.php');
+		request = new barmatz.net.Request('http://quiz.co.il/api/user/login.php');
 		request.method = barmatz.net.Methods.POST;
 		request.data = {u: userName, p: password};
 		
@@ -5425,10 +5535,13 @@ Object.defineProperties(barmatz.net.Loader.prototype,
 	}},
 	load: {value: function(request)
 	{
-		var _this = this, url = request.url;
+		var _this, url, contentTypeSet, i;
 		
 		barmatz.utils.DataTypes.isNotUndefined(request);
 		barmatz.utils.DataTypes.isInstanceOf(request, barmatz.net.Request);
+		
+		_this = this;
+		url = request.url;
 
 		if(request.data && request.method == barmatz.net.Methods.GET)
 			url += (url.indexOf('?') > -1 ? '&' : '?') + barmatz.net.Loader.serialize(request.data);
@@ -5440,7 +5553,16 @@ Object.defineProperties(barmatz.net.Loader.prototype,
 		else
 			this._xhr.open(request.method, url, request.async);
 		
-		this._xhr.setRequestHeader('Content-Type', barmatz.net.Encoding.FORM);
+		if(request.headers)
+			for(i in request.headers)
+			{
+				this._xhr.setRequestHeader(request.headers[i].header, request.headers[i].value);
+				if(request.headers[i].header.toLowerCase() == 'content-type')
+					contentTypeSet = true;
+			}
+		
+		if(!contentTypeSet)
+			this._xhr.setRequestHeader('Content-Type', barmatz.net.Encoding.FORM);
 		
 		if(request.method == barmatz.net.Methods.POST)
 			this._xhr.send(barmatz.net.Loader.serialize(request.data));
@@ -5478,10 +5600,10 @@ window.barmatz.net.Methods = function(){};
 
 Object.defineProperties(barmatz.net.Methods,
 {
-	GET: {value: 'get'},
-	POST: {value: 'post'},
-	PUT: {value: 'put'},
-	DELETE: {value: 'delete'}	
+	GET: {value: 'GET'},
+	POST: {value: 'POST'},
+	PUT: {value: 'PUT'},
+	DELETE: {value: 'DELETE'}	
 });
 /** barmatz.net.Request */
 window.barmatz.net.Request = function(url)
@@ -5534,6 +5656,14 @@ Object.defineProperties(barmatz.net.Request.prototype,
 	{
 		barmatz.utils.DataTypes.isInstanceOf(value, barmatz.net.RequestCredentils);
 		this.set('credentials', value);
+	}},
+	headers: {get: function()
+	{
+		return this.get('headers');
+	}, set: function(value)
+	{
+		barmatz.utils.DataTypes.isInstanceOf(value, Array);
+		this.set('headers', value);
 	}}
 });
 /** barmatz.net.RequestCredentials **/
@@ -5562,6 +5692,40 @@ Object.defineProperties(barmatz.net.RequestCredentials.prototype,
 	{
 		barmatz.utils.DataTypes.isTypeOf(value, 'string');
 		this.set('password', value);
+	}}
+});
+/** barmatz.net.RequestHeader **/
+window.barmatz.net.RequestHeader = function(header, value)
+{
+	barmatz.utils.DataTypes.isNotUndefined(header);
+	barmatz.utils.DataTypes.isNotUndefined(value);
+	barmatz.utils.DataTypes.isTypeOf(header, 'string');
+	barmatz.utils.DataTypes.isTypeOf(value, 'string');
+	barmatz.mvc.Model.call(this);
+	this.set('header', header);
+	this.set('value', value);
+};
+
+barmatz.net.RequestHeader.prototype = new barmatz.mvc.Model();
+barmatz.net.RequestHeader.prototype.constructor = barmatz.net.RequestHeader;
+
+Object.defineProperties(barmatz.net.RequestHeader.prototype,
+{
+	header: {get: function()
+	{
+		return this.get('header');
+	}, set: function(value)
+	{
+		barmatz.utils.DataTypes.isTypeOf(value, 'string');
+		this.set('header', value);
+	}},
+	value: {get: function()
+	{
+		return this.get('value');
+	}, set: function(value)
+	{
+		barmatz.utils.DataTypes.isTypeOf(value, 'string');
+		this.set('value', value);
 	}}
 });
 /** barmatz.net.Response **/

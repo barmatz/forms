@@ -291,11 +291,8 @@ window.barmatz.forms.ui.BuilderController = function(formModel, userModel, conta
 	
 	function onMenuExportClick(event)
 	{
-		if(barmatz.utils.DataTypes.applySilent('isValid', formModel.id))
-			formModel.getFingerprint(function(fingerprint)
-			{
-				barmatz.forms.factories.DOMFactory.createExportPromptDialog(fingerprint, true);
-			});
+		if(barmatz.utils.DataTypes.applySilent('isValid', formModel.fingerprint))
+			barmatz.forms.factories.DOMFactory.createExportPromptDialog(formModel.fingerprint, true);
 		else
 			barmatz.forms.factories.DOMFactory.createAlertPromptDialog('Failed to export', 'You must save the form before exporting!', true);
 	}
@@ -314,6 +311,7 @@ window.barmatz.forms.ui.BuilderController = function(formModel, userModel, conta
 			formModel.name = wrapper.nameField.value;
 			formModel.method = wrapper.methodField.value;
 			formModel.encoding = wrapper.encodingField.value;
+			formModel.submitButtonLabel = wrapper.submitButtonLabelField.value;
 		}
 	}
 	
