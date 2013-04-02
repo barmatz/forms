@@ -1,17 +1,33 @@
 /** barmatz.forms.fields.DropboxModel **/
 window.barmatz.forms.fields.DropboxModel = function(name, items)
 {
+	var _this;
+	
 	barmatz.utils.DataTypes.isNotUndefined(name);
 	barmatz.utils.DataTypes.isTypeOf(name, 'string', true);
 	barmatz.utils.DataTypes.isInstanceOf(items, Array, true);
 	barmatz.forms.fields.FieldModel.call(this, barmatz.forms.fields.FieldTypes.DROPBOX, name);
 	
+	_this = this;
+	
 	this.set('multiple', false);
 	this.set('items', new barmatz.forms.CollectionModel());
+	this.get('items').addEventListener(barmatz.events.CollectionEvent.ITEM_ADDED, onItemsItemAdded);
+	this.get('items').addEventListener(barmatz.events.CollectionEvent.ITEM_REMOVED, onItemsItemRemoved);
 	
 	if(items)
 		while(items.length > this.numItems)
 			this.addItem(items[this.numItems]);
+	
+	function onItemsItemAdded(event)
+	{
+		_this.dispatchEvent(event);
+	}
+	
+	function onItemsItemRemoved(event)
+	{
+		_this.dispatchEvent(event);
+	}
 };
 
 barmatz.forms.fields.DropboxModel.prototype = new barmatz.forms.fields.FieldModel(null, null);

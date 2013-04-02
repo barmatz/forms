@@ -29,7 +29,7 @@ Object.defineProperties(barmatz.events.EventDispatcher.prototype,
 		{
 			if(i === event.type)
 				for(c in this._listeners[i])
-					this._listeners[i][c](event);
+					this._listeners[i][c].call(this, event);
 		}
 	}},
 	hasEventListener: {value: function(type)

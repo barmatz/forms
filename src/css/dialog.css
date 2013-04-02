@@ -1,11 +1,13 @@
+.forms-dialog-footer { float: right; }
 .forms-dialog-prompt .ui-dialog-titlebar-close { display: none; }
 .forms-dialog-export-embedcode { width: 100%; height: 5em; }
-.forms-dialog-user-forms { max-width: 90%; min-width: 600px; }
-.forms-dialog-user-forms table { width: 100%; }
-.forms-dialog-user-forms th, .forms-dialog-user-forms td { padding: .4em; }
-.forms-dialog-user-forms th { background: rgba(255, 255, 255, .5); }
-.forms-dialog-user-forms td { border: 1px solid rgba(255, 255, 255, .05); cursor: pointer; }
-.forms-dialog-user-forms tr { font-weight: inherit !important; }
-.forms-dialog-user-forms tr.odd td { background: rgba(255, 255, 255, .3); }
-.forms-dialog-user-forms tr.even td { background: rgba(255, 255, 255, .2); }
+.forms-dialog-collection-list { max-width: 90%; min-width: 600px; }
+.forms-dialog-collection-list table { width: 100%; }
+.forms-dialog-collection-list th, .forms-dialog-collection-list td { padding: .4em; }
+.forms-dialog-collection-list th { background: rgba(255, 255, 255, .5); }
+.forms-dialog-collection-list td { border: 1px solid rgba(255, 255, 255, .05); }
+.forms-dialog-collection-list tr { font-weight: inherit !important; }
+.forms-dialog-collection-list tr.odd td { background: rgba(255, 255, 255, .3); }
+.forms-dialog-collection-list tr.even td { background: rgba(255, 255, 255, .2); }
 .forms-dialog-form-properties { min-width: 360px; }
+.forms-dialog-dropbox-items .forms-list-actions { width: 58px; }

@@ -771,7 +771,7 @@ Object.defineProperties(barmatz.events.EventDispatcher.prototype,
 		{
 			if(i === event.type)
 				for(c in this._listeners[i])
-					this._listeners[i][c](event);
+					this._listeners[i][c].call(this, event);
 		}
 	}},
 	hasEventListener: {value: function(type)
@@ -818,7 +818,7 @@ Object.defineProperties(barmatz.events.FormModelEvent,
 	DELETION_FAIL: {value: 'deletionFail'},
 	SUBMITTING: {value: 'submitting'},
 	SUBMITTED: {value: 'submitted'},
-	SUBMITION_FAILED: {value: 'submitionFailed'}
+	SUBMISSION_FAILED: {value: 'submissionFailed'}
 }); 
 Object.defineProperties(barmatz.events.FormModelEvent.prototype, 
 {
@@ -1391,20 +1391,200 @@ Object.defineProperties(barmatz.forms.fields.DropboxItemModel.prototype,
 		return '<option value="' + this.value + '">' + this.label + '</option>';
 	}}
 });
+/** barmatz.forms.fields.DropboxItemsListController **/
+window.barmatz.forms.fields.DropboxItemsListController = function(model, view, addButtonView, resetButtonView)
+{
+	var cachedResetButtonViewDisplay, itemsDictionary, itemsDeleteButtonDictionary;
+	
+	barmatz.utils.DataTypes.isNotUndefined(model);
+	barmatz.utils.DataTypes.isNotUndefined(view);
+	barmatz.utils.DataTypes.isNotUndefined(addButtonView);
+	barmatz.utils.DataTypes.isNotUndefined(resetButtonView);
+	barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.DropboxModel);
+	barmatz.utils.DataTypes.isInstanceOf(view, HTMLElement);
+	barmatz.utils.DataTypes.isInstanceOf(addButtonView, HTMLElement);
+	barmatz.utils.DataTypes.isInstanceOf(resetButtonView, HTMLElement);
+	barmatz.forms.CollectionController.call(this);
+	
+	itemsDictionary = new barmatz.utils.Dictionary();
+	itemsDeleteButtonDictionary = new barmatz.utils.Dictionary();
+	
+	model.forEach(function(item, index, collection)
+	{
+		addItem(item);
+	});
+	model.addEventListener(barmatz.events.CollectionEvent.ITEM_ADDED, onModelItemAdded);
+	model.addEventListener(barmatz.events.CollectionEvent.ITEM_REMOVED, onModelItemRemoved);
+	addButtonView.addEventListener('click', onAddButtonViewClick);
+	resetButtonView.addEventListener('click', onResetButtonViewClick);
+
+	if(model.numItems == 0)
+		hideResetButtonView();
+	
+	function showResetButtonView()
+	{
+		resetButtonView.style.display = cachedResetButtonViewDisplay;
+		cachedResetButtonViewDisplay = null;
+	}
+	
+	function hideResetButtonView()
+	{
+		cachedResetButtonViewDisplay = resetButtonView.style.display;
+		resetButtonView.style.display = 'none';
+	}
+	
+	function addItem(itemModel)
+	{
+		var itemViewWrapper;
+		
+		barmatz.utils.DataTypes.isNotUndefined(itemModel);
+		barmatz.utils.DataTypes.isInstanceOf(itemModel, barmatz.forms.fields.DropboxItemModel);
+		
+		itemViewWrapper = barmatz.forms.factories.DOMFactory.createDropboxItemsListItemWrapper(model.getItemIndex(itemModel));
+		itemViewWrapper.deleteButton.addEventListener('click', onItemDeleteButtonClick);
+		itemsDeleteButtonDictionary.add(itemViewWrapper.deleteButton, itemModel);
+		itemsDictionary.add(itemModel, view.appendChild(itemViewWrapper.wrapper));
+		barmatz.forms.factories.ControllerFactory.createDropboxItemsListItemController(itemModel, itemViewWrapper.labelElement, itemViewWrapper.valueElement, itemViewWrapper.editButton);
+	}
+	
+	function removeItem(itemModel)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(itemModel);
+		barmatz.utils.DataTypes.isInstanceOf(itemModel, barmatz.forms.fields.DropboxItemModel);
+		view.removeChild(itemsDictionary.get(itemModel));
+	}
+	
+	function onItemDeleteButtonClick(event)
+	{
+		model.removeItem(itemsDeleteButtonDictionary.get(event.currentTarget));
+	}
+	
+	function onModelItemAdded(event)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(event);
+		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.CollectionEvent);
+		addItem(event.item);
+		
+		if(model.numItems > 0 && resetButtonView.style.display == 'none')
+			showResetButtonView();
+	}
+	
+	function onModelItemRemoved(event)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(event);
+		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.CollectionEvent);
+		
+		removeItem(event.item);
+
+		if(model.numItems == 0)
+			hideResetButtonView();
+	}
+	
+	function onAddButtonViewClick(event)
+	{
+		barmatz.forms.factories.DOMFactory.createDropboxItemDialog(null, null, onAddItemConfirm);
+	}
+	
+	function onResetButtonViewClick(event)
+	{
+		while(model.numItems > 0)
+			model.removeItemAt(model.numItems - 1);
+	}
+	
+	function onAddItemConfirm(key, value)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(key);
+		barmatz.utils.DataTypes.isNotUndefined(value);
+		barmatz.utils.DataTypes.isTypeOf(key, 'string');
+		model.addItem(barmatz.forms.factories.ModelFactory.createDropboxItemModel(key, value));
+	}
+};
+
+barmatz.forms.fields.DropboxItemsListController.prototype = new barmatz.forms.CollectionController();
+barmatz.forms.fields.DropboxItemsListController.prototype.constructor = barmatz.forms.fields.DropboxItemsListController;
+/** barmatz.forms.fields.DropboxItemsListItemController **/
+window.barmatz.forms.fields.DropboxItemsListItemController = function(model, labelView, valueView, editButtonView)
+{
+	barmatz.utils.DataTypes.isNotUndefined(model);
+	barmatz.utils.DataTypes.isNotUndefined(labelView);
+	barmatz.utils.DataTypes.isNotUndefined(valueView);
+	barmatz.utils.DataTypes.isNotUndefined(editButtonView);
+	barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.DropboxItemModel);
+	barmatz.utils.DataTypes.isInstanceOf(labelView, HTMLElement);
+	barmatz.utils.DataTypes.isInstanceOf(valueView, HTMLElement);
+	barmatz.utils.DataTypes.isInstanceOf(editButtonView, HTMLElement);
+	barmatz.mvc.Controller.call(this);
+	
+	labelView.innerHTML = model.label;
+	valueView.innerHTML = model.value;
+	
+	model.addEventListener(barmatz.events.ModelEvent.VALUE_CHANGED, onModelValueChanged);
+	editButtonView.addEventListener('click', onEditButtonViewClick);
+	
+	function onModelValueChanged(event)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(event);
+		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.ModelEvent);
+		
+		switch(event.key)
+		{
+			case 'label':
+				labelView.innerHTML = event.value;
+				break;
+			case 'value':
+				valueView.innerHTML = event.value;
+				break;
+		}
+	}
+	
+	function onEditButtonViewClick(event)
+	{
+		barmatz.forms.factories.DOMFactory.createDropboxItemDialog(model.label, model.value, onEditConfirm);
+	}
+	
+	function onEditConfirm(label, value)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(label);
+		barmatz.utils.DataTypes.isNotUndefined(value);
+		barmatz.utils.DataTypes.isTypeOf(label, 'string');
+		barmatz.utils.DataTypes.isTypeOf(value, 'string');
+		model.label = label;
+		model.value = value;
+	}
+};
+
+barmatz.forms.fields.DropboxItemsListItemController.prototype = new barmatz.mvc.Controller();
+barmatz.forms.fields.DropboxItemsListItemController.prototype.constructor = barmatz.forms.fields.DropboxItemsListItemController;
 /** barmatz.forms.fields.DropboxModel **/
 window.barmatz.forms.fields.DropboxModel = function(name, items)
 {
+	var _this;
+	
 	barmatz.utils.DataTypes.isNotUndefined(name);
 	barmatz.utils.DataTypes.isTypeOf(name, 'string', true);
 	barmatz.utils.DataTypes.isInstanceOf(items, Array, true);
 	barmatz.forms.fields.FieldModel.call(this, barmatz.forms.fields.FieldTypes.DROPBOX, name);
 	
+	_this = this;
+	
 	this.set('multiple', false);
 	this.set('items', new barmatz.forms.CollectionModel());
+	this.get('items').addEventListener(barmatz.events.CollectionEvent.ITEM_ADDED, onItemsItemAdded);
+	this.get('items').addEventListener(barmatz.events.CollectionEvent.ITEM_REMOVED, onItemsItemRemoved);
 	
 	if(items)
 		while(items.length > this.numItems)
 			this.addItem(items[this.numItems]);
+	
+	function onItemsItemAdded(event)
+	{
+		_this.dispatchEvent(event);
+	}
+	
+	function onItemsItemRemoved(event)
+	{
+		_this.dispatchEvent(event);
+	}
 };
 
 barmatz.forms.fields.DropboxModel.prototype = new barmatz.forms.fields.FieldModel(null, null);
@@ -2794,6 +2974,8 @@ Object.defineProperties(barmatz.forms.ui.PropertiesController.prototype,
 		
 		barmatz.utils.DataTypes.isInstanceOf(value, barmatz.forms.fields.FieldModel, true);
 		
+		_this = this;
+		
 		if(this._model)
 			this._model.removeEventListener(barmatz.events.ModelEvent.VALUE_CHANGED, onModelValueChanged);
 		
@@ -2804,8 +2986,8 @@ Object.defineProperties(barmatz.forms.ui.PropertiesController.prototype,
 		{
 			itemsWrapper = barmatz.forms.factories.DOMFactory.createPropertiesItemWarpper(this._model);
 			
-			if(itemsWrapper.itemsField)
-				itemsWrapper.itemsField.addEventListener('focus', onItemsFieldFocus);
+			if(itemsWrapper.editItemsButton)
+				itemsWrapper.editItemsButton.addEventListener('click', onItemsWrapperEditItemsButtonClick);
 			
 			this._model.addEventListener(barmatz.events.ModelEvent.VALUE_CHANGED, onModelValueChanged);
 			this._view.appendChild(itemsWrapper.wrapper);
@@ -2813,31 +2995,10 @@ Object.defineProperties(barmatz.forms.ui.PropertiesController.prototype,
 		else
 			this._view.appendChild(barmatz.forms.factories.DOMFactory.createElementWithContent('h2', 'forms-filler', 'No item selected'));
 		
-		function onItemsFieldFocus(event)
+		function onItemsWrapperEditItemsButtonClick(event)
 		{
-			var model;
-			
-			barmatz.utils.DataTypes.isNotUndefined(event);
-			barmatz.utils.DataTypes.isInstanceOf(event, Event);
-
-			model = barmatz.forms.factories.ModelFactory.createCollectionModel();
-			model.addEventListener(barmatz.events.CollectionEvent.ITEM_ADDED, onModeItemAdded);
-			model.addEventListener(barmatz.events.CollectionEvent.ITEM_REMOVED, onModeItemRemoved);
-			barmatz.forms.factories.ControllerFactory.createCollectionDialogController(model, barmatz.forms.factories.DOMFactory.createCollectionDialog());
-			
-			function onModeItemAdded(event)
-			{
-				barmatz.utils.DataTypes.isNotUndefined(event);
-				barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.CollectionEvent);
-				_this._model.addItemAt(event.item, event.index);
-			}
-			
-			function onModeItemRemoved(event)
-			{
-				barmatz.utils.DataTypes.isNotUndefined(event);
-				barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.CollectionEvent);
-				_this._model.removeItemAt(event.item, event.index);
-			}
+			var dialogWrapper = barmatz.forms.factories.DOMFactory.createDropboxItemsListDialogWrapper();
+			barmatz.forms.factories.ControllerFactory.createDropboxItemsListController(_this._model, dialogWrapper.dialog.getElementsByTagName('tbody')[0], dialogWrapper.addButton, dialogWrapper.resetButton);
 		}
 		
 		function onModelValueChanged(event)
@@ -3099,7 +3260,7 @@ window.barmatz.forms.ui.UserFormsListController = function(formModel, userModel,
 	
 	function setFormsViews(models)
 	{
-		var modelitemView, i;
+		var itemView, i;
 		
 		barmatz.utils.DataTypes.isNotUndefined(models);
 		barmatz.utils.DataTypes.isInstanceOf(models, Array);
@@ -3446,6 +3607,8 @@ Object.defineProperties(barmatz.forms.ui.WorkspaceController.prototype,
 /** barmatz.forms.ui.WorkspaceItemController **/
 window.barmatz.forms.ui.WorkspaceItemController = function(model, labelView, fieldView, mandatoryView, deleteButtonView)
 {
+	var fieldDictionary;
+	
 	barmatz.utils.DataTypes.isNotUndefined(model);
 	barmatz.utils.DataTypes.isNotUndefined(labelView);
 	barmatz.utils.DataTypes.isNotUndefined(fieldView);
@@ -3458,8 +3621,19 @@ window.barmatz.forms.ui.WorkspaceItemController = function(model, labelView, fie
 	barmatz.utils.DataTypes.isInstanceOf(deleteButtonView, HTMLElement);
 	
 	barmatz.mvc.Controller.call(this);
-	
+
 	model.addEventListener(barmatz.events.ModelEvent.VALUE_CHANGED, onModelValueChanged);
+	
+	if(model instanceof barmatz.forms.fields.DropboxModel)
+	{
+		fieldDictionary = new barmatz.utils.Dictionary();
+		model.addEventListener(barmatz.events.CollectionEvent.ITEM_ADDED, onModelItemAdded);
+		model.addEventListener(barmatz.events.CollectionEvent.ITEM_REMOVED, onModelItemRemoved);
+		model.forEach(function(item, index, collection)
+		{
+			addItem(item);
+		});
+	}
 	
 	setViewValue('name', model.name);
 	setViewValue('label', model.label);
@@ -3514,11 +3688,61 @@ window.barmatz.forms.ui.WorkspaceItemController = function(model, labelView, fie
 		}
 	}
 	
+	function addItem(model)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(model);
+		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.DropboxItemModel);
+		model.addEventListener(barmatz.events.ModelEvent.VALUE_CHANGED, onModelItemValueChanged);
+		fieldDictionary.add(model, fieldView.appendChild(barmatz.forms.factories.DOMFactory.createDropboxItemElement(model)));
+	}
+	
+	function removeItem(model)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(model);
+		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.DropboxItemModel);
+		model.removeEventListener(barmatz.events.ModelEvent.VALUE_CHANGED, onModelItemValueChanged);
+		fieldView.removeChild(fieldDictionary.get(model));
+		fieldDictionary.remove(model);
+	}
+	
 	function onModelValueChanged(event)
 	{
 		barmatz.utils.DataTypes.isNotUndefined(event);
 		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.ModelEvent);
 		setViewValue(event.key, event.value);
+	}
+	
+	function onModelItemAdded(event)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(event);
+		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.CollectionEvent);
+		addItem(event.item);
+	}
+
+	function onModelItemRemoved(event) 
+	{
+		barmatz.utils.DataTypes.isNotUndefined(event);
+		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.CollectionEvent);
+		removeItem(event.item);
+	}
+	
+	function onModelItemValueChanged(event)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(event);
+		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.ModelEvent);
+
+		switch(event.key)
+		{
+			default:
+				throw new Error('Unknown key');
+				break;
+			case 'label':
+				fieldDictionary.get(event.target).innerHTML = event.value;
+				break;
+			case 'value':
+				fieldDictionary.get(event.target).value = event.value;
+				break;
+		}
 	}
 };
 
@@ -3544,14 +3768,14 @@ window.barmatz.forms.FormController = function(model, view)
 	 {
 		 model.addEventListener(barmatz.events.FormModelEvent.SUBMITTING, onModelSubmitting);
 		 model.addEventListener(barmatz.events.FormModelEvent.SUBMITTED, onModelSubmitted);
-		 model.addEventListener(barmatz.events.FormModelEvent.SUBMITION_FAILED, onModelSubmitionFailed);
+		 model.addEventListener(barmatz.events.FormModelEvent.SUBMISSION_FAILED, onModelSubmitionFailed);
 	 }
 	 
 	 function removeModelListeners()
 	 {
 		 model.removeEventListener(barmatz.events.FormModelEvent.SUBMITTING, onModelSubmitting);
 		 model.removeEventListener(barmatz.events.FormModelEvent.SUBMITTED, onModelSubmitted);
-		 model.removeEventListener(barmatz.events.FormModelEvent.SUBMITION_FAILED, onModelSubmitionFailed);
+		 model.removeEventListener(barmatz.events.FormModelEvent.SUBMISSION_FAILED, onModelSubmitionFailed);
 	 }
 	 
 	 function getViewData()
@@ -3766,6 +3990,15 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 			if(item instanceof barmatz.forms.fields.CheckboxFieldModel)
 				field.checked = item.checked;
 			
+			if(item instanceof barmatz.forms.fields.DropboxModel)
+			{
+				field.items = [];
+				item.forEach(function(item, index, collection)
+				{
+					field.items.push({label: item.label, value: item.value});
+				});
+			}
+			
 			object.fields.push(field);
 		});
 		
@@ -3853,7 +4086,7 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 		
 		function parseFieldsData(data)
 		{
-			var field, name;
+			var field, name, dataItem, i, c;
 			
 			while(_this.numItems > 0)
 				_this.removeItemAt(_this.numItems);
@@ -3908,6 +4141,16 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 				
 				if(field instanceof barmatz.forms.fields.CheckboxFieldModel)
 					field.checked = data[i].checked;
+				
+				if(field instanceof barmatz.forms.fields.DropboxModel)
+				{
+					for(c in data[i].items)
+					{
+						dataItem = data[i].items[c];
+						field.addItem(barmatz.forms.factories.ModelFactory.createDropboxItemModel(dataItem.label, dataItem.value));
+					}
+				
+				}
 				
 				_this.addItem(field);
 			}
@@ -4013,7 +4256,7 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 			if(response && response.status == 200)
 				_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.SUBMITTED));
 			else
-				_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.SUBMITION_FAILED));
+				_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.SUBMISSION_FAILED));
 			
 		}
 	}}
@@ -4157,14 +4400,6 @@ Object.defineProperties(barmatz.forms.factories.ControllerFactory,
 		barmatz.utils.DataTypes.isInstanceOf(fingerprintView, HTMLElement);
 		return new barmatz.forms.ui.UserFormsListItemController(model, view, nameView, createdView, fingerprintView);
 	}},
-	createCollectionDialogController: {value: function(model, view)
-	{
-		barmatz.utils.DataTypes.isNotUndefined(model);
-		barmatz.utils.DataTypes.isNotUndefined(view);
-		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.CollectionModel);
-		barmatz.utils.DataTypes.isInstanceOf(view, HTMLTableElement);
-		return new barmatz.forms.ui.CollectionDialogController(model, view);
-	}},
 	createFormController: {value: function(model, view)
 	{
 		barmatz.utils.DataTypes.isNotUndefined(model);
@@ -4172,6 +4407,30 @@ Object.defineProperties(barmatz.forms.factories.ControllerFactory,
 		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.FormModel);
 		barmatz.utils.DataTypes.isInstanceOf(view, HTMLFormElement);
 		return new barmatz.forms.FormController(model, view);
+	}},
+	createDropboxItemsListController: {value: function(model, view, addButtonView, resetButtonView)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(model);
+		barmatz.utils.DataTypes.isNotUndefined(view);
+		barmatz.utils.DataTypes.isNotUndefined(addButtonView);
+		barmatz.utils.DataTypes.isNotUndefined(resetButtonView);
+		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.DropboxModel);
+		barmatz.utils.DataTypes.isInstanceOf(view, HTMLElement);
+		barmatz.utils.DataTypes.isInstanceOf(addButtonView, HTMLElement);
+		barmatz.utils.DataTypes.isInstanceOf(resetButtonView, HTMLElement);
+		return new barmatz.forms.fields.DropboxItemsListController(model, view, addButtonView, resetButtonView);
+	}},
+	createDropboxItemsListItemController: {value: function(model, labelView, valueView, editButtonView)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(model);
+		barmatz.utils.DataTypes.isNotUndefined(labelView);
+		barmatz.utils.DataTypes.isNotUndefined(valueView);
+		barmatz.utils.DataTypes.isNotUndefined(editButtonView);
+		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.DropboxItemModel);
+		barmatz.utils.DataTypes.isInstanceOf(labelView, HTMLElement);
+		barmatz.utils.DataTypes.isInstanceOf(valueView, HTMLElement);
+		barmatz.utils.DataTypes.isInstanceOf(editButtonView, HTMLElement);
+		return new barmatz.forms.fields.DropboxItemsListItemController(model, labelView, valueView, editButtonView);
 	}}
 });
 /** barmatz.forms.factories.DOMFactory **/
@@ -4236,6 +4495,19 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 			}
 		}
 	}},
+	createButton: {value: function(label, className)
+	{
+		var button;
+		
+		barmatz.utils.DataTypes.isNotUndefined(label);
+		barmatz.utils.DataTypes.isTypeOf(label, 'string');
+		barmatz.utils.DataTypes.isTypeOf(className, 'string', true);
+		
+		button = this.createElementWithContent('button', className || '', label);
+		jQuery(button).button();
+		
+		return button;
+	}},
 	createDropboxElement: {value: function(model, selectedIndex)
 	{
 		var _this, dropbox;
@@ -4249,15 +4521,25 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		
 		model.forEach(function(item, index, collection)
 		{
-			var option =_this.createElementWithContent('option', '', item.label);
-			option.value = item.value;
-			dropbox.appendChild(option);
+			dropbox.appendChild(_this.createDropboxItemElement(item));
 		});
 		
 		if(selectedIndex)
 			dropbox.selectedIndex = selectedIndex;
 		
 		return dropbox;
+	}},
+	createDropboxItemElement: {value: function(model)
+	{
+		var item;
+
+		barmatz.utils.DataTypes.isNotUndefined(model);
+		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.DropboxItemModel);
+		
+		item = this.createElementWithContent('option', '', model.label);
+		item.value = model.value;
+		
+		return item;
 	}},
 	createFormFieldElement: {value: function(model)
 	{
@@ -4320,8 +4602,7 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		barmatz.utils.DataTypes.isNotUndefined(clickHandler);
 		barmatz.utils.DataTypes.isTypeOf(clickHandler, 'function');
 		wrapper = this.createElement('div');
-		button = this.createElementWithContent('button', '', label);
-		button.addEventListener('click', clickHandler);
+		button = this.createButton(label, clickHandler);
 		wrapper.appendChild(button);
 		
 		return wrapper;
@@ -4366,7 +4647,7 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		label = this.createElementWithContent('label', '', model.label ? model.label : '');
 		field = this.createFormFieldElement(model);
 		mandatory = this.createElementWithContent('span', 'forms-workspace-item-mandatory', mandatory ? '*' : '');
-		deleteButton = this.createIconButton('circle-close');
+		deleteButton = this.createDeleteButton();
 		
 		addToWrapper('forms-workspace-item-grip', grip);
 		addToWrapper('forms-workspace-item-label', label);
@@ -4424,8 +4705,7 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		if(model instanceof barmatz.forms.fields.DropboxModel)
 		{
 			returnWrapper.multipleField = addFieldToWrapper('boolean', 'multiple', 'multiple', model.multiple);
-			returnWrapper.itemsField = addFieldToWrapper('array', 'items', 'items', ['add item...']);
-			returnWrapper.itemsField.selectedIndex = null;
+			returnWrapper.editItemsButton = addFieldToWrapper('button', '', 'Edit items');
 		}
 		
 		return returnWrapper;
@@ -4437,7 +4717,6 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 			barmatz.utils.DataTypes.isNotUndefined(type);
 			barmatz.utils.DataTypes.isNotUndefined(name);
 			barmatz.utils.DataTypes.isNotUndefined(label);
-			barmatz.utils.DataTypes.isNotUndefined(value);
 			barmatz.utils.DataTypes.isTypeOf(type, 'string');
 			barmatz.utils.DataTypes.isTypeOf(name, 'string');
 			barmatz.utils.DataTypes.isTypeOf(label, 'string');
@@ -4498,12 +4777,11 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 	}},
 	createPropertiesItemFieldWrapper: {value: function(type, name, label, value, changeHandler)
 	{
-		var field, i;
+		var content, field, i;
 		
 		barmatz.utils.DataTypes.isNotUndefined(type);
 		barmatz.utils.DataTypes.isNotUndefined(name);
 		barmatz.utils.DataTypes.isNotUndefined(label);
-		barmatz.utils.DataTypes.isNotUndefined(value);
 		barmatz.utils.DataTypes.isNotUndefined(changeHandler);
 		barmatz.utils.DataTypes.isTypeOf(type, 'string');
 		barmatz.utils.DataTypes.isTypeOf(name, 'string');
@@ -4544,12 +4822,22 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 					barmatz.forms.factories.ModelFactory.createDropboxItemModel('Yes', true)
 				]), value ? 1 : 0);
 				break;
+			case 'button':
+				field = this.createButton(label);
+				break;
 		}
 		
 		field.name = name;
 		field.addEventListener('change', changeHandler);
+		
+		content = [];
 
-		return {wrapper: this.createElementWithContent('div', 'forms-item', [this.createElementWithContent('label', '', label), field]), field: field};
+		if(type != 'button')
+			content.push(this.createElementWithContent('label', '', label));
+		
+		content.push(field);
+
+		return {wrapper: this.createElementWithContent('div', 'forms-item', content), field: field};
 	}},
 	createDialog: {value: function(title, content, open, container)
 	{
@@ -4765,7 +5053,7 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 	}},
 	createMenuIcon: {value: function()
 	{
-		return this.createIconButton('gear');
+		return this.createSettingsButton();
 	}},
 	createMenu: {value: function()
 	{
@@ -4795,6 +5083,18 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		jQuery(button).button();
 		
 		return button;
+	}},
+	createEditButton: {value: function()
+	{
+		return this.createIconButton('pencil');
+	}},
+	createDeleteButton: {value: function()
+	{
+		return this.createIconButton('trash');
+	}},
+	createSettingsButton: {value: function()
+	{
+		return this.createIconButton('gear');
 	}},
 	createLoadingDialog: {value: function(container)
 	{
@@ -4842,11 +5142,23 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 			return field;
 		}
 	}},
+	createCollectionListDialog: {value: function(title, content, className)
+	{
+		var dialog;
+		
+		barmatz.utils.DataTypes.isNotUndefined(title);
+		barmatz.utils.DataTypes.isNotUndefined(content);
+		barmatz.utils.DataTypes.isTypeOf(title, 'string');
+		barmatz.utils.DataTypes.isTypesOrInstances(content, ['string'], [HTMLElement, Array]);
+		barmatz.utils.DataTypes.isTypeOf(className, 'string', true);
+		
+		dialog = this.createDialog(title, content);
+		jQuery(dialog).dialog({autoOpen: true, dialogClass: 'forms-dialog-collection-list' + (className ? ' ' + className : '')});
+		return dialog;
+	}},
 	createUserFormsListDialog: {value: function()
 	{
-		var dialog = this.createDialog('Your forms', this.createUserFormsList());
-		jQuery(dialog).dialog({autoOpen: true, dialogClass: 'forms-dialog-user-forms'});
-		return dialog;
+		return this.createCollectionListDialog('Your forms', this.createUserFormsList(), 'forms-dialog-user-forms forms-clickable-td');
 	}},
 	createUserFormsList: {value: function()
 	{
@@ -4861,6 +5173,72 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		barmatz.utils.DataTypes.isNotUndefined(index);
 		barmatz.utils.DataTypes.isTypeOf(index, 'number');
 		return this.createElementWithContent('tr', 'ui-widget ui-state-default ui-corner-all ui-button-text-only ' + (index % 2 == 0 ? 'even' : 'odd'), [this.createElement('td'), this.createElement('td'), this.createElement('td')]);
+	}},
+	createDropboxItemsListDialogWrapper: {value: function()
+	{
+		var addButton, resetButton;
+		
+		addButton = this.createButton('Add item');
+		resetButton = this.createButton('Reset');
+		
+		return {dialog: this.createCollectionListDialog('Items', [this.createDropboxItemsList(), this.createElementWithContent('div', 'forms-dialog-footer', [addButton, resetButton])], 'forms-dialog-dropbox-items'), addButton: addButton, resetButton: resetButton};
+	}},
+	createDropboxItemsList: {value: function()
+	{
+		var options = new barmatz.forms.ui.TableOptions();
+		options.headColumns.push('Key', 'Value', '');
+		return this.createTable(options);
+	}},
+	createDropboxItemDialog: {value: function(labelValue, valueValue, confirmHandler)
+	{
+		var _this, options, keyField, valueField;
+		
+		barmatz.utils.DataTypes.isNotUndefined(labelValue);
+		barmatz.utils.DataTypes.isNotUndefined(valueValue);
+		barmatz.utils.DataTypes.isNotUndefined(confirmHandler);
+		barmatz.utils.DataTypes.isTypeOf(labelValue, 'string', true);
+		barmatz.utils.DataTypes.isTypeOf(confirmHandler, 'function');
+		
+		_this = this;
+		options = new barmatz.forms.ui.TableOptions();
+		labelField = addRow('label', labelValue || '');
+		valueField = addRow('Value', valueValue || '');
+		return this.createPromptDialog(labelField != null ? 'Edit item' : 'New item', this.createTable(options), onConfirm, true);
+		
+		function addRow(key, value)
+		{
+			var field;
+			
+			barmatz.utils.DataTypes.isNotUndefined(key);
+			barmatz.utils.DataTypes.isNotUndefined(value);
+			barmatz.utils.DataTypes.isTypeOf(key, 'string');
+			
+			field = _this.createElement('input');
+			field.value = value;
+			options.bodyRows.push([_this.createElementWithContent('label', '', key), field]);
+			
+			return field;
+		}
+		
+		function onConfirm()
+		{
+			confirmHandler(labelField.value, valueField.value);
+		}
+	}},
+	createDropboxItemsListItemWrapper: {value: function(index)
+	{
+		var wrapper, labelElement, valueElement, editButton, deleteButton;
+		
+		barmatz.utils.DataTypes.isNotUndefined(index);
+		barmatz.utils.DataTypes.isTypeOf(index, 'number');
+		
+		labelElement = this.createElement('div');
+		valueElement = this.createElement('div');
+		editButton = this.createEditButton();
+		deleteButton = this.createDeleteButton();
+		wrapper = this.createTableRow([labelElement, valueElement, this.createElementWithContent('div', '', [editButton, deleteButton])], ['', '', 'forms-list-actions'], 'ui-widget ui-state-default ui-corner-all ui-button-text-only ' + (index % 2 == 0 ? 'even' : 'odd'));
+		
+		return {wrapper: wrapper, labelElement: labelElement, valueElement: valueElement, editButton: editButton, deleteButton: deleteButton};
 	}},
 	createTable: {value: function(options)
 	{

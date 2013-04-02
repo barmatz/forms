@@ -22,6 +22,8 @@ Object.defineProperties(barmatz.forms.ui.PropertiesController.prototype,
 		
 		barmatz.utils.DataTypes.isInstanceOf(value, barmatz.forms.fields.FieldModel, true);
 		
+		_this = this;
+		
 		if(this._model)
 			this._model.removeEventListener(barmatz.events.ModelEvent.VALUE_CHANGED, onModelValueChanged);
 		
@@ -32,8 +34,8 @@ Object.defineProperties(barmatz.forms.ui.PropertiesController.prototype,
 		{
 			itemsWrapper = barmatz.forms.factories.DOMFactory.createPropertiesItemWarpper(this._model);
 			
-			if(itemsWrapper.itemsField)
-				itemsWrapper.itemsField.addEventListener('focus', onItemsFieldFocus);
+			if(itemsWrapper.editItemsButton)
+				itemsWrapper.editItemsButton.addEventListener('click', onItemsWrapperEditItemsButtonClick);
 			
 			this._model.addEventListener(barmatz.events.ModelEvent.VALUE_CHANGED, onModelValueChanged);
 			this._view.appendChild(itemsWrapper.wrapper);
@@ -41,31 +43,10 @@ Object.defineProperties(barmatz.forms.ui.PropertiesController.prototype,
 		else
 			this._view.appendChild(barmatz.forms.factories.DOMFactory.createElementWithContent('h2', 'forms-filler', 'No item selected'));
 		
-		function onItemsFieldFocus(event)
+		function onItemsWrapperEditItemsButtonClick(event)
 		{
-			var model;
-			
-			barmatz.utils.DataTypes.isNotUndefined(event);
-			barmatz.utils.DataTypes.isInstanceOf(event, Event);
-
-			model = barmatz.forms.factories.ModelFactory.createCollectionModel();
-			model.addEventListener(barmatz.events.CollectionEvent.ITEM_ADDED, onModeItemAdded);
-			model.addEventListener(barmatz.events.CollectionEvent.ITEM_REMOVED, onModeItemRemoved);
-			barmatz.forms.factories.ControllerFactory.createCollectionDialogController(model, barmatz.forms.factories.DOMFactory.createCollectionDialog());
-			
-			function onModeItemAdded(event)
-			{
-				barmatz.utils.DataTypes.isNotUndefined(event);
-				barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.CollectionEvent);
-				_this._model.addItemAt(event.item, event.index);
-			}
-			
-			function onModeItemRemoved(event)
-			{
-				barmatz.utils.DataTypes.isNotUndefined(event);
-				barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.CollectionEvent);
-				_this._model.removeItemAt(event.item, event.index);
-			}
+			var dialogWrapper = barmatz.forms.factories.DOMFactory.createDropboxItemsListDialogWrapper();
+			barmatz.forms.factories.ControllerFactory.createDropboxItemsListController(_this._model, dialogWrapper.dialog.getElementsByTagName('tbody')[0], dialogWrapper.addButton, dialogWrapper.resetButton);
 		}
 		
 		function onModelValueChanged(event)

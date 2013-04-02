@@ -129,14 +129,6 @@ Object.defineProperties(barmatz.forms.factories.ControllerFactory,
 		barmatz.utils.DataTypes.isInstanceOf(fingerprintView, HTMLElement);
 		return new barmatz.forms.ui.UserFormsListItemController(model, view, nameView, createdView, fingerprintView);
 	}},
-	createCollectionDialogController: {value: function(model, view)
-	{
-		barmatz.utils.DataTypes.isNotUndefined(model);
-		barmatz.utils.DataTypes.isNotUndefined(view);
-		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.CollectionModel);
-		barmatz.utils.DataTypes.isInstanceOf(view, HTMLTableElement);
-		return new barmatz.forms.ui.CollectionDialogController(model, view);
-	}},
 	createFormController: {value: function(model, view)
 	{
 		barmatz.utils.DataTypes.isNotUndefined(model);
@@ -144,5 +136,29 @@ Object.defineProperties(barmatz.forms.factories.ControllerFactory,
 		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.FormModel);
 		barmatz.utils.DataTypes.isInstanceOf(view, HTMLFormElement);
 		return new barmatz.forms.FormController(model, view);
+	}},
+	createDropboxItemsListController: {value: function(model, view, addButtonView, resetButtonView)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(model);
+		barmatz.utils.DataTypes.isNotUndefined(view);
+		barmatz.utils.DataTypes.isNotUndefined(addButtonView);
+		barmatz.utils.DataTypes.isNotUndefined(resetButtonView);
+		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.DropboxModel);
+		barmatz.utils.DataTypes.isInstanceOf(view, HTMLElement);
+		barmatz.utils.DataTypes.isInstanceOf(addButtonView, HTMLElement);
+		barmatz.utils.DataTypes.isInstanceOf(resetButtonView, HTMLElement);
+		return new barmatz.forms.fields.DropboxItemsListController(model, view, addButtonView, resetButtonView);
+	}},
+	createDropboxItemsListItemController: {value: function(model, labelView, valueView, editButtonView)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(model);
+		barmatz.utils.DataTypes.isNotUndefined(labelView);
+		barmatz.utils.DataTypes.isNotUndefined(valueView);
+		barmatz.utils.DataTypes.isNotUndefined(editButtonView);
+		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.DropboxItemModel);
+		barmatz.utils.DataTypes.isInstanceOf(labelView, HTMLElement);
+		barmatz.utils.DataTypes.isInstanceOf(valueView, HTMLElement);
+		barmatz.utils.DataTypes.isInstanceOf(editButtonView, HTMLElement);
+		return new barmatz.forms.fields.DropboxItemsListItemController(model, labelView, valueView, editButtonView);
 	}}
 });

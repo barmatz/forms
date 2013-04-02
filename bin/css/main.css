@@ -1,16 +1,18 @@
 /* Eric Meyer's Reset CSS v2.0 - http://cssreset.com */
 html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td,article,aside,canvas,details,embed,figure,figcaption,footer,header,hgroup,menu,nav,output,ruby,section,summary,time,mark,audio,video{border:0;font-size:100%;font:inherit;margin:0;padding:0}article,aside,details,figcaption,figure,footer,header,hgroup,menu,nav,section{display:block}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:none}table{border-collapse:collapse;border-spacing:0}th,td{vertical-align:top;}
+.forms-dialog-footer { float: right; }
 .forms-dialog-prompt .ui-dialog-titlebar-close { display: none; }
 .forms-dialog-export-embedcode { width: 100%; height: 5em; }
-.forms-dialog-user-forms { max-width: 90%; min-width: 600px; }
-.forms-dialog-user-forms table { width: 100%; }
-.forms-dialog-user-forms th, .forms-dialog-user-forms td { padding: .4em; }
-.forms-dialog-user-forms th { background: rgba(255, 255, 255, .5); }
-.forms-dialog-user-forms td { border: 1px solid rgba(255, 255, 255, .05); cursor: pointer; }
-.forms-dialog-user-forms tr { font-weight: inherit !important; }
-.forms-dialog-user-forms tr.odd td { background: rgba(255, 255, 255, .3); }
-.forms-dialog-user-forms tr.even td { background: rgba(255, 255, 255, .2); }
+.forms-dialog-collection-list { max-width: 90%; min-width: 600px; }
+.forms-dialog-collection-list table { width: 100%; }
+.forms-dialog-collection-list th, .forms-dialog-collection-list td { padding: .4em; }
+.forms-dialog-collection-list th { background: rgba(255, 255, 255, .5); }
+.forms-dialog-collection-list td { border: 1px solid rgba(255, 255, 255, .05); }
+.forms-dialog-collection-list tr { font-weight: inherit !important; }
+.forms-dialog-collection-list tr.odd td { background: rgba(255, 255, 255, .3); }
+.forms-dialog-collection-list tr.even td { background: rgba(255, 255, 255, .2); }
 .forms-dialog-form-properties { min-width: 360px; }
+.forms-dialog-dropbox-items .forms-list-actions { width: 58px; }
 .rounded-corner { -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; }
 .forms-error-wrapper { padding: .2em; }
 .forms-error-wrapper .ui-icon-alert:first-child { float: left; margin-right: .3em; }
@@ -26,6 +28,8 @@ label { font-weight: bold; }
 .ui-icon-wrapper .ui-button-text { padding: 4px 0 !important; }
 .ui-corner-all { -webkit-border-radius: 3px !important; -moz-border-radius: 3px !important; border-radius: 3px !important; }
 .ui-dialog th, .ui-dialog td { vertical-align: middle; padding: .2em 0; }
+.forms-list-actions { text-align: right; }
+.forms-clickable-td td { cursor: pointer; }
 .forms-menu { height: 2em; padding: .4em; background: #404040; }
 .forms-menu .ui-menu { position: absolute; top: .4em; min-width: 150px; min-height: 1.3em; }
 .forms-properties-panel { background: #E9E9E9; width: 232px; }

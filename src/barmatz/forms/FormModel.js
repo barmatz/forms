@@ -150,6 +150,15 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 			if(item instanceof barmatz.forms.fields.CheckboxFieldModel)
 				field.checked = item.checked;
 			
+			if(item instanceof barmatz.forms.fields.DropboxModel)
+			{
+				field.items = [];
+				item.forEach(function(item, index, collection)
+				{
+					field.items.push({label: item.label, value: item.value});
+				});
+			}
+			
 			object.fields.push(field);
 		});
 		
@@ -237,7 +246,7 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 		
 		function parseFieldsData(data)
 		{
-			var field, name;
+			var field, name, dataItem, i, c;
 			
 			while(_this.numItems > 0)
 				_this.removeItemAt(_this.numItems);
@@ -292,6 +301,16 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 				
 				if(field instanceof barmatz.forms.fields.CheckboxFieldModel)
 					field.checked = data[i].checked;
+				
+				if(field instanceof barmatz.forms.fields.DropboxModel)
+				{
+					for(c in data[i].items)
+					{
+						dataItem = data[i].items[c];
+						field.addItem(barmatz.forms.factories.ModelFactory.createDropboxItemModel(dataItem.label, dataItem.value));
+					}
+				
+				}
 				
 				_this.addItem(field);
 			}

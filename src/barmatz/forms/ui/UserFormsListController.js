@@ -30,7 +30,7 @@ window.barmatz.forms.ui.UserFormsListController = function(formModel, userModel,
 	
 	function setFormsViews(models)
 	{
-		var modelitemView, i;
+		var itemView, i;
 		
 		barmatz.utils.DataTypes.isNotUndefined(models);
 		barmatz.utils.DataTypes.isInstanceOf(models, Array);

@@ -60,6 +60,19 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 			}
 		}
 	}},
+	createButton: {value: function(label, className)
+	{
+		var button;
+		
+		barmatz.utils.DataTypes.isNotUndefined(label);
+		barmatz.utils.DataTypes.isTypeOf(label, 'string');
+		barmatz.utils.DataTypes.isTypeOf(className, 'string', true);
+		
+		button = this.createElementWithContent('button', className || '', label);
+		jQuery(button).button();
+		
+		return button;
+	}},
 	createDropboxElement: {value: function(model, selectedIndex)
 	{
 		var _this, dropbox;
@@ -73,15 +86,25 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		
 		model.forEach(function(item, index, collection)
 		{
-			var option =_this.createElementWithContent('option', '', item.label);
-			option.value = item.value;
-			dropbox.appendChild(option);
+			dropbox.appendChild(_this.createDropboxItemElement(item));
 		});
 		
 		if(selectedIndex)
 			dropbox.selectedIndex = selectedIndex;
 		
 		return dropbox;
+	}},
+	createDropboxItemElement: {value: function(model)
+	{
+		var item;
+
+		barmatz.utils.DataTypes.isNotUndefined(model);
+		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.DropboxItemModel);
+		
+		item = this.createElementWithContent('option', '', model.label);
+		item.value = model.value;
+		
+		return item;
 	}},
 	createFormFieldElement: {value: function(model)
 	{
@@ -144,8 +167,7 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		barmatz.utils.DataTypes.isNotUndefined(clickHandler);
 		barmatz.utils.DataTypes.isTypeOf(clickHandler, 'function');
 		wrapper = this.createElement('div');
-		button = this.createElementWithContent('button', '', label);
-		button.addEventListener('click', clickHandler);
+		button = this.createButton(label, clickHandler);
 		wrapper.appendChild(button);
 		
 		return wrapper;
@@ -190,7 +212,7 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		label = this.createElementWithContent('label', '', model.label ? model.label : '');
 		field = this.createFormFieldElement(model);
 		mandatory = this.createElementWithContent('span', 'forms-workspace-item-mandatory', mandatory ? '*' : '');
-		deleteButton = this.createIconButton('circle-close');
+		deleteButton = this.createDeleteButton();
 		
 		addToWrapper('forms-workspace-item-grip', grip);
 		addToWrapper('forms-workspace-item-label', label);
@@ -248,8 +270,7 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		if(model instanceof barmatz.forms.fields.DropboxModel)
 		{
 			returnWrapper.multipleField = addFieldToWrapper('boolean', 'multiple', 'multiple', model.multiple);
-			returnWrapper.itemsField = addFieldToWrapper('array', 'items', 'items', ['add item...']);
-			returnWrapper.itemsField.selectedIndex = null;
+			returnWrapper.editItemsButton = addFieldToWrapper('button', '', 'Edit items');
 		}
 		
 		return returnWrapper;
@@ -261,7 +282,6 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 			barmatz.utils.DataTypes.isNotUndefined(type);
 			barmatz.utils.DataTypes.isNotUndefined(name);
 			barmatz.utils.DataTypes.isNotUndefined(label);
-			barmatz.utils.DataTypes.isNotUndefined(value);
 			barmatz.utils.DataTypes.isTypeOf(type, 'string');
 			barmatz.utils.DataTypes.isTypeOf(name, 'string');
 			barmatz.utils.DataTypes.isTypeOf(label, 'string');
@@ -322,12 +342,11 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 	}},
 	createPropertiesItemFieldWrapper: {value: function(type, name, label, value, changeHandler)
 	{
-		var field, i;
+		var content, field, i;
 		
 		barmatz.utils.DataTypes.isNotUndefined(type);
 		barmatz.utils.DataTypes.isNotUndefined(name);
 		barmatz.utils.DataTypes.isNotUndefined(label);
-		barmatz.utils.DataTypes.isNotUndefined(value);
 		barmatz.utils.DataTypes.isNotUndefined(changeHandler);
 		barmatz.utils.DataTypes.isTypeOf(type, 'string');
 		barmatz.utils.DataTypes.isTypeOf(name, 'string');
@@ -368,12 +387,22 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 					barmatz.forms.factories.ModelFactory.createDropboxItemModel('Yes', true)
 				]), value ? 1 : 0);
 				break;
+			case 'button':
+				field = this.createButton(label);
+				break;
 		}
 		
 		field.name = name;
 		field.addEventListener('change', changeHandler);
+		
+		content = [];
 
-		return {wrapper: this.createElementWithContent('div', 'forms-item', [this.createElementWithContent('label', '', label), field]), field: field};
+		if(type != 'button')
+			content.push(this.createElementWithContent('label', '', label));
+		
+		content.push(field);
+
+		return {wrapper: this.createElementWithContent('div', 'forms-item', content), field: field};
 	}},
 	createDialog: {value: function(title, content, open, container)
 	{
@@ -589,7 +618,7 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 	}},
 	createMenuIcon: {value: function()
 	{
-		return this.createIconButton('gear');
+		return this.createSettingsButton();
 	}},
 	createMenu: {value: function()
 	{
@@ -619,6 +648,18 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		jQuery(button).button();
 		
 		return button;
+	}},
+	createEditButton: {value: function()
+	{
+		return this.createIconButton('pencil');
+	}},
+	createDeleteButton: {value: function()
+	{
+		return this.createIconButton('trash');
+	}},
+	createSettingsButton: {value: function()
+	{
+		return this.createIconButton('gear');
 	}},
 	createLoadingDialog: {value: function(container)
 	{
@@ -666,11 +707,23 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 			return field;
 		}
 	}},
+	createCollectionListDialog: {value: function(title, content, className)
+	{
+		var dialog;
+		
+		barmatz.utils.DataTypes.isNotUndefined(title);
+		barmatz.utils.DataTypes.isNotUndefined(content);
+		barmatz.utils.DataTypes.isTypeOf(title, 'string');
+		barmatz.utils.DataTypes.isTypesOrInstances(content, ['string'], [HTMLElement, Array]);
+		barmatz.utils.DataTypes.isTypeOf(className, 'string', true);
+		
+		dialog = this.createDialog(title, content);
+		jQuery(dialog).dialog({autoOpen: true, dialogClass: 'forms-dialog-collection-list' + (className ? ' ' + className : '')});
+		return dialog;
+	}},
 	createUserFormsListDialog: {value: function()
 	{
-		var dialog = this.createDialog('Your forms', this.createUserFormsList());
-		jQuery(dialog).dialog({autoOpen: true, dialogClass: 'forms-dialog-user-forms'});
-		return dialog;
+		return this.createCollectionListDialog('Your forms', this.createUserFormsList(), 'forms-dialog-user-forms forms-clickable-td');
 	}},
 	createUserFormsList: {value: function()
 	{
@@ -685,6 +738,72 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		barmatz.utils.DataTypes.isNotUndefined(index);
 		barmatz.utils.DataTypes.isTypeOf(index, 'number');
 		return this.createElementWithContent('tr', 'ui-widget ui-state-default ui-corner-all ui-button-text-only ' + (index % 2 == 0 ? 'even' : 'odd'), [this.createElement('td'), this.createElement('td'), this.createElement('td')]);
+	}},
+	createDropboxItemsListDialogWrapper: {value: function()
+	{
+		var addButton, resetButton;
+		
+		addButton = this.createButton('Add item');
+		resetButton = this.createButton('Reset');
+		
+		return {dialog: this.createCollectionListDialog('Items', [this.createDropboxItemsList(), this.createElementWithContent('div', 'forms-dialog-footer', [addButton, resetButton])], 'forms-dialog-dropbox-items'), addButton: addButton, resetButton: resetButton};
+	}},
+	createDropboxItemsList: {value: function()
+	{
+		var options = new barmatz.forms.ui.TableOptions();
+		options.headColumns.push('Key', 'Value', '');
+		return this.createTable(options);
+	}},
+	createDropboxItemDialog: {value: function(labelValue, valueValue, confirmHandler)
+	{
+		var _this, options, keyField, valueField;
+		
+		barmatz.utils.DataTypes.isNotUndefined(labelValue);
+		barmatz.utils.DataTypes.isNotUndefined(valueValue);
+		barmatz.utils.DataTypes.isNotUndefined(confirmHandler);
+		barmatz.utils.DataTypes.isTypeOf(labelValue, 'string', true);
+		barmatz.utils.DataTypes.isTypeOf(confirmHandler, 'function');
+		
+		_this = this;
+		options = new barmatz.forms.ui.TableOptions();
+		labelField = addRow('label', labelValue || '');
+		valueField = addRow('Value', valueValue || '');
+		return this.createPromptDialog(labelField != null ? 'Edit item' : 'New item', this.createTable(options), onConfirm, true);
+		
+		function addRow(key, value)
+		{
+			var field;
+			
+			barmatz.utils.DataTypes.isNotUndefined(key);
+			barmatz.utils.DataTypes.isNotUndefined(value);
+			barmatz.utils.DataTypes.isTypeOf(key, 'string');
+			
+			field = _this.createElement('input');
+			field.value = value;
+			options.bodyRows.push([_this.createElementWithContent('label', '', key), field]);
+			
+			return field;
+		}
+		
+		function onConfirm()
+		{
+			confirmHandler(labelField.value, valueField.value);
+		}
+	}},
+	createDropboxItemsListItemWrapper: {value: function(index)
+	{
+		var wrapper, labelElement, valueElement, editButton, deleteButton;
+		
+		barmatz.utils.DataTypes.isNotUndefined(index);
+		barmatz.utils.DataTypes.isTypeOf(index, 'number');
+		
+		labelElement = this.createElement('div');
+		valueElement = this.createElement('div');
+		editButton = this.createEditButton();
+		deleteButton = this.createDeleteButton();
+		wrapper = this.createTableRow([labelElement, valueElement, this.createElementWithContent('div', '', [editButton, deleteButton])], ['', '', 'forms-list-actions'], 'ui-widget ui-state-default ui-corner-all ui-button-text-only ' + (index % 2 == 0 ? 'even' : 'odd'));
+		
+		return {wrapper: wrapper, labelElement: labelElement, valueElement: valueElement, editButton: editButton, deleteButton: deleteButton};
 	}},
 	createTable: {value: function(options)
 	{
