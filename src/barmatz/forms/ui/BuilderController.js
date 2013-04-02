@@ -75,6 +75,7 @@ window.barmatz.forms.ui.BuilderController = function(formModel, userModel, conta
 		addToolboxItem(barmatz.forms.fields.FieldTypes.CHECKBOX, 'Checkbox field');
 		addToolboxItem(barmatz.forms.fields.FieldTypes.RADIO, 'Radio field');
 		addToolboxItem(barmatz.forms.fields.FieldTypes.DROPBOX, 'Dropbox field');
+		addToolboxItem(barmatz.forms.fields.FieldTypes.PHONE, 'Phone field');
 	}
 	
 	function addMenuItem(label, clickHandler)

@@ -284,6 +284,9 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 					case barmatz.forms.fields.FieldTypes.HIDDEN:
 						field = new barmatz.forms.fields.HiddenFieldModel(name);
 						break;
+					case barmatz.forms.fields.FieldTypes.PHONE:
+						field = new barmatz.forms.fields.PhoneFieldModel(name);
+						break;
 				}
 				
 				if(field instanceof barmatz.forms.fields.FieldModel)

@@ -43,6 +43,9 @@ Object.defineProperties(barmatz.forms.factories.ModelFactory,
 			case barmatz.forms.fields.FieldTypes.HIDDEN:
 				return new barmatz.forms.fields.HiddenFieldModel(name);
 				break;
+			case barmatz.forms.fields.FieldTypes.PHONE:
+				return new barmatz.forms.fields.PhoneFieldModel(name);
+				break;
 		}
 	}},
 	createToolboxModel: {value: function()

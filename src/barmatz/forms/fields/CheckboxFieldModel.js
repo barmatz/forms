@@ -22,7 +22,7 @@ Object.defineProperties(barmatz.forms.fields.CheckboxFieldModel.prototype,
 	}},
 	value: {get: function()
 	{
-		return this.checked ? this.get('value') : null;
+		return this.checked ? this.get('value') : '';
 	}},
 	clone: {value: function()
 	{

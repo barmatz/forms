@@ -30,16 +30,46 @@ window.barmatz.forms.FormController = function(model, view)
 	 
 	 function getViewData()
 	 {
-		 var data = {}, elements = Array.prototype.slice.call(view.elements), element, i;
+		 var data, elements, specialElements, element, i;
+		 
+		 data = {};
+		 specialElements = Array.prototype.slice.call(view.getElementsByTagName('span')).filter(function(element)
+		 {
+			return element.hasAttribute('rel') && element.getAttribute('rel') == 'phone'; 
+		 });
+		 elements = Array.prototype.slice.call(view.elements).filter(function(element)
+		 {
+			var i;
+
+			if(element.tagName.toLowerCase() == 'button' || element.type == 'button' || element.type == 'submit')
+				return false;
+			 
+			for(i in specialElements)
+			{
+				if(specialElements[i].contains(element))
+					return false;
+			}
+			 
+			return true;
+		 }).concat(specialElements);
 		 
 		 for(i = 0; i < elements.length; i++)
 		 {
-			 element = elements[i];
-
-			 if(element.tagName.toLowerCase() != 'button' && element.type != 'button' && element.type != 'submit')
-				 data[element.name] = element.value;
+			element = elements[i];
+			
+			if(specialElements.indexOf(element) > -1)
+			{
+				switch(element.getAttribute('rel'))
+				{
+					case 'phone':
+						data[element.getAttribute('name')] = element.getElementsByTagName('select')[0].value + element.getElementsByTagName('input')[0].value;
+						break;
+				}
+			}
+			else
+				data[element.name] = element.value;
 		 }
-		 
+		 	
 		 return data;
 	 }
 	 

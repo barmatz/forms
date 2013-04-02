@@ -10,5 +10,6 @@ Object.defineProperties(barmatz.forms.fields.FieldTypes,
 	CHECKBOX: {value: 'checkbox'},
 	RADIO: {value: 'radio'},
 	FILE: {value: 'file'},
-	HIDDEN: {value: 'hidden'}
+	HIDDEN: {value: 'hidden'},
+	PHONE: {value: 'phone'}
 });

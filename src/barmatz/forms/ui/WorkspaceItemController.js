@@ -59,7 +59,13 @@ window.barmatz.forms.ui.WorkspaceItemController = function(model, labelView, fie
 				fieldView.value = value;
 				break;
 			case 'enabled':
-				fieldView.disabled = !value;
+				if(model instanceof barmatz.forms.fields.PhoneFieldModel)
+				{
+					fieldView.getElementsByTagName('select')[0].disabled = !value;
+					fieldView.getElementsByTagName('input')[0].disabled = !value;
+				}
+				else
+					fieldView.disabled = !value;
 				break;
 			case 'max':
 				fieldView.maxLength = value;

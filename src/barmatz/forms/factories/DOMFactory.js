@@ -83,6 +83,7 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		
 		_this = this;
 		dropbox = this.createElement('select');
+		dropbox.name = model.name;
 		
 		model.forEach(function(item, index, collection)
 		{
@@ -108,11 +109,16 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 	}},
 	createFormFieldElement: {value: function(model)
 	{
-		var field, key;
+		var _this, field, key;
 		
 		barmatz.utils.DataTypes.isNotUndefined(model);
 		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FieldModel);
+		
+		_this = this;
 		field = this.createElement(getElementTagName(model.type));
+		
+		if(model.type == barmatz.forms.fields.FieldTypes.PHONE)
+			createPhoneField();
 		
 		if(field.tagName.toLowerCase() == 'input')
 			field.type = model.type;
@@ -127,6 +133,9 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		{
 			switch(type)
 			{
+				default:
+					throw new Error('Unknown type');
+					break;
 				case barmatz.forms.fields.FieldTypes.TEXT_FIELD:
 				case barmatz.forms.fields.FieldTypes.PASSWORD:
 				case barmatz.forms.fields.FieldTypes.CHECKBOX:
@@ -141,7 +150,29 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 				case barmatz.forms.fields.FieldTypes.DROPBOX:
 					return 'select';
 					break;
+				case barmatz.forms.fields.FieldTypes.PHONE:
+					return 'span';
+					break;
 			}
+		}
+		
+		function createPhoneField()
+		{
+			var phoneField, prefixModel;
+			
+			phoneField = _this.createElement('input');
+			phoneField.name = 'phone';
+			phoneField.maxLength = 7;
+			
+			prefixModel = barmatz.forms.factories.ModelFactory.createDropboxModel('phone-prefix');
+			
+			barmatz.forms.fields.PhonePrefixes.forEach(function(prefix)
+			{
+				prefixModel.addItem(barmatz.forms.factories.ModelFactory.createDropboxItemModel(prefix, prefix));
+			});
+
+			field.appendChild(_this.createDropboxElement(prefixModel));
+			field.appendChild(phoneField)
 		}
 	}},
 	createFieldWrapper: {value: function(model, className)
