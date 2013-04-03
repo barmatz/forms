@@ -11,6 +11,7 @@ window.barmatz.forms.fields.FieldModel = function(type, name)
 	this.set('mandatory', false);
 	this.set('value', '');
 	this.set('enabled', true);
+	this.set('validatorCode', barmatz.forms.ValidationModel.NONE);
 };
 
 barmatz.forms.fields.FieldModel.prototype = new barmatz.forms.TypeModel(null);
@@ -57,6 +58,27 @@ Object.defineProperties(barmatz.forms.fields.FieldModel.prototype,
 		barmatz.utils.DataTypes.isTypeOf(value, 'boolean');
 		this.set('enabled', value);
 	}},
+	availableValidators: {get: function()
+	{
+		return barmatz.forms.ValidationModel.EQUALS +
+			   barmatz.forms.ValidationModel.VALID_EMAIL +
+			   barmatz.forms.ValidationModel.VALID_PHONE +
+			   barmatz.forms.ValidationModel.MIN_LENGTH +
+			   barmatz.forms.ValidationModel.MAX_LENGTH +
+			   barmatz.forms.ValidationModel.EXAC_LENGTH +
+			   barmatz.forms.ValidationModel.GREATER_THAN +
+			   barmatz.forms.ValidationModel.LESSER_THAN +
+			   barmatz.forms.ValidationModel.DIGITS_ONLY +
+			   barmatz.forms.ValidationModel.NOT_DIGITS;
+	}},
+	validatorCode: {get: function()
+	{
+		return this.get('validatorCode');
+	}, set: function(value)
+	{
+		barmatz.utils.DataTypes.isTypeOf(value, 'number');
+		this.set('validatorCode', value);
+	}},
 	clone: {value: function()
 	{
 		var clone = new barmatz.forms.fields.FieldModel(this.type, this.name);
@@ -64,6 +86,7 @@ Object.defineProperties(barmatz.forms.fields.FieldModel.prototype,
 		clone.mandatory = this.mandatory;
 		clone.value = this.value;
 		clone.enabled = this.enabled;
+		clone.validatorCode = this.validatorCode;
 		return clone;
 	}},
 	toHTML: {value: function()

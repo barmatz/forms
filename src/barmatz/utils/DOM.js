@@ -29,5 +29,19 @@ Object.defineProperties(barmatz.utils.DOM,
 		barmatz.utils.DataTypes.isInstanceOf(element, HTMLElement);
 		while(element.childNodes.length > 0)
 			element.removeChild(element.lastChild);
+	}},
+	sort: {value: function(element, compareFunction)
+	{
+		var children, i;
+
+		barmatz.utils.DataTypes.isNotUndefined(element);
+		barmatz.utils.DataTypes.isNotUndefined(compareFunction);
+		barmatz.utils.DataTypes.isInstanceOf(element, HTMLElement);
+		barmatz.utils.DataTypes.isTypeOf(compareFunction, 'function');
+		
+		children = Array.prototype.slice.call(element.childNodes).sort(compareFunction);
+		
+		for(i in children)
+			element.appendChild(children[i]);
 	}}
 });

@@ -110,6 +110,7 @@ Object.defineProperties(barmatz.forms.fields.DropboxModel.prototype,
 		clone.mandatory = this.mandatory;
 		clone.value = this.value;
 		clone.enabled = this.enabled;
+		clone.validatorCode = this.validatorCode;
 		clone.multiple = this.multiple;
 		return clone;
 	}},

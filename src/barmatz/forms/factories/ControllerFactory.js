@@ -160,5 +160,13 @@ Object.defineProperties(barmatz.forms.factories.ControllerFactory,
 		barmatz.utils.DataTypes.isInstanceOf(valueView, HTMLElement);
 		barmatz.utils.DataTypes.isInstanceOf(editButtonView, HTMLElement);
 		return new barmatz.forms.fields.DropboxItemsListItemController(model, labelView, valueView, editButtonView);
+	}},
+	createFieldValidationOptionsController: {value: function(model, options)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(model);
+		barmatz.utils.DataTypes.isNotUndefined(options);
+		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FieldModel);
+		barmatz.utils.DataTypes.isTypeOf(options, 'object');
+		return barmatz.forms.fields.FieldValidationOptionsController(model, options);
 	}}
 });

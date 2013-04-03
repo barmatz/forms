@@ -33,6 +33,7 @@ Object.defineProperties(barmatz.forms.ui.PropertiesController.prototype,
 		if(this._model)
 		{
 			itemsWrapper = barmatz.forms.factories.DOMFactory.createPropertiesItemWarpper(this._model);
+			itemsWrapper.validationOptionsButton.addEventListener('click', onItemsWrapperValidationOptionsButtonClick);
 			
 			if(itemsWrapper.editItemsButton)
 				itemsWrapper.editItemsButton.addEventListener('click', onItemsWrapperEditItemsButtonClick);
@@ -42,6 +43,12 @@ Object.defineProperties(barmatz.forms.ui.PropertiesController.prototype,
 		}
 		else
 			this._view.appendChild(barmatz.forms.factories.DOMFactory.createElementWithContent('h2', 'forms-filler', 'No item selected'));
+		
+		function onItemsWrapperValidationOptionsButtonClick(event)
+		{
+			var dialogWrapper = barmatz.forms.factories.DOMFactory.createFieldValidationOptionsDialogWrapper(_this._model);
+			barmatz.forms.factories.ControllerFactory.createFieldValidationOptionsController(_this.model, dialogWrapper.options);
+		}
 		
 		function onItemsWrapperEditItemsButtonClick(event)
 		{
@@ -88,6 +95,8 @@ Object.defineProperties(barmatz.forms.ui.PropertiesController.prototype,
 					break;
 				case 'multiple':
 					itemsWrapper.multipleField.value = event.value;
+					break;
+				case 'validatorCode':
 					break;
 			}
 		}

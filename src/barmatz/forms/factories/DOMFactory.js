@@ -304,6 +304,8 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 			returnWrapper.editItemsButton = addFieldToWrapper('button', '', 'Edit items');
 		}
 		
+		returnWrapper.validationOptionsButton = addFieldToWrapper('button', '', 'Validation options');
+		
 		return returnWrapper;
 		
 		function addFieldToWrapper(type, name, label, value)
@@ -962,5 +964,101 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 
 			return createField(label, _this.createDropboxElement(model));
 		}
+	}},
+	createFieldValidationOptionsDialogWrapper: {value: function(model)
+	{
+		var fieldValidationOptionsWrapper;
+		
+		barmatz.utils.DataTypes.isNotUndefined(model);
+		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FieldModel);
+		
+		fieldValidationOptionsWrapper = this.createFieldValidationOptionsWrapper(model);
+		
+		return {dialog: this.createDialog(barmatz.utils.String.firstLetterToUpperCase(model.type) + ' field "' + model.name + '" validation options', fieldValidationOptionsWrapper.wrapper, true), options: fieldValidationOptionsWrapper.options};
+	}},
+	createFieldValidationOptionsWrapper: {value: function(model)
+	{
+		var wrapper, options, fieldValidatorWrapper, bits, i;
+		
+		barmatz.utils.DataTypes.isNotUndefined(model);
+		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FieldModel);
+		
+		wrapper = this.createElement('div');
+		bits = barmatz.utils.Bitwise.parseBit(model.availableValidators);
+		options = {};
+		
+		for(i in bits)
+		{
+			fieldValidatorWrapper = this.createFieldValidatorWrapper(bits[i]);
+			options[bits[i]] = fieldValidatorWrapper.checkbox;
+			wrapper.appendChild(fieldValidatorWrapper.wrapper);
+		}
+		
+		barmatz.utils.DOM.sort(wrapper, function(elementA, elementB)
+		{
+			var a, b;
+			
+			a = elementA.getElementsByTagName('span')[0].innerHTML;
+			b = elementB.getElementsByTagName('span')[0].innerHTML;
+			
+			return a > b ? 1 : a < b ? -1 : 0;
+		});
+
+		return {wrapper: wrapper, options: options};
+	}},
+	createFieldValidatorWrapper: {value: function(bit)
+	{
+		var wrapper, checkbox, label;
+		
+		barmatz.utils.DataTypes.isNotUndefined(bit);
+		barmatz.utils.DataTypes.isTypeOf(bit, 'number');
+		
+		checkbox = this.createElement('input');
+		checkbox.type = 'checkbox';
+		
+		label = this.createElement('span');
+		
+		wrapper = this.createElement('div');
+		wrapper.appendChild(checkbox);
+		wrapper.appendChild(label);
+		
+		switch(bit)
+		{
+			default:
+				throw new Error('Unknown bit');
+				break;
+			case barmatz.forms.ValidationModel.EQUALS:
+				label.innerHTML = 'equals...';
+				break;
+			case barmatz.forms.ValidationModel.VALID_EMAIL:
+				label.innerHTML = 'valid email';
+				break;
+			case barmatz.forms.ValidationModel.VALID_PHONE:
+				label.innerHTML = 'valid phone number';
+				break;
+			case barmatz.forms.ValidationModel.MIN_LENGTH:
+				label.innerHTML = 'minimum length...';
+				break;
+			case barmatz.forms.ValidationModel.MAX_LENGTH:
+				label.innerHTML = 'maximum length...';
+				break;
+			case barmatz.forms.ValidationModel.EXAC_LENGTH:
+				label.innerHTML = 'exact length...';
+				break;
+			case barmatz.forms.ValidationModel.GREATER_THAN:
+				label.innerHTML = 'number greater than...';
+				break;
+			case barmatz.forms.ValidationModel.LESSER_THAN:
+				label.innerHTML = 'number lesser than...';
+				break;
+			case barmatz.forms.ValidationModel.DIGITS_ONLY:
+				label.innerHTML = 'only digits';
+				break;
+			case barmatz.forms.ValidationModel.NOT_DIGITS:
+				label.innerHTML = 'not digits';
+				break;
+		}
+		
+		return {wrapper: wrapper, checkbox: checkbox}; 
 	}}
 });

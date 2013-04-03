@@ -45,7 +45,7 @@ window.barmatz.forms.ui.WorkspaceItemController = function(model, labelView, fie
 		{
 			default:
 				throw new Error('unknown key');
-			break;
+				break;
 			case 'name':
 				fieldView.name = value;
 				break;
@@ -84,6 +84,8 @@ window.barmatz.forms.ui.WorkspaceItemController = function(model, labelView, fie
 				break;
 			case 'multiple':
 				fieldView.multiple = value;
+				break;
+			case 'validatorCode':
 				break;
 		}
 	}

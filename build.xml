@@ -21,7 +21,7 @@
 			<fileset dir="${SRC_DIR}/barmatz/events" includes="Event.js"/>
 			<fileset dir="${SRC_DIR}/barmatz/events" includes="**/*.js" excludes="Event.js"/>
 			<fileset dir="${SRC_DIR}/barmatz/mvc" includes="**/*.js"/>
-			<fileset dir="${SRC_DIR}/barmatz/forms" includes="TypeModel.js CollectionController.js CollectionModel.js"/>
+			<fileset dir="${SRC_DIR}/barmatz/forms" includes="TypeModel.js CollectionController.js CollectionModel.js ValidationModel.js"/>
 			<fileset dir="${SRC_DIR}/barmatz/forms/fields" includes="FieldModel.js TextFieldModel.js"/>
 			<fileset dir="${SRC_DIR}/barmatz/forms/fields" includes="**/*.js" excludes="FieldModel.js TextFieldModel.js"/>
 			<fileset dir="${SRC_DIR}/barmatz/forms/ui" includes="DialogController.js PromptDialogController.js"/>
@@ -36,7 +36,7 @@
 			<fileset dir="${SRC_DIR}/barmatz/events" includes="Event.js"/>
 			<fileset dir="${SRC_DIR}/barmatz/events" includes="EventDispatcher.js ModelEvent.js Event.js FormModelEvent.js LoaderEvent.js CollectionEvent.js" excludes="Event.js"/>
 			<fileset dir="${SRC_DIR}/barmatz/mvc" includes="Model.js Controller.js"/>
-			<fileset dir="${SRC_DIR}/barmatz/forms" includes="FormModel.js FormController.js CollectionModel.js CollectionController.js Methods.js TypeModel.js"/>
+			<fileset dir="${SRC_DIR}/barmatz/forms" includes="FormModel.js FormController.js CollectionModel.js CollectionController.js Methods.js TypeModel.js ValidationModel.js"/>
 			<fileset dir="${SRC_DIR}/barmatz/forms/factories" includes="ModelFactory.js DOMFactory.js ControllerFactory.js"/>
 			<fileset dir="${SRC_DIR}/barmatz/forms/fields" includes="FieldModel.js TextFieldModel.js"/>
 			<fileset dir="${SRC_DIR}/barmatz/forms/fields" includes="**/*.js" excludes="FieldModel.js TextFieldModel.js"/>
