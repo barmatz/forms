@@ -568,7 +568,7 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 			textarea
 		]), open);
 	}},
-	createChangePropertyPromptDialog: {value: function(title, key, value, confirmHandler, open)
+	createChangePropertyPromptDialogWrapper: {value: function(title, key, value, confirmHandler, open)
 	{
 		var field, wrapper;
 

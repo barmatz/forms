@@ -96,7 +96,7 @@ Object.defineProperties(barmatz.forms.ui.PropertiesController.prototype,
 				case 'multiple':
 					itemsWrapper.multipleField.value = event.value;
 					break;
-				case 'validatorCode':
+				case 'validator':
 					break;
 			}
 		}

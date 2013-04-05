@@ -85,7 +85,7 @@ window.barmatz.forms.ui.WorkspaceItemController = function(model, labelView, fie
 			case 'multiple':
 				fieldView.multiple = value;
 				break;
-			case 'validatorCode':
+			case 'validator':
 				break;
 		}
 	}

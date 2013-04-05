@@ -11,7 +11,7 @@ window.barmatz.forms.fields.FieldModel = function(type, name)
 	this.set('mandatory', false);
 	this.set('value', '');
 	this.set('enabled', true);
-	this.set('validatorCode', barmatz.forms.ValidationModel.NONE);
+	this.set('validator', barmatz.forms.ValidationModel.NONE);
 };
 
 barmatz.forms.fields.FieldModel.prototype = new barmatz.forms.TypeModel(null);
@@ -71,13 +71,15 @@ Object.defineProperties(barmatz.forms.fields.FieldModel.prototype,
 			   barmatz.forms.ValidationModel.DIGITS_ONLY +
 			   barmatz.forms.ValidationModel.NOT_DIGITS;
 	}},
-	validatorCode: {get: function()
+	validator: {get: function()
 	{
-		return this.get('validatorCode');
+		if(!this.get('validator'))
+			this.set('validator', {});
+		return this.get('validator');
 	}, set: function(value)
 	{
-		barmatz.utils.DataTypes.isTypeOf(value, 'number');
-		this.set('validatorCode', value);
+		barmatz.utils.DataTypes.isTypeOf(value, 'object');
+		this.set('validator', value);
 	}},
 	clone: {value: function()
 	{
@@ -86,7 +88,7 @@ Object.defineProperties(barmatz.forms.fields.FieldModel.prototype,
 		clone.mandatory = this.mandatory;
 		clone.value = this.value;
 		clone.enabled = this.enabled;
-		clone.validatorCode = this.validatorCode;
+		clone.validator = this.validator;
 		return clone;
 	}},
 	toHTML: {value: function()

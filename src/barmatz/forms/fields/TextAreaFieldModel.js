@@ -34,7 +34,7 @@ Object.defineProperties(barmatz.forms.fields.TextAreaFieldModel.prototype,
 		clone.mandatory = this.mandatory;
 		clone.value = this.value;
 		clone.enabled = this.enabled;
-		clone.validatorCode = this.validatorCode;
+		clone.validator = this.validator;
 		clone.rows = this.rows;
 		clone.cols = this.cols;
 		return clone;

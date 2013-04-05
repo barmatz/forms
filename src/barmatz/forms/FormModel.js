@@ -133,7 +133,7 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 				field.label = item.label;
 				field.mandatory = item.mandatory;
 				field.enabled = item.enabled;
-				field.validatorCode = item.validatorCode;
+				field.validator = item.validator;
 			}
 			
 			if(item instanceof barmatz.forms.fields.FileFieldModel)

@@ -31,7 +31,7 @@ Object.defineProperties(barmatz.forms.fields.CheckboxFieldModel.prototype,
 		clone.mandatory = this.mandatory;
 		clone.value = this.value;
 		clone.enabled = this.enabled;
-		clone.validatorCode = this.validatorCode;
+		clone.validator = this.validator;
 		clone.checked = this.checked;
 		return clone;
 	}},

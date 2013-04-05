@@ -266,7 +266,7 @@ window.barmatz.forms.ui.BuilderController = function(formModel, userModel, conta
 	
 	function onMenuNewClick(event)
 	{
-		formRenameField = barmatz.forms.factories.DOMFactory.createChangePropertyPromptDialog('New form', 'Name', formModel.name, onResetFromConfirm, true).field;
+		formRenameField = barmatz.forms.factories.DOMFactory.createChangePropertyPromptDialogWrapper('New form', 'Name', formModel.name, onResetFromConfirm, true).field;
 	}
 	
 	function onMenuSaveClick(event)
@@ -276,7 +276,7 @@ window.barmatz.forms.ui.BuilderController = function(formModel, userModel, conta
 	
 	function onMenuSaveAsClick(event)
 	{
-		formRenameField = barmatz.forms.factories.DOMFactory.createChangePropertyPromptDialog('Save as', 'Form name', formModel.name, onSaveFromAsConfirm, true).field;
+		formRenameField = barmatz.forms.factories.DOMFactory.createChangePropertyPromptDialogWrapper('Save as', 'Form name', formModel.name, onSaveFromAsConfirm, true).field;
 	}
 	
 	function onMenuLoadClick(event)
@@ -287,7 +287,7 @@ window.barmatz.forms.ui.BuilderController = function(formModel, userModel, conta
 	
 	function onMenuRenameClick(event)
 	{
-		formRenameField = barmatz.forms.factories.DOMFactory.createChangePropertyPromptDialog('Rename form', 'Name', formModel.name, onRenameFromConfirm, true).field;
+		formRenameField = barmatz.forms.factories.DOMFactory.createChangePropertyPromptDialogWrapper('Rename form', 'Name', formModel.name, onRenameFromConfirm, true).field;
 	}
 	
 	function onMenuExportClick(event)
