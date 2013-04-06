@@ -38,9 +38,5 @@ Object.defineProperties(barmatz.forms.fields.TextAreaFieldModel.prototype,
 		clone.rows = this.rows;
 		clone.cols = this.cols;
 		return clone;
-	}},
-	toHTML: {value: function()
-	{
-		return barmatz.forms.fields.FieldModel.prototype.toHTML.call(this).replace(/(\<input.*\/\>)/, '<textarea cols="' + this.cols + '"' + (this.enabled ? '' : ' disabled="disabled"') + ' name="' + this.name + '"  rows="' + this.rows + '">' + this.value + '</textarea>');
 	}}
 });

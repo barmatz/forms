@@ -34,9 +34,5 @@ Object.defineProperties(barmatz.forms.fields.CheckboxFieldModel.prototype,
 		clone.validator = this.validator;
 		clone.checked = this.checked;
 		return clone;
-	}},
-	toHTML: {value: function()
-	{
-		return barmatz.forms.fields.FieldModel.prototype.toHTML.call(this).replace(/(\<input)\s/, '$1 ' + (this.checked ? 'checked="checked"' : ''));
 	}}
 });

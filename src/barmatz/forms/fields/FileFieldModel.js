@@ -32,9 +32,5 @@ Object.defineProperties(barmatz.forms.fields.FileFieldModel.prototype,
 		clone.validator = this.validator;
 		clone.accept = this.accept;
 		return clone;
-	}},
-	toHTML: {value: function()
-	{
-		return barmatz.forms.fields.FieldModel.prototype.toHTML.call(this).replace(/(\<input)\s/, '$1 accept="' + this.accept.join(',') + '"');
 	}}
 });

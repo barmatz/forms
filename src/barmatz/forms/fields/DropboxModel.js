@@ -117,16 +117,5 @@ Object.defineProperties(barmatz.forms.fields.DropboxModel.prototype,
 	toString: {value: function()
 	{
 		return this.get('items').toString();
-	}},
-	toHTML: {value: function()
-	{
-		var items = '';
-		
-		this.forEach(function(item, index, collection)
-		{
-			items += item.toHTML();
-		});
-		
-		return barmatz.forms.fields.FieldModel.prototype.toHTML.call(this).replace(/(\<input.*\/\>)/, '<select' + (this.enabled ? '' : ' disbaled="disbaled"') + (this.multiple ? ' multiple="multiple"' : '') + ' name="' + this.name + '">' + items + '</select>');
 	}}
 });

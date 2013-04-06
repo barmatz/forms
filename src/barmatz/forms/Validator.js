@@ -1,13 +1,13 @@
-/** barmatz.forms.ValidationModel **/
-window.barmatz.forms.ValidationModel = function()
+/** barmatz.forms.Validator **/
+window.barmatz.forms.Validator = function()
 {
 	barmatz.mvc.Model.call(this);
 };
 
-barmatz.forms.ValidationModel.prototype = new barmatz.mvc.Model();
-barmatz.forms.ValidationModel.prototype.constructor = barmatz.forms.ValidationModel;
+barmatz.forms.Validator.prototype = new barmatz.mvc.Model();
+barmatz.forms.Validator.prototype.constructor = barmatz.forms.Validator;
 
-Object.defineProperties(barmatz.forms.ValidationModel,
+Object.defineProperties(barmatz.forms.Validator,
 {
 	NONE: {value: 0X0},
 	NOT_EMPTY: {value: 0X1},
@@ -16,14 +16,11 @@ Object.defineProperties(barmatz.forms.ValidationModel,
 	VALID_PHONE: {value: 0x8},
 	MIN_LENGTH: {value: 0x10},
 	MAX_LENGTH: {value: 0x20},
-	EXAC_LENGTH: {value: 0x40},
+	EXACT_LENGTH: {value: 0x40},
 	GREATER_THAN: {value: 0x80},
 	LESSER_THAN: {value: 0x100},
 	DIGITS_ONLY: {value: 0x200},
-	NOT_DIGITS: {value: 0x400}
-});
-Object.defineProperties(barmatz.forms.ValidationModel.prototype,
-{
+	NOT_DIGITS: {value: 0x400},
 	trim: {value: function(string)
 	{
 		barmatz.utils.DataTypes.isNotUndefined(string);
@@ -58,13 +55,13 @@ Object.defineProperties(barmatz.forms.ValidationModel.prototype,
 		barmatz.utils.DataTypes.isTypeOf(number, 'string');
 		return this.digitsOnly(prefix) && this.equals(number, /^[2-9]\d{6}$/);
 	}},
-	minLength: {value: function(value, length)
+	maxLength: {value: function(value, length)
 	{
 		barmatz.utils.DataTypes.isNotUndefined(value);
 		barmatz.utils.DataTypes.isNotUndefined(length);
 		barmatz.utils.DataTypes.isTypeOf(value, 'string');
 		barmatz.utils.DataTypes.isTypeOf(length, 'number');
-		return value.length > length;
+		return value.length <= length;
 	}},
 	minLength: {value: function(value, length)
 	{
@@ -72,15 +69,31 @@ Object.defineProperties(barmatz.forms.ValidationModel.prototype,
 		barmatz.utils.DataTypes.isNotUndefined(length);
 		barmatz.utils.DataTypes.isTypeOf(value, 'string');
 		barmatz.utils.DataTypes.isTypeOf(length, 'number');
-		return value.length < length;
+		return value.length >= length;
 	}},
-	exacLength: {value: function(value, length)
+	exactLength: {value: function(value, length)
 	{
 		barmatz.utils.DataTypes.isNotUndefined(value);
 		barmatz.utils.DataTypes.isNotUndefined(length);
 		barmatz.utils.DataTypes.isTypeOf(value, 'string');
 		barmatz.utils.DataTypes.isTypeOf(length, 'number');
 		return value.length == length;
+	}},
+	greaterThan: {value: function(valueA, valueB)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(valueA);
+		barmatz.utils.DataTypes.isNotUndefined(valueB);
+		barmatz.utils.DataTypes.isTypeOf(valueA, 'number');
+		barmatz.utils.DataTypes.isTypeOf(valueB, 'number');
+		return valueA > valueB;
+	}},
+	lesserThan: {value: function(valueA, valueB)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(valueA);
+		barmatz.utils.DataTypes.isNotUndefined(valueB);
+		barmatz.utils.DataTypes.isTypeOf(valueA, 'number');
+		barmatz.utils.DataTypes.isTypeOf(valueB, 'number');
+		return valueA < valueB;
 	}},
 	digitsOnly: {value: function(value)
 	{

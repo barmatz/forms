@@ -34,11 +34,6 @@ Object.defineProperties(barmatz.events.FormModelEvent.prototype,
 	}},
 	toString: {value: function()
 	{
-		switch(this.type)
-		{
-			default:
-				return this.formatToString('FormModelEvent', 'type');
-				break;
-		}
+		return this.formatToString('FormModelEvent', 'type');
 	}}
 });

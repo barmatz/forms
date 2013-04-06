@@ -30,9 +30,5 @@ Object.defineProperties(barmatz.forms.fields.TextFieldModel.prototype,
 		clone.validator = this.validator;
 		clone.max = this.max;
 		return clone;
-	}},
-	toHTML: {value: function()
-	{
-		return barmatz.forms.fields.FieldModel.prototype.toHTML.call(this).replace(/(\<input)\s/, '$1 ' + (isNaN(this.max) ? '' : 'maxlength="' + this.max + '"') + ' ');
 	}}
 });

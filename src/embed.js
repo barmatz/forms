@@ -45,13 +45,49 @@ barmatz.forms.embed = function(fingerprint)
 		model.removeEventListener(barmatz.events.FormModelEvent.LOADING_FORM_ERROR, onLoadingFormError);
 	}
 	
+	function addFormToContainer(model)
+	{
+		var container, wrapper, field, submitButton, i;
+		
+		container = dictionary.get(model);
+		wrapper = barmatz.forms.factories.DOMFactory.createElement('div', 'forms-form-wrapper');
+		form = barmatz.forms.factories.DOMFactory.createElement('form');
+		submitButton = barmatz.forms.factories.DOMFactory.createElementWithContent('button', 'forms-form-submit-button', model.submitButtonLabel);
+		
+		container.innerHTML = '';
+
+		for(i in model.stylesheets)
+			container.appendChild(barmatz.forms.factories.DOMFactory.createStylesheet(model.stylesheets[i]));
+		
+		model.forEach(function(item, index, collection)
+		{
+			var field, errorMessage;
+			
+			field = barmatz.forms.factories.DOMFactory.createFormFieldElement(item);
+			field.name = item.name;
+			errorMessage = barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageElement();
+			
+			form.appendChild(barmatz.forms.factories.DOMFactory.createElementWithContent('div', 'forms-form-item', [
+				barmatz.forms.factories.DOMFactory.createElementWithContent('label', '', item.label),
+				field,
+				barmatz.forms.factories.DOMFactory.createElementWithContent('span', 'forms-form-item-mandatory', item.mandatory ? '*' : ''),
+				 errorMessage
+			]));
+			barmatz.forms.factories.ControllerFactory.createFieldController(item, field, errorMessage);
+		});
+		
+		form.appendChild(barmatz.forms.factories.DOMFactory.createElementWithContent('div', 'forms-form-item forms-form-submit', submitButton));
+		wrapper.appendChild(form);
+		container.appendChild(wrapper);
+		
+		barmatz.forms.factories.ControllerFactory.createFormController(model, form, submitButton);
+	}
+	
 	function onLoadingFormComplete(event)
 	{
-		var container = dictionary.get(event.target);
-		dictionary.remove(event.target);
+		addFormToContainer(event.target);
 		removeFormModelListeners(event.target);
-		container.innerHTML = event.target.toHTML();
-		barmatz.forms.factories.ControllerFactory.createFormController(event.target, container.getElementsByTagName('form')[0]);
+		dictionary.remove(event.target);
 	}
 	
 	function onLoadingFormError(event)

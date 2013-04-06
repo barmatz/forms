@@ -4,6 +4,7 @@ window.barmatz.forms.fields.PhoneFieldModel = function(name)
 	barmatz.utils.DataTypes.isNotUndefined(name);
 	barmatz.utils.DataTypes.isTypeOf(name, 'string', true);
 	barmatz.forms.fields.FieldModel.call(this, barmatz.forms.fields.FieldTypes.PHONE, name);
+	this.set('prefix', '');
 };
 
 barmatz.forms.fields.PhoneFieldModel.prototype = new barmatz.forms.fields.FieldModel(null, null);
@@ -39,7 +40,7 @@ Object.defineProperties(barmatz.forms.fields.PhoneFieldModel.prototype,
 			value = value.replace(new RegExp(prefixesRegex + '(.+$)'), '$2');
 		}
 		else
-			this.set('prefix', null);
+			this.set('prefix', '');
 		
 		if(value.length > 7)
 			value = value.substring(0, 7);
@@ -55,16 +56,5 @@ Object.defineProperties(barmatz.forms.fields.PhoneFieldModel.prototype,
 		clone.enabled = this.enabled;
 		clone.validator = this.validator;
 		return clone;
-	}},
-	toHTML: {value: function()
-	{
-		var prefixes = '';
-		
-		barmatz.forms.fields.PhonePrefixes.forEach(function(prefix)
-		{
-			prefixes += '<option value="' + prefix + '"' + (prefix == this.prefix ? ' selected="selected"' : '') + '>' + prefix + '</option>';
-		});
-		
-		return barmatz.forms.fields.FieldModel.prototype.toHTML.call(this).replace(/(^.+?)(\<input)(.*)(type=").+?(".+)(\/\>)(\<\/div\>$)/, '$1<span name="' + this.name + '" rel="phone"><select name="' + this.name + '-prefix">' + prefixes + '</select>$2$3$4text$5 maxLength="7"$6</span>$7');
 	}}
 });

@@ -129,13 +129,15 @@ Object.defineProperties(barmatz.forms.factories.ControllerFactory,
 		barmatz.utils.DataTypes.isInstanceOf(fingerprintView, HTMLElement);
 		return new barmatz.forms.ui.UserFormsListItemController(model, view, nameView, createdView, fingerprintView);
 	}},
-	createFormController: {value: function(model, view)
+	createFormController: {value: function(model, formView, submitButtonView)
 	{
 		barmatz.utils.DataTypes.isNotUndefined(model);
-		barmatz.utils.DataTypes.isNotUndefined(view);
+		barmatz.utils.DataTypes.isNotUndefined(formView);
+		barmatz.utils.DataTypes.isNotUndefined(submitButtonView);
 		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.FormModel);
-		barmatz.utils.DataTypes.isInstanceOf(view, HTMLFormElement);
-		return new barmatz.forms.FormController(model, view);
+		barmatz.utils.DataTypes.isInstanceOf(formView, HTMLFormElement);
+		barmatz.utils.DataTypes.isInstanceOf(submitButtonView, HTMLElement);
+		return new barmatz.forms.FormController(model, formView, submitButtonView);
 	}},
 	createDropboxItemsListController: {value: function(model, view, addButtonView, resetButtonView)
 	{
@@ -167,6 +169,16 @@ Object.defineProperties(barmatz.forms.factories.ControllerFactory,
 		barmatz.utils.DataTypes.isNotUndefined(options);
 		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FieldModel);
 		barmatz.utils.DataTypes.isTypeOf(options, 'object');
-		return barmatz.forms.fields.FieldValidationOptionsController(model, options);
+		return new barmatz.forms.fields.FieldValidationOptionsController(model, options);
+	}},
+	createFieldController: {value: function(model, fieldView, errorMessageView)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(model);
+		barmatz.utils.DataTypes.isNotUndefined(fieldView);
+		barmatz.utils.DataTypes.isNotUndefined(errorMessageView);
+		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FieldModel);
+		barmatz.utils.DataTypes.isInstanceOf(fieldView, HTMLElement);
+		barmatz.utils.DataTypes.isInstanceOf(errorMessageView, HTMLElement);
+		return new barmatz.forms.fields.FieldController(model, fieldView, errorMessageView);
 	}}
 });

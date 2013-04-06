@@ -9,6 +9,7 @@ window.barmatz.forms.FormModel = function()
 	this.set('encoding', barmatz.net.Encoding.FORM);
 	this.set('created', null);
 	this.set('fingerprint', null);
+	this.stylesheets.push('http://www.quiz.co.il/css/form.css');
 };
 
 barmatz.forms.FormModel.prototype = new barmatz.forms.CollectionModel();
@@ -66,6 +67,12 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 		if(!this.fingerprint)
 			this.set('fingerprint', value);
 	}},
+	stylesheets: {get: function()
+	{
+		if(!this.get('stylesheets'))
+			this.set('stylesheets', []);
+		return this.get('stylesheets');
+	}},
 	addItem: {value: function(item)
 	{
 		barmatz.utils.DataTypes.isNotUndefined(item);
@@ -99,25 +106,6 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 		barmatz.utils.DataTypes.isInstanceOf(item, barmatz.forms.fields.FieldModel);
 		barmatz.utils.DataTypes.isTypeOf(index, 'number');
 		return barmatz.forms.CollectionModel.prototype.setItemIndex.call(this, item, index);
-	}},
-	toHTML: {value: function()
-	{
-		var fields = '';
-		
-		this.forEach(function(item, index, collection)
-		{
-			fields += item.toHTML();
-		});
-		
-		return '<link rel="stylesheet" type="text/css" href="http://www.quiz.co.il/css/form.css"/>' +
-			   '<div class="forms-form-wrapper">' +
-				   '<form onsubmit="return false;">' + 
-					   fields + 
-					   '<div class="forms-form-item forms-form-submit">' +
-					   		'<input type="submit" value="' + this.submitButtonLabel + '"/>' +
-					   '</div>' +
-				   '</form>' +
-			   '</div>';
 	}},
 	toJSON: {value: function()
 	{
@@ -295,6 +283,7 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 					field.label = data[i].label;
 					field.mandatory = data[i].mandatory;
 					field.enabled = data[i].enabled;
+					field.validator = data[i].validator;
 				}
 				
 				if(field instanceof barmatz.forms.fields.FileFieldModel)
@@ -387,16 +376,29 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 				_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.DELETION_FAIL));
 		}
 	}},
-	submit: {value: function(data)
+	isValid: {get: function()
 	{
-		var _this, request, loader;
+		var validFields = 0;
 		
-		barmatz.utils.DataTypes.isNotUndefined(data);
-		barmatz.utils.DataTypes.isTypeOf(data, 'object');
+		this.forEach(function(item, index, collection)
+		{
+			validFields += item.validate() ? 1 : 0;
+		});
+		
+		return validFields == this.numItems;
+	}},
+	submit: {value: function()
+	{
+		var _this, request, loader, data;
 		
 		_this = this;
+		data = {};
 		
-		_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.SUBMITTING));
+		this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.SUBMITTING));
+		this.forEach(function(item, index, collection)
+		{
+			data[item.name] = item.value;
+		});
 
 		request = new barmatz.net.Request('http://www.quiz.co.il/api/form/submit.php');
 		request.method = this.method;

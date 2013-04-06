@@ -10,4 +10,3 @@
 .forms-workspace-item .forms-workspace-item-label { width: 100px; max-width: 100%; padding-top: .7em; }
 .forms-workspace-item .forms-workspace-item-field { width: auto; position: relative; }
 .forms-workspace-item .forms-workspace-item-delete-button { width: 25px; max-width: 25px; padding: 0 5px; vertical-align: middle; }
-.forms-workspace-item .forms-workspace-item-mandatory { color: #F00; font-weight: bold; position: absolute; top: .5em; }

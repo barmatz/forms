@@ -40,28 +40,28 @@ window.barmatz.forms.fields.FieldValidationOptionsController = function(model, o
 		
 		switch(bit)
 		{
-			case barmatz.forms.ValidationModel.EQUALS:
+			case barmatz.forms.Validator.EQUALS:
 				getOptionParameters(option, 'Equals to', 'equals');
 				break;
-			case barmatz.forms.ValidationModel.EXAC_LENGTH:
-				getOptionParameters(option, 'Exact length', 'exactLength');
+			case barmatz.forms.Validator.EXACT_LENGTH:
+				getOptionParameters(option, 'Exact length', 'exactLength', true);
 				break;
-			case barmatz.forms.ValidationModel.MAX_LENGTH:
-				getOptionParameters(option, 'Maximum length', 'maxLength');
+			case barmatz.forms.Validator.MAX_LENGTH:
+				getOptionParameters(option, 'Maximum length', 'maxLength', true);
 				break;
-			case barmatz.forms.ValidationModel.MIN_LENGTH:
-				getOptionParameters(option, 'Minimum length', 'minLength');
+			case barmatz.forms.Validator.MIN_LENGTH:
+				getOptionParameters(option, 'Minimum length', 'minLength', true);
 				break;
-			case barmatz.forms.ValidationModel.GREATER_THAN:
-				getOptionParameters(option, 'Greater than', 'greaterThan');
+			case barmatz.forms.Validator.GREATER_THAN:
+				getOptionParameters(option, 'Greater than', 'greaterThan', true);
 				break;
-			case barmatz.forms.ValidationModel.LESSER_THAN:
-				getOptionParameters(option, 'Lesser than', 'lesserThan');
+			case barmatz.forms.Validator.LESSER_THAN:
+				getOptionParameters(option, 'Lesser than', 'lesserThan', true);
 				break;
 		}
 	}
 	
-	function getOptionParameters(option, label, key)
+	function getOptionParameters(option, label, key, isNumber)
 	{
 		var field;
 		
@@ -75,7 +75,7 @@ window.barmatz.forms.fields.FieldValidationOptionsController = function(model, o
 		if(option.checked)
 			field = barmatz.forms.factories.DOMFactory.createChangePropertyPromptDialogWrapper('', label, model.validator[key] || '', function(event)
 			{
-				model.validator[key] = field.value;
+				model.validator[key] = isNumber ? parseFloat(field.value) : field.value;
 			}, true).field;
 		else
 			delete model.validator[key];
