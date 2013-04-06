@@ -184,6 +184,22 @@ window.barmatz.forms.ui.BuilderController = function(formModel, userModel, conta
 			case 'id':
 				saveStatusView.innerHTML = '';
 				break;
+			case 'direction':
+				switch(event.value)
+				{
+					default:
+						throw new Error('Unknown direction');
+						break;
+					case barmatz.forms.Directions.LTR:
+						barmatz.utils.CSS.addClass(workspaceView, 'forms-ltr');
+						barmatz.utils.CSS.removeClass(workspaceView, 'forms-rtl');
+						break;
+					case barmatz.forms.Directions.RTL:
+						barmatz.utils.CSS.addClass(workspaceView, 'forms-rtl');
+						barmatz.utils.CSS.removeClass(workspaceView, 'forms-ltr');
+						break;
+				}
+				break;
 		}
 	}
 	
@@ -313,6 +329,9 @@ window.barmatz.forms.ui.BuilderController = function(formModel, userModel, conta
 			formModel.method = wrapper.methodField.value;
 			formModel.encoding = wrapper.encodingField.value;
 			formModel.submitButtonLabel = wrapper.submitButtonLabelField.value;
+			formModel.direction = wrapper.directionField.value;
+			formModel.stylesheets = wrapper.stylesheetsField.value.replace(/\s+/, ' ').split(' ');
+			formModel.targetEmail = wrapper.targetEmailField.value;
 		}
 	}
 	

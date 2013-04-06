@@ -23,7 +23,8 @@ class FormModel extends \api\database\DatabaseTableModel
 			'`data` text default null',
 			'`created` timestamp default current_timestamp',
 			'`fingerprint` char(255) unique not null',
-			'`user` int(11) not null'
+			'`user` int(11) not null',
+			'`email` char(255) not null'
 		));
 	}
 	
@@ -32,17 +33,17 @@ class FormModel extends \api\database\DatabaseTableModel
 		return base64_encode(mysql_fetch_object($this->query("show index from forms"))->Cardinality . 1 . mysql_fetch_object($this->query("select now() as a"))->a);
 	}
 	
-	protected function doInsert($userId, $name, $data)
+	protected function doInsert($userId, $name, $data, $email)
 	{
-		if($this->query("insert into `{$this->name}`(`user`, `name`, `data`, `fingerprint`) values($userId, '{$this->encodeString($name)}', '{$this->encodeString($data)}', '{$this->createFingerprint()}')"))
+		if($this->query("insert into `{$this->name}`(`user`, `name`, `data`, `fingerprint`, `email`) values($userId, '{$this->encodeString($name)}', '{$this->encodeString($data)}', '{$this->createFingerprint()}', '{$this->encodeString($email)}')"))
 			return mysql_fetch_object($this->query("select `fingerprint` from `{$this->name}` order by `id` desc"))->fingerprint;
 		else
 			\api\errors\Errors::internalServerError('Cannot insert data.');
 	}
 	
-	protected function doUpdate($fingerprint, $name, $data)
+	protected function doUpdate($fingerprint, $name, $data, $email)
 	{
-		if(!$this->query("update `{$this->name}` set `name`='{$this->encodeString($name)}', `data`='{$this->encodeString($data)}' where `fingerprint`='$fingerprint'"))
+		if(!$this->query("update `{$this->name}` set `name`='{$this->encodeString($name)}', `data`='{$this->encodeString($data)}', `email`='{$this->encodeString($email)}' where `fingerprint`='$fingerprint'"))
 			\api\errors\Errors::internalServerError('Cannot update data');
 	}
 	
@@ -56,6 +57,7 @@ class FormModel extends \api\database\DatabaseTableModel
 			$data->name = $this->decodeString($data->name);
 			$data->data = json_decode($this->decodeString($data->data));
 			$data->fingerprint = $this->decodeString($data->fingerprint);
+			$data->email = $this->decodeString($data->email);
 			return $data;
 		}
 		else
@@ -64,7 +66,7 @@ class FormModel extends \api\database\DatabaseTableModel
 	
 	public function getFormsByUser($id)
 	{
-		$result = $this->query("select `name`, `created`, `fingerprint` from `{$this->name}` where `user`=$id");
+		$result = $this->query("select `name`, `created`, `fingerprint`, `email from `{$this->name}` where `user`=$id");
 
 		if($result)
 		{
@@ -80,6 +82,21 @@ class FormModel extends \api\database\DatabaseTableModel
 		}
 		else
 			\api\errors\Errors::internalServerError('Cannot get forms by user');
+	}
+	
+	public function getFormByFingerprint($fingerprint)
+	{
+		$result = $this->query("select `name`, `created`, `user`, `email` from `{$this->name}` where `fingerprint`='$fingerprint'");
+
+		if($result)
+		{
+			$form = mysql_fetch_object($result);
+			$form->name = $this->decodeString($form->name);
+			$form->email = $this->decodeString($form->email);
+			return $form;
+		}
+		else
+			\api\errors\Errors::internalServerError('Cannot get forms by fingerprint');
 	}
 	
 	public function deleteForm($fingerprint)

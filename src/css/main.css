@@ -8,6 +8,6 @@ label { font-weight: bold; }
 .ui-icon-wrapper .ui-icon { margin: 0 4px; }
 .ui-icon-wrapper .ui-button-text { padding: 4px 0 !important; }
 .ui-corner-all { -webkit-border-radius: 3px !important; -moz-border-radius: 3px !important; border-radius: 3px !important; }
-.ui-dialog th, .ui-dialog td { vertical-align: middle; padding: .2em 0; }
-.forms-list-actions { text-align: right; }
 .forms-clickable-td td { cursor: pointer; }
+.forms-ltr .forms-list-actions { text-align: right; }
+.forms-rtl .forms-list-actions { text-align: left; }

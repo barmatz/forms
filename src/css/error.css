@@ -1,2 +1,3 @@
 .forms-error-wrapper { padding: .2em; }
-.forms-error-wrapper .ui-icon-alert:first-child { float: left; margin-right: .3em; }
+.forms-rtl .forms-error-wrapper .ui-icon-alert:first-child { float: left; margin-right: .3em; }
+.forms-ltr .forms-error-wrapper .ui-icon-alert:first-child { float: right; margin-left: .3em; }

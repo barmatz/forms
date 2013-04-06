@@ -4,5 +4,8 @@
 .forms-form-item label { width: 5em; display: inline-block; }
 .forms-form-item-mandatory { color: #F00; font-weight: bold; top: .5em; }
 .forms-form-item-error-message { min-height: 1.3em; font-weight: bold; color: #F00; margin: 0; padding: 0; }
-.forms-form-item-error-message-item { margin-left: 5em; }
-.forms-form-submit { text-align: right; }
+.forms-ltr .forms-form-item-error-message-item { margin-left: 5em; }
+.forms-rtl .forms-form-item-error-message-item { margin-right: 5em; }
+.forms-ltr .forms-form-submit { text-align: right; }
+.form-rtl .forms-form-submit { text-align: left; }
+.forms-phone-field { direction: ltr !important; }

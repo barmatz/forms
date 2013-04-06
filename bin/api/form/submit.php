@@ -9,4 +9,5 @@ function processForm()
 	global $db;
 	$model = new \api\form\LeadModel($db);
 	$model->insert($_REQUEST['f'], $_REQUEST['d']);
+	$model->email($_REQUEST['f'], $_REQUEST['d']);
 }

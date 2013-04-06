@@ -1,5 +1,6 @@
 /* Eric Meyer's Reset CSS v2.0 - http://cssreset.com */
 html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td,article,aside,canvas,details,embed,figure,figcaption,footer,header,hgroup,menu,nav,output,ruby,section,summary,time,mark,audio,video{border:0;font-size:100%;font:inherit;margin:0;padding:0}article,aside,details,figcaption,figure,footer,header,hgroup,menu,nav,section{display:block}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:none}table{border-collapse:collapse;border-spacing:0}th,td{vertical-align:top;}
+.ui-dialog th, .ui-dialog td { vertical-align: middle; padding: .2em 0; }
 .forms-dialog-footer { float: right; }
 .forms-dialog-prompt .ui-dialog-titlebar-close { display: none; }
 .forms-dialog-export-embedcode { width: 100%; height: 5em; }
@@ -11,19 +12,25 @@ html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abb
 .forms-dialog-collection-list tr { font-weight: inherit !important; }
 .forms-dialog-collection-list tr.odd td { background: rgba(255, 255, 255, .3); }
 .forms-dialog-collection-list tr.even td { background: rgba(255, 255, 255, .2); }
-.forms-dialog-form-properties { min-width: 360px; }
+.forms-dialog-form-properties { min-width: 420px; }
 .forms-dialog-dropbox-items .forms-list-actions { width: 58px; }
+.forms-ltr { direction: ltr; }
+.forms-rtl { direction: rtl; }
 .rounded-corner { -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; }
 .forms-error-wrapper { padding: .2em; }
-.forms-error-wrapper .ui-icon-alert:first-child { float: left; margin-right: .3em; }
+.forms-rtl .forms-error-wrapper .ui-icon-alert:first-child { float: left; margin-right: .3em; }
+.forms-ltr .forms-error-wrapper .ui-icon-alert:first-child { float: right; margin-left: .3em; }
 .forms-form-wrapper { display: inline-block; position: relative; }
 .forms-form-wrapper .loading-image { background-color: rgba(255, 255, 255, .7) !important; }
 .forms-form-item { display: block; }
 .forms-form-item label { width: 5em; display: inline-block; }
 .forms-form-item-mandatory { color: #F00; font-weight: bold; top: .5em; }
 .forms-form-item-error-message { min-height: 1.3em; font-weight: bold; color: #F00; margin: 0; padding: 0; }
-.forms-form-item-error-message-item { margin-left: 5em; }
-.forms-form-submit { text-align: right; }
+.forms-ltr .forms-form-item-error-message-item { margin-left: 5em; }
+.forms-rtl .forms-form-item-error-message-item { margin-right: 5em; }
+.forms-ltr .forms-form-submit { text-align: right; }
+.form-rtl .forms-form-submit { text-align: left; }
+.forms-phone-field { direction: ltr !important; }
 .loading-image { position: absolute; top: 0; left: 0; min-width: 126px; min-height: 22px; width: 100%; height: 100%; background: rgba(0,0,0,.3) url(images/ajax-loader.gif) 50% 50% no-repeat; }
 html, body { width: 100%; height: 100%; }
 body { font-size: 14px; font-family: Arial, Helvetica, sans-serif; }
@@ -35,9 +42,9 @@ label { font-weight: bold; }
 .ui-icon-wrapper .ui-icon { margin: 0 4px; }
 .ui-icon-wrapper .ui-button-text { padding: 4px 0 !important; }
 .ui-corner-all { -webkit-border-radius: 3px !important; -moz-border-radius: 3px !important; border-radius: 3px !important; }
-.ui-dialog th, .ui-dialog td { vertical-align: middle; padding: .2em 0; }
-.forms-list-actions { text-align: right; }
 .forms-clickable-td td { cursor: pointer; }
+.forms-ltr .forms-list-actions { text-align: right; }
+.forms-rtl .forms-list-actions { text-align: left; }
 .forms-menu { height: 2em; padding: .4em; background: #404040; }
 .forms-menu .ui-menu { position: absolute; top: .4em; min-width: 150px; min-height: 1.3em; }
 .forms-properties-panel { background: #E9E9E9; width: 232px; }

@@ -232,6 +232,8 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 				prefixModel.addItem(barmatz.forms.factories.ModelFactory.createDropboxItemModel(prefix, prefix));
 			});
 
+			barmatz.utils.CSS.addClass(field, 'forms-phone-field');
+			field.dir = 'ltr';
 			field.appendChild(_this.createDropboxElement(prefixModel));
 			field.appendChild(phoneField)
 		}
@@ -966,11 +968,11 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		
 		jQuery(dialog).dialog({dialogClass: 'forms-dialog-form-properties'});
 		
-		return {dialog: dialog, nameField: properties.nameField, submitButtonLabelField: properties.submitButtonLabelField, methodField: properties.methodField, encodingField: properties.encodingField};
+		return {dialog: dialog, nameField: properties.nameField, submitButtonLabelField: properties.submitButtonLabelField, methodField: properties.methodField, encodingField: properties.encodingField, stylesheetsField: properties.stylesheetsField, directionField: properties.directionField, targetEmailField: properties.targetEmailField};
 	}},
 	createFormPropertiesWrapper: {value: function(model)
 	{
-		var _this, options, nameField, methodField, encodingField, submitButtonLabelField;
+		var _this, options, nameField, methodField, encodingField, submitButtonLabelField, stylesheetsField, directionField, targetEmailField;
 		
 		barmatz.utils.DataTypes.isNotUndefined(model);
 		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.FormModel);
@@ -992,7 +994,16 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		encodingField = createDropbox('Encoding', 'formEncoding', [barmatz.net.Encoding.FORM, barmatz.net.Encoding.FILES]);
 		encodingField.value = model.encoding;
 		
-		return {wrapper: this.createTable(options), nameField: nameField, submitButtonLabelField: submitButtonLabelField, methodField: methodField, encodingField: encodingField};
+		stylesheetsField = createField('Stylesheets');
+		stylesheetsField.value = model.stylesheets.join(' ');
+		
+		directionField = createDropbox('Direction', 'formDirection', [barmatz.forms.Directions.LTR, barmatz.forms.Directions.RTL]);
+		directionField.value = model.direction;
+		
+		targetEmailField = createField('Target email');
+		targetEmailField.value = model.targetEmail;
+		
+		return {wrapper: this.createTable(options), nameField: nameField, submitButtonLabelField: submitButtonLabelField, methodField: methodField, encodingField: encodingField, stylesheetsField: stylesheetsField, directionField: directionField, targetEmailField: targetEmailField};
 		
 		function createField(label, content)
 		{

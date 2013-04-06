@@ -6,8 +6,8 @@ require_once dirname(__FILE__) . '/../config.php';
 class DatabaseTableModel
 {
 	const SCHEMA_NAME = CONF_MYSQL_DATABASE;
-	private $db, $dbSelected;
-	protected $name;
+	private $dbSelected;
+	protected $db, $name;
 
 	function __construct($name, $db)
 	{

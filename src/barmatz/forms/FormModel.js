@@ -9,7 +9,8 @@ window.barmatz.forms.FormModel = function()
 	this.set('encoding', barmatz.net.Encoding.FORM);
 	this.set('created', null);
 	this.set('fingerprint', null);
-	this.stylesheets.push('http://www.quiz.co.il/css/form.css');
+	this.set('direction', barmatz.forms.Directions.LTR);
+	this.set('targetEmail', '');
 };
 
 barmatz.forms.FormModel.prototype = new barmatz.forms.CollectionModel();
@@ -72,6 +73,26 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 		if(!this.get('stylesheets'))
 			this.set('stylesheets', []);
 		return this.get('stylesheets');
+	}, set: function(value)
+	{
+		barmatz.utils.DataTypes.isInstanceOf(value, Array);
+		this.set('stylesheets', value);
+	}},
+	direction: {get: function()
+	{
+		return this.get('direction');
+	}, set: function(value)
+	{
+		barmatz.utils.DataTypes.isTypeOf(value, 'string');
+		this.set('direction', value);
+	}},
+	targetEmail: {get: function()
+	{
+		return this.get('targetEmail');
+	}, set: function(value)
+	{
+		barmatz.utils.DataTypes.isTypeOf(value, 'string');
+		this.set('targetEmail', value);
 	}},
 	addItem: {value: function(item)
 	{
@@ -109,7 +130,18 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 	}},
 	toJSON: {value: function()
 	{
-		var object = {name: this.name, submitButtonLabel: this.submitButtonLabel, method: this.method, encoding: this.encoding, created: this.created ? this.created.valueOf() : NaN, fingerprint: this.fingerprint, fields: []};
+		var object = {
+			name: this.name, 
+			submitButtonLabel: this.submitButtonLabel, 
+			method: this.method, 
+			encoding: this.encoding, 
+			created: this.created ? this.created.valueOf() : NaN, 
+			fingerprint: this.fingerprint, 
+			stylesheets: this.stylesheets, 
+			direction: this.direction, 
+			targetEmail: this.targetEmail, 
+			fields: []
+		};
 		
 		this.forEach(function(item, index, collection)
 		{
@@ -161,6 +193,9 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 		this.set('encoding', barmatz.net.Encoding.FORM);
 		this.set('created', null);
 		this.set('fingerprint', null);
+		this.set('stylesheets', []);
+		this.set('direction', barmatz.forms.Direction.LRT);
+		this.set('targetEmail', '');
 		while(this.numItems > 0)
 			this.removeItemAt(this.numItems - 1);
 	}},
@@ -175,7 +210,7 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 
 		request = new barmatz.net.Request('http://quiz.co.il/api/form/save.php');
 		request.method = barmatz.net.Methods.POST;
-		request.data = {f: this.fingerprint || null, n: this.name, d: this.toJSON()};
+		request.data = {f: this.fingerprint || null, n: this.name, e: this.targetEmail, d: this.toJSON()};
 		loader = new barmatz.net.Loader();
 		loader.addEventListener(barmatz.events.LoaderEvent.DONE, onLoaderDone);
 		loader.load(request);
@@ -329,11 +364,14 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 					
 					data = data.data;
 					
-					_this.name = data.name;
-					_this.submitButtonLabel = data.submitButtonLabel;
+					_this.name = data.name || '';
+					_this.submitButtonLabel = data.submitButtonLabel || 'Submit';
 					_this.created = new Date(data.created);
-					_this.method = data.method;
-					_this.encoding = data.encoding;
+					_this.method = data.method || barmatz.forms.Methods.GET;
+					_this.encoding = data.encoding || barmatz.net.Encoding.FORM;
+					_this.direction = data.direction || barmatz.forms.Directions.LTR;
+					_this.targetEmail = data.targetEmail || '';
+					_this.set('stylesheets', data.stylesheets || []);
 					parseFieldsData(data.fields);
 					_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.LOADING_FORM_COMPLETE));
 				}

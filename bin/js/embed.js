@@ -79,6 +79,99 @@ Object.defineProperties(barmatz.utils.Bitwise,
 		return bitA & bitB ? true : false;
 	}}
 });
+/** barmatz.utils.CSS **/
+window.barmatz.utils.CSS = function(){};
+
+Object.defineProperties(barmatz.utils.CSS, 
+{
+	getStyle: {value: function(element)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(element);
+		barmatz.utils.DataTypes.isInstanceOf(element, HTMLElement);
+		
+		if(element.currentStyle)
+			return element.currentStyle;
+		else if(document.defaultView && document.defaultView.getComputedStyle)
+			return document.defaultView.getComputedStyle(element);
+		else
+			return element.style;
+	}},
+	unitToPixal: {value: function(element, value)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(element);
+		barmatz.utils.DataTypes.isNotUndefined(value);
+		barmatz.utils.DataTypes.isInstanceOf(element, HTMLElement);
+		barmatz.utils.DataTypes.isTypeOf(value, 'string');
+		
+		if(/em/.test(value))
+			return this.emToPixal(element, parseFloat(value));
+		else if(/px/.test(value))
+			return parseFloat(value);
+		else
+			return 0;
+	}},
+	emToPixal: {value: function(element, value)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(element);
+		barmatz.utils.DataTypes.isNotUndefined(value);
+		barmatz.utils.DataTypes.isInstanceOf(element, HTMLElement);
+		barmatz.utils.DataTypes.isTypeOf(value, 'number');
+		return parseFloat(this.getStyle(element).fontSize) * value;
+	}},
+	absoluteHeight: {value: function(element)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(element);
+		barmatz.utils.DataTypes.isInstanceOf(element, HTMLElement);
+		return element.offsetHeight + this.unitToPixal(element, this.getStyle(element).marginTop) + this.unitToPixal(element, this.getStyle(element).marginBottom) + this.unitToPixal(element, this.getStyle(element).borderTop) + this.unitToPixal(element, this.getStyle(element).borderBottom);
+	}},
+	absoluteWidth: {value: function(element)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(element);
+		barmatz.utils.DataTypes.isInstanceOf(element, HTMLElement);
+		return element.offsetWidth + this.unitToPixal(element, this.getStyle(element).marginLeft) + this.unitToPixal(element, this.getStyle(element).marginRight) + this.unitToPixal(element, this.getStyle(element).borderLeft) + this.unitToPixal(element, this.getStyle(element).borderRight);
+	}},
+	verticalAlign: {value: function(element)
+	{
+		var parent;
+		
+		barmatz.utils.DataTypes.isNotUndefined(element);
+		barmatz.utils.DataTypes.isInstanceOf(element, HTMLElement);
+		
+		parent = element.parentElement;
+		
+		if(parent)
+			element.style.marginTop = ((parent.offsetHeight * .5) - (this.absoluteHeight(element) * .5)) + 'px';
+	}},
+	verticalAlignChildren: {value: function(element)
+	{
+		var i;
+		
+		barmatz.utils.DataTypes.isNotUndefined(element);
+		barmatz.utils.DataTypes.isInstanceOf(element, HTMLElement);
+		
+		for(i = 0; i < element.childNodes.length; i++)
+			this.verticalAlign(element.childNodes[i]);
+	}},
+	addClass: {value: function(element, className)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(element);
+		barmatz.utils.DataTypes.isNotUndefined(className);
+		barmatz.utils.DataTypes.isInstanceOf(element, HTMLElement);
+		barmatz.utils.DataTypes.isTypeOf(className, 'string');
+		
+		if(element.className.indexOf(className) == -1)
+			element.className += ' ' + className;
+	}},
+	removeClass: {value: function(element, className)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(element);
+		barmatz.utils.DataTypes.isNotUndefined(className);
+		barmatz.utils.DataTypes.isInstanceOf(element, HTMLElement);
+		barmatz.utils.DataTypes.isTypeOf(className, 'string');
+		
+		element.className = element.className.replace(new RegExp('^' + className + '\\s?|\\s' + className + '[^\\S]?', 'g'), ' ').replace(/\s+/g, ' ').replace(/^\s+|\s+$/, '');
+	}}
+});
 /** barmatz.utils.DataTypes **/
 window.barmatz.utils.DataTypes = function(){};
 
@@ -836,6 +929,14 @@ Object.defineProperties(barmatz.forms.CollectionModel.prototype,
 		return this.get('items').slice(0);
 	}}
 });
+/** barmatz.forms.Directions **/
+window.barmatz.forms.Directions = function(){};
+
+Object.defineProperties(barmatz.forms.Directions,
+{
+	RTL: {value: 'right'},
+	LTR: {value: 'left'}
+});
 /** barmatz.forms.FormController **/
 window.barmatz.forms.FormController = function(model, formView, submitButtonView)
 {
@@ -927,7 +1028,8 @@ window.barmatz.forms.FormModel = function()
 	this.set('encoding', barmatz.net.Encoding.FORM);
 	this.set('created', null);
 	this.set('fingerprint', null);
-	this.stylesheets.push('http://www.quiz.co.il/css/form.css');
+	this.set('direction', barmatz.forms.Directions.LTR);
+	this.set('targetEmail', '');
 };
 
 barmatz.forms.FormModel.prototype = new barmatz.forms.CollectionModel();
@@ -990,6 +1092,26 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 		if(!this.get('stylesheets'))
 			this.set('stylesheets', []);
 		return this.get('stylesheets');
+	}, set: function(value)
+	{
+		barmatz.utils.DataTypes.isInstanceOf(value, Array);
+		this.set('stylesheets', value);
+	}},
+	direction: {get: function()
+	{
+		return this.get('direction');
+	}, set: function(value)
+	{
+		barmatz.utils.DataTypes.isTypeOf(value, 'string');
+		this.set('direction', value);
+	}},
+	targetEmail: {get: function()
+	{
+		return this.get('targetEmail');
+	}, set: function(value)
+	{
+		barmatz.utils.DataTypes.isTypeOf(value, 'string');
+		this.set('targetEmail', value);
 	}},
 	addItem: {value: function(item)
 	{
@@ -1027,7 +1149,18 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 	}},
 	toJSON: {value: function()
 	{
-		var object = {name: this.name, submitButtonLabel: this.submitButtonLabel, method: this.method, encoding: this.encoding, created: this.created ? this.created.valueOf() : NaN, fingerprint: this.fingerprint, fields: []};
+		var object = {
+			name: this.name, 
+			submitButtonLabel: this.submitButtonLabel, 
+			method: this.method, 
+			encoding: this.encoding, 
+			created: this.created ? this.created.valueOf() : NaN, 
+			fingerprint: this.fingerprint, 
+			stylesheets: this.stylesheets, 
+			direction: this.direction, 
+			targetEmail: this.targetEmail, 
+			fields: []
+		};
 		
 		this.forEach(function(item, index, collection)
 		{
@@ -1079,6 +1212,9 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 		this.set('encoding', barmatz.net.Encoding.FORM);
 		this.set('created', null);
 		this.set('fingerprint', null);
+		this.set('stylesheets', []);
+		this.set('direction', barmatz.forms.Direction.LRT);
+		this.set('targetEmail', '');
 		while(this.numItems > 0)
 			this.removeItemAt(this.numItems - 1);
 	}},
@@ -1093,7 +1229,7 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 
 		request = new barmatz.net.Request('http://quiz.co.il/api/form/save.php');
 		request.method = barmatz.net.Methods.POST;
-		request.data = {f: this.fingerprint || null, n: this.name, d: this.toJSON()};
+		request.data = {f: this.fingerprint || null, n: this.name, e: this.targetEmail, d: this.toJSON()};
 		loader = new barmatz.net.Loader();
 		loader.addEventListener(barmatz.events.LoaderEvent.DONE, onLoaderDone);
 		loader.load(request);
@@ -1247,11 +1383,14 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 					
 					data = data.data;
 					
-					_this.name = data.name;
-					_this.submitButtonLabel = data.submitButtonLabel;
+					_this.name = data.name || '';
+					_this.submitButtonLabel = data.submitButtonLabel || 'Submit';
 					_this.created = new Date(data.created);
-					_this.method = data.method;
-					_this.encoding = data.encoding;
+					_this.method = data.method || barmatz.forms.Methods.GET;
+					_this.encoding = data.encoding || barmatz.net.Encoding.FORM;
+					_this.direction = data.direction || barmatz.forms.Directions.LTR;
+					_this.targetEmail = data.targetEmail || '';
+					_this.set('stylesheets', data.stylesheets || []);
 					parseFieldsData(data.fields);
 					_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.LOADING_FORM_COMPLETE));
 				}
@@ -1900,6 +2039,8 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 				prefixModel.addItem(barmatz.forms.factories.ModelFactory.createDropboxItemModel(prefix, prefix));
 			});
 
+			barmatz.utils.CSS.addClass(field, 'forms-phone-field');
+			field.dir = 'ltr';
 			field.appendChild(_this.createDropboxElement(prefixModel));
 			field.appendChild(phoneField)
 		}
@@ -2634,11 +2775,11 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		
 		jQuery(dialog).dialog({dialogClass: 'forms-dialog-form-properties'});
 		
-		return {dialog: dialog, nameField: properties.nameField, submitButtonLabelField: properties.submitButtonLabelField, methodField: properties.methodField, encodingField: properties.encodingField};
+		return {dialog: dialog, nameField: properties.nameField, submitButtonLabelField: properties.submitButtonLabelField, methodField: properties.methodField, encodingField: properties.encodingField, stylesheetsField: properties.stylesheetsField, directionField: properties.directionField, targetEmailField: properties.targetEmailField};
 	}},
 	createFormPropertiesWrapper: {value: function(model)
 	{
-		var _this, options, nameField, methodField, encodingField, submitButtonLabelField;
+		var _this, options, nameField, methodField, encodingField, submitButtonLabelField, stylesheetsField, directionField, targetEmailField;
 		
 		barmatz.utils.DataTypes.isNotUndefined(model);
 		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.FormModel);
@@ -2660,7 +2801,16 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		encodingField = createDropbox('Encoding', 'formEncoding', [barmatz.net.Encoding.FORM, barmatz.net.Encoding.FILES]);
 		encodingField.value = model.encoding;
 		
-		return {wrapper: this.createTable(options), nameField: nameField, submitButtonLabelField: submitButtonLabelField, methodField: methodField, encodingField: encodingField};
+		stylesheetsField = createField('Stylesheets');
+		stylesheetsField.value = model.stylesheets.join(' ');
+		
+		directionField = createDropbox('Direction', 'formDirection', [barmatz.forms.Directions.LTR, barmatz.forms.Directions.RTL]);
+		directionField.value = model.direction;
+		
+		targetEmailField = createField('Target email');
+		targetEmailField.value = model.targetEmail;
+		
+		return {wrapper: this.createTable(options), nameField: nameField, submitButtonLabelField: submitButtonLabelField, methodField: methodField, encodingField: encodingField, stylesheetsField: stylesheetsField, directionField: directionField, targetEmailField: targetEmailField};
 		
 		function createField(label, content)
 		{
@@ -4329,6 +4479,20 @@ barmatz.forms.embed = function(fingerprint)
 		submitButton = barmatz.forms.factories.DOMFactory.createElementWithContent('button', 'forms-form-submit-button', model.submitButtonLabel);
 		
 		container.innerHTML = '';
+		container.appendChild(barmatz.forms.factories.DOMFactory.createStylesheet('http://www.quiz.co.il/css/form.css'));
+		
+		switch(model.direction)
+		{
+			default:
+				throw new Error('Unknown direction');
+				break;
+			case barmatz.forms.Directions.LTR:
+				barmatz.utils.CSS.addClass(wrapper, 'forms-ltr');
+				break;
+			case barmatz.forms.Directions.RTL:
+				barmatz.utils.CSS.addClass(wrapper, 'forms-rtl');
+				break;
+		}
 
 		for(i in model.stylesheets)
 			container.appendChild(barmatz.forms.factories.DOMFactory.createStylesheet(model.stylesheets[i]));

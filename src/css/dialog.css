@@ -1,3 +1,4 @@
+.ui-dialog th, .ui-dialog td { vertical-align: middle; padding: .2em 0; }
 .forms-dialog-footer { float: right; }
 .forms-dialog-prompt .ui-dialog-titlebar-close { display: none; }
 .forms-dialog-export-embedcode { width: 100%; height: 5em; }
@@ -9,5 +10,5 @@
 .forms-dialog-collection-list tr { font-weight: inherit !important; }
 .forms-dialog-collection-list tr.odd td { background: rgba(255, 255, 255, .3); }
 .forms-dialog-collection-list tr.even td { background: rgba(255, 255, 255, .2); }
-.forms-dialog-form-properties { min-width: 360px; }
+.forms-dialog-form-properties { min-width: 420px; }
 .forms-dialog-dropbox-items .forms-list-actions { width: 58px; }

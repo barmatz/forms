@@ -55,6 +55,20 @@ barmatz.forms.embed = function(fingerprint)
 		submitButton = barmatz.forms.factories.DOMFactory.createElementWithContent('button', 'forms-form-submit-button', model.submitButtonLabel);
 		
 		container.innerHTML = '';
+		container.appendChild(barmatz.forms.factories.DOMFactory.createStylesheet('http://www.quiz.co.il/css/form.css'));
+		
+		switch(model.direction)
+		{
+			default:
+				throw new Error('Unknown direction');
+				break;
+			case barmatz.forms.Directions.LTR:
+				barmatz.utils.CSS.addClass(wrapper, 'forms-ltr');
+				break;
+			case barmatz.forms.Directions.RTL:
+				barmatz.utils.CSS.addClass(wrapper, 'forms-rtl');
+				break;
+		}
 
 		for(i in model.stylesheets)
 			container.appendChild(barmatz.forms.factories.DOMFactory.createStylesheet(model.stylesheets[i]));
