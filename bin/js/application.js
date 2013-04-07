@@ -1384,7 +1384,7 @@ Object.defineProperties(barmatz.forms.Validator,
 		barmatz.utils.DataTypes.isNotUndefined(number);
 		barmatz.utils.DataTypes.isTypeOf(prefix, 'string');
 		barmatz.utils.DataTypes.isTypeOf(number, 'string');
-		return this.digitsOnly(prefix) && this.equals(number, /^[2-9]\d{6}$/);
+		return this.notEmpty(prefix) && this.digitsOnly(prefix) && this.equals(number, /^[2-9]\d{6}$/);
 	}},
 	maxLength: {value: function(value, length)
 	{
@@ -2043,6 +2043,8 @@ window.barmatz.forms.fields.FieldController = function(model, fieldView, errorMe
 			
 			if(model instanceof barmatz.forms.fields.PhoneFieldModel)
 				model.value = fieldView.getElementsByTagName('select')[0].value + fieldView.getElementsByTagName('input')[0].value;
+			else if(model instanceof barmatz.forms.fields.CheckboxFieldModel)
+				model.checked = fieldView.checked;
 			else
 				model.value = fieldView.value;
 			
@@ -2729,7 +2731,7 @@ window.barmatz.forms.ui.BuilderController = function(formModel, userModel, conta
 		addToolboxItem(barmatz.forms.fields.FieldTypes.TEXT_AREA, 'Text area');
 		addToolboxItem(barmatz.forms.fields.FieldTypes.PASSWORD, 'Password field');
 		addToolboxItem(barmatz.forms.fields.FieldTypes.CHECKBOX, 'Checkbox field');
-		addToolboxItem(barmatz.forms.fields.FieldTypes.RADIO, 'Radio field');
+		//addToolboxItem(barmatz.forms.fields.FieldTypes.RADIO, 'Radio field');
 		addToolboxItem(barmatz.forms.fields.FieldTypes.DROPBOX, 'Dropbox field');
 		addToolboxItem(barmatz.forms.fields.FieldTypes.PHONE, 'Phone field');
 	}
@@ -4914,6 +4916,8 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 		{
 			if(item instanceof barmatz.forms.fields.PhoneFieldModel)
 				data[item.name] = item.prefix + item.value;
+			else if(item instanceof barmatz.forms.fields.CheckboxFieldModel)
+				data[item.name] = item.checked ? 'yes' : 'no';
 			else
 				data[item.name] = item.value;
 		});
@@ -5121,7 +5125,7 @@ Object.defineProperties(barmatz.forms.Validator,
 		barmatz.utils.DataTypes.isNotUndefined(number);
 		barmatz.utils.DataTypes.isTypeOf(prefix, 'string');
 		barmatz.utils.DataTypes.isTypeOf(number, 'string');
-		return this.digitsOnly(prefix) && this.equals(number, /^[2-9]\d{6}$/);
+		return this.notEmpty(prefix) && this.digitsOnly(prefix) && this.equals(number, /^[2-9]\d{6}$/);
 	}},
 	maxLength: {value: function(value, length)
 	{

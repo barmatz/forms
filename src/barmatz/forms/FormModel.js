@@ -350,6 +350,8 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 		{
 			if(item instanceof barmatz.forms.fields.PhoneFieldModel)
 				data[item.name] = item.prefix + item.value;
+			else if(item instanceof barmatz.forms.fields.CheckboxFieldModel)
+				data[item.name] = item.checked ? 'yes' : 'no';
 			else
 				data[item.name] = item.value;
 		});

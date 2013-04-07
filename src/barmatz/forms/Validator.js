@@ -53,7 +53,7 @@ Object.defineProperties(barmatz.forms.Validator,
 		barmatz.utils.DataTypes.isNotUndefined(number);
 		barmatz.utils.DataTypes.isTypeOf(prefix, 'string');
 		barmatz.utils.DataTypes.isTypeOf(number, 'string');
-		return this.digitsOnly(prefix) && this.equals(number, /^[2-9]\d{6}$/);
+		return this.notEmpty(prefix) && this.digitsOnly(prefix) && this.equals(number, /^[2-9]\d{6}$/);
 	}},
 	maxLength: {value: function(value, length)
 	{

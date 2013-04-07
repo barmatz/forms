@@ -28,6 +28,8 @@ window.barmatz.forms.fields.FieldController = function(model, fieldView, errorMe
 			
 			if(model instanceof barmatz.forms.fields.PhoneFieldModel)
 				model.value = fieldView.getElementsByTagName('select')[0].value + fieldView.getElementsByTagName('input')[0].value;
+			else if(model instanceof barmatz.forms.fields.CheckboxFieldModel)
+				model.checked = fieldView.checked;
 			else
 				model.value = fieldView.value;
 			

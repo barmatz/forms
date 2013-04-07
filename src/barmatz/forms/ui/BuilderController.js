@@ -73,7 +73,7 @@ window.barmatz.forms.ui.BuilderController = function(formModel, userModel, conta
 		addToolboxItem(barmatz.forms.fields.FieldTypes.TEXT_AREA, 'Text area');
 		addToolboxItem(barmatz.forms.fields.FieldTypes.PASSWORD, 'Password field');
 		addToolboxItem(barmatz.forms.fields.FieldTypes.CHECKBOX, 'Checkbox field');
-		addToolboxItem(barmatz.forms.fields.FieldTypes.RADIO, 'Radio field');
+		//addToolboxItem(barmatz.forms.fields.FieldTypes.RADIO, 'Radio field');
 		addToolboxItem(barmatz.forms.fields.FieldTypes.DROPBOX, 'Dropbox field');
 		addToolboxItem(barmatz.forms.fields.FieldTypes.PHONE, 'Phone field');
 	}
