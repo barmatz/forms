@@ -1,4 +1,5 @@
 .forms-form-wrapper { display: inline-block; position: relative; }
+.forms-form-wrapper select { width: auto; }
 .forms-form-wrapper .loading-image { background-color: rgba(255, 255, 255, .7) !important; }
 .forms-form-item { display: block; }
 .forms-form-item label { width: 5em; display: inline-block; }

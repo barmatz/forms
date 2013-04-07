@@ -522,13 +522,16 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		jQuery(dialog).dialog('destroy');
 		dialog.parentElement.removeChild(dialog);
 	}},
-	createNewFieldDialogWrapper: {value: function()
+	createNewFieldDialogWrapper: {value: function(model)
 	{
 		var _this, dialog, nameField, labelField, wrapper, form, formTableOptions;
+
+		barmatz.utils.DataTypes.isNotUndefined(model);
+		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FieldModel);
 		
 		_this = this;
-		nameField = getField();
-		labelField = getField();
+		nameField = getField(model.name);
+		labelField = getField(model.label);
 		
 		formTableOptions = new barmatz.forms.ui.TableOptions();
 		formTableOptions.bodyRows.push(getRowContent('Name', nameField));
@@ -554,10 +557,16 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 			return [_this.createElementWithContent('label', '', label), field];
 		}
 		
-		function getField()
+		function getField(value)
 		{
-			var field = _this.createElement('input');
+			var field;
+
+			barmatz.utils.DataTypes.isNotUndefined(value);
+			barmatz.utils.DataTypes.isTypeOf(value, 'string');
+			
+			field = _this.createElement('input');
 			field.type = 'text';
+			field.value = value;
 			return field;
 		}
 	}},

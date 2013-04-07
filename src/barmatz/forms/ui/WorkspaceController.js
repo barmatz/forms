@@ -48,7 +48,7 @@ window.barmatz.forms.ui.WorkspaceController = function(model, view)
 		barmatz.utils.DataTypes.isNotUndefined(model);
 		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FieldModel);
 		
-		dialogWarpper = barmatz.forms.factories.DOMFactory.createNewFieldDialogWrapper();
+		dialogWarpper = barmatz.forms.factories.DOMFactory.createNewFieldDialogWrapper(model);
 		jQuery(dialogWarpper.wrapper).dialog('open');
 		
 		barmatz.forms.factories.ControllerFactory.createNewFieldDialogController(model, dialogWarpper.wrapper, dialogWarpper.nameField, dialogWarpper.labelField);

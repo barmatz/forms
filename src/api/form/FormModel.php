@@ -66,7 +66,7 @@ class FormModel extends \api\database\DatabaseTableModel
 	
 	public function getFormsByUser($id)
 	{
-		$result = $this->query("select `name`, `created`, `fingerprint`, `email from `{$this->name}` where `user`=$id");
+		$result = $this->query("select `name`, `created`, `fingerprint`, `email` from `{$this->name}` where `user`=$id");
 
 		if($result)
 		{

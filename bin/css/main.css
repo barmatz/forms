@@ -21,6 +21,7 @@ html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abb
 .forms-rtl .forms-error-wrapper .ui-icon-alert:first-child { float: left; margin-right: .3em; }
 .forms-ltr .forms-error-wrapper .ui-icon-alert:first-child { float: right; margin-left: .3em; }
 .forms-form-wrapper { display: inline-block; position: relative; }
+.forms-form-wrapper select { width: auto; }
 .forms-form-wrapper .loading-image { background-color: rgba(255, 255, 255, .7) !important; }
 .forms-form-item { display: block; }
 .forms-form-item label { width: 5em; display: inline-block; }
