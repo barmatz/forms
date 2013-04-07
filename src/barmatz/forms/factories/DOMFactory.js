@@ -344,6 +344,7 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 			returnWrapper.labelField = addFieldToWrapper('string', 'label', 'label', model.label);
 			returnWrapper.mandatoryField = addFieldToWrapper('boolean', 'mandatory', 'mandatory', model.mandatory);
 			returnWrapper.enabledField = addFieldToWrapper('boolean', 'enabled', 'enabled', model.enabled);
+			returnWrapper.widthField = addFieldToWrapper('number', 'width', 'width', model.width);
 		}
 		
 		if(model instanceof barmatz.forms.fields.FileFieldModel)
@@ -997,20 +998,20 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		submitButtonLabelField = createField('Submit button label');
 		submitButtonLabelField.value = model.submitButtonLabel;
 		
+		targetEmailField = createField('Target email');
+		targetEmailField.value = model.targetEmail;
+		
+		directionField = createDropbox('Direction', 'formDirection', [barmatz.forms.Directions.LTR, barmatz.forms.Directions.RTL]);
+		directionField.value = model.direction;
+		
+		stylesheetsField = createField('Stylesheets');
+		stylesheetsField.value = model.stylesheets.join(' ');
+		
 		methodField = createDropbox('Method', 'formMethod', ['GET', 'POST']);
 		methodField.value = model.method;
 		
 		encodingField = createDropbox('Encoding', 'formEncoding', [barmatz.net.Encoding.FORM, barmatz.net.Encoding.FILES]);
 		encodingField.value = model.encoding;
-		
-		stylesheetsField = createField('Stylesheets');
-		stylesheetsField.value = model.stylesheets.join(' ');
-		
-		directionField = createDropbox('Direction', 'formDirection', [barmatz.forms.Directions.LTR, barmatz.forms.Directions.RTL]);
-		directionField.value = model.direction;
-		
-		targetEmailField = createField('Target email');
-		targetEmailField.value = model.targetEmail;
 		
 		return {wrapper: this.createTable(options), nameField: nameField, submitButtonLabelField: submitButtonLabelField, methodField: methodField, encodingField: encodingField, stylesheetsField: stylesheetsField, directionField: directionField, targetEmailField: targetEmailField};
 		

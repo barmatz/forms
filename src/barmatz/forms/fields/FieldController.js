@@ -15,8 +15,30 @@ window.barmatz.forms.fields.FieldController = function(model, fieldView, errorMe
 	model.addEventListener(barmatz.events.FieldModelEvent.VALID, onModelValid);
 	model.addEventListener(barmatz.events.FieldModelEvent.INVALID, onModelInvalid);
 	fieldView.addEventListener('keydown', onFieldViewKeyDown);
+	fieldView.addEventListener('change', onFieldViewChange);
+	setModelValue();
 	setErrorMessageContent();
 	hideErrorMessage();
+	
+	function setModelValue()
+	{
+		if(!settingValue)
+		{
+			settingValue = true;
+			
+			if(model instanceof barmatz.forms.fields.PhoneFieldModel)
+				model.value = fieldView.getElementsByTagName('select')[0].value + fieldView.getElementsByTagName('input')[0].value;
+			else
+				model.value = fieldView.value;
+			
+			model.validate();
+			
+			settingValue = false;
+		}
+
+		fieldView.addEventListener('keydown', onFieldViewKeyDown);
+		fieldView.removeEventListener('keyup', onFieldViewKeyUp);
+	}
 	
 	function setErrorMessageContent()
 	{
@@ -128,24 +150,14 @@ window.barmatz.forms.fields.FieldController = function(model, fieldView, errorMe
 		fieldView.addEventListener('keyup', onFieldViewKeyUp);
 	}
 	
+	function onFieldViewChange(event)
+	{
+		setModelValue();
+	}
+	
 	function onFieldViewKeyUp(event)
 	{
-		if(!settingValue)
-		{
-			settingValue = true;
-			
-			if(model instanceof barmatz.forms.fields.PhoneFieldModel)
-				model.value = fieldView.getElementsByTagName('select')[0].value + fieldView.getElementsByTagName('input')[0].value;
-			else
-				model.value = fieldView.value;
-			
-			model.validate();
-			
-			settingValue = false;
-		}
-
-		fieldView.addEventListener('keydown', onFieldViewKeyDown);
-		fieldView.removeEventListener('keyup', onFieldViewKeyUp);
+		setModelValue();
 	}
 };
 

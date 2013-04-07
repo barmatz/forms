@@ -9,6 +9,7 @@ window.barmatz.forms.ui.WorkspaceController = function(model, view)
 	barmatz.utils.DataTypes.isInstanceOf(view, HTMLElement);
 	barmatz.forms.CollectionController.call(this, model, view);
 	
+	model.addEventListener(barmatz.events.ModelEvent.VALUE_CHANGED, onModelValueChanged);
 	model.addEventListener(barmatz.events.CollectionEvent.ITEM_ADDED, onModelItemAdded);
 	setViewToSortable();
 	
@@ -63,6 +64,32 @@ window.barmatz.forms.ui.WorkspaceController = function(model, view)
 	{
 		model.setItemIndex(model.getItemAt(selectedItemIndex), getIndexFromSortEvent(ui.item[0]));
 		selectedItemIndex = NaN;
+	}
+	
+	function onModelValueChanged(event)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(event);
+		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.ModelEvent);
+		
+		switch(event.key)
+		{
+			case 'direction':
+				switch(event.value)
+				{
+					default:
+						throw new Error('Unknown direction');
+						break;
+					case barmatz.forms.Directions.LTR:
+						barmatz.utils.CSS.addClass(view, 'forms-ltr');
+						barmatz.utils.CSS.removeClass(view, 'forms-rtl');
+						break;
+					case barmatz.forms.Directions.RTL:
+						barmatz.utils.CSS.addClass(view, 'forms-rtl');
+						barmatz.utils.CSS.removeClass(view, 'forms-ltr');
+						break;
+				}
+				break;
+		}
 	}
 	
 	function onModelItemAdded(event)

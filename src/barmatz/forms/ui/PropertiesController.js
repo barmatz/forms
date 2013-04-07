@@ -98,6 +98,9 @@ Object.defineProperties(barmatz.forms.ui.PropertiesController.prototype,
 					break;
 				case 'validator':
 					break;
+				case 'width':
+					itemsWrapper.widthField.value = event.value;
+					break;
 			}
 		}
 	}}

@@ -101,16 +101,9 @@ window.barmatz.forms.ui.UserFormsListController = function(formModel, userModel,
 	{
 		barmatz.utils.DataTypes.isNotUndefined(model);
 		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.FormModel);
-		formModel.id = model.id;
-		formModel.name = model.name;
-		formModel.created = model.created;
-		formModel.fingerprint = model.fingerprint;
 		
-		while(formModel.numItems > 0)
-			formModel.removeItemAt(formModel.numItems - 1);
-		
-		while(formModel.numItems < model.numItems)
-			formModel.addItem(model.getItemAt(formModel.numItems));
+		if(formModel !== model)
+			formModel.copy(model.fingerprint, model);
 	}
 	
 	function onFormModelLoadingForm(event)

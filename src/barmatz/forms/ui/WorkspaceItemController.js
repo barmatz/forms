@@ -25,7 +25,7 @@ window.barmatz.forms.ui.WorkspaceItemController = function(model, labelView, fie
 		model.addEventListener(barmatz.events.CollectionEvent.ITEM_REMOVED, onModelItemRemoved);
 		model.forEach(function(item, index, collection)
 		{
-			addItem(item);
+			addItem(item, index);
 		});
 	}
 	
@@ -87,15 +87,27 @@ window.barmatz.forms.ui.WorkspaceItemController = function(model, labelView, fie
 				break;
 			case 'validator':
 				break;
+			case 'width':
+				if(model instanceof barmatz.forms.fields.PhoneFieldModel)
+					fieldView.getElementsByTagName('input')[0].style.width = value + 'px';
+				else
+					fieldView.style.width = value + 'px';
+				break;
 		}
 	}
 	
-	function addItem(model)
+	function addItem(model, index)
 	{
+		var view;
+		
 		barmatz.utils.DataTypes.isNotUndefined(model);
+		barmatz.utils.DataTypes.isNotUndefined(index);
 		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.DropboxItemModel);
+		barmatz.utils.DataTypes.isTypeOf(index, 'number');
+		
+		view = fieldView.children[index] || fieldView.appendChild(barmatz.forms.factories.DOMFactory.createDropboxItemElement(model));
 		model.addEventListener(barmatz.events.ModelEvent.VALUE_CHANGED, onModelItemValueChanged);
-		fieldDictionary.add(model, fieldView.appendChild(barmatz.forms.factories.DOMFactory.createDropboxItemElement(model)));
+		fieldDictionary.add(model, view);
 	}
 	
 	function removeItem(model)
@@ -118,7 +130,7 @@ window.barmatz.forms.ui.WorkspaceItemController = function(model, labelView, fie
 	{
 		barmatz.utils.DataTypes.isNotUndefined(event);
 		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.CollectionEvent);
-		addItem(event.item);
+		addItem(event.item, event.index);
 	}
 
 	function onModelItemRemoved(event) 

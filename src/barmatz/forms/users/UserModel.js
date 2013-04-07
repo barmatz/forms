@@ -113,7 +113,7 @@ Object.defineProperties(barmatz.forms.users.UserModel.prototype,
 			
 			for(i in data)
 			{
-				form = new barmatz.forms.FormModel();
+				form = barmatz.forms.factories.ModelFactory.createFormModel();
 				form.created = barmatz.utils.Date.toDate(data[i].created);
 				form.fingerprint = data[i].fingerprint;
 				form.name = data[i].name;

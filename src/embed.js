@@ -79,6 +79,12 @@ barmatz.forms.embed = function(fingerprint)
 			
 			field = barmatz.forms.factories.DOMFactory.createFormFieldElement(item);
 			field.name = item.name;
+			
+			if(item instanceof barmatz.forms.fields.PhoneFieldModel)
+				field.getElementsByTagName('input')[0].style.width = item.width + 'px';
+			else
+				field.style.width = item.width + 'px';
+			
 			errorMessage = barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageElement();
 			
 			form.appendChild(barmatz.forms.factories.DOMFactory.createElementWithContent('div', 'forms-form-item', [

@@ -12,6 +12,7 @@ window.barmatz.forms.fields.FieldModel = function(type, name)
 	this.set('value', '');
 	this.set('enabled', true);
 	this.set('validator', barmatz.forms.Validator.NONE);
+	this.set('width', NaN);
 };
 
 barmatz.forms.fields.FieldModel.prototype = new barmatz.forms.TypeModel(null);
@@ -80,6 +81,14 @@ Object.defineProperties(barmatz.forms.fields.FieldModel.prototype,
 	{
 		barmatz.utils.DataTypes.isTypeOf(value, 'object');
 		this.set('validator', value);
+	}},
+	width: {get: function()
+	{
+		return this.get('width');
+	}, set: function(value)
+	{
+		barmatz.utils.DataTypes.isTypeOf(value, 'number');
+		this.set('width', value);
 	}},
 	validate: {value: function()
 	{
@@ -167,6 +176,7 @@ Object.defineProperties(barmatz.forms.fields.FieldModel.prototype,
 		clone.value = this.value;
 		clone.enabled = this.enabled;
 		clone.validator = this.validator;
+		clone.width = this.width;
 		return clone;
 	}}
 });
