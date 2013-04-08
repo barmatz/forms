@@ -27,7 +27,7 @@ Object.defineProperties(barmatz.forms.fields.TextFieldModel.prototype,
 		clone.mandatory = this.mandatory;
 		clone.value = this.value;
 		clone.enabled = this.enabled;
-		clone.validator = this.validator;
+		clone.validator = this.validator.clone();
 		clone.max = this.max;
 		return clone;
 	}}

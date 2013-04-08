@@ -182,7 +182,7 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 			if(model instanceof barmatz.forms.fields.PhoneFieldModel)
 			{
 				field.getElementsByTagName('select')[0].value = model.prefix;
-				field.getElementsByTagName('input')[0].value = model.value;
+				field.getElementsByTagName('input')[0].value = model.value.replace(model.prefix, '');
 			}
 		}
 		

@@ -19,7 +19,7 @@ Object.defineProperties(barmatz.forms.fields.PasswordFieldModel.prototype,
 		clone.mandatory = this.mandatory;
 		clone.value = this.value;
 		clone.enabled = this.enabled;
-		clone.validator = this.validator;
+		clone.validator = this.validator.clone();
 		return clone;
 	}}
 });

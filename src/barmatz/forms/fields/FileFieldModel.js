@@ -29,7 +29,7 @@ Object.defineProperties(barmatz.forms.fields.FileFieldModel.prototype,
 		clone.mandatory = this.mandatory;
 		clone.value = this.value;
 		clone.enabled = this.enabled;
-		clone.validator = this.validator;
+		clone.validator = this.validator.clone();
 		clone.accept = this.accept;
 		return clone;
 	}}

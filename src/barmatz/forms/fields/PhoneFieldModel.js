@@ -21,7 +21,7 @@ Object.defineProperties(barmatz.forms.fields.PhoneFieldModel.prototype,
 		return this.get('value');
 	}, set: function(value)
 	{
-		var prefixes, prefixesRegex;
+		var prefixes, prefixesRegex, maxLength;
 		
 		barmatz.utils.DataTypes.isTypeOf(value, 'string', true);
 		
@@ -35,15 +35,14 @@ Object.defineProperties(barmatz.forms.fields.PhoneFieldModel.prototype,
 		prefixesRegex = '^(' + prefixes.join('|') + ')';
 		
 		if(new RegExp(prefixesRegex).test(value))
-		{
 			this.set('prefix', value.replace(new RegExp(prefixesRegex + '.+$'), '$1'));
-			value = value.replace(new RegExp(prefixesRegex + '(.+$)'), '$2');
-		}
 		else
 			this.set('prefix', '');
 		
-		if(value.length > 7)
-			value = value.substring(0, 7);
+		maxLength = value.length + this.prefix.length;
+		
+		if(maxLength > 7)
+			value = value.substring(0, maxLength);
 		
 		this.set('value', value);
 	}},
@@ -54,7 +53,7 @@ Object.defineProperties(barmatz.forms.fields.PhoneFieldModel.prototype,
 		clone.mandatory = this.mandatory;
 		clone.value = this.value;
 		clone.enabled = this.enabled;
-		clone.validator = this.validator;
+		clone.validator = this.validator.clone();
 		return clone;
 	}}
 });

@@ -106,5 +106,9 @@ Object.defineProperties(barmatz.forms.factories.ModelFactory,
 		barmatz.utils.DataTypes.isTypeOf(className, 'string');
 		barmatz.utils.DataTypes.isTypesOrInstances(content, ['string'], [HTMLElement, Array]);
 		return new barmatz.forms.ui.PanelModel(className, content);
+	}},
+	createValidatorModel: {value: function()
+	{
+		return new barmatz.forms.fields.ValidatorModel();
 	}}
 });

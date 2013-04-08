@@ -43,7 +43,7 @@ class LeadModel extends \api\database\DatabaseTableModel
 		
 		if($formData->email)
 		{
-			$leadData = mysql_fetch_object($this->query("select `created`, `referer` from `{$this->name}` order by `id` desc limit 1"));
+			$leadData = mysql_fetch_object($this->query("select `created`, `referer`, `ip` from `{$this->name}` order by `id` desc limit 1"));
 			
 			$data = json_decode($this->decodeString($data));
 			$tableData = "";
@@ -59,6 +59,7 @@ class LeadModel extends \api\database\DatabaseTableModel
 					<hr/>
 					<h5>Created on {$leadData->created}</h5>
 					<h5>Refered from {$leadData->referer}</h5>
+					<h5>User IP {$leadData->ip}</h5>
 				</div>", 
 				"From: no-reply@quiz.co.il" . "\r\n" .
 				"Mime-Version: 1.0" . "\r\n" .

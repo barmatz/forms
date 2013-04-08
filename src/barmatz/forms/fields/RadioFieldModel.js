@@ -19,7 +19,7 @@ Object.defineProperties(barmatz.forms.fields.RadioFieldModel.prototype,
 		clone.mandatory = this.mandatory;
 		clone.value = this.value;
 		clone.enabled = this.enabled;
-		clone.validator = this.validator;
+		clone.validator = this.validator.clone();
 		clone.checked = this.checked;
 		return clone;
 	}}

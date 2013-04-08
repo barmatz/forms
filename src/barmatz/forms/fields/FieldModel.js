@@ -11,7 +11,7 @@ window.barmatz.forms.fields.FieldModel = function(type, name)
 	this.set('mandatory', false);
 	this.set('value', '');
 	this.set('enabled', true);
-	this.set('validator', barmatz.forms.Validator.NONE);
+	this.set('validator', barmatz.forms.factories.ModelFactory.createValidatorModel());
 	this.set('width', NaN);
 };
 
@@ -74,12 +74,10 @@ Object.defineProperties(barmatz.forms.fields.FieldModel.prototype,
 	}},
 	validator: {get: function()
 	{
-		if(!this.get('validator'))
-			this.set('validator', {});
 		return this.get('validator');
 	}, set: function(value)
 	{
-		barmatz.utils.DataTypes.isTypeOf(value, 'object');
+		barmatz.utils.DataTypes.isInstanceOf(value, barmatz.forms.fields.ValidatorModel);
 		this.set('validator', value);
 	}},
 	width: {get: function()
@@ -122,7 +120,7 @@ Object.defineProperties(barmatz.forms.fields.FieldModel.prototype,
 							errors = barmatz.utils.Bitwise.concat(errors, barmatz.forms.Validator.VALID_EMAIL);
 						break;
 					case barmatz.forms.Validator.VALID_PHONE:
-						if(!barmatz.forms.Validator.validPhone(this.prefix, this.value))
+						if(!barmatz.forms.Validator.validPhone(this.value))
 							errors = barmatz.utils.Bitwise.concat(errors, barmatz.forms.Validator.VALID_PHONE);
 						break;
 					case barmatz.forms.Validator.MIN_LENGTH:
@@ -175,7 +173,7 @@ Object.defineProperties(barmatz.forms.fields.FieldModel.prototype,
 		clone.mandatory = this.mandatory;
 		clone.value = this.value;
 		clone.enabled = this.enabled;
-		clone.validator = this.validator;
+		clone.validator = this.validator.clone();
 		clone.width = this.width;
 		return clone;
 	}}

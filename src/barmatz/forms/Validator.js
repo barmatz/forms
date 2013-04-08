@@ -47,13 +47,11 @@ Object.defineProperties(barmatz.forms.Validator,
 		barmatz.utils.DataTypes.isTypeOf(value, 'string');
 		return this.equals(value, /^[a-z0-9!#$%&'*+\/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+\/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+([a-z].+)\b$/);
 	}},
-	validPhone: {value: function(prefix, number)
+	validPhone: {value: function(value)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(prefix);
-		barmatz.utils.DataTypes.isNotUndefined(number);
-		barmatz.utils.DataTypes.isTypeOf(prefix, 'string');
-		barmatz.utils.DataTypes.isTypeOf(number, 'string');
-		return this.notEmpty(prefix) && this.digitsOnly(prefix) && this.equals(number, /^[2-9]\d{6}$/);
+		barmatz.utils.DataTypes.isNotUndefined(value);
+		barmatz.utils.DataTypes.isTypeOf(value, 'string');
+		return this.equals(value, /^[0-9]{2,3}[2-9]\d{6}$/);
 	}},
 	maxLength: {value: function(value, length)
 	{

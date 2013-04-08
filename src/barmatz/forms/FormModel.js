@@ -153,7 +153,7 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 				field.label = item.label;
 				field.mandatory = item.mandatory;
 				field.enabled = item.enabled;
-				field.validator = item.validator;
+				field.validator = item.validator.clone();
 				field.width = item.width;
 			}
 			
@@ -348,9 +348,7 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 		this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.SUBMITTING));
 		this.forEach(function(item, index, collection)
 		{
-			if(item instanceof barmatz.forms.fields.PhoneFieldModel)
-				data[item.name] = item.prefix + item.value;
-			else if(item instanceof barmatz.forms.fields.CheckboxFieldModel)
+			if(item instanceof barmatz.forms.fields.CheckboxFieldModel)
 				data[item.name] = item.checked ? 'yes' : 'no';
 			else
 				data[item.name] = item.value;
@@ -462,7 +460,7 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 				field.label = fieldData.label || '';
 				field.mandatory = fieldData.mandatory || false;
 				field.enabled = fieldData.enabled || true;
-				field.validator = fieldData.validator || barmatz.forms.Validator.NONE;
+				field.validator = fieldData.validator.clone() || barmatz.forms.factories.ModelFactory.createValidatorModel();
 				field.width = fieldData.width || NaN;
 			}
 			
