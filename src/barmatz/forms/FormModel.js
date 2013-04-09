@@ -153,7 +153,7 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 				field.label = item.label;
 				field.mandatory = item.mandatory;
 				field.enabled = item.enabled;
-				field.validator = item.validator.clone();
+				field.validator = item.validator;
 				field.width = item.width;
 			}
 			
@@ -184,7 +184,13 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 			object.fields.push(field);
 		});
 		
-		return JSON.stringify(object);
+		return JSON.stringify(object, function(key, value)
+		{ 
+			if(this === value) 
+				return undefined; 
+			else 
+				return value;
+		});
 	}},
 	reset: {value: function()
 	{
@@ -460,7 +466,7 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 				field.label = fieldData.label || '';
 				field.mandatory = fieldData.mandatory || false;
 				field.enabled = fieldData.enabled || true;
-				field.validator = fieldData.validator.clone() || barmatz.forms.factories.ModelFactory.createValidatorModel();
+				field.validator = barmatz.forms.factories.ModelFactory.createValidatorModel(fieldData.validator || null);
 				field.width = fieldData.width || NaN;
 			}
 			

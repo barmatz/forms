@@ -1,8 +1,20 @@
 /** barmatz.forms.fields.ValidatorModel **/
-window.barmatz.forms.fields.ValidatorModel = function()
+window.barmatz.forms.fields.ValidatorModel = function(data)
 {
+	var i;
+	
+	barmatz.utils.DataTypes.isTypeOf(data, 'object', true);
 	barmatz.mvc.Model.call(this);
 	this.set('code', barmatz.forms.Validator.NONE);
+
+	if(data)
+	{
+		if(data.code)
+			this.set('code', data.code);
+		
+		for(i in data)
+			this[i] = data[i];
+	}
 };
 
 barmatz.forms.fields.ValidatorModel.prototype = new barmatz.mvc.Model();

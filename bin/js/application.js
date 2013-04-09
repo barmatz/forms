@@ -2600,9 +2600,10 @@ Object.defineProperties(barmatz.forms.factories.ModelFactory,
 		barmatz.utils.DataTypes.isTypesOrInstances(content, ['string'], [HTMLElement, Array]);
 		return new barmatz.forms.ui.PanelModel(className, content);
 	}},
-	createValidatorModel: {value: function()
+	createValidatorModel: {value: function(data)
 	{
-		return new barmatz.forms.fields.ValidatorModel();
+		barmatz.utils.DataTypes.isTypeOf(data, 'object', true);
+		return new barmatz.forms.fields.ValidatorModel(data);
 	}}
 });
 /** barmatz.forms.CollectionController **/
@@ -2892,10 +2893,22 @@ Object.defineProperties(barmatz.forms.Validator,
 	}}
 });
 /** barmatz.forms.fields.ValidatorModel **/
-window.barmatz.forms.fields.ValidatorModel = function()
+window.barmatz.forms.fields.ValidatorModel = function(data)
 {
+	var i;
+	
+	barmatz.utils.DataTypes.isTypeOf(data, 'object', true);
 	barmatz.mvc.Model.call(this);
 	this.set('code', barmatz.forms.Validator.NONE);
+
+	if(data)
+	{
+		if(data.code)
+			this.set('code', data.code);
+		
+		for(i in data)
+			this[i] = data[i];
+	}
 };
 
 barmatz.forms.fields.ValidatorModel.prototype = new barmatz.mvc.Model();
@@ -6201,7 +6214,7 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 				field.label = item.label;
 				field.mandatory = item.mandatory;
 				field.enabled = item.enabled;
-				field.validator = item.validator.clone();
+				field.validator = item.validator;
 				field.width = item.width;
 			}
 			
@@ -6232,7 +6245,13 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 			object.fields.push(field);
 		});
 		
-		return JSON.stringify(object);
+		return JSON.stringify(object, function(key, value)
+		{ 
+			if(this === value) 
+				return undefined; 
+			else 
+				return value;
+		});
 	}},
 	reset: {value: function()
 	{
@@ -6508,7 +6527,7 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 				field.label = fieldData.label || '';
 				field.mandatory = fieldData.mandatory || false;
 				field.enabled = fieldData.enabled || true;
-				field.validator = fieldData.validator.clone() || barmatz.forms.factories.ModelFactory.createValidatorModel();
+				field.validator = barmatz.forms.factories.ModelFactory.createValidatorModel(fieldData.validator || null);
 				field.width = fieldData.width || NaN;
 			}
 			
