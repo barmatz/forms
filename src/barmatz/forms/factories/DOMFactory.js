@@ -975,14 +975,16 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		
 		properties = this.createFormPropertiesWrapper(model);
 		dialog = this.createPromptDialog('Properties', properties.wrapper, confirmHandler, open);
+		properties.dialog = dialog;
 		
 		jQuery(dialog).dialog({dialogClass: 'forms-dialog-form-properties'});
 		
-		return {dialog: dialog, nameField: properties.nameField, submitButtonLabelField: properties.submitButtonLabelField, methodField: properties.methodField, encodingField: properties.encodingField, stylesheetsField: properties.stylesheetsField, directionField: properties.directionField, targetEmailField: properties.targetEmailField};
+		return properties;
+		
 	}},
 	createFormPropertiesWrapper: {value: function(model)
 	{
-		var _this, options, nameField, methodField, encodingField, submitButtonLabelField, stylesheetsField, directionField, targetEmailField;
+		var _this, options, nameField, methodField, encodingField, submitButtonLabelField, stylesheetsField, directionField, targetEmailField, layoutIdField;
 		
 		barmatz.utils.DataTypes.isNotUndefined(model);
 		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.FormModel);
@@ -1004,6 +1006,9 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		directionField = createDropbox('Direction', 'formDirection', [barmatz.forms.Directions.LTR, barmatz.forms.Directions.RTL]);
 		directionField.value = model.direction;
 		
+		layoutIdField = createDropbox('Layout', 'formLayoutId', ['1', '2']);
+		layoutIdField.value = model.layoutId;
+		
 		stylesheetsField = createField('Stylesheets');
 		stylesheetsField.value = model.stylesheets.join(' ');
 		
@@ -1013,7 +1018,7 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		encodingField = createDropbox('Encoding', 'formEncoding', [barmatz.net.Encoding.FORM, barmatz.net.Encoding.FILES]);
 		encodingField.value = model.encoding;
 		
-		return {wrapper: this.createTable(options), nameField: nameField, submitButtonLabelField: submitButtonLabelField, methodField: methodField, encodingField: encodingField, stylesheetsField: stylesheetsField, directionField: directionField, targetEmailField: targetEmailField};
+		return {wrapper: this.createTable(options), nameField: nameField, submitButtonLabelField: submitButtonLabelField, methodField: methodField, encodingField: encodingField, stylesheetsField: stylesheetsField, directionField: directionField, targetEmailField: targetEmailField, layoutIdField: layoutIdField};
 		
 		function createField(label, content)
 		{

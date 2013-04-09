@@ -1030,6 +1030,7 @@ window.barmatz.forms.FormModel = function()
 	this.set('fingerprint', null);
 	this.set('direction', barmatz.forms.Directions.LTR);
 	this.set('targetEmail', '');
+	this.set('layoutId', 1);
 };
 
 barmatz.forms.FormModel.prototype = new barmatz.forms.CollectionModel();
@@ -1113,6 +1114,13 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 		barmatz.utils.DataTypes.isTypeOf(value, 'string');
 		this.set('targetEmail', value);
 	}},
+	layoutId: {get: function()
+	{
+		return this.get('layoutId');
+	}, set: function(value)
+	{
+		this.set('layoutId', value);
+	}},
 	addItem: {value: function(item)
 	{
 		barmatz.utils.DataTypes.isNotUndefined(item);
@@ -1159,6 +1167,7 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 			stylesheets: this.stylesheets, 
 			direction: this.direction, 
 			targetEmail: this.targetEmail, 
+			layoutId: this.layoutId, 
 			fields: []
 		};
 		
@@ -1222,6 +1231,7 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 		this.set('stylesheets', []);
 		this.set('direction', barmatz.forms.Directions.LTR);
 		this.set('targetEmail', '');
+		this.set('layoutId', 1);
 		while(this.numItems > 0)
 			this.removeItemAt(this.numItems - 1);
 	}},
@@ -1421,6 +1431,7 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 		this.encoding = data.encoding || barmatz.net.Encoding.FORM;
 		this.direction = data.direction || barmatz.forms.Directions.LTR;
 		this.targetEmail = data.targetEmail || '';
+		this.layoutId = data.layoutId || 1;
 		this.set('fingerprint', fingerprint);
 		this.set('stylesheets', data.stylesheets || []);
 		
@@ -2815,14 +2826,16 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		
 		properties = this.createFormPropertiesWrapper(model);
 		dialog = this.createPromptDialog('Properties', properties.wrapper, confirmHandler, open);
+		properties.dialog = dialog;
 		
 		jQuery(dialog).dialog({dialogClass: 'forms-dialog-form-properties'});
 		
-		return {dialog: dialog, nameField: properties.nameField, submitButtonLabelField: properties.submitButtonLabelField, methodField: properties.methodField, encodingField: properties.encodingField, stylesheetsField: properties.stylesheetsField, directionField: properties.directionField, targetEmailField: properties.targetEmailField};
+		return properties;
+		
 	}},
 	createFormPropertiesWrapper: {value: function(model)
 	{
-		var _this, options, nameField, methodField, encodingField, submitButtonLabelField, stylesheetsField, directionField, targetEmailField;
+		var _this, options, nameField, methodField, encodingField, submitButtonLabelField, stylesheetsField, directionField, targetEmailField, layoutIdField;
 		
 		barmatz.utils.DataTypes.isNotUndefined(model);
 		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.FormModel);
@@ -2844,6 +2857,9 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		directionField = createDropbox('Direction', 'formDirection', [barmatz.forms.Directions.LTR, barmatz.forms.Directions.RTL]);
 		directionField.value = model.direction;
 		
+		layoutIdField = createDropbox('Layout', 'formLayoutId', ['1', '2']);
+		layoutIdField.value = model.layoutId;
+		
 		stylesheetsField = createField('Stylesheets');
 		stylesheetsField.value = model.stylesheets.join(' ');
 		
@@ -2853,7 +2869,7 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		encodingField = createDropbox('Encoding', 'formEncoding', [barmatz.net.Encoding.FORM, barmatz.net.Encoding.FILES]);
 		encodingField.value = model.encoding;
 		
-		return {wrapper: this.createTable(options), nameField: nameField, submitButtonLabelField: submitButtonLabelField, methodField: methodField, encodingField: encodingField, stylesheetsField: stylesheetsField, directionField: directionField, targetEmailField: targetEmailField};
+		return {wrapper: this.createTable(options), nameField: nameField, submitButtonLabelField: submitButtonLabelField, methodField: methodField, encodingField: encodingField, stylesheetsField: stylesheetsField, directionField: directionField, targetEmailField: targetEmailField, layoutIdField: layoutIdField};
 		
 		function createField(label, content)
 		{
@@ -4633,7 +4649,7 @@ barmatz.forms.embed = function(fingerprint)
 		var container, wrapper, field, submitButton, i;
 		
 		container = dictionary.get(model);
-		wrapper = barmatz.forms.factories.DOMFactory.createElement('div', 'forms-form-wrapper');
+		wrapper = barmatz.forms.factories.DOMFactory.createElement('div', 'forms-form-wrapper forms-layout-' + model.layoutId);
 		form = barmatz.forms.factories.DOMFactory.createElement('form');
 		submitButton = barmatz.forms.factories.DOMFactory.createElementWithContent('button', 'forms-form-submit-button', model.submitButtonLabel);
 		

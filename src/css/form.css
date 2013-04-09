@@ -2,7 +2,8 @@
 .forms-form-wrapper select { width: auto; }
 .forms-form-wrapper .loading-image { background-color: rgba(255, 255, 255, .7) !important; }
 .forms-form-item { display: block; }
-.forms-form-item label { width: 5em; display: inline-block; }
+.forms-layout-1 .forms-form-item label { width: 5em; display: inline-block; }
+.forms-layout-2 .forms-form-item label { display: block; }
 .forms-form-item-mandatory { color: #F00; font-weight: bold; top: .5em; }
 .forms-form-item-error-message { min-height: 1.3em; font-weight: bold; color: #F00; margin: 0; padding: 0; }
 .forms-ltr .forms-form-item-error-message-item { margin-left: 5em; }

@@ -11,6 +11,7 @@ window.barmatz.forms.FormModel = function()
 	this.set('fingerprint', null);
 	this.set('direction', barmatz.forms.Directions.LTR);
 	this.set('targetEmail', '');
+	this.set('layoutId', 1);
 };
 
 barmatz.forms.FormModel.prototype = new barmatz.forms.CollectionModel();
@@ -94,6 +95,13 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 		barmatz.utils.DataTypes.isTypeOf(value, 'string');
 		this.set('targetEmail', value);
 	}},
+	layoutId: {get: function()
+	{
+		return this.get('layoutId');
+	}, set: function(value)
+	{
+		this.set('layoutId', value);
+	}},
 	addItem: {value: function(item)
 	{
 		barmatz.utils.DataTypes.isNotUndefined(item);
@@ -140,6 +148,7 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 			stylesheets: this.stylesheets, 
 			direction: this.direction, 
 			targetEmail: this.targetEmail, 
+			layoutId: this.layoutId, 
 			fields: []
 		};
 		
@@ -203,6 +212,7 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 		this.set('stylesheets', []);
 		this.set('direction', barmatz.forms.Directions.LTR);
 		this.set('targetEmail', '');
+		this.set('layoutId', 1);
 		while(this.numItems > 0)
 			this.removeItemAt(this.numItems - 1);
 	}},
@@ -402,6 +412,7 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 		this.encoding = data.encoding || barmatz.net.Encoding.FORM;
 		this.direction = data.direction || barmatz.forms.Directions.LTR;
 		this.targetEmail = data.targetEmail || '';
+		this.layoutId = data.layoutId || 1;
 		this.set('fingerprint', fingerprint);
 		this.set('stylesheets', data.stylesheets || []);
 		

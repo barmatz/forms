@@ -316,6 +316,7 @@ window.barmatz.forms.ui.BuilderController = function(formModel, userModel, conta
 			formModel.direction = wrapper.directionField.value;
 			formModel.stylesheets = wrapper.stylesheetsField.value.replace(/\s+/, ' ').split(' ');
 			formModel.targetEmail = wrapper.targetEmailField.value;
+			formModel.layoutId = wrapper.layoutIdField.value;
 		}
 	}
 	

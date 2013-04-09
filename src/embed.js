@@ -50,7 +50,7 @@ barmatz.forms.embed = function(fingerprint)
 		var container, wrapper, field, submitButton, i;
 		
 		container = dictionary.get(model);
-		wrapper = barmatz.forms.factories.DOMFactory.createElement('div', 'forms-form-wrapper');
+		wrapper = barmatz.forms.factories.DOMFactory.createElement('div', 'forms-form-wrapper forms-layout-' + model.layoutId);
 		form = barmatz.forms.factories.DOMFactory.createElement('form');
 		submitButton = barmatz.forms.factories.DOMFactory.createElementWithContent('button', 'forms-form-submit-button', model.submitButtonLabel);
 		
