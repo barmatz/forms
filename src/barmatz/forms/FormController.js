@@ -34,7 +34,6 @@ window.barmatz.forms.FormController = function(model, formView, submitButtonView
 	function addLoadingDialog()
 	{
 		loadingDialog = barmatz.forms.factories.DOMFactory.createLoadingDialog(formView);
-		barmatz.forms.factories.ControllerFactory.createJQueryDialogController(loadingDialog);
 	}
 	 
 	function removeLoadingDialog()
@@ -63,6 +62,8 @@ window.barmatz.forms.FormController = function(model, formView, submitButtonView
 	function onModelSubmitted(event)
 	{
 		submittingForm = false;
+		submitButtonView.innerHTML = 'Your form has been submitted';
+		submitButtonView.disabled = true;
 		removeModelListeners(); 
 		removeLoadingDialog();
 	}
@@ -70,6 +71,7 @@ window.barmatz.forms.FormController = function(model, formView, submitButtonView
 	function onModelSubmitionFailed(event)
 	{
 		submittingForm = false;
+		submitButtonView.innerHTML = 'An error has occured! Click to try again';
 		removeModelListeners();
 		removeLoadingDialog();
 	 }

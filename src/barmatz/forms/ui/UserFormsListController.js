@@ -18,7 +18,6 @@ window.barmatz.forms.ui.UserFormsListController = function(formModel, userModel,
 	function createLoadingDialog()
 	{
 		loadingDialog = barmatz.forms.factories.DOMFactory.createLoadingDialog();
-		barmatz.forms.factories.ControllerFactory.createJQueryDialogController(loadingDialog);
 	}
 	
 	function getForms()

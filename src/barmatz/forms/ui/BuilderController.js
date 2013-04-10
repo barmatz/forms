@@ -115,7 +115,6 @@ window.barmatz.forms.ui.BuilderController = function(formModel, userModel, conta
 	function addLoadingView()
 	{
 		loadingDialog = barmatz.forms.factories.DOMFactory.createLoadingDialog();
-		barmatz.forms.factories.ControllerFactory.createJQueryDialogController(loadingDialog);
 	}
 	
 	function removeLoadingView()

@@ -4344,7 +4344,6 @@ window.barmatz.forms.ui.BuilderController = function(formModel, userModel, conta
 	function addLoadingView()
 	{
 		loadingDialog = barmatz.forms.factories.DOMFactory.createLoadingDialog();
-		barmatz.forms.factories.ControllerFactory.createJQueryDialogController(loadingDialog);
 	}
 	
 	function removeLoadingView()
@@ -5554,7 +5553,6 @@ window.barmatz.forms.ui.UserFormsListController = function(formModel, userModel,
 	function createLoadingDialog()
 	{
 		loadingDialog = barmatz.forms.factories.DOMFactory.createLoadingDialog();
-		barmatz.forms.factories.ControllerFactory.createJQueryDialogController(loadingDialog);
 	}
 	
 	function getForms()
@@ -6144,7 +6142,6 @@ window.barmatz.forms.FormController = function(model, formView, submitButtonView
 	function addLoadingDialog()
 	{
 		loadingDialog = barmatz.forms.factories.DOMFactory.createLoadingDialog(formView);
-		barmatz.forms.factories.ControllerFactory.createJQueryDialogController(loadingDialog);
 	}
 	 
 	function removeLoadingDialog()
@@ -6173,6 +6170,8 @@ window.barmatz.forms.FormController = function(model, formView, submitButtonView
 	function onModelSubmitted(event)
 	{
 		submittingForm = false;
+		submitButtonView.innerHTML = 'Your form has been submitted';
+		submitButtonView.disabled = true;
 		removeModelListeners(); 
 		removeLoadingDialog();
 	}
@@ -6180,6 +6179,7 @@ window.barmatz.forms.FormController = function(model, formView, submitButtonView
 	function onModelSubmitionFailed(event)
 	{
 		submittingForm = false;
+		submitButtonView.innerHTML = 'An error has occured! Click to try again';
 		removeModelListeners();
 		removeLoadingDialog();
 	 }
@@ -6793,7 +6793,6 @@ window.barmatz.forms.users.LogingController = function(model, userNameFieldView,
 	function showLoading()
 	{
 		loadingView = barmatz.forms.factories.DOMFactory.createLoadingDialog();
-		barmatz.forms.factories.ControllerFactory.createJQueryDialogController(loadingView);
 	}
 	
 	function hideLoading()
