@@ -13,7 +13,9 @@ window.barmatz.events.LoaderEvent = function(type)
 			this._request = arguments[1];
 		case barmatz.events.LoaderEvent.HEADERS_RECEIVED:
 		case barmatz.events.LoaderEvent.LOADING:
-		case barmatz.events.LoaderEvent.DONE:
+		case barmatz.events.LoaderEvent.COMPLETE:
+		case barmatz.events.LoaderEvent.SUCCESS:
+		case barmatz.events.LoaderEvent.ERROR:
 			this._response = arguments[1];
 			break;
 	}
@@ -28,7 +30,9 @@ Object.defineProperties(barmatz.events.LoaderEvent,
 	OPENED: {value: 'opened'},
 	HEADERS_RECEIVED: {value: 'headersReceived'},
 	LOADING: {value: 'loading'},
-	DONE: {value: 'done'}
+	COMPLETE: {value: 'complete'},
+	SUCCESS: {value: 'success'},
+	ERROR: {value: 'error'}
 });
 
 Object.defineProperties(barmatz.events.LoaderEvent.prototype,
@@ -51,6 +55,21 @@ Object.defineProperties(barmatz.events.LoaderEvent.prototype,
 	}},
 	toString: {value: function()
 	{
-		return this.formatToString('LoaderEvent', 'type', 'request', 'response');
+		switch(type)
+		{
+			default:
+				return this.formatToString('LoaderEvent', 'type');
+				break;
+			case barmatz.events.LoaderEvent.UNSENT:
+			case barmatz.events.LoaderEvent.OPENED:
+				return this.formatToString('LoaderEvent', 'type', 'request');
+			case barmatz.events.LoaderEvent.HEADERS_RECEIVED:
+			case barmatz.events.LoaderEvent.LOADING:
+			case barmatz.events.LoaderEvent.COMPLETE:
+			case barmatz.events.LoaderEvent.SUCCESS:
+			case barmatz.events.LoaderEvent.ERROR:
+				return this.formatToString('LoaderEvent', 'type', 'response');
+				break;
+		}
 	}}
 });

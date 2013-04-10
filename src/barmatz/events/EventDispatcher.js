@@ -28,8 +28,12 @@ Object.defineProperties(barmatz.events.EventDispatcher.prototype,
 		for(i in this._listeners)
 		{
 			if(i === event.type)
-				for(c in this._listeners[i])
+				for(c = 0; c < this._listeners[i].length; c++)
+				{
 					this._listeners[i][c].call(this, event);
+					if(!this._listeners[i])
+						break;
+				}
 		}
 	}},
 	hasEventListener: {value: function(type)
@@ -49,5 +53,19 @@ Object.defineProperties(barmatz.events.EventDispatcher.prototype,
 			if(this._listeners[type].length == 0)
 				delete this._listeners[type];
 		}
+	}},
+	toJSON: {value: function()
+	{
+		var object, i;
+		
+		object = {};
+		
+		for(i in this)
+			object[i] = this[i];
+		
+		delete object._target;
+		delete object._listeners;
+		
+		return object;
 	}}
 });

@@ -852,8 +852,12 @@ Object.defineProperties(barmatz.events.EventDispatcher.prototype,
 		for(i in this._listeners)
 		{
 			if(i === event.type)
-				for(c in this._listeners[i])
+				for(c = 0; c < this._listeners[i].length; c++)
+				{
 					this._listeners[i][c].call(this, event);
+					if(!this._listeners[i])
+						break;
+				}
 		}
 	}},
 	hasEventListener: {value: function(type)
@@ -873,6 +877,20 @@ Object.defineProperties(barmatz.events.EventDispatcher.prototype,
 			if(this._listeners[type].length == 0)
 				delete this._listeners[type];
 		}
+	}},
+	toJSON: {value: function()
+	{
+		var object, i;
+		
+		object = {};
+		
+		for(i in this)
+			object[i] = this[i];
+		
+		delete object._target;
+		delete object._listeners;
+		
+		return object;
 	}}
 });
 
@@ -981,7 +999,9 @@ window.barmatz.events.LoaderEvent = function(type)
 			this._request = arguments[1];
 		case barmatz.events.LoaderEvent.HEADERS_RECEIVED:
 		case barmatz.events.LoaderEvent.LOADING:
-		case barmatz.events.LoaderEvent.DONE:
+		case barmatz.events.LoaderEvent.COMPLETE:
+		case barmatz.events.LoaderEvent.SUCCESS:
+		case barmatz.events.LoaderEvent.ERROR:
 			this._response = arguments[1];
 			break;
 	}
@@ -996,7 +1016,9 @@ Object.defineProperties(barmatz.events.LoaderEvent,
 	OPENED: {value: 'opened'},
 	HEADERS_RECEIVED: {value: 'headersReceived'},
 	LOADING: {value: 'loading'},
-	DONE: {value: 'done'}
+	COMPLETE: {value: 'complete'},
+	SUCCESS: {value: 'success'},
+	ERROR: {value: 'error'}
 });
 
 Object.defineProperties(barmatz.events.LoaderEvent.prototype,
@@ -1019,7 +1041,22 @@ Object.defineProperties(barmatz.events.LoaderEvent.prototype,
 	}},
 	toString: {value: function()
 	{
-		return this.formatToString('LoaderEvent', 'type', 'request', 'response');
+		switch(type)
+		{
+			default:
+				return this.formatToString('LoaderEvent', 'type');
+				break;
+			case barmatz.events.LoaderEvent.UNSENT:
+			case barmatz.events.LoaderEvent.OPENED:
+				return this.formatToString('LoaderEvent', 'type', 'request');
+			case barmatz.events.LoaderEvent.HEADERS_RECEIVED:
+			case barmatz.events.LoaderEvent.LOADING:
+			case barmatz.events.LoaderEvent.COMPLETE:
+			case barmatz.events.LoaderEvent.SUCCESS:
+			case barmatz.events.LoaderEvent.ERROR:
+				return this.formatToString('LoaderEvent', 'type', 'response');
+				break;
+		}
 	}}
 });
 /** barmatz.events.ModelEvent **/
@@ -2411,7 +2448,7 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		bits = barmatz.utils.Bitwise.parseBit(model.availableValidators);
 		options = {};
 		
-		for(i in bits)
+		for(i = 0; i < bits.length; i++)
 		{
 			fieldValidatorWrapper = this.createFieldValidatorWrapper(bits[i]);
 			options[bits[i]] = fieldValidatorWrapper.checkbox;
@@ -2940,6 +2977,18 @@ Object.defineProperties(barmatz.forms.fields.ValidatorModel.prototype,
 			object[i] = this[i];
 		
 		return object;
+	}},
+	toJSON: {value: function()
+	{
+		var object, i;
+		
+		object = {code: this.code};
+		
+		for(i in this)
+			if(typeof this[i] != 'function' && /^[^_]/.test(i))
+				object[i] = this[i];
+		
+		return object;
 	}}
 });
 /** barmatz.forms.fields.FieldModel **/
@@ -3046,7 +3095,7 @@ Object.defineProperties(barmatz.forms.fields.FieldModel.prototype,
 		{
 			bits = barmatz.utils.Bitwise.parseBit(this.validator.code);
 			
-			for(i in bits)
+			for(i = 0; i < bits.length; i++)
 				switch(bits[i])
 				{
 					default:
@@ -3725,6 +3774,9 @@ window.barmatz.forms.fields.FieldValidationOptionsController = function(model, o
 		
 		if(barmatz.utils.Bitwise.contains(model.validator.code, bit))
 			option.checked = true;
+		
+		if(model instanceof barmatz.forms.fields.PhoneFieldModel && barmatz.utils.Bitwise.contains(model.validator.code, barmatz.forms.Validator.VALID_PHONE))
+			option.disabled = true;
 	}
 	
 	function changeModelByOption(option, bit)
@@ -3734,7 +3786,15 @@ window.barmatz.forms.fields.FieldValidationOptionsController = function(model, o
 		barmatz.utils.DataTypes.isInstanceOf(option, HTMLInputElement);
 		barmatz.utils.DataTypes.isTypeOf(bit, 'number');
 
-		model.validator.code = option.checked ? model.validator.code ? barmatz.utils.Bitwise.concat(model.validator.code, bit) : bit : barmatz.utils.Bitwise.slice(model.validator.code, bit); 
+		if(option.checked)
+		{
+			if(model.validator.code)
+				bit = barmatz.utils.Bitwise.concat(model.validator.code, bit);
+		}
+		else
+			bit = barmatz.utils.Bitwise.slice(model.validator.code, bit); 
+		
+		model.validator.code = bit; 
 		
 		switch(bit)
 		{
@@ -3885,6 +3945,7 @@ window.barmatz.forms.fields.PhoneFieldModel = function(name)
 	barmatz.utils.DataTypes.isNotUndefined(name);
 	barmatz.utils.DataTypes.isTypeOf(name, 'string', true);
 	barmatz.forms.fields.FieldModel.call(this, barmatz.forms.fields.FieldTypes.PHONE, name);
+	this.validator.code = barmatz.forms.Validator.VALID_PHONE; 
 	this.set('prefix', '');
 };
 
@@ -3955,7 +4016,7 @@ Object.defineProperties(barmatz.forms.fields.PhonePrefixes,
 		barmatz.utils.DataTypes.isNotUndefined(callback);
 		barmatz.utils.DataTypes.isTypeOf(callback, 'function');
 		
-		for(i in this.ALL)
+		for(i = 0; i < this.ALL.length; i++)
 			callback(this.ALL[i]);
 	}}
 });
@@ -6260,13 +6321,7 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 			object.fields.push(field);
 		});
 		
-		return JSON.stringify(object, function(key, value)
-		{ 
-			if(this === value) 
-				return undefined; 
-			else 
-				return value;
-		});
+		return JSON.stringify(object);
 	}},
 	reset: {value: function()
 	{
@@ -6296,31 +6351,49 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 		request.method = barmatz.net.Methods.POST;
 		request.data = {f: this.fingerprint || null, n: this.name, e: this.targetEmail, d: this.toJSON()};
 		loader = new barmatz.net.Loader();
-		loader.addEventListener(barmatz.events.LoaderEvent.DONE, onLoaderDone);
+		addLoaderListeners();
 		loader.load(request);
-		
-		function onLoaderDone(event)
+
+		function addLoaderListeners()
 		{
-			var response, data;
+			loader.addEventListener(barmatz.events.LoaderEvent.SUCCESS, onLoaderSuccess);
+			loader.addEventListener(barmatz.events.LoaderEvent.ERROR, onLoaderError);
+		}
+		
+		function removeLoaderListeners()
+		{
+			loader.removeEventListener(barmatz.events.LoaderEvent.SUCCESS, onLoaderSuccess);
+			loader.removeEventListener(barmatz.events.LoaderEvent.ERROR, onLoaderError);
+		}
+		
+		function onLoaderSuccess(event)
+		{
+			var data;
 			
 			barmatz.utils.DataTypes.isNotUndefined(event);
 			barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.LoaderEvent);
 			
-			event.target.removeEventListener(barmatz.events.LoaderEvent.DONE, onLoaderDone);
+			removeLoaderListeners();
 			
-			response = event.response;
-			
-			if(response && response.status == 200)
+			try
 			{
-				data = response.data ? JSON.parse(response.data) : null;
-				
-				if(data && data.fingerprint)
-					_this.set('fingerprint', data.fingerprint);
-				
-				_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.SAVED));
+				data = JSON.parse(event.response.data);
 			}
-			else
-				_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.ERROR_SAVING));
+			catch(error)
+			{
+				return;
+			}
+				
+			if(data.fingerprint)
+				_this.set('fingerprint', data.fingerprint);
+			
+			_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.SAVED));
+		}
+		
+		function onLoaderError(event)
+		{
+			removeLoaderListeners();
+			_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.ERROR_SAVING));
 		}
 	}},
 	saveAs: {value: function(model, name)
@@ -6349,33 +6422,48 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 		request.data = {f: fingerprint};
 		
 		loader = new barmatz.net.Loader();
-		loader.addEventListener(barmatz.events.LoaderEvent.DONE, onLoaderDone);
+		addLoaderListeners();
 		loader.load(request);
-		
-		function onLoaderDone(event)
+
+		function addLoaderListeners()
 		{
-			var response, data, parsedData;
+			loader.addEventListener(barmatz.events.LoaderEvent.SUCCESS, onLoaderSuccess);
+			loader.addEventListener(barmatz.events.LoaderEvent.ERROR, onLoaderError);
+		}
+		
+		function removeLoaderListeners()
+		{
+			loader.removeEventListener(barmatz.events.LoaderEvent.SUCCESS, onLoaderSuccess);
+			loader.removeEventListener(barmatz.events.LoaderEvent.ERROR, onLoaderError);
+		}
+		
+		function onLoaderSuccess(event)
+		{
+			var data;
 
 			barmatz.utils.DataTypes.isNotUndefined(event);
 			barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.LoaderEvent);
-			event.target.addEventListener(barmatz.events.LoaderEvent.DONE, onLoaderDone);
+
+			removeLoaderListeners();
 			
-			response = event.response;
-			
-			if(response && response.status == 200)
+			try
 			{
-				data = response.data ? JSON.parse(response.data) : null;
-				
-				if(data)
-				{
-					_this.copy(data.fingerprint, data.data);
-					_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.LOADING_FORM_COMPLETE));
-				}
-				else
-					_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.LOADING_FORM_ERROR));
+				data = JSON.parse(event.response.data);
 			}
-			else
-				_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.LOADING_FORM_ERROR));
+			catch(error)
+			{
+				onLoaderError(event);
+				return;
+			}
+			
+			_this.copy(data.fingerprint, data.data);
+			_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.LOADING_FORM_COMPLETE));
+		}
+		
+		function onLoaderError(event)
+		{
+			removeLoaderListeners();
+			_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.LOADING_FORM_ERROR));
 		}
 	}},
 	delete: {value: function()
@@ -6391,23 +6479,34 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 		request.data = {f: this.fingerprint};
 		
 		loader = new barmatz.net.Loader();
-		loader.addEventListener(barmatz.events.LoaderEvent.DONE, onLoaderDone);
+		addLoaderListeners();
 		loader.load(request);
-		
-		function onLoaderDone(event)
-		{
-			var response;
 
+		function addLoaderListeners()
+		{
+			loader.addEventListener(barmatz.events.LoaderEvent.SUCCESS, onLoaderSuccess);
+			loader.addEventListener(barmatz.events.LoaderEvent.ERROR, onLoaderError);
+		}
+		
+		function removeLoaderListeners()
+		{
+			loader.removeEventListener(barmatz.events.LoaderEvent.SUCCESS, onLoaderSuccess);
+			loader.removeEventListener(barmatz.events.LoaderEvent.ERROR, onLoaderError);
+		}
+		
+		function onLoaderSuccess(event)
+		{
 			barmatz.utils.DataTypes.isNotUndefined(event);
 			barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.LoaderEvent);
-			event.target.removeEventListener(barmatz.events.LoaderEvent.DONE, onLoaderDone);
 			
-			response = event.response;
-			
-			if(response && response.status == 200)
-				_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.DELETED));
-			else
-				_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.DELETION_FAIL));
+			removeLoaderListeners();
+			_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.DELETED));
+		}
+		
+		function onLoaderError(event)
+		{
+			removeLoaderListeners();
+			_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.DELETION_FAIL));
 		}
 	}},
 	isValid: {get: function()
@@ -6443,23 +6542,33 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 		request.headers = [new barmatz.net.RequestHeader('Content-Type', this.encoding)];
 		
 		loader = new barmatz.net.Loader();
-		loader.addEventListener(barmatz.events.LoaderEvent.DONE, onLoaderDone);
+		addLoaderListeners();
 		loader.load(request);
-		
-		function onLoaderDone(event)
+
+		function addLoaderListeners()
 		{
-			var response;
-			
+			loader.addEventListener(barmatz.events.LoaderEvent.SUCCESS, onLoaderSuccess);
+			loader.addEventListener(barmatz.events.LoaderEvent.ERROR, onLoaderError);
+		}
+		
+		function removeLoaderListeners()
+		{
+			loader.removeEventListener(barmatz.events.LoaderEvent.SUCCESS, onLoaderSuccess);
+			loader.removeEventListener(barmatz.events.LoaderEvent.ERROR, onLoaderError);
+		}
+		
+		function onLoaderSuccess(event)
+		{
 			barmatz.utils.DataTypes.isNotUndefined(event);
 			barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.LoaderEvent);
-			event.target.removeEventListener(barmatz.events.LoaderEvent.DONE, onLoaderDone);
-			
-			response = event.response;
-			
-			if(response && response.status == 200)
-				_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.SUBMITTED));
-			else
-				_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.SUBMISSION_FAILED));
+			removeLoaderListeners();
+			_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.SUBMITTED));
+		}
+		
+		function onLoaderError(event)
+		{
+			removeLoaderListeners();
+			_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.SUBMISSION_FAILED));
 		}
 	}},
 	copy: {value: function(fingerprint, data)
@@ -6493,7 +6602,7 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 				addField(item);
 			});
 		else
-			for(i in data.fields)
+			for(i = 0; i < data.fields.length; i++)
 				addField(data.fields[i]);
 		
 		function addField(fieldData)
@@ -6774,8 +6883,24 @@ Object.defineProperties(barmatz.forms.users.UserModel.prototype,
 			request.data = {u: _this.id};
 			
 			loader = new barmatz.net.Loader();
-			loader.addEventListener(barmatz.events.LoaderEvent.DONE, onLoadFormsDataDone);
+			addLoadFormsDataListeners(loader);
 			loader.load(request);
+		}
+		
+		function addLoadFormsDataListeners(loader)
+		{
+			barmatz.utils.DataTypes.isNotUndefined(loader);
+			barmatz.utils.DataTypes.isInstanceOf(loader, barmatz.net.Loader);
+			loader.addEventListener(barmatz.events.LoaderEvent.SUCCESS, onLoadFormsDataSuccess);
+			loader.addEventListener(barmatz.events.LoaderEvent.ERROR, onLoadFormsDataError);
+		}
+		
+		function removeLoadFormsDataListeners(loader)
+		{
+			barmatz.utils.DataTypes.isNotUndefined(loader);
+			barmatz.utils.DataTypes.isInstanceOf(loader, barmatz.net.Loader);
+			loader.removeEventListener(barmatz.events.LoaderEvent.SUCCESS, onLoadFormsDataSuccess);
+			loader.removeEventListener(barmatz.events.LoaderEvent.ERROR, onLoadFormsDataError);
 		}
 		
 		function addLoadUserDataListeners()
@@ -6819,31 +6944,35 @@ Object.defineProperties(barmatz.forms.users.UserModel.prototype,
 			_this.dispatchEvent(new barmatz.events.UserModelEvent(barmatz.events.UserModelEvent.GET_FORMS_FAIL));
 		}
 		
-		function onLoadFormsDataDone(event)
+		function onLoadFormsDataSuccess(event)
 		{
-			var response, data;
+			var data;
 			
 			barmatz.utils.DataTypes.isNotUndefined(event);
 			barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.LoaderEvent);
 			
-			event.target.removeEventListener(barmatz.events.LoaderEvent.DONE, onLoadFormsDataDone);
-
-			response = event.response;
-			
-			if(response && response.status == 200)
+			removeLoadFormsDataListeners(event.target);
+				
+			try
 			{
-				data = response.data ? JSON.parse(response.data) : null;
-					
-				if(data)
-				{
-					parseFormsData(data);
-					_this.dispatchEvent(new barmatz.events.UserModelEvent(barmatz.events.UserModelEvent.GET_FORMS_SUCCESS, data));
-				}
-				else
-					_this.dispatchEvent(new barmatz.events.UserModelEvent(barmatz.events.UserModelEvent.GET_FORMS_FAIL));
+				data = JSON.parse(event.response.data);
 			}
-			else
-				_this.dispatchEvent(new barmatz.events.UserModelEvent(barmatz.events.UserModelEvent.GET_FORMS_FAIL));
+			catch(error)
+			{
+				onLoadFormsDataError(event);
+				return;
+			}
+			
+			parseFormsData(data);
+			_this.dispatchEvent(new barmatz.events.UserModelEvent(barmatz.events.UserModelEvent.GET_FORMS_SUCCESS, data));
+		}
+		
+		function onLoadFormsDataError(event)
+		{
+			barmatz.utils.DataTypes.isNotUndefined(event);
+			barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.LoaderEvent);
+			removeLoadFormsDataListeners(event.target);
+			_this.dispatchEvent(new barmatz.events.UserModelEvent(barmatz.events.UserModelEvent.GET_FORMS_FAIL));
 		}
 	}},
 	getData: {value: function()
@@ -6854,40 +6983,53 @@ Object.defineProperties(barmatz.forms.users.UserModel.prototype,
 		request.method = barmatz.net.Methods.GET;
 		
 		loader = new barmatz.net.Loader();
-		loader.addEventListener(barmatz.events.LoaderEvent.DONE, onLoaderDone);
+		addLoaderListeners();
 		loader.load(request);
 		
-		function onLoaderDone(event)
+		function addLoaderListeners()
 		{
-			var response, data;
+			loader.addEventListener(barmatz.events.LoaderEvent.SUCCESS, onLoaderSuccess);
+			loader.addEventListener(barmatz.events.LoaderEvent.ERROR, onLoaderError);
+		}
+		
+		function removeLoaderListeners()
+		{
+			loader.removeEventListener(barmatz.events.LoaderEvent.SUCCESS, onLoaderSuccess);
+			loader.removeEventListener(barmatz.events.LoaderEvent.ERROR, onLoaderError);
+		}
+		
+		function onLoaderSuccess(event)
+		{
+			var data;
 			
 			barmatz.utils.DataTypes.isNotUndefined(event);
 			barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.LoaderEvent);
 			
-			event.target.removeEventListener(barmatz.events.LoaderEvent.DONE, onLoaderDone);
-
-			response = event.response;
+			removeLoaderListeners();
 			
-			if(response && response.status == 200)
+			try
 			{
-				data = response.data ? JSON.parse(response.data) : null;
-				
-				if(data)
-				{
-					_this.set('id', data.id);
-					_this.set('userName', data.userName);
-					_this.set('firstName', data.first_name);
-					_this.set('lastName', data.last_name);
-					_this.set('created', barmatz.utils.Date.toDate(data.created));
-					_this.set('active', data.active == '1' ? true : false);
-					_this.dispatchEvent(new barmatz.events.UserModelEvent(barmatz.events.UserModelEvent.DATA_LOAD_SUCCESS));
-				}
-				else
-					_this.dispatchEvent(new barmatz.events.UserModelEvent(barmatz.events.UserModelEvent.DATA_LOAD_FAIL));
+				data = JSON.parse(event.response.data);
 			}
-			else
-				_this.dispatchEvent(new barmatz.events.UserModelEvent(barmatz.events.UserModelEvent.DATA_LOAD_FAIL));
-				
+			catch(error)
+			{
+				onLoaderError(event);
+				return;
+			}
+			
+			_this.set('id', data.id);
+			_this.set('userName', data.userName);
+			_this.set('firstName', data.first_name);
+			_this.set('lastName', data.last_name);
+			_this.set('created', barmatz.utils.Date.toDate(data.created));
+			_this.set('active', data.active == '1' ? true : false);
+			_this.dispatchEvent(new barmatz.events.UserModelEvent(barmatz.events.UserModelEvent.DATA_LOAD_SUCCESS));
+		}
+	
+		function onLoaderError(event)
+		{
+			removeLoaderListeners();
+			_this.dispatchEvent(new barmatz.events.UserModelEvent(barmatz.events.UserModelEvent.DATA_LOAD_FAIL));
 		}
 	}},
 	login: {value: function(userName, password)
@@ -6906,35 +7048,48 @@ Object.defineProperties(barmatz.forms.users.UserModel.prototype,
 		request.data = {u: userName, p: password};
 		
 		loader = new barmatz.net.Loader();
-		loader.addEventListener(barmatz.events.LoaderEvent.DONE, onLoadDone);
+		addLoaderListeners();
 		loader.load(request);
 		
-		function onLoadDone(event)
+		function addLoaderListeners()
 		{
-			var response, data;
+			loader.addEventListener(barmatz.events.LoaderEvent.SUCCESS, onLoaderSuccess);
+			loader.addEventListener(barmatz.events.LoaderEvent.ERROR, onLoaderError);
+		}
+		
+		function removeLoaderListeners()
+		{
+			loader.removeEventListener(barmatz.events.LoaderEvent.SUCCESS, onLoaderSuccess);
+			loader.removeEventListener(barmatz.events.LoaderEvent.ERROR, onLoaderError);
+		}
+		
+		function onLoaderSuccess(event)
+		{
+			var data;
 			
 			barmatz.utils.DataTypes.isNotUndefined(event);
 			barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.LoaderEvent);
 
-			event.target.removeEventListener(barmatz.events.LoaderEvent.DONE, onLoadDone);
+			removeLoaderListeners();
 			
-			response = event.response;
-			
-			if(response && response.status == 200)
+			try
 			{
-				try
-				{
-					data = response.data ? JSON.parse(response.data) : null;
-					_this.set('id', data.id);
-					_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.UserModelEvent.LOGIN_SUCCESS));
-				}
-				catch(error)
-				{
-					_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.UserModelEvent.LOGIN_FAIL));
-				}
+				data = JSON.parse(event.response.data);
 			}
-			else
-				_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.UserModelEvent.LOGIN_FAIL));
+			catch(error)
+			{
+				onLoaderError(event);
+				return;
+			}
+			
+			_this.set('id', data.id);
+			_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.UserModelEvent.LOGIN_SUCCESS));
+		}
+		
+		function onLoaderError(event)
+		{
+			removeLoaderListeners();
+			_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.UserModelEvent.LOGIN_FAIL));
 		}
 	}}
 });
@@ -7043,7 +7198,7 @@ Object.defineProperties(barmatz.net.Loader.prototype,
 			this._xhr.open(request.method, url, request.async);
 		
 		if(request.headers)
-			for(i in request.headers)
+			for(i = 0; i < request.headers.length; i++)
 			{
 				this._xhr.setRequestHeader(request.headers[i].header, request.headers[i].value);
 				if(request.headers[i].header.toLowerCase() == 'content-type')
@@ -7060,7 +7215,7 @@ Object.defineProperties(barmatz.net.Loader.prototype,
 		
 		function onReadyStateChange(event)
 		{
-			var type;
+			var type, response;
 			
 			switch(event.target.readyState)
 			{
@@ -7072,13 +7227,20 @@ Object.defineProperties(barmatz.net.Loader.prototype,
 					_this.dispatchEvent(new barmatz.events.LoaderEvent(barmatz.events.LoaderEvent.OPENED, request));
 					break;
 				case 2:
-					type = barmatz.events.LoaderEvent.HEADERS_RECEIVED;
+					_this.dispatchEvent(new barmatz.events.LoaderEvent(barmatz.events.LoaderEvent.HEADERS_RECEIVED, request));
+					break;
 				case 3:
-					type = barmatz.events.LoaderEvent.LOADING;
+					_this.dispatchEvent(new barmatz.events.LoaderEvent(barmatz.events.LoaderEvent.LOADING, request));
+					break;
 				case 4:
-					if(!type)
-						type = barmatz.events.LoaderEvent.DONE;
-					_this.dispatchEvent(new barmatz.events.LoaderEvent(type, new barmatz.net.Response(request.url, _this._xhr.responseText, _this._xhr.responseType || '', _this._xhr.status, _this._xhr.getAllResponseHeaders().split('\n'))));
+					response = new barmatz.net.Response(request.url, _this._xhr.responseText, _this._xhr.responseType || '', _this._xhr.status, _this._xhr.getAllResponseHeaders().split('\n'));
+
+					_this.dispatchEvent(new barmatz.events.LoaderEvent(barmatz.events.LoaderEvent.COMPLETE));
+					
+					if(response.status == 200)
+						_this.dispatchEvent(new barmatz.events.LoaderEvent(barmatz.events.LoaderEvent.SUCCESS, response));
+					else
+						_this.dispatchEvent(new barmatz.events.LoaderEvent(barmatz.events.LoaderEvent.ERROR, response));
 					break;
 			}
 		}

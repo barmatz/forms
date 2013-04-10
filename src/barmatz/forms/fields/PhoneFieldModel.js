@@ -4,6 +4,7 @@ window.barmatz.forms.fields.PhoneFieldModel = function(name)
 	barmatz.utils.DataTypes.isNotUndefined(name);
 	barmatz.utils.DataTypes.isTypeOf(name, 'string', true);
 	barmatz.forms.fields.FieldModel.call(this, barmatz.forms.fields.FieldTypes.PHONE, name);
+	this.validator.code = barmatz.forms.Validator.VALID_PHONE; 
 	this.set('prefix', '');
 };
 

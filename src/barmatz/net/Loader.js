@@ -94,7 +94,7 @@ Object.defineProperties(barmatz.net.Loader.prototype,
 			this._xhr.open(request.method, url, request.async);
 		
 		if(request.headers)
-			for(i in request.headers)
+			for(i = 0; i < request.headers.length; i++)
 			{
 				this._xhr.setRequestHeader(request.headers[i].header, request.headers[i].value);
 				if(request.headers[i].header.toLowerCase() == 'content-type')
@@ -111,7 +111,7 @@ Object.defineProperties(barmatz.net.Loader.prototype,
 		
 		function onReadyStateChange(event)
 		{
-			var type;
+			var type, response;
 			
 			switch(event.target.readyState)
 			{
@@ -123,13 +123,20 @@ Object.defineProperties(barmatz.net.Loader.prototype,
 					_this.dispatchEvent(new barmatz.events.LoaderEvent(barmatz.events.LoaderEvent.OPENED, request));
 					break;
 				case 2:
-					type = barmatz.events.LoaderEvent.HEADERS_RECEIVED;
+					_this.dispatchEvent(new barmatz.events.LoaderEvent(barmatz.events.LoaderEvent.HEADERS_RECEIVED, request));
+					break;
 				case 3:
-					type = barmatz.events.LoaderEvent.LOADING;
+					_this.dispatchEvent(new barmatz.events.LoaderEvent(barmatz.events.LoaderEvent.LOADING, request));
+					break;
 				case 4:
-					if(!type)
-						type = barmatz.events.LoaderEvent.DONE;
-					_this.dispatchEvent(new barmatz.events.LoaderEvent(type, new barmatz.net.Response(request.url, _this._xhr.responseText, _this._xhr.responseType || '', _this._xhr.status, _this._xhr.getAllResponseHeaders().split('\n'))));
+					response = new barmatz.net.Response(request.url, _this._xhr.responseText, _this._xhr.responseType || '', _this._xhr.status, _this._xhr.getAllResponseHeaders().split('\n'));
+
+					_this.dispatchEvent(new barmatz.events.LoaderEvent(barmatz.events.LoaderEvent.COMPLETE));
+					
+					if(response.status == 200)
+						_this.dispatchEvent(new barmatz.events.LoaderEvent(barmatz.events.LoaderEvent.SUCCESS, response));
+					else
+						_this.dispatchEvent(new barmatz.events.LoaderEvent(barmatz.events.LoaderEvent.ERROR, response));
 					break;
 			}
 		}

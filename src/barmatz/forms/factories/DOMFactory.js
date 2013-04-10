@@ -1074,7 +1074,7 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		bits = barmatz.utils.Bitwise.parseBit(model.availableValidators);
 		options = {};
 		
-		for(i in bits)
+		for(i = 0; i < bits.length; i++)
 		{
 			fieldValidatorWrapper = this.createFieldValidatorWrapper(bits[i]);
 			options[bits[i]] = fieldValidatorWrapper.checkbox;

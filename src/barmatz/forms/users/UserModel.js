@@ -88,8 +88,24 @@ Object.defineProperties(barmatz.forms.users.UserModel.prototype,
 			request.data = {u: _this.id};
 			
 			loader = new barmatz.net.Loader();
-			loader.addEventListener(barmatz.events.LoaderEvent.DONE, onLoadFormsDataDone);
+			addLoadFormsDataListeners(loader);
 			loader.load(request);
+		}
+		
+		function addLoadFormsDataListeners(loader)
+		{
+			barmatz.utils.DataTypes.isNotUndefined(loader);
+			barmatz.utils.DataTypes.isInstanceOf(loader, barmatz.net.Loader);
+			loader.addEventListener(barmatz.events.LoaderEvent.SUCCESS, onLoadFormsDataSuccess);
+			loader.addEventListener(barmatz.events.LoaderEvent.ERROR, onLoadFormsDataError);
+		}
+		
+		function removeLoadFormsDataListeners(loader)
+		{
+			barmatz.utils.DataTypes.isNotUndefined(loader);
+			barmatz.utils.DataTypes.isInstanceOf(loader, barmatz.net.Loader);
+			loader.removeEventListener(barmatz.events.LoaderEvent.SUCCESS, onLoadFormsDataSuccess);
+			loader.removeEventListener(barmatz.events.LoaderEvent.ERROR, onLoadFormsDataError);
 		}
 		
 		function addLoadUserDataListeners()
@@ -133,31 +149,35 @@ Object.defineProperties(barmatz.forms.users.UserModel.prototype,
 			_this.dispatchEvent(new barmatz.events.UserModelEvent(barmatz.events.UserModelEvent.GET_FORMS_FAIL));
 		}
 		
-		function onLoadFormsDataDone(event)
+		function onLoadFormsDataSuccess(event)
 		{
-			var response, data;
+			var data;
 			
 			barmatz.utils.DataTypes.isNotUndefined(event);
 			barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.LoaderEvent);
 			
-			event.target.removeEventListener(barmatz.events.LoaderEvent.DONE, onLoadFormsDataDone);
-
-			response = event.response;
-			
-			if(response && response.status == 200)
+			removeLoadFormsDataListeners(event.target);
+				
+			try
 			{
-				data = response.data ? JSON.parse(response.data) : null;
-					
-				if(data)
-				{
-					parseFormsData(data);
-					_this.dispatchEvent(new barmatz.events.UserModelEvent(barmatz.events.UserModelEvent.GET_FORMS_SUCCESS, data));
-				}
-				else
-					_this.dispatchEvent(new barmatz.events.UserModelEvent(barmatz.events.UserModelEvent.GET_FORMS_FAIL));
+				data = JSON.parse(event.response.data);
 			}
-			else
-				_this.dispatchEvent(new barmatz.events.UserModelEvent(barmatz.events.UserModelEvent.GET_FORMS_FAIL));
+			catch(error)
+			{
+				onLoadFormsDataError(event);
+				return;
+			}
+			
+			parseFormsData(data);
+			_this.dispatchEvent(new barmatz.events.UserModelEvent(barmatz.events.UserModelEvent.GET_FORMS_SUCCESS, data));
+		}
+		
+		function onLoadFormsDataError(event)
+		{
+			barmatz.utils.DataTypes.isNotUndefined(event);
+			barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.LoaderEvent);
+			removeLoadFormsDataListeners(event.target);
+			_this.dispatchEvent(new barmatz.events.UserModelEvent(barmatz.events.UserModelEvent.GET_FORMS_FAIL));
 		}
 	}},
 	getData: {value: function()
@@ -168,40 +188,53 @@ Object.defineProperties(barmatz.forms.users.UserModel.prototype,
 		request.method = barmatz.net.Methods.GET;
 		
 		loader = new barmatz.net.Loader();
-		loader.addEventListener(barmatz.events.LoaderEvent.DONE, onLoaderDone);
+		addLoaderListeners();
 		loader.load(request);
 		
-		function onLoaderDone(event)
+		function addLoaderListeners()
 		{
-			var response, data;
+			loader.addEventListener(barmatz.events.LoaderEvent.SUCCESS, onLoaderSuccess);
+			loader.addEventListener(barmatz.events.LoaderEvent.ERROR, onLoaderError);
+		}
+		
+		function removeLoaderListeners()
+		{
+			loader.removeEventListener(barmatz.events.LoaderEvent.SUCCESS, onLoaderSuccess);
+			loader.removeEventListener(barmatz.events.LoaderEvent.ERROR, onLoaderError);
+		}
+		
+		function onLoaderSuccess(event)
+		{
+			var data;
 			
 			barmatz.utils.DataTypes.isNotUndefined(event);
 			barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.LoaderEvent);
 			
-			event.target.removeEventListener(barmatz.events.LoaderEvent.DONE, onLoaderDone);
-
-			response = event.response;
+			removeLoaderListeners();
 			
-			if(response && response.status == 200)
+			try
 			{
-				data = response.data ? JSON.parse(response.data) : null;
-				
-				if(data)
-				{
-					_this.set('id', data.id);
-					_this.set('userName', data.userName);
-					_this.set('firstName', data.first_name);
-					_this.set('lastName', data.last_name);
-					_this.set('created', barmatz.utils.Date.toDate(data.created));
-					_this.set('active', data.active == '1' ? true : false);
-					_this.dispatchEvent(new barmatz.events.UserModelEvent(barmatz.events.UserModelEvent.DATA_LOAD_SUCCESS));
-				}
-				else
-					_this.dispatchEvent(new barmatz.events.UserModelEvent(barmatz.events.UserModelEvent.DATA_LOAD_FAIL));
+				data = JSON.parse(event.response.data);
 			}
-			else
-				_this.dispatchEvent(new barmatz.events.UserModelEvent(barmatz.events.UserModelEvent.DATA_LOAD_FAIL));
-				
+			catch(error)
+			{
+				onLoaderError(event);
+				return;
+			}
+			
+			_this.set('id', data.id);
+			_this.set('userName', data.userName);
+			_this.set('firstName', data.first_name);
+			_this.set('lastName', data.last_name);
+			_this.set('created', barmatz.utils.Date.toDate(data.created));
+			_this.set('active', data.active == '1' ? true : false);
+			_this.dispatchEvent(new barmatz.events.UserModelEvent(barmatz.events.UserModelEvent.DATA_LOAD_SUCCESS));
+		}
+	
+		function onLoaderError(event)
+		{
+			removeLoaderListeners();
+			_this.dispatchEvent(new barmatz.events.UserModelEvent(barmatz.events.UserModelEvent.DATA_LOAD_FAIL));
 		}
 	}},
 	login: {value: function(userName, password)
@@ -220,35 +253,48 @@ Object.defineProperties(barmatz.forms.users.UserModel.prototype,
 		request.data = {u: userName, p: password};
 		
 		loader = new barmatz.net.Loader();
-		loader.addEventListener(barmatz.events.LoaderEvent.DONE, onLoadDone);
+		addLoaderListeners();
 		loader.load(request);
 		
-		function onLoadDone(event)
+		function addLoaderListeners()
 		{
-			var response, data;
+			loader.addEventListener(barmatz.events.LoaderEvent.SUCCESS, onLoaderSuccess);
+			loader.addEventListener(barmatz.events.LoaderEvent.ERROR, onLoaderError);
+		}
+		
+		function removeLoaderListeners()
+		{
+			loader.removeEventListener(barmatz.events.LoaderEvent.SUCCESS, onLoaderSuccess);
+			loader.removeEventListener(barmatz.events.LoaderEvent.ERROR, onLoaderError);
+		}
+		
+		function onLoaderSuccess(event)
+		{
+			var data;
 			
 			barmatz.utils.DataTypes.isNotUndefined(event);
 			barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.LoaderEvent);
 
-			event.target.removeEventListener(barmatz.events.LoaderEvent.DONE, onLoadDone);
+			removeLoaderListeners();
 			
-			response = event.response;
-			
-			if(response && response.status == 200)
+			try
 			{
-				try
-				{
-					data = response.data ? JSON.parse(response.data) : null;
-					_this.set('id', data.id);
-					_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.UserModelEvent.LOGIN_SUCCESS));
-				}
-				catch(error)
-				{
-					_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.UserModelEvent.LOGIN_FAIL));
-				}
+				data = JSON.parse(event.response.data);
 			}
-			else
-				_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.UserModelEvent.LOGIN_FAIL));
+			catch(error)
+			{
+				onLoaderError(event);
+				return;
+			}
+			
+			_this.set('id', data.id);
+			_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.UserModelEvent.LOGIN_SUCCESS));
+		}
+		
+		function onLoaderError(event)
+		{
+			removeLoaderListeners();
+			_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.UserModelEvent.LOGIN_FAIL));
 		}
 	}}
 });

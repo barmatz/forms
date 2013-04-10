@@ -102,7 +102,7 @@ Object.defineProperties(barmatz.forms.fields.FieldModel.prototype,
 		{
 			bits = barmatz.utils.Bitwise.parseBit(this.validator.code);
 			
-			for(i in bits)
+			for(i = 0; i < bits.length; i++)
 				switch(bits[i])
 				{
 					default:

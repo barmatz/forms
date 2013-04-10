@@ -11,7 +11,7 @@ barmatz.forms.embed = function(fingerprint)
 		
 		containers = Array.prototype.slice.call(document.getElementsByName('formContainer')).filter(filterFormContainers);
 
-		for(i in containers)
+		for(i = 0; i < containers.length; i++)
 			embedForm(containers[i]);
 	}
 	
@@ -70,7 +70,7 @@ barmatz.forms.embed = function(fingerprint)
 				break;
 		}
 
-		for(i in model.stylesheets)
+		for(i = 0; i < model.stylesheets.length; i++)
 			container.appendChild(barmatz.forms.factories.DOMFactory.createStylesheet(model.stylesheets[i]));
 		
 		model.forEach(function(item, index, collection)

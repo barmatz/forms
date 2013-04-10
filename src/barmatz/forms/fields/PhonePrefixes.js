@@ -15,7 +15,7 @@ Object.defineProperties(barmatz.forms.fields.PhonePrefixes,
 		barmatz.utils.DataTypes.isNotUndefined(callback);
 		barmatz.utils.DataTypes.isTypeOf(callback, 'function');
 		
-		for(i in this.ALL)
+		for(i = 0; i < this.ALL.length; i++)
 			callback(this.ALL[i]);
 	}}
 });

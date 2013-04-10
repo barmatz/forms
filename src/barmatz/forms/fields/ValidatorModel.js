@@ -41,5 +41,17 @@ Object.defineProperties(barmatz.forms.fields.ValidatorModel.prototype,
 			object[i] = this[i];
 		
 		return object;
+	}},
+	toJSON: {value: function()
+	{
+		var object, i;
+		
+		object = {code: this.code};
+		
+		for(i in this)
+			if(typeof this[i] != 'function' && /^[^_]/.test(i))
+				object[i] = this[i];
+		
+		return object;
 	}}
 });

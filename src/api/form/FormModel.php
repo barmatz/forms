@@ -43,7 +43,9 @@ class FormModel extends \api\database\DatabaseTableModel
 	
 	protected function doUpdate($fingerprint, $name, $data, $email)
 	{
-		if(!$this->query("update `{$this->name}` set `name`='{$this->encodeString($name)}', `data`='{$this->encodeString($data)}', `email`='{$this->encodeString($email)}' where `fingerprint`='$fingerprint'"))
+		if($this->query("update `{$this->name}` set `name`='{$this->encodeString($name)}', `data`='{$this->encodeString($data)}', `email`='{$this->encodeString($email)}' where `fingerprint`='$fingerprint'"))
+			return $fingerprint;
+		else
 			\api\errors\Errors::internalServerError('Cannot update data');
 	}
 	

@@ -193,13 +193,7 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 			object.fields.push(field);
 		});
 		
-		return JSON.stringify(object, function(key, value)
-		{ 
-			if(this === value) 
-				return undefined; 
-			else 
-				return value;
-		});
+		return JSON.stringify(object);
 	}},
 	reset: {value: function()
 	{
@@ -229,31 +223,49 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 		request.method = barmatz.net.Methods.POST;
 		request.data = {f: this.fingerprint || null, n: this.name, e: this.targetEmail, d: this.toJSON()};
 		loader = new barmatz.net.Loader();
-		loader.addEventListener(barmatz.events.LoaderEvent.DONE, onLoaderDone);
+		addLoaderListeners();
 		loader.load(request);
-		
-		function onLoaderDone(event)
+
+		function addLoaderListeners()
 		{
-			var response, data;
+			loader.addEventListener(barmatz.events.LoaderEvent.SUCCESS, onLoaderSuccess);
+			loader.addEventListener(barmatz.events.LoaderEvent.ERROR, onLoaderError);
+		}
+		
+		function removeLoaderListeners()
+		{
+			loader.removeEventListener(barmatz.events.LoaderEvent.SUCCESS, onLoaderSuccess);
+			loader.removeEventListener(barmatz.events.LoaderEvent.ERROR, onLoaderError);
+		}
+		
+		function onLoaderSuccess(event)
+		{
+			var data;
 			
 			barmatz.utils.DataTypes.isNotUndefined(event);
 			barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.LoaderEvent);
 			
-			event.target.removeEventListener(barmatz.events.LoaderEvent.DONE, onLoaderDone);
+			removeLoaderListeners();
 			
-			response = event.response;
-			
-			if(response && response.status == 200)
+			try
 			{
-				data = response.data ? JSON.parse(response.data) : null;
-				
-				if(data && data.fingerprint)
-					_this.set('fingerprint', data.fingerprint);
-				
-				_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.SAVED));
+				data = JSON.parse(event.response.data);
 			}
-			else
-				_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.ERROR_SAVING));
+			catch(error)
+			{
+				return;
+			}
+				
+			if(data.fingerprint)
+				_this.set('fingerprint', data.fingerprint);
+			
+			_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.SAVED));
+		}
+		
+		function onLoaderError(event)
+		{
+			removeLoaderListeners();
+			_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.ERROR_SAVING));
 		}
 	}},
 	saveAs: {value: function(model, name)
@@ -282,33 +294,48 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 		request.data = {f: fingerprint};
 		
 		loader = new barmatz.net.Loader();
-		loader.addEventListener(barmatz.events.LoaderEvent.DONE, onLoaderDone);
+		addLoaderListeners();
 		loader.load(request);
-		
-		function onLoaderDone(event)
+
+		function addLoaderListeners()
 		{
-			var response, data, parsedData;
+			loader.addEventListener(barmatz.events.LoaderEvent.SUCCESS, onLoaderSuccess);
+			loader.addEventListener(barmatz.events.LoaderEvent.ERROR, onLoaderError);
+		}
+		
+		function removeLoaderListeners()
+		{
+			loader.removeEventListener(barmatz.events.LoaderEvent.SUCCESS, onLoaderSuccess);
+			loader.removeEventListener(barmatz.events.LoaderEvent.ERROR, onLoaderError);
+		}
+		
+		function onLoaderSuccess(event)
+		{
+			var data;
 
 			barmatz.utils.DataTypes.isNotUndefined(event);
 			barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.LoaderEvent);
-			event.target.addEventListener(barmatz.events.LoaderEvent.DONE, onLoaderDone);
+
+			removeLoaderListeners();
 			
-			response = event.response;
-			
-			if(response && response.status == 200)
+			try
 			{
-				data = response.data ? JSON.parse(response.data) : null;
-				
-				if(data)
-				{
-					_this.copy(data.fingerprint, data.data);
-					_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.LOADING_FORM_COMPLETE));
-				}
-				else
-					_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.LOADING_FORM_ERROR));
+				data = JSON.parse(event.response.data);
 			}
-			else
-				_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.LOADING_FORM_ERROR));
+			catch(error)
+			{
+				onLoaderError(event);
+				return;
+			}
+			
+			_this.copy(data.fingerprint, data.data);
+			_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.LOADING_FORM_COMPLETE));
+		}
+		
+		function onLoaderError(event)
+		{
+			removeLoaderListeners();
+			_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.LOADING_FORM_ERROR));
 		}
 	}},
 	delete: {value: function()
@@ -324,23 +351,34 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 		request.data = {f: this.fingerprint};
 		
 		loader = new barmatz.net.Loader();
-		loader.addEventListener(barmatz.events.LoaderEvent.DONE, onLoaderDone);
+		addLoaderListeners();
 		loader.load(request);
-		
-		function onLoaderDone(event)
-		{
-			var response;
 
+		function addLoaderListeners()
+		{
+			loader.addEventListener(barmatz.events.LoaderEvent.SUCCESS, onLoaderSuccess);
+			loader.addEventListener(barmatz.events.LoaderEvent.ERROR, onLoaderError);
+		}
+		
+		function removeLoaderListeners()
+		{
+			loader.removeEventListener(barmatz.events.LoaderEvent.SUCCESS, onLoaderSuccess);
+			loader.removeEventListener(barmatz.events.LoaderEvent.ERROR, onLoaderError);
+		}
+		
+		function onLoaderSuccess(event)
+		{
 			barmatz.utils.DataTypes.isNotUndefined(event);
 			barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.LoaderEvent);
-			event.target.removeEventListener(barmatz.events.LoaderEvent.DONE, onLoaderDone);
 			
-			response = event.response;
-			
-			if(response && response.status == 200)
-				_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.DELETED));
-			else
-				_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.DELETION_FAIL));
+			removeLoaderListeners();
+			_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.DELETED));
+		}
+		
+		function onLoaderError(event)
+		{
+			removeLoaderListeners();
+			_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.DELETION_FAIL));
 		}
 	}},
 	isValid: {get: function()
@@ -376,23 +414,33 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 		request.headers = [new barmatz.net.RequestHeader('Content-Type', this.encoding)];
 		
 		loader = new barmatz.net.Loader();
-		loader.addEventListener(barmatz.events.LoaderEvent.DONE, onLoaderDone);
+		addLoaderListeners();
 		loader.load(request);
-		
-		function onLoaderDone(event)
+
+		function addLoaderListeners()
 		{
-			var response;
-			
+			loader.addEventListener(barmatz.events.LoaderEvent.SUCCESS, onLoaderSuccess);
+			loader.addEventListener(barmatz.events.LoaderEvent.ERROR, onLoaderError);
+		}
+		
+		function removeLoaderListeners()
+		{
+			loader.removeEventListener(barmatz.events.LoaderEvent.SUCCESS, onLoaderSuccess);
+			loader.removeEventListener(barmatz.events.LoaderEvent.ERROR, onLoaderError);
+		}
+		
+		function onLoaderSuccess(event)
+		{
 			barmatz.utils.DataTypes.isNotUndefined(event);
 			barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.LoaderEvent);
-			event.target.removeEventListener(barmatz.events.LoaderEvent.DONE, onLoaderDone);
-			
-			response = event.response;
-			
-			if(response && response.status == 200)
-				_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.SUBMITTED));
-			else
-				_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.SUBMISSION_FAILED));
+			removeLoaderListeners();
+			_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.SUBMITTED));
+		}
+		
+		function onLoaderError(event)
+		{
+			removeLoaderListeners();
+			_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.SUBMISSION_FAILED));
 		}
 	}},
 	copy: {value: function(fingerprint, data)
@@ -426,7 +474,7 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 				addField(item);
 			});
 		else
-			for(i in data.fields)
+			for(i = 0; i < data.fields.length; i++)
 				addField(data.fields[i]);
 		
 		function addField(fieldData)

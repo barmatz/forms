@@ -11,7 +11,9 @@ function processForm()
 	$model = new \api\form\FormModel($db);
 	
 	if(isset($_POST['f']))
-		$model->update($_POST['f'], $_POST['n'], $_POST['d'], $_POST['e']);
+		$fingerprint = $model->update($_POST['f'], $_POST['n'], $_POST['d'], $_POST['e']);
 	else
-		echo json_encode(array("fingerprint"=>$model->insert($_SESSION['userId'], $_POST['n'], $_POST['d'], $_POST['e'])));
+		$fingerprint = $model->insert($_SESSION['userId'], $_POST['n'], $_POST['d'], $_POST['e']);
+	
+	echo json_encode(array("fingerprint"=>$fingerprint));
 } 

@@ -27,6 +27,9 @@ window.barmatz.forms.fields.FieldValidationOptionsController = function(model, o
 		
 		if(barmatz.utils.Bitwise.contains(model.validator.code, bit))
 			option.checked = true;
+		
+		if(model instanceof barmatz.forms.fields.PhoneFieldModel && barmatz.utils.Bitwise.contains(model.validator.code, barmatz.forms.Validator.VALID_PHONE))
+			option.disabled = true;
 	}
 	
 	function changeModelByOption(option, bit)
@@ -36,7 +39,15 @@ window.barmatz.forms.fields.FieldValidationOptionsController = function(model, o
 		barmatz.utils.DataTypes.isInstanceOf(option, HTMLInputElement);
 		barmatz.utils.DataTypes.isTypeOf(bit, 'number');
 
-		model.validator.code = option.checked ? model.validator.code ? barmatz.utils.Bitwise.concat(model.validator.code, bit) : bit : barmatz.utils.Bitwise.slice(model.validator.code, bit); 
+		if(option.checked)
+		{
+			if(model.validator.code)
+				bit = barmatz.utils.Bitwise.concat(model.validator.code, bit);
+		}
+		else
+			bit = barmatz.utils.Bitwise.slice(model.validator.code, bit); 
+		
+		model.validator.code = bit; 
 		
 		switch(bit)
 		{
