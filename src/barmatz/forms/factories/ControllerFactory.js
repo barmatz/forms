@@ -180,5 +180,11 @@ Object.defineProperties(barmatz.forms.factories.ControllerFactory,
 		barmatz.utils.DataTypes.isInstanceOf(fieldView, HTMLElement);
 		barmatz.utils.DataTypes.isInstanceOf(errorMessageView, HTMLElement);
 		return new barmatz.forms.fields.FieldController(model, fieldView, errorMessageView);
+	}},
+	createJQueryDialogController: {value: function(view)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(view);
+		barmatz.utils.DataTypes.isInstanceOf(view, HTMLElement);
+		return new barmatz.forms.ui.JQueryDialogController(view);
 	}}
 });

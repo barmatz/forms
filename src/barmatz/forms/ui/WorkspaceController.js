@@ -44,15 +44,15 @@ window.barmatz.forms.ui.WorkspaceController = function(model, view)
 	
 	function openNewFieldDialog(model)
 	{
-		var dialogWarpper;
+		var dialogWrapper;
 		
 		barmatz.utils.DataTypes.isNotUndefined(model);
 		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FieldModel);
 		
-		dialogWarpper = barmatz.forms.factories.DOMFactory.createNewFieldDialogWrapper(model);
-		jQuery(dialogWarpper.wrapper).dialog('open');
-		
-		barmatz.forms.factories.ControllerFactory.createNewFieldDialogController(model, dialogWarpper.wrapper, dialogWarpper.nameField, dialogWarpper.labelField);
+		dialogWrapper = barmatz.forms.factories.DOMFactory.createNewFieldDialogWrapper(model);
+		jQuery(dialogWrapper.dialog).dialog('open');
+		barmatz.forms.factories.ControllerFactory.createJQueryDialogController(dialogWrapper.dialog);
+		barmatz.forms.factories.ControllerFactory.createNewFieldDialogController(model, dialogWrapper.dialog, dialogWrapper.nameField, dialogWrapper.labelField);
 	}
 	
 	function onSortingStart(event, ui)
@@ -129,7 +129,7 @@ Object.defineProperties(barmatz.forms.ui.WorkspaceController.prototype,
 		{
 			barmatz.utils.DataTypes.isNotUndefined(event);
 			barmatz.utils.DataTypes.isInstanceOf(event, MouseEvent);
-			barmatz.forms.factories.DOMFactory.createConfirmPromptDialog('Are you sure you want to delete this item?', onDialogConfirm, true);
+			barmatz.forms.factories.ControllerFactory.createJQueryDialogController(barmatz.forms.factories.DOMFactory.createConfirmPromptDialog('Are you sure you want to delete this item?', onDialogConfirm, true));
 			event.stopImmediatePropagation();
 		}
 		

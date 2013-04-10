@@ -35,7 +35,7 @@ window.barmatz.forms.fields.DropboxItemsListItemController = function(model, lab
 	
 	function onEditButtonViewClick(event)
 	{
-		barmatz.forms.factories.DOMFactory.createDropboxItemDialog(model.label, model.value, onEditConfirm);
+		barmatz.forms.factories.ControllerFactory.createJQueryDialogController(barmatz.forms.factories.DOMFactory.createDropboxItemDialog(model.label, model.value, onEditConfirm));
 	}
 	
 	function onEditConfirm(label, value)

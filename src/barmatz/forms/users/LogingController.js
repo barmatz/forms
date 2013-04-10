@@ -33,6 +33,7 @@ window.barmatz.forms.users.LogingController = function(model, userNameFieldView,
 	function showLoading()
 	{
 		loadingView = barmatz.forms.factories.DOMFactory.createLoadingDialog();
+		barmatz.forms.factories.ControllerFactory.createJQueryDialogController(loadingView);
 	}
 	
 	function hideLoading()

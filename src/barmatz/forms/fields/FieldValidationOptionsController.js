@@ -74,7 +74,7 @@ window.barmatz.forms.fields.FieldValidationOptionsController = function(model, o
 	
 	function getOptionParameters(option, label, key, isNumber)
 	{
-		var field;
+		var dialogWrapper, field;
 		
 		barmatz.utils.DataTypes.isNotUndefined(option);
 		barmatz.utils.DataTypes.isNotUndefined(label);
@@ -84,10 +84,14 @@ window.barmatz.forms.fields.FieldValidationOptionsController = function(model, o
 		barmatz.utils.DataTypes.isTypeOf(key, 'string');
 		
 		if(option.checked)
-			field = barmatz.forms.factories.DOMFactory.createChangePropertyPromptDialogWrapper('', label, model.validator[key] || '', function(event)
+		{
+			dialogWrapper = barmatz.forms.factories.DOMFactory.createChangePropertyPromptDialogWrapper('', label, model.validator[key] || '', function(event)
 			{
 				model.validator[key] = isNumber ? parseFloat(field.value) : field.value;
-			}, true).field;
+			}, true);
+			field = dialogWrapper.field;
+			barmatz.forms.factories.ControllerFactory.createJQueryDialogController(dialogWrapper.dialog);
+		}
 		else
 			delete model.validator[key];
 	}

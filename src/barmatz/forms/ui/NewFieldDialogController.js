@@ -22,8 +22,13 @@ Object.defineProperties(barmatz.forms.ui.NewFieldDialogController.prototype,
 {
 	_submitDialog: {value: function()
 	{
-		this._model.name = this._nameFieldView.value;
-		this._model.label = this._labelFieldView.value;
-		barmatz.forms.factories.DOMFactory.destroyDialog(this._view);
+		if(barmatz.forms.Validator.notEmpty(this._nameFieldView.value))
+		{
+			this._model.name = this._nameFieldView.value;
+			this._model.label = this._labelFieldView.value;
+			barmatz.forms.factories.DOMFactory.destroyDialog(this._view);
+		}
+		else
+			barmatz.forms.factories.ControllerFactory.createJQueryDialogController(barmatz.forms.factories.DOMFactory.createAlertPromptDialog('Error', 'A field must have a name!', true));
 	}}
 });

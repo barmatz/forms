@@ -47,12 +47,14 @@ Object.defineProperties(barmatz.forms.ui.PropertiesController.prototype,
 		function onItemsWrapperValidationOptionsButtonClick(event)
 		{
 			var dialogWrapper = barmatz.forms.factories.DOMFactory.createFieldValidationOptionsDialogWrapper(_this._model);
+			barmatz.forms.factories.ControllerFactory.createJQueryDialogController(dialogWrapper.dialog);
 			barmatz.forms.factories.ControllerFactory.createFieldValidationOptionsController(_this.model, dialogWrapper.options);
 		}
 		
 		function onItemsWrapperEditItemsButtonClick(event)
 		{
 			var dialogWrapper = barmatz.forms.factories.DOMFactory.createDropboxItemsListDialogWrapper();
+			barmatz.forms.factories.ControllerFactory.createJQueryDialogController(dialogWrapper.dialog);
 			barmatz.forms.factories.ControllerFactory.createDropboxItemsListController(_this._model, dialogWrapper.dialog.getElementsByTagName('tbody')[0], dialogWrapper.addButton, dialogWrapper.resetButton);
 		}
 		

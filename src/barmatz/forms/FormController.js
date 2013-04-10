@@ -34,6 +34,7 @@ window.barmatz.forms.FormController = function(model, formView, submitButtonView
 	function addLoadingDialog()
 	{
 		loadingDialog = barmatz.forms.factories.DOMFactory.createLoadingDialog(formView);
+		barmatz.forms.factories.ControllerFactory.createJQueryDialogController(loadingDialog);
 	}
 	 
 	function removeLoadingDialog()

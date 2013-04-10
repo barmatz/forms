@@ -15,9 +15,15 @@ window.barmatz.forms.ui.UserFormsListController = function(formModel, userModel,
 	
 	getForms();
 	
-	function getForms()
+	function createLoadingDialog()
 	{
 		loadingDialog = barmatz.forms.factories.DOMFactory.createLoadingDialog();
+		barmatz.forms.factories.ControllerFactory.createJQueryDialogController(loadingDialog);
+	}
+	
+	function getForms()
+	{
+		createLoadingDialog();
 		addUserModelListeners();
 		userModel.getForms();
 	}
@@ -85,7 +91,7 @@ window.barmatz.forms.ui.UserFormsListController = function(formModel, userModel,
 	{
 		barmatz.utils.DataTypes.isNotUndefined(model);
 		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.FormModel);
-		loadingDialog = barmatz.forms.factories.DOMFactory.createLoadingDialog();
+		createLoadingDialog();
 		addFormModelLoadingFormEvents(model);
 	}
 	
@@ -128,7 +134,7 @@ window.barmatz.forms.ui.UserFormsListController = function(formModel, userModel,
 		barmatz.utils.DataTypes.isNotUndefined(event);
 		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.FormModelEvent);
 		formModelStopLoading(event.target);
-		barmatz.forms.factories.DOMFactory.createAlertPromptDialog('Error', 'An error has occured. Please try again later.', true);
+		barmatz.forms.factories.ControllerFactory.createJQueryDialogController(barmatz.forms.factories.DOMFactory.createAlertPromptDialog('Error', 'An error has occured. Please try again later.', true));
 	}
 	
 	function onModelGetFormsSuccess(event)
@@ -143,7 +149,7 @@ window.barmatz.forms.ui.UserFormsListController = function(formModel, userModel,
 	{
 		barmatz.utils.DataTypes.isNotUndefined(event);
 		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.UserModelEvent);
-		barmatz.forms.factories.DOMFactory.createAlertPromptDialog('Error', 'An error has occured. Please try again later.', true);
+		barmatz.forms.factories.ControllerFactory.createJQueryDialogController(barmatz.forms.factories.DOMFactory.createAlertPromptDialog('Error', 'An error has occured. Please try again later.', true));
 		getFormsComplete();
 	}
 };

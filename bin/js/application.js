@@ -1370,6 +1370,12 @@ Object.defineProperties(barmatz.forms.factories.ControllerFactory,
 		barmatz.utils.DataTypes.isInstanceOf(fieldView, HTMLElement);
 		barmatz.utils.DataTypes.isInstanceOf(errorMessageView, HTMLElement);
 		return new barmatz.forms.fields.FieldController(model, fieldView, errorMessageView);
+	}},
+	createJQueryDialogController: {value: function(view)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(view);
+		barmatz.utils.DataTypes.isInstanceOf(view, HTMLElement);
+		return new barmatz.forms.ui.JQueryDialogController(view);
 	}}
 });
 /** barmatz.forms.factories.DOMFactory **/
@@ -1921,7 +1927,7 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 			dialogClass: 'forms-dialog-prompt'
 		});
 		
-		return {wrapper: dialog, nameField: nameField, labelField: labelField};
+		return {dialog: dialog, nameField: nameField, labelField: labelField};
 		
 		function getRowContent(label, field)
 		{
@@ -3369,7 +3375,7 @@ window.barmatz.forms.fields.DropboxItemsListController = function(model, view, a
 	
 	function onAddButtonViewClick(event)
 	{
-		barmatz.forms.factories.DOMFactory.createDropboxItemDialog(null, null, onAddItemConfirm);
+		barmatz.forms.factories.ControllerFactory.createJQueryDialogController(barmatz.forms.factories.DOMFactory.createDropboxItemDialog(null, null, onAddItemConfirm));
 	}
 	
 	function onResetButtonViewClick(event)
@@ -3426,7 +3432,7 @@ window.barmatz.forms.fields.DropboxItemsListItemController = function(model, lab
 	
 	function onEditButtonViewClick(event)
 	{
-		barmatz.forms.factories.DOMFactory.createDropboxItemDialog(model.label, model.value, onEditConfirm);
+		barmatz.forms.factories.ControllerFactory.createJQueryDialogController(barmatz.forms.factories.DOMFactory.createDropboxItemDialog(model.label, model.value, onEditConfirm));
 	}
 	
 	function onEditConfirm(label, value)
@@ -3821,7 +3827,7 @@ window.barmatz.forms.fields.FieldValidationOptionsController = function(model, o
 	
 	function getOptionParameters(option, label, key, isNumber)
 	{
-		var field;
+		var dialogWrapper, field;
 		
 		barmatz.utils.DataTypes.isNotUndefined(option);
 		barmatz.utils.DataTypes.isNotUndefined(label);
@@ -3831,10 +3837,14 @@ window.barmatz.forms.fields.FieldValidationOptionsController = function(model, o
 		barmatz.utils.DataTypes.isTypeOf(key, 'string');
 		
 		if(option.checked)
-			field = barmatz.forms.factories.DOMFactory.createChangePropertyPromptDialogWrapper('', label, model.validator[key] || '', function(event)
+		{
+			dialogWrapper = barmatz.forms.factories.DOMFactory.createChangePropertyPromptDialogWrapper('', label, model.validator[key] || '', function(event)
 			{
 				model.validator[key] = isNumber ? parseFloat(field.value) : field.value;
-			}, true).field;
+			}, true);
+			field = dialogWrapper.field;
+			barmatz.forms.factories.ControllerFactory.createJQueryDialogController(dialogWrapper.dialog);
+		}
 		else
 			delete model.validator[key];
 	}
@@ -4220,7 +4230,7 @@ window.barmatz.forms.ui.Builder = function()
 /** barmatz.forms.ui.BuilderController **/
 window.barmatz.forms.ui.BuilderController = function(formModel, userModel, containerView, panelsView, formNameView, saveStatusView, menuModel, menuView, toolboxModel, toolboxView, workspaceView, propertiesController)
 {
-	var loadingDialog;
+	var dialogWrapper, loadingDialog;
 	
 	barmatz.utils.DataTypes.isNotUndefined(formModel);
 	barmatz.utils.DataTypes.isNotUndefined(userModel);
@@ -4334,6 +4344,7 @@ window.barmatz.forms.ui.BuilderController = function(formModel, userModel, conta
 	function addLoadingView()
 	{
 		loadingDialog = barmatz.forms.factories.DOMFactory.createLoadingDialog();
+		barmatz.forms.factories.ControllerFactory.createJQueryDialogController(loadingDialog);
 	}
 	
 	function removeLoadingView()
@@ -4349,7 +4360,7 @@ window.barmatz.forms.ui.BuilderController = function(formModel, userModel, conta
 		barmatz.utils.DataTypes.isTypeOf(title, 'string');
 		barmatz.utils.DataTypes.isTypeOf(message, 'string');
 		removeLoadingView();
-		barmatz.forms.factories.DOMFactory.createAlertPromptDialog(title, message, true);
+		barmatz.forms.factories.ControllerFactory.createJQueryDialogController(barmatz.forms.factories.DOMFactory.createAlertPromptDialog(title, message, true));
 	}
 	
 	function addFromModelDeleteEventListeners()
@@ -4364,6 +4375,13 @@ window.barmatz.forms.ui.BuilderController = function(formModel, userModel, conta
 		formModel.removeEventListener(barmatz.events.FormModelEvent.DELETING, onFormModelDeleting);
 		formModel.removeEventListener(barmatz.events.FormModelEvent.DELETED, onFormModelDeleted);
 		formModel.removeEventListener(barmatz.events.FormModelEvent.DELETION_FAIL, onFormModelDeletionFail);
+	}
+	
+	function createRenamePrompt(title, label, value, confirmHandler)
+	{
+		dialogWrapper = barmatz.forms.factories.DOMFactory.createChangePropertyPromptDialogWrapper(title, label, value, confirmHandler, true);
+		formRenameField = dialogWrapper.field;
+		barmatz.forms.factories.ControllerFactory.createJQueryDialogController(dialogWrapper.dialog);
 	}
 	
 	function onMenuModelItemAdded(event)
@@ -4485,7 +4503,7 @@ window.barmatz.forms.ui.BuilderController = function(formModel, userModel, conta
 	
 	function onMenuNewClick(event)
 	{
-		formRenameField = barmatz.forms.factories.DOMFactory.createChangePropertyPromptDialogWrapper('New form', 'Name', formModel.name, onResetFromConfirm, true).field;
+		createRenamePrompt('New form', 'Name', formModel.name, onResetFromConfirm);
 	}
 	
 	function onMenuSaveClick(event)
@@ -4495,36 +4513,43 @@ window.barmatz.forms.ui.BuilderController = function(formModel, userModel, conta
 	
 	function onMenuSaveAsClick(event)
 	{
-		formRenameField = barmatz.forms.factories.DOMFactory.createChangePropertyPromptDialogWrapper('Save as', 'Form name', formModel.name, onSaveFromAsConfirm, true).field;
+		createRenamePrompt('Save as', 'Form name', formModel.name, onSaveFromAsConfirm);
 	}
 	
 	function onMenuLoadClick(event)
 	{
 		var dialog = barmatz.forms.factories.DOMFactory.createUserFormsListDialog();
+		barmatz.forms.factories.ControllerFactory.createJQueryDialogController(dialog);
 		barmatz.forms.factories.ControllerFactory.createUserFormsListController(formModel, userModel, dialog.getElementsByTagName('tbody')[0], dialog);
 	}
 	
 	function onMenuRenameClick(event)
 	{
-		formRenameField = barmatz.forms.factories.DOMFactory.createChangePropertyPromptDialogWrapper('Rename form', 'Name', formModel.name, onRenameFromConfirm, true).field;
+		createRenamePrompt('Rename form', 'Name', formModel.name, onRenameFromConfirm);
 	}
 	
 	function onMenuExportClick(event)
 	{
+		var dialog;
+		
 		if(barmatz.utils.DataTypes.applySilent('isValid', formModel.fingerprint))
-			barmatz.forms.factories.DOMFactory.createExportPromptDialog(formModel.fingerprint, true);
+			dialog = barmatz.forms.factories.DOMFactory.createExportPromptDialog(formModel.fingerprint, true);
 		else
-			barmatz.forms.factories.DOMFactory.createAlertPromptDialog('Failed to export', 'You must save the form before exporting!', true);
+			dialog = barmatz.forms.factories.DOMFactory.createAlertPromptDialog('Failed to export', 'You must save the form before exporting!', true);
+		
+		barmatz.forms.factories.ControllerFactory.createJQueryDialogController(dialog);
 	}
 	
 	function onMenuDeleteClick(event)
 	{
-		barmatz.forms.factories.DOMFactory.createConfirmPromptDialog('Are you sure you want to delete this form?', onDeleteFormConfirm, true);
+		barmatz.forms.factories.ControllerFactory.createJQueryDialogController(barmatz.forms.factories.DOMFactory.createConfirmPromptDialog('Are you sure you want to delete this form?', onDeleteFormConfirm, true));
 	}
 	
 	function onMenuPropertiesClick(event)
 	{
 		var wrapper = barmatz.forms.factories.DOMFactory.createFormPropertiesDialogWrapper(formModel, onChangeFormPropertiesConfirm, true);
+		
+		barmatz.forms.factories.ControllerFactory.createJQueryDialogController(wrapper.dialog);
 		
 		function onChangeFormPropertiesConfirm(event)
 		{
@@ -4868,6 +4893,29 @@ Object.defineProperties(barmatz.forms.ui.CollectionDialogController.prototype,
 		return barmatz.forms.factories.DOMFactory.createTableRow(model);
 	}}	
 });
+/** barmatz.forms.ui.JQueryDialogController **/
+window.barmatz.forms.ui.JQueryDialogController = function(view)
+{
+	barmatz.utils.DataTypes.isNotUndefined(view);
+	barmatz.utils.DataTypes.isInstanceOf(view, HTMLElement);
+	barmatz.mvc.Controller.call(this);
+	
+	$view = jQuery(view);
+	window.addEventListener('resize', onWindowResize);
+	
+	function onWindowResize(event)
+	{
+		try
+		{
+			if($view.dialog('isOpen'))
+				$view.dialog('close').dialog('open');
+		}
+		catch(error){}
+	}
+};
+
+barmatz.forms.ui.JQueryDialogController.prototype = new barmatz.mvc.Controller();
+barmatz.forms.ui.JQueryDialogController.prototype.constructor = barmatz.forms.ui.JQueryDialogController;
 /** barmatz.forms.ui.JQueryPromptDialogController **/
 window.barmatz.forms.ui.JQueryPromptDialogController = function(model, view)
 {
@@ -4903,6 +4951,7 @@ barmatz.forms.ui.JQueryPromptDialogController.prototype.constructor = barmatz.fo
 window.barmatz.forms.ui.Login = function()
 {
 	var loginFormWrapper = barmatz.forms.factories.DOMFactory.createLoginFormDialogWrapper();
+	barmatz.forms.factories.ControllerFactory.createJQueryDialogController(loginFormWrapper.dialog);
 	barmatz.forms.factories.ControllerFactory.createLoginController(barmatz.forms.factories.ModelFactory.createUserModel(), loginFormWrapper.userNameField, loginFormWrapper.passwordField, loginFormWrapper.submitButton, loginFormWrapper.errorField);
 };
 /** barmatz.forms.ui.MenuController **/
@@ -5149,9 +5198,14 @@ Object.defineProperties(barmatz.forms.ui.NewFieldDialogController.prototype,
 {
 	_submitDialog: {value: function()
 	{
-		this._model.name = this._nameFieldView.value;
-		this._model.label = this._labelFieldView.value;
-		barmatz.forms.factories.DOMFactory.destroyDialog(this._view);
+		if(barmatz.forms.Validator.notEmpty(this._nameFieldView.value))
+		{
+			this._model.name = this._nameFieldView.value;
+			this._model.label = this._labelFieldView.value;
+			barmatz.forms.factories.DOMFactory.destroyDialog(this._view);
+		}
+		else
+			barmatz.forms.factories.ControllerFactory.createJQueryDialogController(barmatz.forms.factories.DOMFactory.createAlertPromptDialog('Error', 'A field must have a name!', true));
 	}}
 });
 /** barmatz.forms.ui.PanelModel **/
@@ -5237,12 +5291,14 @@ Object.defineProperties(barmatz.forms.ui.PropertiesController.prototype,
 		function onItemsWrapperValidationOptionsButtonClick(event)
 		{
 			var dialogWrapper = barmatz.forms.factories.DOMFactory.createFieldValidationOptionsDialogWrapper(_this._model);
+			barmatz.forms.factories.ControllerFactory.createJQueryDialogController(dialogWrapper.dialog);
 			barmatz.forms.factories.ControllerFactory.createFieldValidationOptionsController(_this.model, dialogWrapper.options);
 		}
 		
 		function onItemsWrapperEditItemsButtonClick(event)
 		{
 			var dialogWrapper = barmatz.forms.factories.DOMFactory.createDropboxItemsListDialogWrapper();
+			barmatz.forms.factories.ControllerFactory.createJQueryDialogController(dialogWrapper.dialog);
 			barmatz.forms.factories.ControllerFactory.createDropboxItemsListController(_this._model, dialogWrapper.dialog.getElementsByTagName('tbody')[0], dialogWrapper.addButton, dialogWrapper.resetButton);
 		}
 		
@@ -5495,9 +5551,15 @@ window.barmatz.forms.ui.UserFormsListController = function(formModel, userModel,
 	
 	getForms();
 	
-	function getForms()
+	function createLoadingDialog()
 	{
 		loadingDialog = barmatz.forms.factories.DOMFactory.createLoadingDialog();
+		barmatz.forms.factories.ControllerFactory.createJQueryDialogController(loadingDialog);
+	}
+	
+	function getForms()
+	{
+		createLoadingDialog();
 		addUserModelListeners();
 		userModel.getForms();
 	}
@@ -5565,7 +5627,7 @@ window.barmatz.forms.ui.UserFormsListController = function(formModel, userModel,
 	{
 		barmatz.utils.DataTypes.isNotUndefined(model);
 		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.FormModel);
-		loadingDialog = barmatz.forms.factories.DOMFactory.createLoadingDialog();
+		createLoadingDialog();
 		addFormModelLoadingFormEvents(model);
 	}
 	
@@ -5608,7 +5670,7 @@ window.barmatz.forms.ui.UserFormsListController = function(formModel, userModel,
 		barmatz.utils.DataTypes.isNotUndefined(event);
 		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.FormModelEvent);
 		formModelStopLoading(event.target);
-		barmatz.forms.factories.DOMFactory.createAlertPromptDialog('Error', 'An error has occured. Please try again later.', true);
+		barmatz.forms.factories.ControllerFactory.createJQueryDialogController(barmatz.forms.factories.DOMFactory.createAlertPromptDialog('Error', 'An error has occured. Please try again later.', true));
 	}
 	
 	function onModelGetFormsSuccess(event)
@@ -5623,7 +5685,7 @@ window.barmatz.forms.ui.UserFormsListController = function(formModel, userModel,
 	{
 		barmatz.utils.DataTypes.isNotUndefined(event);
 		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.UserModelEvent);
-		barmatz.forms.factories.DOMFactory.createAlertPromptDialog('Error', 'An error has occured. Please try again later.', true);
+		barmatz.forms.factories.ControllerFactory.createJQueryDialogController(barmatz.forms.factories.DOMFactory.createAlertPromptDialog('Error', 'An error has occured. Please try again later.', true));
 		getFormsComplete();
 	}
 };
@@ -5778,15 +5840,15 @@ window.barmatz.forms.ui.WorkspaceController = function(model, view)
 	
 	function openNewFieldDialog(model)
 	{
-		var dialogWarpper;
+		var dialogWrapper;
 		
 		barmatz.utils.DataTypes.isNotUndefined(model);
 		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FieldModel);
 		
-		dialogWarpper = barmatz.forms.factories.DOMFactory.createNewFieldDialogWrapper(model);
-		jQuery(dialogWarpper.wrapper).dialog('open');
-		
-		barmatz.forms.factories.ControllerFactory.createNewFieldDialogController(model, dialogWarpper.wrapper, dialogWarpper.nameField, dialogWarpper.labelField);
+		dialogWrapper = barmatz.forms.factories.DOMFactory.createNewFieldDialogWrapper(model);
+		jQuery(dialogWrapper.dialog).dialog('open');
+		barmatz.forms.factories.ControllerFactory.createJQueryDialogController(dialogWrapper.dialog);
+		barmatz.forms.factories.ControllerFactory.createNewFieldDialogController(model, dialogWrapper.dialog, dialogWrapper.nameField, dialogWrapper.labelField);
 	}
 	
 	function onSortingStart(event, ui)
@@ -5863,7 +5925,7 @@ Object.defineProperties(barmatz.forms.ui.WorkspaceController.prototype,
 		{
 			barmatz.utils.DataTypes.isNotUndefined(event);
 			barmatz.utils.DataTypes.isInstanceOf(event, MouseEvent);
-			barmatz.forms.factories.DOMFactory.createConfirmPromptDialog('Are you sure you want to delete this item?', onDialogConfirm, true);
+			barmatz.forms.factories.ControllerFactory.createJQueryDialogController(barmatz.forms.factories.DOMFactory.createConfirmPromptDialog('Are you sure you want to delete this item?', onDialogConfirm, true));
 			event.stopImmediatePropagation();
 		}
 		
@@ -6082,6 +6144,7 @@ window.barmatz.forms.FormController = function(model, formView, submitButtonView
 	function addLoadingDialog()
 	{
 		loadingDialog = barmatz.forms.factories.DOMFactory.createLoadingDialog(formView);
+		barmatz.forms.factories.ControllerFactory.createJQueryDialogController(loadingDialog);
 	}
 	 
 	function removeLoadingDialog()
@@ -6730,6 +6793,7 @@ window.barmatz.forms.users.LogingController = function(model, userNameFieldView,
 	function showLoading()
 	{
 		loadingView = barmatz.forms.factories.DOMFactory.createLoadingDialog();
+		barmatz.forms.factories.ControllerFactory.createJQueryDialogController(loadingView);
 	}
 	
 	function hideLoading()

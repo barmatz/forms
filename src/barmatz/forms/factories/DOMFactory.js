@@ -547,7 +547,7 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 			dialogClass: 'forms-dialog-prompt'
 		});
 		
-		return {wrapper: dialog, nameField: nameField, labelField: labelField};
+		return {dialog: dialog, nameField: nameField, labelField: labelField};
 		
 		function getRowContent(label, field)
 		{

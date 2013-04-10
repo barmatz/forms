@@ -1,7 +1,7 @@
 /** barmatz.forms.ui.BuilderController **/
 window.barmatz.forms.ui.BuilderController = function(formModel, userModel, containerView, panelsView, formNameView, saveStatusView, menuModel, menuView, toolboxModel, toolboxView, workspaceView, propertiesController)
 {
-	var loadingDialog;
+	var dialogWrapper, loadingDialog;
 	
 	barmatz.utils.DataTypes.isNotUndefined(formModel);
 	barmatz.utils.DataTypes.isNotUndefined(userModel);
@@ -115,6 +115,7 @@ window.barmatz.forms.ui.BuilderController = function(formModel, userModel, conta
 	function addLoadingView()
 	{
 		loadingDialog = barmatz.forms.factories.DOMFactory.createLoadingDialog();
+		barmatz.forms.factories.ControllerFactory.createJQueryDialogController(loadingDialog);
 	}
 	
 	function removeLoadingView()
@@ -130,7 +131,7 @@ window.barmatz.forms.ui.BuilderController = function(formModel, userModel, conta
 		barmatz.utils.DataTypes.isTypeOf(title, 'string');
 		barmatz.utils.DataTypes.isTypeOf(message, 'string');
 		removeLoadingView();
-		barmatz.forms.factories.DOMFactory.createAlertPromptDialog(title, message, true);
+		barmatz.forms.factories.ControllerFactory.createJQueryDialogController(barmatz.forms.factories.DOMFactory.createAlertPromptDialog(title, message, true));
 	}
 	
 	function addFromModelDeleteEventListeners()
@@ -145,6 +146,13 @@ window.barmatz.forms.ui.BuilderController = function(formModel, userModel, conta
 		formModel.removeEventListener(barmatz.events.FormModelEvent.DELETING, onFormModelDeleting);
 		formModel.removeEventListener(barmatz.events.FormModelEvent.DELETED, onFormModelDeleted);
 		formModel.removeEventListener(barmatz.events.FormModelEvent.DELETION_FAIL, onFormModelDeletionFail);
+	}
+	
+	function createRenamePrompt(title, label, value, confirmHandler)
+	{
+		dialogWrapper = barmatz.forms.factories.DOMFactory.createChangePropertyPromptDialogWrapper(title, label, value, confirmHandler, true);
+		formRenameField = dialogWrapper.field;
+		barmatz.forms.factories.ControllerFactory.createJQueryDialogController(dialogWrapper.dialog);
 	}
 	
 	function onMenuModelItemAdded(event)
@@ -266,7 +274,7 @@ window.barmatz.forms.ui.BuilderController = function(formModel, userModel, conta
 	
 	function onMenuNewClick(event)
 	{
-		formRenameField = barmatz.forms.factories.DOMFactory.createChangePropertyPromptDialogWrapper('New form', 'Name', formModel.name, onResetFromConfirm, true).field;
+		createRenamePrompt('New form', 'Name', formModel.name, onResetFromConfirm);
 	}
 	
 	function onMenuSaveClick(event)
@@ -276,36 +284,43 @@ window.barmatz.forms.ui.BuilderController = function(formModel, userModel, conta
 	
 	function onMenuSaveAsClick(event)
 	{
-		formRenameField = barmatz.forms.factories.DOMFactory.createChangePropertyPromptDialogWrapper('Save as', 'Form name', formModel.name, onSaveFromAsConfirm, true).field;
+		createRenamePrompt('Save as', 'Form name', formModel.name, onSaveFromAsConfirm);
 	}
 	
 	function onMenuLoadClick(event)
 	{
 		var dialog = barmatz.forms.factories.DOMFactory.createUserFormsListDialog();
+		barmatz.forms.factories.ControllerFactory.createJQueryDialogController(dialog);
 		barmatz.forms.factories.ControllerFactory.createUserFormsListController(formModel, userModel, dialog.getElementsByTagName('tbody')[0], dialog);
 	}
 	
 	function onMenuRenameClick(event)
 	{
-		formRenameField = barmatz.forms.factories.DOMFactory.createChangePropertyPromptDialogWrapper('Rename form', 'Name', formModel.name, onRenameFromConfirm, true).field;
+		createRenamePrompt('Rename form', 'Name', formModel.name, onRenameFromConfirm);
 	}
 	
 	function onMenuExportClick(event)
 	{
+		var dialog;
+		
 		if(barmatz.utils.DataTypes.applySilent('isValid', formModel.fingerprint))
-			barmatz.forms.factories.DOMFactory.createExportPromptDialog(formModel.fingerprint, true);
+			dialog = barmatz.forms.factories.DOMFactory.createExportPromptDialog(formModel.fingerprint, true);
 		else
-			barmatz.forms.factories.DOMFactory.createAlertPromptDialog('Failed to export', 'You must save the form before exporting!', true);
+			dialog = barmatz.forms.factories.DOMFactory.createAlertPromptDialog('Failed to export', 'You must save the form before exporting!', true);
+		
+		barmatz.forms.factories.ControllerFactory.createJQueryDialogController(dialog);
 	}
 	
 	function onMenuDeleteClick(event)
 	{
-		barmatz.forms.factories.DOMFactory.createConfirmPromptDialog('Are you sure you want to delete this form?', onDeleteFormConfirm, true);
+		barmatz.forms.factories.ControllerFactory.createJQueryDialogController(barmatz.forms.factories.DOMFactory.createConfirmPromptDialog('Are you sure you want to delete this form?', onDeleteFormConfirm, true));
 	}
 	
 	function onMenuPropertiesClick(event)
 	{
 		var wrapper = barmatz.forms.factories.DOMFactory.createFormPropertiesDialogWrapper(formModel, onChangeFormPropertiesConfirm, true);
+		
+		barmatz.forms.factories.ControllerFactory.createJQueryDialogController(wrapper.dialog);
 		
 		function onChangeFormPropertiesConfirm(event)
 		{

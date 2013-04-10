@@ -1010,6 +1010,7 @@ window.barmatz.forms.FormController = function(model, formView, submitButtonView
 	function addLoadingDialog()
 	{
 		loadingDialog = barmatz.forms.factories.DOMFactory.createLoadingDialog(formView);
+		barmatz.forms.factories.ControllerFactory.createJQueryDialogController(loadingDialog);
 	}
 	 
 	function removeLoadingDialog()
@@ -1932,6 +1933,12 @@ Object.defineProperties(barmatz.forms.factories.ControllerFactory,
 		barmatz.utils.DataTypes.isInstanceOf(fieldView, HTMLElement);
 		barmatz.utils.DataTypes.isInstanceOf(errorMessageView, HTMLElement);
 		return new barmatz.forms.fields.FieldController(model, fieldView, errorMessageView);
+	}},
+	createJQueryDialogController: {value: function(view)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(view);
+		barmatz.utils.DataTypes.isInstanceOf(view, HTMLElement);
+		return new barmatz.forms.ui.JQueryDialogController(view);
 	}}
 });
 /** barmatz.forms.factories.DOMFactory **/
@@ -2483,7 +2490,7 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 			dialogClass: 'forms-dialog-prompt'
 		});
 		
-		return {wrapper: dialog, nameField: nameField, labelField: labelField};
+		return {dialog: dialog, nameField: nameField, labelField: labelField};
 		
 		function getRowContent(label, field)
 		{
@@ -3645,7 +3652,7 @@ window.barmatz.forms.fields.DropboxItemsListController = function(model, view, a
 	
 	function onAddButtonViewClick(event)
 	{
-		barmatz.forms.factories.DOMFactory.createDropboxItemDialog(null, null, onAddItemConfirm);
+		barmatz.forms.factories.ControllerFactory.createJQueryDialogController(barmatz.forms.factories.DOMFactory.createDropboxItemDialog(null, null, onAddItemConfirm));
 	}
 	
 	function onResetButtonViewClick(event)
@@ -3702,7 +3709,7 @@ window.barmatz.forms.fields.DropboxItemsListItemController = function(model, lab
 	
 	function onEditButtonViewClick(event)
 	{
-		barmatz.forms.factories.DOMFactory.createDropboxItemDialog(model.label, model.value, onEditConfirm);
+		barmatz.forms.factories.ControllerFactory.createJQueryDialogController(barmatz.forms.factories.DOMFactory.createDropboxItemDialog(model.label, model.value, onEditConfirm));
 	}
 	
 	function onEditConfirm(label, value)
@@ -4097,7 +4104,7 @@ window.barmatz.forms.fields.FieldValidationOptionsController = function(model, o
 	
 	function getOptionParameters(option, label, key, isNumber)
 	{
-		var field;
+		var dialogWrapper, field;
 		
 		barmatz.utils.DataTypes.isNotUndefined(option);
 		barmatz.utils.DataTypes.isNotUndefined(label);
@@ -4107,10 +4114,14 @@ window.barmatz.forms.fields.FieldValidationOptionsController = function(model, o
 		barmatz.utils.DataTypes.isTypeOf(key, 'string');
 		
 		if(option.checked)
-			field = barmatz.forms.factories.DOMFactory.createChangePropertyPromptDialogWrapper('', label, model.validator[key] || '', function(event)
+		{
+			dialogWrapper = barmatz.forms.factories.DOMFactory.createChangePropertyPromptDialogWrapper('', label, model.validator[key] || '', function(event)
 			{
 				model.validator[key] = isNumber ? parseFloat(field.value) : field.value;
-			}, true).field;
+			}, true);
+			field = dialogWrapper.field;
+			barmatz.forms.factories.ControllerFactory.createJQueryDialogController(dialogWrapper.dialog);
+		}
 		else
 			delete model.validator[key];
 	}
