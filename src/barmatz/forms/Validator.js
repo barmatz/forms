@@ -51,7 +51,7 @@ Object.defineProperties(barmatz.forms.Validator,
 	{
 		barmatz.utils.DataTypes.isNotUndefined(value);
 		barmatz.utils.DataTypes.isTypeOf(value, 'string');
-		return this.equals(value, /^[0-9]{2,3}[2-9]\d{6}$/);
+		return this.equals(value, new RegExp('^(' + barmatz.forms.fields.PhonePrefixes.ALL.join('|') + ')[2-9][0-9]{6}$'));
 	}},
 	maxLength: {value: function(value, length)
 	{
