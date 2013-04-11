@@ -41,7 +41,7 @@ Object.defineProperties(barmatz.utils.DOM,
 		
 		children = Array.prototype.slice.call(element.childNodes).sort(compareFunction);
 		
-		for(i in children)
+		for(i = 0; i < children.length; i++)
 			element.appendChild(children[i]);
 	}}
 });

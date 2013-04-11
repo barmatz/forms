@@ -545,7 +545,7 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 						addItemToField(field, item);
 					});
 				else
-					for(i in fieldData.items)
+					for(i = 0; i < fieldData.items.length; i++)
 						addItemToField(field, fieldData.items[i]);
 			
 			_this.addItem(field);

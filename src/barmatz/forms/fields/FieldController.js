@@ -99,7 +99,7 @@ window.barmatz.forms.fields.FieldController = function(model, fieldView, errorMe
 		errors = barmatz.utils.Bitwise.parseBit(event.errors);
 		errorMessageView.innerHTML = '';
 		
-		for(i in errors)
+		for(i = 0; i < errors.length; i++)
 			switch(errors[i])
 			{
 				default:

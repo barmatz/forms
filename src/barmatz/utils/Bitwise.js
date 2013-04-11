@@ -15,7 +15,7 @@ Object.defineProperties(barmatz.utils.Bitwise,
 		bitsA = this.parseBit(bitA);
 		bitsB = this.parseBit(bitB);
 		
-		for(i in bitsB)
+		for(i = 0; i < bitsB.length; i++)
 		{
 			index = bitsA.indexOf(bitsB[i]);
 			
@@ -33,7 +33,7 @@ Object.defineProperties(barmatz.utils.Bitwise,
 		filterredBits = [];
 		result = 0;
 		
-		for(i in arguments)
+		for(i = 0; i < arguments.length; i++)
 			bits = bits.concat(this.parseBit(arguments[i]));
 		
 		filterredBits = bits.filter(function(a,b,c)
@@ -41,7 +41,7 @@ Object.defineProperties(barmatz.utils.Bitwise,
 			return filterredBits.indexOf(a) >= 0 ? false : filterredBits.push(a) >= 0;
 		});
 		
-		for(i in filterredBits)
+		for(i = 0; i < filterredBits.length; i++)
 			result += filterredBits[i];
 		
 		return result;

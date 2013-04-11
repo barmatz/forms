@@ -69,7 +69,7 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 				parent.appendChild(appendChildWrapper != null ? appendChildWrapper(content) : content);
 			else if(barmatz.utils.DataTypes.applySilent('isInstanceOf', content, Array))
 			{
-				for(i in content)
+				for(i = 0; i < content.length; i++)
 					addContent(content[i], parent, 'span');
 			}
 		}
@@ -475,7 +475,7 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 			case 'array':
 				field = this.createElement('select');
 				
-				for(i in value)
+				for(i = 0; i < value.length; i++)
 					field.appendChild(this.createElement('option')).innerHTML = value[i];
 				break;
 			case 'boolean':
@@ -1046,8 +1046,12 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 			
 			model = barmatz.forms.factories.ModelFactory.createDropboxModel(name);
 			
-			for(key in values)
-				model.addItem(barmatz.forms.factories.ModelFactory.createDropboxItemModel(values instanceof Array ? values[key] : key, values[key]));
+			if(values instanceof Array)
+				for(key = 0; key < values.length; key++)
+					model.addItem(barmatz.forms.factories.ModelFactory.createDropboxItemModel(values instanceof Array ? values[key] : key, values[key]));
+			else
+				for(key in values)
+					model.addItem(barmatz.forms.factories.ModelFactory.createDropboxItemModel(values instanceof Array ? values[key] : key, values[key]));
 
 			return createField(label, _this.createDropboxElement(model));
 		}

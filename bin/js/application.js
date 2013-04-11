@@ -28,7 +28,7 @@ Object.defineProperties(barmatz.utils.Bitwise,
 		bitsA = this.parseBit(bitA);
 		bitsB = this.parseBit(bitB);
 		
-		for(i in bitsB)
+		for(i = 0; i < bitsB.length; i++)
 		{
 			index = bitsA.indexOf(bitsB[i]);
 			
@@ -46,7 +46,7 @@ Object.defineProperties(barmatz.utils.Bitwise,
 		filterredBits = [];
 		result = 0;
 		
-		for(i in arguments)
+		for(i = 0; i < arguments.length; i++)
 			bits = bits.concat(this.parseBit(arguments[i]));
 		
 		filterredBits = bits.filter(function(a,b,c)
@@ -54,7 +54,7 @@ Object.defineProperties(barmatz.utils.Bitwise,
 			return filterredBits.indexOf(a) >= 0 ? false : filterredBits.push(a) >= 0;
 		});
 		
-		for(i in filterredBits)
+		for(i = 0; i < filterredBits.length; i++)
 			result += filterredBits[i];
 		
 		return result;
@@ -215,7 +215,7 @@ Object.defineProperties(barmatz.utils.DOM,
 		
 		children = Array.prototype.slice.call(element.childNodes).sort(compareFunction);
 		
-		for(i in children)
+		for(i = 0; i < children.length; i++)
 			element.appendChild(children[i]);
 	}}
 });
@@ -1449,7 +1449,7 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 				parent.appendChild(appendChildWrapper != null ? appendChildWrapper(content) : content);
 			else if(barmatz.utils.DataTypes.applySilent('isInstanceOf', content, Array))
 			{
-				for(i in content)
+				for(i = 0; i < content.length; i++)
 					addContent(content[i], parent, 'span');
 			}
 		}
@@ -1855,7 +1855,7 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 			case 'array':
 				field = this.createElement('select');
 				
-				for(i in value)
+				for(i = 0; i < value.length; i++)
 					field.appendChild(this.createElement('option')).innerHTML = value[i];
 				break;
 			case 'boolean':
@@ -2426,8 +2426,12 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 			
 			model = barmatz.forms.factories.ModelFactory.createDropboxModel(name);
 			
-			for(key in values)
-				model.addItem(barmatz.forms.factories.ModelFactory.createDropboxItemModel(values instanceof Array ? values[key] : key, values[key]));
+			if(values instanceof Array)
+				for(key = 0; key < values.length; key++)
+					model.addItem(barmatz.forms.factories.ModelFactory.createDropboxItemModel(values instanceof Array ? values[key] : key, values[key]));
+			else
+				for(key in values)
+					model.addItem(barmatz.forms.factories.ModelFactory.createDropboxItemModel(values instanceof Array ? values[key] : key, values[key]));
 
 			return createField(label, _this.createDropboxElement(model));
 		}
@@ -3670,7 +3674,7 @@ window.barmatz.forms.fields.FieldController = function(model, fieldView, errorMe
 		errors = barmatz.utils.Bitwise.parseBit(event.errors);
 		errorMessageView.innerHTML = '';
 		
-		for(i in errors)
+		for(i = 0; i < errors.length; i++)
 			switch(errors[i])
 			{
 				default:
@@ -6736,7 +6740,7 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 						addItemToField(field, item);
 					});
 				else
-					for(i in fieldData.items)
+					for(i = 0; i < fieldData.items.length; i++)
 						addItemToField(field, fieldData.items[i]);
 			
 			_this.addItem(field);
@@ -6985,7 +6989,7 @@ Object.defineProperties(barmatz.forms.users.UserModel.prototype,
 			barmatz.utils.DataTypes.isNotUndefined(data);
 			barmatz.utils.DataTypes.isInstanceOf(data, Array);
 			
-			for(i in data)
+			for(i = 0; i < data.length; i++)
 			{
 				form = barmatz.forms.factories.ModelFactory.createFormModel();
 				form.created = barmatz.utils.Date.toDate(data[i].created);

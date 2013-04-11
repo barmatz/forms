@@ -127,7 +127,7 @@ Object.defineProperties(barmatz.forms.users.UserModel.prototype,
 			barmatz.utils.DataTypes.isNotUndefined(data);
 			barmatz.utils.DataTypes.isInstanceOf(data, Array);
 			
-			for(i in data)
+			for(i = 0; i < data.length; i++)
 			{
 				form = barmatz.forms.factories.ModelFactory.createFormModel();
 				form.created = barmatz.utils.Date.toDate(data[i].created);
