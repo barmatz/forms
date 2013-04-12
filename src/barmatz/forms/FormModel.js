@@ -170,7 +170,10 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 				field.accept = item.accept;
 
 			if(item instanceof barmatz.forms.fields.TextFieldModel)
+			{
 				field.max = item.max;
+				field.description = item.description;
+			}
 			
 			if(item instanceof barmatz.forms.fields.TextAreaFieldModel)
 			{
@@ -533,7 +536,10 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 				field.accept = fieldData.accept;
 
 			if(field instanceof barmatz.forms.fields.TextFieldModel)
-				field.max = parseInt(fieldData.max);
+			{
+				field.max = parseInt(fieldData.max || NaN);
+				field.description = fieldData.description || '';
+			}
 			
 			if(field instanceof barmatz.forms.fields.CheckboxFieldModel)
 				field.checked = fieldData.checked;

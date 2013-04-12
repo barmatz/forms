@@ -123,6 +123,7 @@ Object.defineProperties(barmatz.forms.ui.WorkspaceController.prototype,
 		viewWrapper = barmatz.forms.factories.DOMFactory.createWorkspaceItemWrapper(model);
 		viewWrapper.deleteButton.addEventListener('click', onDeleteButtonClick);
 		barmatz.forms.factories.ControllerFactory.createWorkspaceItemController(model, viewWrapper.label, viewWrapper.field, viewWrapper.mandatory, viewWrapper.deleteButton);
+		barmatz.forms.factories.ControllerFactory.createFieldController(model, viewWrapper.field);
 		return viewWrapper.wrapper;
 		
 		function onDeleteButtonClick(event)

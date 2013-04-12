@@ -351,7 +351,10 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 			returnWrapper.acceptField = addFieldToWrapper('array', 'accept', 'accept', model.accept);
 
 		if(model instanceof barmatz.forms.fields.TextFieldModel)
+		{
+			returnWrapper.descriptionField = addFieldToWrapper('string', 'description', 'description', model.description);
 			returnWrapper.maxField = addFieldToWrapper('number', 'max', 'max', model.max);
+		}
 		
 		if(model instanceof barmatz.forms.fields.TextAreaFieldModel)
 		{

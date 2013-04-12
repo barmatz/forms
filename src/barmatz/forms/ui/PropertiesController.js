@@ -67,6 +67,8 @@ Object.defineProperties(barmatz.forms.ui.PropertiesController.prototype,
 			{
 				default:
 					throw new Error('unknown key');
+				break;
+				case 'value':
 					break;
 				case 'name':
 					itemsWrapper.nameField.value = event.value;
@@ -102,6 +104,9 @@ Object.defineProperties(barmatz.forms.ui.PropertiesController.prototype,
 					break;
 				case 'width':
 					itemsWrapper.widthField.value = event.value;
+					break;
+				case 'description':
+					itemsWrapper.descriptionField.value = event.value;
 					break;
 			}
 		}

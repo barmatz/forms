@@ -11,3 +11,4 @@
 .forms-ltr .forms-form-submit { text-align: right; }
 .forms-rtl .forms-form-submit { text-align: left; }
 .forms-phone-field { direction: ltr !important; }
+.forms-empty-field { color: #BBB; }

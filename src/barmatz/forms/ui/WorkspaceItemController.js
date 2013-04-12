@@ -46,6 +46,10 @@ window.barmatz.forms.ui.WorkspaceItemController = function(model, labelView, fie
 			default:
 				throw new Error('unknown key');
 				break;
+			case 'validator':
+			case 'description':
+			case 'prefix':
+				break;
 			case 'name':
 				fieldView.name = value;
 				break;
@@ -84,8 +88,6 @@ window.barmatz.forms.ui.WorkspaceItemController = function(model, labelView, fie
 				break;
 			case 'multiple':
 				fieldView.multiple = value;
-				break;
-			case 'validator':
 				break;
 			case 'width':
 				if(model instanceof barmatz.forms.fields.PhoneFieldModel)

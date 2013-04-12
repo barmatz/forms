@@ -1,24 +1,49 @@
 /** barmatz.forms.fields.FieldController **/
 window.barmatz.forms.fields.FieldController = function(model, fieldView, errorMessageView)
 {
-	var settingValue, cachedErrorMessageVisibility;
+	var settingValue, cachedErrorMessageVisibility, valueIsDescription;
 	
 	barmatz.utils.DataTypes.isNotUndefined(model);
 	barmatz.utils.DataTypes.isNotUndefined(fieldView);
-	barmatz.utils.DataTypes.isNotUndefined(errorMessageView);
 	barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FieldModel);
 	barmatz.utils.DataTypes.isInstanceOf(fieldView, HTMLElement);
-	barmatz.utils.DataTypes.isInstanceOf(errorMessageView, HTMLElement);
+	barmatz.utils.DataTypes.isInstanceOf(errorMessageView, HTMLElement, true);
 	barmatz.mvc.Controller.call(this);
 	
 	model.addEventListener(barmatz.events.ModelEvent.VALUE_CHANGED, onModelValueChanged);
 	model.addEventListener(barmatz.events.FieldModelEvent.VALID, onModelValid);
 	model.addEventListener(barmatz.events.FieldModelEvent.INVALID, onModelInvalid);
+	fieldView.addEventListener('focus', onFieldViewFocus);
 	fieldView.addEventListener('keydown', onFieldViewKeyDown);
 	fieldView.addEventListener('change', onFieldViewChange);
 	setModelValue();
-	setErrorMessageContent();
-	hideErrorMessage();
+	addDescription();
+	
+	if(errorMessageView)
+	{
+		setErrorMessageContent();
+		hideErrorMessage();
+	}
+	
+	function addDescription()
+	{
+		if(model instanceof barmatz.forms.fields.TextFieldModel && !barmatz.forms.Validator.notEmpty(model.value))
+		{
+			fieldView.value = model.description;
+			barmatz.utils.CSS.addClass(fieldView, 'forms-empty-field');
+			valueIsDescription = true;
+		}
+	}
+	
+	function removeDescription()
+	{
+		if(valueIsDescription)
+		{
+			fieldView.value = '';
+			barmatz.utils.CSS.removeClass(fieldView, 'forms-empty-field');
+			valueIsDescription = false;
+		}
+	}
 	
 	function setModelValue()
 	{
@@ -61,7 +86,7 @@ window.barmatz.forms.fields.FieldController = function(model, fieldView, errorMe
 	
 	function isErrorMessageHidden()
 	{
-		return errorMessageView.style.visibility == 'hidden';
+		return errorMessageView && errorMessageView.style.visibility == 'hidden';
 	}
 	
 	function onModelValueChanged(event)
@@ -69,14 +94,19 @@ window.barmatz.forms.fields.FieldController = function(model, fieldView, errorMe
 		barmatz.utils.DataTypes.isNotUndefined(event);
 		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.ModelEvent);
 
-		if(event.key == 'value')
+		switch(event.key)
 		{
-			if(!settingValue)
-			{
-				settingValue = true;
-				fieldView.value = model.value;
-				settingValue = false;
-			}
+			case 'value':
+				if(!settingValue)
+				{
+					settingValue = true;
+					fieldView.value = model.value;
+					settingValue = false;
+				}
+				break;
+			case 'description':
+				addDescription();
+				break;
 		}
 	}
 	
@@ -96,54 +126,71 @@ window.barmatz.forms.fields.FieldController = function(model, fieldView, errorMe
 		barmatz.utils.DataTypes.isNotUndefined(event);
 		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.FieldModelEvent);
 		
-		errors = barmatz.utils.Bitwise.parseBit(event.errors);
-		errorMessageView.innerHTML = '';
-		
-		for(i = 0; i < errors.length; i++)
-			switch(errors[i])
-			{
-				default:
-					throw new Error('Unknown error code');
+		if(errorMessageView)
+		{
+			errors = barmatz.utils.Bitwise.parseBit(event.errors);
+			errorMessageView.innerHTML = '';
+			
+			for(i = 0; i < errors.length; i++)
+				switch(errors[i])
+				{
+					default:
+						throw new Error('Unknown error code');
 					break;
-				case barmatz.forms.Validator.NONE:
-					break;
-				case barmatz.forms.Validator.NOT_EMPTY:
-					errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement('value is empty'));
-					break;
-				case barmatz.forms.Validator.EQUALS:
-					errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement('invalid value'));
-					break;
-				case barmatz.forms.Validator.VALID_EMAIL:
-					errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement('invalid email address'));
-					break;
-				case barmatz.forms.Validator.VALID_PHONE:
-					errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement('invalid phone number'));
-					break;
-				case barmatz.forms.Validator.MIN_LENGTH:
-					errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement('value must be ' + model.validator.minLength + ' characters minimum'));
-					break;
-				case barmatz.forms.Validator.MAX_LENGTH:
-					errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement('value must be ' + model.validator.maxLength + ' characters maximum'));
-					break;
-				case barmatz.forms.Validator.EXACT_LENGTH:
-					errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement('value must be exactly ' + model.validator.exactLength + ' characters'));
-					break;
-				case barmatz.forms.Validator.GREATER_THAN:
-					errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement('value must be greater than ' + model.validator.greaterThan));
-					break;
-				case barmatz.forms.Validator.LESSER_THAN:
-					errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement('valud must be lesser than ' + model.validator.lesserThan));
-					break;
-				case barmatz.forms.Validator.DIGITS_ONLY:
-					errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement('only digits are allowed'));
-					break;
-				case barmatz.forms.Validator.NOT_DIGITS:
-					errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement('cannot contain digits'));
-					break;
-			}
-		
-		if(isErrorMessageHidden())
-			showErrorMessage();
+					case barmatz.forms.Validator.NONE:
+						break;
+					case barmatz.forms.Validator.NOT_EMPTY:
+						errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement('value is empty'));
+						break;
+					case barmatz.forms.Validator.EQUALS:
+						errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement('invalid value'));
+						break;
+					case barmatz.forms.Validator.VALID_EMAIL:
+						errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement('invalid email address'));
+						break;
+					case barmatz.forms.Validator.VALID_PHONE:
+						errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement('invalid phone number'));
+						break;
+					case barmatz.forms.Validator.MIN_LENGTH:
+						errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement('value must be ' + model.validator.minLength + ' characters minimum'));
+						break;
+					case barmatz.forms.Validator.MAX_LENGTH:
+						errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement('value must be ' + model.validator.maxLength + ' characters maximum'));
+						break;
+					case barmatz.forms.Validator.EXACT_LENGTH:
+						errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement('value must be exactly ' + model.validator.exactLength + ' characters'));
+						break;
+					case barmatz.forms.Validator.GREATER_THAN:
+						errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement('value must be greater than ' + model.validator.greaterThan));
+						break;
+					case barmatz.forms.Validator.LESSER_THAN:
+						errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement('valud must be lesser than ' + model.validator.lesserThan));
+						break;
+					case barmatz.forms.Validator.DIGITS_ONLY:
+						errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement('only digits are allowed'));
+						break;
+					case barmatz.forms.Validator.NOT_DIGITS:
+						errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement('cannot contain digits'));
+						break;
+				}
+			
+			if(isErrorMessageHidden())
+				showErrorMessage();
+		}
+	}
+	
+	function onFieldViewFocus(event)
+	{
+		fieldView.removeEventListener('focus', onFieldViewFocus);
+		fieldView.addEventListener('blur', onFieldViewBlur);
+		removeDescription();
+	}
+	
+	function onFieldViewBlur(event)
+	{
+		fieldView.addEventListener('focus', onFieldViewFocus);
+		fieldView.removeEventListener('blur', onFieldViewBlur);
+		addDescription();
 	}
 	
 	function onFieldViewKeyDown(event)
