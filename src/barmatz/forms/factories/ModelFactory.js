@@ -19,6 +19,9 @@ Object.defineProperties(barmatz.forms.factories.ModelFactory,
 			default:
 				return new barmatz.forms.fields.FieldModel(type, name);
 				break;
+			case barmatz.forms.fields.FieldTypes.HTML_CONTENT:
+				return new barmatz.forms.fields.HTMLContentModel();
+				break;
 			case barmatz.forms.fields.FieldTypes.TEXT_AREA:
 				return new barmatz.forms.fields.TextAreaFieldModel(name);
 				break;
@@ -59,7 +62,7 @@ Object.defineProperties(barmatz.forms.factories.ModelFactory,
 		barmatz.utils.DataTypes.isNotUndefined(fieldModel);
 		barmatz.utils.DataTypes.isTypeOf(type, 'string');
 		barmatz.utils.DataTypes.isTypeOf(label, 'string');
-		barmatz.utils.DataTypes.isInstanceOf(fieldModel, barmatz.forms.fields.FieldModel);
+		barmatz.utils.DataTypes.isInstanceOf(fieldModel, barmatz.forms.fields.FormItemModel);
 		return new barmatz.forms.ui.ToolboxItemModel(type, label, fieldModel);
 	}},
 	createCollectionModel: {value: function()

@@ -18,9 +18,9 @@ Object.defineProperties(barmatz.forms.ui.PropertiesController.prototype,
 		return this._model;
 	}, set: function(value)
 	{
-		var _this, itemsWrapper;
+		var _this, itemsWrapper, dialogWrapper;
 		
-		barmatz.utils.DataTypes.isInstanceOf(value, barmatz.forms.fields.FieldModel, true);
+		barmatz.utils.DataTypes.isInstanceOf(value, barmatz.forms.fields.FormItemModel, true);
 		
 		_this = this;
 		
@@ -33,10 +33,15 @@ Object.defineProperties(barmatz.forms.ui.PropertiesController.prototype,
 		if(this._model)
 		{
 			itemsWrapper = barmatz.forms.factories.DOMFactory.createPropertiesItemWarpper(this._model);
-			itemsWrapper.validationOptionsButton.addEventListener('click', onItemsWrapperValidationOptionsButtonClick);
+			
+			if(itemsWrapper.validationOptionsButton)
+				itemsWrapper.validationOptionsButton.addEventListener('click', onItemsWrapperValidationOptionsButtonClick);
 			
 			if(itemsWrapper.editItemsButton)
 				itemsWrapper.editItemsButton.addEventListener('click', onItemsWrapperEditItemsButtonClick);
+			
+			if(itemsWrapper.editContentButton)
+				itemsWrapper.editContentButton.addEventListener('click', onItemsWrapperEditContentButtonClick);
 			
 			this._model.addEventListener(barmatz.events.ModelEvent.VALUE_CHANGED, onModelValueChanged);
 			this._view.appendChild(itemsWrapper.wrapper);
@@ -46,16 +51,27 @@ Object.defineProperties(barmatz.forms.ui.PropertiesController.prototype,
 		
 		function onItemsWrapperValidationOptionsButtonClick(event)
 		{
-			var dialogWrapper = barmatz.forms.factories.DOMFactory.createFieldValidationOptionsDialogWrapper(_this._model);
+			dialogWrapper = barmatz.forms.factories.DOMFactory.createFieldValidationOptionsDialogWrapper(_this._model);
 			barmatz.forms.factories.ControllerFactory.createJQueryDialogController(dialogWrapper.dialog);
 			barmatz.forms.factories.ControllerFactory.createFieldValidationOptionsController(_this.model, dialogWrapper.options);
 		}
 		
 		function onItemsWrapperEditItemsButtonClick(event)
 		{
-			var dialogWrapper = barmatz.forms.factories.DOMFactory.createDropboxItemsListDialogWrapper();
+			dialogWrapper = barmatz.forms.factories.DOMFactory.createDropboxItemsListDialogWrapper();
 			barmatz.forms.factories.ControllerFactory.createJQueryDialogController(dialogWrapper.dialog);
 			barmatz.forms.factories.ControllerFactory.createDropboxItemsListController(_this._model, dialogWrapper.dialog.getElementsByTagName('tbody')[0], dialogWrapper.addButton, dialogWrapper.resetButton);
+		}
+		
+		function onItemsWrapperEditContentButtonClick(event)
+		{
+			dialogWrapper = barmatz.forms.factories.DOMFactory.createHTMLContentEditorDialogWrapper(onEditContentConfrim, _this._model.content);
+			barmatz.forms.factories.ControllerFactory.createJQueryDialogController(dialogWrapper.dialog);
+		}
+		
+		function onEditContentConfrim(event)
+		{
+			_this._model.content = tinymce.get(dialogWrapper.editor.id).getContent();
 		}
 		
 		function onModelValueChanged(event)
@@ -67,8 +83,9 @@ Object.defineProperties(barmatz.forms.ui.PropertiesController.prototype,
 			{
 				default:
 					throw new Error('unknown key');
-				break;
+					break;
 				case 'value':
+				case 'content':
 					break;
 				case 'name':
 					itemsWrapper.nameField.value = event.value;

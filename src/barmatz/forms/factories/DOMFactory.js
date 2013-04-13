@@ -126,10 +126,10 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		var _this, field;
 		
 		barmatz.utils.DataTypes.isNotUndefined(model);
-		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FieldModel);
+		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FormItemModel);
 		
 		_this = this;
-		field = this.createElement(getElementTagName(model.type));
+		field = this.createElement(getElementTagName(model.type || barmatz.forms.fields.FieldTypes.HTML_CONTENT));
 		
 		if(model instanceof barmatz.forms.fields.PhoneFieldModel)
 			createPhoneField();
@@ -146,7 +146,7 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 			barmatz.utils.DataTypes.isNotUndefined(field);
 			barmatz.utils.DataTypes.isNotUndefined(model);
 			barmatz.utils.DataTypes.isInstanceOf(field, HTMLElement);
-			barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FieldModel);
+			barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FormItemModel);
 			
 			if(!(model instanceof barmatz.forms.fields.PhoneFieldModel))
 				field.value = model.value;
@@ -195,6 +195,9 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 			{
 				default:
 					throw new Error('Unknown type');
+					break;
+				case barmatz.forms.fields.FieldTypes.HTML_CONTENT:
+					return 'div';
 					break;
 				case barmatz.forms.fields.FieldTypes.TEXT_FIELD:
 				case barmatz.forms.fields.FieldTypes.PASSWORD:
@@ -295,17 +298,18 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 	}},
 	createWorkspaceItemWrapper: {value: function(model)
 	{
-		var _this, wrapper, grip, label, field, mandatory, deleteButton;
+		var _this, isFieldModel, wrapper, grip, label, field, mandatory, deleteButton;
 		
 		barmatz.utils.DataTypes.isNotUndefined(model);
-		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FieldModel);
+		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FormItemModel);
 		
 		_this = this;
+		isFieldModel = model instanceof barmatz.forms.fields.FieldModel;
 		wrapper = this.createElement('tr', 'forms-workspace-item');
 		grip = this.createElement('span', 'forms-grip ui-icon ui-icon-grip-solid-vertical');
-		label = this.createElementWithContent('label', '', model.label ? model.label : '');
+		label = this.createElementWithContent('label', '', isFieldModel && model.label ? model.label : '');
 		field = this.createFormFieldElement(model);
-		mandatory = this.createElementWithContent('span', 'forms-form-item-mandatory', mandatory ? '*' : '');
+		mandatory = this.createElementWithContent('span', 'forms-form-item-mandatory', isFieldModel && model.mandatory ? '*' : '');
 		deleteButton = this.createDeleteButton();
 		
 		addToWrapper('forms-workspace-item-grip', grip);
@@ -328,7 +332,7 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		var _this, returnWrapper, wrapper;
 		
 		barmatz.utils.DataTypes.isNotUndefined(model);
-		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FieldModel);
+		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FormItemModel);
 		
 		_this = this;
 		returnWrapper = {};
@@ -370,8 +374,12 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 			returnWrapper.multipleField = addFieldToWrapper('boolean', 'multiple', 'multiple', model.multiple);
 			returnWrapper.editItemsButton = addFieldToWrapper('button', '', 'Edit items');
 		}
+
+		if(model instanceof barmatz.forms.fields.FieldModel)
+			returnWrapper.validationOptionsButton = addFieldToWrapper('button', '', 'Validation options');
 		
-		returnWrapper.validationOptionsButton = addFieldToWrapper('button', '', 'Validation options');
+		if(model instanceof barmatz.forms.fields.HTMLContentModel)
+			returnWrapper.editContentButton = addFieldToWrapper('button', '', 'Edit content');
 		
 		return returnWrapper;
 		
@@ -1164,5 +1172,46 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		barmatz.utils.DataTypes.isNotUndefined(message);
 		barmatz.utils.DataTypes.isTypeOf(message, 'string');
 		return this.createElementWithContent('li', 'forms-form-item-error-message-item', message);
+	}},
+	createHTMLContentEditorDialogWrapper: {value: function(confirmHandler, content)
+	{
+		var wrapper, dialog, editor;
+		
+		barmatz.utils.DataTypes.isNotUndefined(confirmHandler);
+		barmatz.utils.DataTypes.isTypeOf(confirmHandler, 'function');
+		barmatz.utils.DataTypes.isTypeOf(content, 'string', true);
+		
+		wrapper = this.createElement('div');
+		dialog = this.createPromptDialog('HTML content editor', wrapper, confirmHandler, true);
+		editor = this.createHTMLContentEditor(wrapper, content, onEditorInit);
+		
+		jQuery(dialog).dialog({dialogClass: 'forms-dialog-html-content-editor'});
+
+		return {dialog: dialog, editor: editor};
+		
+		function onEditorInit()
+		{
+			setTimeout(function()
+			{
+				jQuery(dialog).dialog('close').dialog('open');
+			},1);
+		}
+	}},
+	createHTMLContentEditor: {value: function(parent, content, initHandler)
+	{
+		var editor, textArea;
+		
+		barmatz.utils.DataTypes.isNotUndefined(parent);
+		barmatz.utils.DataTypes.isInstanceOf(parent, HTMLElement);
+		barmatz.utils.DataTypes.isTypeOf(content, 'string', true);
+		barmatz.utils.DataTypes.isTypeOf(initHandler, 'function', true);
+
+		textArea = this.createElement('textarea');
+		textArea.id = 'htmlContentEditor' + tinymce.editors.length;
+		textArea.innerHTML = content || '';
+		parent.appendChild(textArea);
+		tinymce.init({selector: '#' + textArea.id, theme: 'modern', oninit: initHandler});
+		
+		return textArea;
 	}}
 });

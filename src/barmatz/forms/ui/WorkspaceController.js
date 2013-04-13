@@ -98,7 +98,7 @@ window.barmatz.forms.ui.WorkspaceController = function(model, view)
 		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.CollectionEvent);
 		setViewToSortable();
 		
-		if(!event.item.name)
+		if(event.item instanceof barmatz.forms.fields.FieldModel && !event.item.name)
 			openNewFieldDialog(event.item);
 	}
 };
@@ -119,11 +119,14 @@ Object.defineProperties(barmatz.forms.ui.WorkspaceController.prototype,
 		var _this = this, viewWrapper;
 		
 		barmatz.utils.DataTypes.isNotUndefined(model);
-		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FieldModel);
+		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FormItemModel);
 		viewWrapper = barmatz.forms.factories.DOMFactory.createWorkspaceItemWrapper(model);
 		viewWrapper.deleteButton.addEventListener('click', onDeleteButtonClick);
 		barmatz.forms.factories.ControllerFactory.createWorkspaceItemController(model, viewWrapper.label, viewWrapper.field, viewWrapper.mandatory, viewWrapper.deleteButton);
-		barmatz.forms.factories.ControllerFactory.createFieldController(model, viewWrapper.field);
+		
+		if(model instanceof barmatz.forms.fields.FieldModel)
+			barmatz.forms.factories.ControllerFactory.createFieldController(model, viewWrapper.field);
+		
 		return viewWrapper.wrapper;
 		
 		function onDeleteButtonClick(event)

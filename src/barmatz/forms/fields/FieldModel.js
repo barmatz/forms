@@ -5,7 +5,7 @@ window.barmatz.forms.fields.FieldModel = function(type, name)
 	barmatz.utils.DataTypes.isNotUndefined(name);
 	barmatz.utils.DataTypes.isTypeOf(type, 'string', true);
 	barmatz.utils.DataTypes.isTypeOf(name, 'string', true);
-	barmatz.forms.TypeModel.call(this, type);
+	barmatz.forms.fields.FormItemModel.call(this, type);
 	this.set('name', name);
 	this.set('label', '');
 	this.set('mandatory', false);
@@ -15,7 +15,7 @@ window.barmatz.forms.fields.FieldModel = function(type, name)
 	this.set('width', NaN);
 };
 
-barmatz.forms.fields.FieldModel.prototype = new barmatz.forms.TypeModel(null);
+barmatz.forms.fields.FieldModel.prototype = new barmatz.forms.fields.FormItemModel(null);
 barmatz.forms.fields.FieldModel.prototype.constructor = barmatz.forms.fields.FieldModel;
 
 Object.defineProperties(barmatz.forms.fields.FieldModel.prototype,

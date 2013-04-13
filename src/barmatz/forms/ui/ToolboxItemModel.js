@@ -6,7 +6,7 @@ window.barmatz.forms.ui.ToolboxItemModel = function(type, label, fieldModel)
 	barmatz.utils.DataTypes.isNotUndefined(fieldModel);
 	barmatz.utils.DataTypes.isTypeOf(type, 'string');
 	barmatz.utils.DataTypes.isTypeOf(label, 'string');
-	barmatz.utils.DataTypes.isInstanceOf(fieldModel, barmatz.forms.fields.FieldModel);
+	barmatz.utils.DataTypes.isInstanceOf(fieldModel, barmatz.forms.fields.FormItemModel);
 	barmatz.forms.TypeModel.call(this, type);
 	this.set('label', label);
 	this.set('fieldModel', fieldModel);

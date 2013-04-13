@@ -69,19 +69,26 @@ window.barmatz.forms.fields.FieldController = function(model, fieldView, errorMe
 	
 	function setErrorMessageContent()
 	{
-		errorMessageView.innerHTML = 'invalid';
+		if(errorMessageView)
+			errorMessageView.innerHTML = 'invalid';
 	}
 	
 	function showErrorMessage()
 	{
-		errorMessageView.style.visibility = cachedErrorMessageVisibility;
-		cachedErrorMessageVisibility = null;
+		if(errorMessageView)
+		{
+			errorMessageView.style.visibility = cachedErrorMessageVisibility;
+			cachedErrorMessageVisibility = null;
+		}
 	}
 	
 	function hideErrorMessage()
 	{
-		cachedErrorMessageVisibility = errorMessageView.style.visibility;
-		errorMessageView.style.visibility = 'hidden';
+		if(errorMessageView)
+		{
+			cachedErrorMessageVisibility = errorMessageView.style.visibility;
+			errorMessageView.style.visibility = 'hidden';
+		}
 	}
 	
 	function isErrorMessageHidden()

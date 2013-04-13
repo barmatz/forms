@@ -82,7 +82,7 @@ Object.defineProperties(barmatz.utils.DataTypes,
 				return false;
 		return true;
 	}},
-	isallowNull: {value: function(value)
+	isAllowNull: {value: function(value)
 	{
 		if(value == null)
 			if(!this.throw(TypeError, this.VALUE_NULL))
@@ -116,7 +116,7 @@ Object.defineProperties(barmatz.utils.DataTypes,
 				return false;
 		return true;
 	}},
-	isInstacnesOf: {value: function(instances, objects, allowNull)
+	isInstancesOf: {value: function(instances, objects, allowNull)
 	{
 		this._recursiveVlidation(instances, objects, this.isInstanceOf, this.WRONG_INSTANCE, allowNull);
 		return true;
@@ -148,7 +148,7 @@ Object.defineProperties(barmatz.utils.DataTypes,
 		catch(error){}
 		try
 		{
-			isInstance = this.isInstacnesOf(value, objects, allowNull);
+			isInstance = this.isInstancesOf(value, objects, allowNull);
 		}
 		catch(error){}
 		

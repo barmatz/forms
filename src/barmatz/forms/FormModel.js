@@ -105,34 +105,34 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 	addItem: {value: function(item)
 	{
 		barmatz.utils.DataTypes.isNotUndefined(item);
-		barmatz.utils.DataTypes.isInstanceOf(item, barmatz.forms.fields.FieldModel);
+		barmatz.utils.DataTypes.isInstanceOf(item, barmatz.forms.fields.FormItemModel);
 		barmatz.forms.CollectionModel.prototype.addItem.call(this, item);
 	}},
 	addItemAt: {value: function(item, index)
 	{
 		barmatz.utils.DataTypes.isNotUndefined(item);
 		barmatz.utils.DataTypes.isNotUndefined(index);
-		barmatz.utils.DataTypes.isInstanceOf(item, barmatz.forms.fields.FieldModel);
+		barmatz.utils.DataTypes.isInstanceOf(item, barmatz.forms.fields.FormItemModel);
 		barmatz.utils.DataTypes.isTypeOf(index, 'number');
 		barmatz.forms.CollectionModel.prototype.addItemAt.call(this, item, index);
 	}},
 	removeItem: {value: function(item)
 	{
 		barmatz.utils.DataTypes.isNotUndefined(item);
-		barmatz.utils.DataTypes.isInstanceOf(item, barmatz.forms.fields.FieldModel);
+		barmatz.utils.DataTypes.isInstanceOf(item, barmatz.forms.fields.FormItemModel);
 		barmatz.forms.CollectionModel.prototype.removeItem.call(this, item);
 	}},
 	getItemIndex: {value: function(item)
 	{
 		barmatz.utils.DataTypes.isNotUndefined(item);
-		barmatz.utils.DataTypes.isInstanceOf(item, barmatz.forms.fields.FieldModel);
+		barmatz.utils.DataTypes.isInstanceOf(item, barmatz.forms.fields.FormItemModel);
 		return barmatz.forms.CollectionModel.prototype.getItemIndex.call(this, item);
 	}},
 	setItemIndex: {value: function(item, index)
 	{
 		barmatz.utils.DataTypes.isNotUndefined(item);
 		barmatz.utils.DataTypes.isNotUndefined(index);
-		barmatz.utils.DataTypes.isInstanceOf(item, barmatz.forms.fields.FieldModel);
+		barmatz.utils.DataTypes.isInstanceOf(item, barmatz.forms.fields.FormItemModel);
 		barmatz.utils.DataTypes.isTypeOf(index, 'number');
 		return barmatz.forms.CollectionModel.prototype.setItemIndex.call(this, item, index);
 	}},
@@ -193,6 +193,9 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 				});
 			}
 			
+			if(item instanceof barmatz.forms.fields.HTMLContentModel)
+				field.content = item.content;
+			
 			object.fields.push(field);
 		});
 		
@@ -222,7 +225,7 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 		
 		this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.SAVING));
 
-		request = new barmatz.net.Request('http://quiz.co.il/api/form/save.php');
+		request = new barmatz.net.Request(barmatz.forms.Config.BASE_URL + '/api/form/save.php');
 		request.method = barmatz.net.Methods.POST;
 		request.data = {f: this.fingerprint || null, n: this.name, e: this.targetEmail, d: this.toJSON()};
 		loader = new barmatz.net.Loader();
@@ -292,7 +295,7 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 		
 		this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.LOADING_FORM));
 		
-		request = new barmatz.net.Request('http://quiz.co.il/api/form.php');
+		request = new barmatz.net.Request(barmatz.forms.Config.BASE_URL + '/api/form.php');
 		request.method = barmatz.net.Methods.GET;
 		request.data = {f: fingerprint};
 		
@@ -349,7 +352,7 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 		
 		this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.DELETING));
 
-		request = new barmatz.net.Request('http://quiz.co.il/api/form/delete.php');
+		request = new barmatz.net.Request(barmatz.forms.Config.BASE_URL + '/api/form/delete.php');
 		request.method = barmatz.net.Methods.POST;
 		request.data = {f: this.fingerprint};
 		
@@ -411,7 +414,7 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 				data[item.name] = item.value;
 		});
 
-		request = new barmatz.net.Request('http://www.quiz.co.il/api/form/submit.php');
+		request = new barmatz.net.Request(barmatz.forms.Config.BASE_URL + '/api/form/submit.php');
 		request.method = this.method;
 		request.data = {f: this.fingerprint, d: JSON.stringify(data)};
 		request.headers = [new barmatz.net.RequestHeader('Content-Type', this.encoding)];
@@ -494,6 +497,9 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 				default:
 					throw new Error('Unknown type');
 					break;
+				case barmatz.forms.fields.FieldTypes.HTML_CONTENT:
+					field = new barmatz.forms.fields.HTMLContentModel();
+					break;
 				case barmatz.forms.fields.FieldTypes.TEXT_AREA:
 					field = new barmatz.forms.fields.TextAreaFieldModel(name);
 					break;
@@ -523,6 +529,9 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 					break;
 			}
 			
+			if(field instanceof barmatz.forms.fields.HTMLContentModel)
+				field.content = fieldData.content || '';
+
 			if(field instanceof barmatz.forms.fields.FieldModel)
 			{
 				field.label = fieldData.label || '';

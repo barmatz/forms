@@ -8,7 +8,7 @@ window.barmatz.forms.ui.WorkspaceItemController = function(model, labelView, fie
 	barmatz.utils.DataTypes.isNotUndefined(fieldView);
 	barmatz.utils.DataTypes.isNotUndefined(mandatoryView);
 	barmatz.utils.DataTypes.isNotUndefined(deleteButtonView);
-	barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FieldModel);
+	barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FormItemModel);
 	barmatz.utils.DataTypes.isInstanceOf(labelView, HTMLElement);
 	barmatz.utils.DataTypes.isInstanceOf(fieldView, HTMLElement);
 	barmatz.utils.DataTypes.isInstanceOf(mandatoryView, HTMLElement);
@@ -29,15 +29,29 @@ window.barmatz.forms.ui.WorkspaceItemController = function(model, labelView, fie
 		});
 	}
 	
-	setViewValue('name', model.name);
-	setViewValue('label', model.label);
-	setViewValue('mandatory', model.mandatory);
-	setViewValue('value', model.value);
-	setViewValue('enabled', model.enabled);
-	setViewValue('max', model.max);
-	setViewValue('checked', model.checked);
-	setViewValue('accept', model.accept);
-	setViewValue('rows', model.rows);
+	if(model instanceof barmatz.forms.fields.FieldModel)
+	{
+		setViewValue('name', model.name);
+		setViewValue('label', model.label);
+		setViewValue('mandatory', model.mandatory);
+		setViewValue('value', model.value);
+		setViewValue('enabled', model.enabled);
+	}
+	
+	if(model instanceof barmatz.forms.fields.TextFieldModel)
+		setViewValue('max', model.max);
+
+	if(model instanceof barmatz.forms.fields.CheckboxFieldModel)
+		setViewValue('checked', model.checked);
+	
+	if(model instanceof barmatz.forms.fields.FileFieldModel)
+		setViewValue('accept', model.accept);
+	
+	if(model instanceof barmatz.forms.fields.TextAreaFieldModel)
+		setViewValue('rows', model.rows);
+	
+	if(model instanceof barmatz.forms.fields.HTMLContentModel)
+		setViewValue('content', model.content);
 	
 	function setViewValue(key, value)
 	{
@@ -94,6 +108,9 @@ window.barmatz.forms.ui.WorkspaceItemController = function(model, labelView, fie
 					fieldView.getElementsByTagName('input')[0].style.width = value + 'px';
 				else
 					fieldView.style.width = value + 'px';
+				break;
+			case 'content':
+				fieldView.innerHTML = value;
 				break;
 		}
 	}

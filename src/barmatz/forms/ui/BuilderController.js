@@ -69,6 +69,7 @@ window.barmatz.forms.ui.BuilderController = function(formModel, userModel, conta
 	{
 		toolboxModel.addEventListener(barmatz.events.CollectionEvent.ITEM_ADDED, onToolboxModelItemAdded);
 		toolboxModel.addEventListener(barmatz.events.CollectionEvent.ITEM_REMOVED, onToolboxModelItemRemoved);
+		addToolboxItem(barmatz.forms.fields.FieldTypes.HTML_CONTENT, 'HTML content');
 		addToolboxItem(barmatz.forms.fields.FieldTypes.TEXT_FIELD, 'Text field');
 		addToolboxItem(barmatz.forms.fields.FieldTypes.TEXT_AREA, 'Text area');
 		addToolboxItem(barmatz.forms.fields.FieldTypes.PASSWORD, 'Password field');

@@ -83,7 +83,7 @@ Object.defineProperties(barmatz.forms.users.UserModel.prototype,
 		{
 			var request, loader;
 			
-			request = new barmatz.net.Request('http://quiz.co.il/api/user/forms.php');
+			request = new barmatz.net.Request(barmatz.forms.Config.BASE_URL + '/api/user/forms.php');
 			request.method = barmatz.net.Methods.GET;
 			request.data = {u: _this.id};
 			
@@ -184,7 +184,7 @@ Object.defineProperties(barmatz.forms.users.UserModel.prototype,
 	{
 		var _this = this, request, loader;
 		
-		request = new barmatz.net.Request('http://quiz.co.il/api/user/user.php');
+		request = new barmatz.net.Request(barmatz.forms.Config.BASE_URL + '/api/user/user.php');
 		request.method = barmatz.net.Methods.GET;
 		
 		loader = new barmatz.net.Loader();
@@ -248,7 +248,7 @@ Object.defineProperties(barmatz.forms.users.UserModel.prototype,
 		
 		_this = this;
 		
-		request = new barmatz.net.Request('http://quiz.co.il/api/user/login.php');
+		request = new barmatz.net.Request(barmatz.forms.Config.BASE_URL + '/api/user/login.php');
 		request.method = barmatz.net.Methods.POST;
 		request.data = {u: userName, p: password};
 		

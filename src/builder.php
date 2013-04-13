@@ -15,6 +15,7 @@ if(!\api\user\UserModel::isAuthenticated())
 	<body>
 		<script src="jqueryui/js/jquery-1.9.0.js"></script>
 		<script src="jqueryui/js/jquery-ui-1.10.0.custom.min.js"></script>
+		<script src="tinymce/tinymce.min.js"></script>
 		<script src="js/application.js"></script>
 		<script src="js/builder.js"></script>
 	</body>
