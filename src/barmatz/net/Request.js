@@ -25,6 +25,9 @@ Object.defineProperties(barmatz.net.Request.prototype,
 	url: {get: function()
 	{
 		return this.get('url');
+	}, set: function(value)
+	{
+		this.set('url', value);
 	}},
 	method: {get: function()
 	{

@@ -304,7 +304,7 @@ window.barmatz.forms.ui.BuilderController = function(formModel, userModel, conta
 		var dialog;
 		
 		if(barmatz.utils.DataTypes.applySilent('isValid', formModel.fingerprint))
-			dialog = barmatz.forms.factories.DOMFactory.createExportPromptDialog(formModel.fingerprint, true);
+			dialog = barmatz.forms.factories.DOMFactory.createExportPromptDialog(formModel.fingerprint, barmatz.forms.Language.form.loading, true);
 		else
 			dialog = barmatz.forms.factories.DOMFactory.createAlertPromptDialog('Failed to export', 'You must save the form before exporting!', true);
 		
@@ -331,7 +331,8 @@ window.barmatz.forms.ui.BuilderController = function(formModel, userModel, conta
 			formModel.direction = wrapper.directionField.value;
 			formModel.stylesheets = wrapper.stylesheetsField.value.replace(/\s+/, ' ').split(' ');
 			formModel.targetEmail = wrapper.targetEmailField.value;
-			formModel.layoutId = wrapper.layoutIdField.value;
+			formModel.layoutId = parseInt(wrapper.layoutIdField.value);
+			formModel.language = wrapper.languageField.value;
 		}
 	}
 	

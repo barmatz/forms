@@ -12,6 +12,7 @@ window.barmatz.forms.FormModel = function()
 	this.set('direction', barmatz.forms.Directions.LTR);
 	this.set('targetEmail', '');
 	this.set('layoutId', 1);
+	this.set('language', 'en');
 };
 
 barmatz.forms.FormModel.prototype = new barmatz.forms.CollectionModel();
@@ -100,7 +101,16 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 		return this.get('layoutId');
 	}, set: function(value)
 	{
+		barmatz.utils.DataTypes.isTypeOf(value, 'number');
 		this.set('layoutId', value);
+	}},
+	language: {get: function()
+	{
+		return this.get('language');
+	}, set: function(value)
+	{
+		barmatz.utils.DataTypes.isTypeOf(value, 'string');
+		this.set('language', value);
 	}},
 	addItem: {value: function(item)
 	{
@@ -149,6 +159,7 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 			direction: this.direction, 
 			targetEmail: this.targetEmail, 
 			layoutId: this.layoutId, 
+			language: this.language, 
 			fields: []
 		};
 		
@@ -213,6 +224,7 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 		this.set('direction', barmatz.forms.Directions.LTR);
 		this.set('targetEmail', '');
 		this.set('layoutId', 1);
+		this.set('language', 'en');
 		while(this.numItems > 0)
 			this.removeItemAt(this.numItems - 1);
 	}},
@@ -286,7 +298,7 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 	}},
 	loadByFingerprint: {value: function(fingerprint)
 	{
-		var _this, request, loader;
+		var _this, request, loader, stage;
 		
 		barmatz.utils.DataTypes.isNotUndefined(fingerprint);	
 		barmatz.utils.DataTypes.isTypeOf(fingerprint, 'string');
@@ -295,13 +307,27 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 		
 		this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.LOADING_FORM));
 		
-		request = new barmatz.net.Request(barmatz.forms.Config.BASE_URL + '/api/form.php');
-		request.method = barmatz.net.Methods.GET;
-		request.data = {f: fingerprint};
+		loadData();
 		
-		loader = new barmatz.net.Loader();
-		addLoaderListeners();
-		loader.load(request);
+		function loadData()
+		{
+			stage = 1;
+			request = new barmatz.net.Request(barmatz.forms.Config.BASE_URL + '/api/form.php');
+			request.method = barmatz.net.Methods.GET;
+			request.data = {f: fingerprint};
+			loader = new barmatz.net.Loader();
+			addLoaderListeners();
+			loader.load(request);
+		}
+		
+		function loadLanguage()
+		{
+			stage = 2;
+			request.url = barmatz.forms.Config.BASE_URL + '/lang/form_' + _this.language + '.json';
+			request.data = null;
+			addLoaderListeners();
+			loader.load(request);
+		}
 
 		function addLoaderListeners()
 		{
@@ -334,8 +360,18 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 				return;
 			}
 			
-			_this.copy(data.fingerprint, data.data);
-			_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.LOADING_FORM_COMPLETE));
+			switch(stage)
+			{
+				case 1:
+					_this.copy(data.fingerprint, data.data);
+					loadLanguage();
+					break;
+				case 2:
+					barmatz.forms.Language = data;
+					_this.submitButtonLabel = barmatz.forms.Language.form.submit.label; 
+					_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.LOADING_FORM_COMPLETE));
+					break;
+			}
 		}
 		
 		function onLoaderError(event)
@@ -467,6 +503,7 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 		this.direction = data.direction || barmatz.forms.Directions.LTR;
 		this.targetEmail = data.targetEmail || '';
 		this.layoutId = data.layoutId || 1;
+		this.language = data.language || 'en';
 		this.set('fingerprint', fingerprint);
 		this.set('stylesheets', data.stylesheets || []);
 		

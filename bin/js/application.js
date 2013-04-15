@@ -1993,30 +1993,31 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 			_this.destroyDialog(dialog);
 		}
 	}},
-	createExportPromptDialog: {value: function(fingerprint, open)
+	createExportPromptDialog: {value: function(fingerprint, loadingMessage, open)
 	{
 		var dir, embedCode, textarea;
 		
 		barmatz.utils.DataTypes.isNotUndefined(fingerprint);
+		barmatz.utils.DataTypes.isTypeOf(loadingMessage, 'string', true);
 		barmatz.utils.DataTypes.isTypeOf(open, 'boolean', true);
 		
 		dir = location.href.replace(location.hash, '').replace(location.search, '').replace(/(^\w+:\/\/.+)\/.+\..+$/, '$1') + '/js'; 
-		embedCode = "<div name=\"formContainer\" fingerprint=\"" + fingerprint + "\">Loading...</div>" +
-					"<script type=\"text/javascript\">" +
-					"(function(w,d)" +
-					"{" +
-						"w.barmatz && w.barmatz.forms && !w.barmatz.forms.embed" +
-						" ? barmatz.forms.embed('" + fingerprint + "')" +
-						" : l('" + dir + "/embed.js');" +
-						"function l(s)" +
-						"{" +
-							"a=d.createElement('script');" +
-							"a.src=s;" +
-							"b=d.getElementsByTagName('script')[0];" +
-							"b.parentNode.insertBefore(a,b);" +
-						"}" +
-					"})(window,document)" +
-					"</script>";
+		embedCode = '<div name="formContainer" fingerprint="' + fingerprint + '">' + (loadingMessage || '') + '</div>' +
+					'<script type="text/javascript">' +
+					'(function(w,d)' +
+					'{' +
+						'w.barmatz && w.barmatz.forms && !w.barmatz.forms.embed' +
+						' ? barmatz.forms.embed(\'' + fingerprint + '\')' +
+						' : l(\'' + dir + '/embed.js\');' +
+						'function l(s)' +
+						'{' +
+							'a=d.createElement(\'script\');' +
+							'a.src=s;' +
+							'b=d.getElementsByTagName(\'script\')[0];' +
+							'b.parentNode.insertBefore(a,b);' +
+						'}' +
+					'})(window,document)' +
+					'</script>';
 		
 		textarea = this.createElementWithContent('textarea', 'forms-dialog-export-embedcode', embedCode);
 		textarea.readOnly = true;
@@ -2374,7 +2375,7 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 	}},
 	createFormPropertiesWrapper: {value: function(model)
 	{
-		var _this, options, nameField, methodField, encodingField, submitButtonLabelField, stylesheetsField, directionField, targetEmailField, layoutIdField;
+		var _this, returnValue, options;
 		
 		barmatz.utils.DataTypes.isNotUndefined(model);
 		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.FormModel);
@@ -2384,31 +2385,38 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		options = new barmatz.forms.ui.TableOptions();
 		options.bodyRows = [];
 		
-		nameField = createField('Name');
-		nameField.value = model.name;
+		returnValue = {};
 		
-		submitButtonLabelField = createField('Submit button label');
-		submitButtonLabelField.value = model.submitButtonLabel;
+		returnValue.nameField = createField('Name');
+		returnValue.nameField.value = model.name;
 		
-		targetEmailField = createField('Target email');
-		targetEmailField.value = model.targetEmail;
+		returnValue.submitButtonLabelField = createField('Submit button label');
+		returnValue.submitButtonLabelField.value = model.submitButtonLabel;
 		
-		directionField = createDropbox('Direction', 'formDirection', [barmatz.forms.Directions.LTR, barmatz.forms.Directions.RTL]);
-		directionField.value = model.direction;
+		returnValue.targetEmailField = createField('Target email');
+		returnValue.targetEmailField.value = model.targetEmail;
 		
-		layoutIdField = createDropbox('Layout', 'formLayoutId', ['1', '2']);
-		layoutIdField.value = model.layoutId;
+		returnValue.directionField = createDropbox('Direction', 'formDirection', [barmatz.forms.Directions.LTR, barmatz.forms.Directions.RTL]);
+		returnValue.directionField.value = model.direction;
 		
-		stylesheetsField = createField('Stylesheets');
-		stylesheetsField.value = model.stylesheets.join(' ');
+		returnValue.languageField = createDropbox('Language', 'formlanguage', ['en', 'he']);
+		returnValue.languageField.value = model.langauge;
 		
-		methodField = createDropbox('Method', 'formMethod', ['GET', 'POST']);
-		methodField.value = model.method;
+		returnValue.layoutIdField = createDropbox('Layout', 'formLayoutId', ['1', '2']);
+		returnValue.layoutIdField.value = model.layoutId;
 		
-		encodingField = createDropbox('Encoding', 'formEncoding', [barmatz.net.Encoding.FORM, barmatz.net.Encoding.FILES]);
-		encodingField.value = model.encoding;
+		returnValue.stylesheetsField = createField('Stylesheets');
+		returnValue.stylesheetsField.value = model.stylesheets.join(' ');
 		
-		return {wrapper: this.createTable(options), nameField: nameField, submitButtonLabelField: submitButtonLabelField, methodField: methodField, encodingField: encodingField, stylesheetsField: stylesheetsField, directionField: directionField, targetEmailField: targetEmailField, layoutIdField: layoutIdField};
+		returnValue.methodField = createDropbox('Method', 'formMethod', ['GET', 'POST']);
+		returnValue.methodField.value = model.method;
+		
+		returnValue.encodingField = createDropbox('Encoding', 'formEncoding', [barmatz.net.Encoding.FORM, barmatz.net.Encoding.FILES]);
+		returnValue.encodingField.value = model.encoding;
+		
+		returnValue.wrapper = this.createTable(options); 
+		
+		return returnValue;
 		
 		function createField(label, content)
 		{
@@ -3797,37 +3805,37 @@ window.barmatz.forms.fields.FieldController = function(model, fieldView, errorMe
 					case barmatz.forms.Validator.NONE:
 						break;
 					case barmatz.forms.Validator.NOT_EMPTY:
-						errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement('value is empty'));
+						errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement(barmatz.forms.Language.form.field.errors.emptyValue));
 						break;
 					case barmatz.forms.Validator.EQUALS:
-						errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement('invalid value'));
+						errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement(barmatz.forms.Language.form.field.errors.invalidValue));
 						break;
 					case barmatz.forms.Validator.VALID_EMAIL:
-						errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement('invalid email address'));
+						errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement(barmatz.forms.Language.form.field.errors.invalidEmail));
 						break;
 					case barmatz.forms.Validator.VALID_PHONE:
-						errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement('invalid phone number'));
+						errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement(barmatz.forms.Language.form.field.errors.invalidPhone));
 						break;
 					case barmatz.forms.Validator.MIN_LENGTH:
-						errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement('value must be ' + model.validator.minLength + ' characters minimum'));
+						errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement(barmatz.forms.Language.form.field.errors.minimumLength.replace(/\$\{1\}/, model.validator.minLength)));
 						break;
 					case barmatz.forms.Validator.MAX_LENGTH:
-						errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement('value must be ' + model.validator.maxLength + ' characters maximum'));
+						errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement(barmatz.forms.Language.form.field.errors.maximumLength.replace(/\$\{1\}/, model.validator.maxLength)));
 						break;
 					case barmatz.forms.Validator.EXACT_LENGTH:
-						errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement('value must be exactly ' + model.validator.exactLength + ' characters'));
+						errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement(barmatz.forms.Language.form.field.errors.exactLength.replace(/\$\{1\}/, model.validator.exactLength)));
 						break;
 					case barmatz.forms.Validator.GREATER_THAN:
-						errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement('value must be greater than ' + model.validator.greaterThan));
+						errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement(barmatz.forms.Language.form.field.errors.greaterThan.replace(/\$\{1\}/, model.validator.greaterThan)));
 						break;
 					case barmatz.forms.Validator.LESSER_THAN:
-						errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement('valud must be lesser than ' + model.validator.lesserThan));
+						errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement(barmatz.forms.Language.form.field.errors.lesserThan.replace(/\$\{1\}/, model.validator.lesserThan)));
 						break;
 					case barmatz.forms.Validator.DIGITS_ONLY:
-						errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement('only digits are allowed'));
+						errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement(barmatz.forms.Language.form.field.errors.digitsOnly));
 						break;
 					case barmatz.forms.Validator.NOT_DIGITS:
-						errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement('cannot contain digits'));
+						errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement(barmatz.forms.Language.form.field.errors.noDigits));
 						break;
 				}
 			
@@ -3925,16 +3933,6 @@ window.barmatz.forms.fields.FieldValidationOptionsController = function(model, o
 		barmatz.utils.DataTypes.isNotUndefined(bit);
 		barmatz.utils.DataTypes.isInstanceOf(option, HTMLInputElement);
 		barmatz.utils.DataTypes.isTypeOf(bit, 'number');
-
-		if(option.checked)
-		{
-			if(model.validator.code)
-				bit = barmatz.utils.Bitwise.concat(model.validator.code, bit);
-		}
-		else
-			bit = barmatz.utils.Bitwise.slice(model.validator.code, bit); 
-		
-		model.validator.code = bit; 
 		
 		switch(bit)
 		{
@@ -3957,6 +3955,16 @@ window.barmatz.forms.fields.FieldValidationOptionsController = function(model, o
 				getOptionParameters(option, 'Lesser than', 'lesserThan', true);
 				break;
 		}
+
+		if(option.checked)
+		{
+			if(model.validator.code)
+				bit = barmatz.utils.Bitwise.concat(model.validator.code, bit);
+		}
+		else
+			bit = barmatz.utils.Bitwise.slice(model.validator.code, bit); 
+		
+		model.validator.code = bit; 
 	}
 	
 	function getOptionParameters(option, label, key, isNumber)
@@ -4696,7 +4704,7 @@ window.barmatz.forms.ui.BuilderController = function(formModel, userModel, conta
 		var dialog;
 		
 		if(barmatz.utils.DataTypes.applySilent('isValid', formModel.fingerprint))
-			dialog = barmatz.forms.factories.DOMFactory.createExportPromptDialog(formModel.fingerprint, true);
+			dialog = barmatz.forms.factories.DOMFactory.createExportPromptDialog(formModel.fingerprint, barmatz.forms.Language.form.loading, true);
 		else
 			dialog = barmatz.forms.factories.DOMFactory.createAlertPromptDialog('Failed to export', 'You must save the form before exporting!', true);
 		
@@ -4723,7 +4731,8 @@ window.barmatz.forms.ui.BuilderController = function(formModel, userModel, conta
 			formModel.direction = wrapper.directionField.value;
 			formModel.stylesheets = wrapper.stylesheetsField.value.replace(/\s+/, ' ').split(' ');
 			formModel.targetEmail = wrapper.targetEmailField.value;
-			formModel.layoutId = wrapper.layoutIdField.value;
+			formModel.layoutId = parseInt(wrapper.layoutIdField.value);
+			formModel.language = wrapper.languageField.value;
 		}
 	}
 	
@@ -6386,7 +6395,7 @@ window.barmatz.forms.FormController = function(model, formView, submitButtonView
 	function onModelSubmitted(event)
 	{
 		submittingForm = false;
-		submitButtonView.innerHTML = 'Your form has been submitted';
+		submitButtonView.innerHTML = barmatz.forms.Language.form.submit.success;
 		submitButtonView.disabled = true;
 		removeModelListeners(); 
 		removeLoadingDialog();
@@ -6395,7 +6404,7 @@ window.barmatz.forms.FormController = function(model, formView, submitButtonView
 	function onModelSubmitionFailed(event)
 	{
 		submittingForm = false;
-		submitButtonView.innerHTML = 'An error has occured! Click to try again';
+		submitButtonView.innerHTML = barmatz.forms.Language.form.submit.error;
 		removeModelListeners();
 		removeLoadingDialog();
 	 }
@@ -6419,6 +6428,7 @@ window.barmatz.forms.FormModel = function()
 	this.set('direction', barmatz.forms.Directions.LTR);
 	this.set('targetEmail', '');
 	this.set('layoutId', 1);
+	this.set('language', 'en');
 };
 
 barmatz.forms.FormModel.prototype = new barmatz.forms.CollectionModel();
@@ -6507,7 +6517,16 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 		return this.get('layoutId');
 	}, set: function(value)
 	{
+		barmatz.utils.DataTypes.isTypeOf(value, 'number');
 		this.set('layoutId', value);
+	}},
+	language: {get: function()
+	{
+		return this.get('language');
+	}, set: function(value)
+	{
+		barmatz.utils.DataTypes.isTypeOf(value, 'string');
+		this.set('language', value);
 	}},
 	addItem: {value: function(item)
 	{
@@ -6556,6 +6575,7 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 			direction: this.direction, 
 			targetEmail: this.targetEmail, 
 			layoutId: this.layoutId, 
+			language: this.language, 
 			fields: []
 		};
 		
@@ -6620,6 +6640,7 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 		this.set('direction', barmatz.forms.Directions.LTR);
 		this.set('targetEmail', '');
 		this.set('layoutId', 1);
+		this.set('language', 'en');
 		while(this.numItems > 0)
 			this.removeItemAt(this.numItems - 1);
 	}},
@@ -6693,7 +6714,7 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 	}},
 	loadByFingerprint: {value: function(fingerprint)
 	{
-		var _this, request, loader;
+		var _this, request, loader, stage;
 		
 		barmatz.utils.DataTypes.isNotUndefined(fingerprint);	
 		barmatz.utils.DataTypes.isTypeOf(fingerprint, 'string');
@@ -6702,13 +6723,27 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 		
 		this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.LOADING_FORM));
 		
-		request = new barmatz.net.Request(barmatz.forms.Config.BASE_URL + '/api/form.php');
-		request.method = barmatz.net.Methods.GET;
-		request.data = {f: fingerprint};
+		loadData();
 		
-		loader = new barmatz.net.Loader();
-		addLoaderListeners();
-		loader.load(request);
+		function loadData()
+		{
+			stage = 1;
+			request = new barmatz.net.Request(barmatz.forms.Config.BASE_URL + '/api/form.php');
+			request.method = barmatz.net.Methods.GET;
+			request.data = {f: fingerprint};
+			loader = new barmatz.net.Loader();
+			addLoaderListeners();
+			loader.load(request);
+		}
+		
+		function loadLanguage()
+		{
+			stage = 2;
+			request.url = barmatz.forms.Config.BASE_URL + '/lang/form_' + _this.language + '.json';
+			request.data = null;
+			addLoaderListeners();
+			loader.load(request);
+		}
 
 		function addLoaderListeners()
 		{
@@ -6741,8 +6776,18 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 				return;
 			}
 			
-			_this.copy(data.fingerprint, data.data);
-			_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.LOADING_FORM_COMPLETE));
+			switch(stage)
+			{
+				case 1:
+					_this.copy(data.fingerprint, data.data);
+					loadLanguage();
+					break;
+				case 2:
+					barmatz.forms.Language = data;
+					_this.submitButtonLabel = barmatz.forms.Language.form.submit.label; 
+					_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.LOADING_FORM_COMPLETE));
+					break;
+			}
 		}
 		
 		function onLoaderError(event)
@@ -6874,6 +6919,7 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 		this.direction = data.direction || barmatz.forms.Directions.LTR;
 		this.targetEmail = data.targetEmail || '';
 		this.layoutId = data.layoutId || 1;
+		this.language = data.language || 'en';
 		this.set('fingerprint', fingerprint);
 		this.set('stylesheets', data.stylesheets || []);
 		
@@ -6981,6 +7027,8 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 		}
 	}}
 });
+/** barmatz.forms.Language **/
+barmatz.forms.Language = {}
 /** barmatz.forms.Methods **/
 window.barmatz.forms.Methods = function(){};
 
@@ -7577,6 +7625,9 @@ Object.defineProperties(barmatz.net.Request.prototype,
 	url: {get: function()
 	{
 		return this.get('url');
+	}, set: function(value)
+	{
+		this.set('url', value);
 	}},
 	method: {get: function()
 	{

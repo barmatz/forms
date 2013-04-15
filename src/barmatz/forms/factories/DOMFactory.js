@@ -614,30 +614,31 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 			_this.destroyDialog(dialog);
 		}
 	}},
-	createExportPromptDialog: {value: function(fingerprint, open)
+	createExportPromptDialog: {value: function(fingerprint, loadingMessage, open)
 	{
 		var dir, embedCode, textarea;
 		
 		barmatz.utils.DataTypes.isNotUndefined(fingerprint);
+		barmatz.utils.DataTypes.isTypeOf(loadingMessage, 'string', true);
 		barmatz.utils.DataTypes.isTypeOf(open, 'boolean', true);
 		
 		dir = location.href.replace(location.hash, '').replace(location.search, '').replace(/(^\w+:\/\/.+)\/.+\..+$/, '$1') + '/js'; 
-		embedCode = "<div name=\"formContainer\" fingerprint=\"" + fingerprint + "\">Loading...</div>" +
-					"<script type=\"text/javascript\">" +
-					"(function(w,d)" +
-					"{" +
-						"w.barmatz && w.barmatz.forms && !w.barmatz.forms.embed" +
-						" ? barmatz.forms.embed('" + fingerprint + "')" +
-						" : l('" + dir + "/embed.js');" +
-						"function l(s)" +
-						"{" +
-							"a=d.createElement('script');" +
-							"a.src=s;" +
-							"b=d.getElementsByTagName('script')[0];" +
-							"b.parentNode.insertBefore(a,b);" +
-						"}" +
-					"})(window,document)" +
-					"</script>";
+		embedCode = '<div name="formContainer" fingerprint="' + fingerprint + '">' + (loadingMessage || '') + '</div>' +
+					'<script type="text/javascript">' +
+					'(function(w,d)' +
+					'{' +
+						'w.barmatz && w.barmatz.forms && !w.barmatz.forms.embed' +
+						' ? barmatz.forms.embed(\'' + fingerprint + '\')' +
+						' : l(\'' + dir + '/embed.js\');' +
+						'function l(s)' +
+						'{' +
+							'a=d.createElement(\'script\');' +
+							'a.src=s;' +
+							'b=d.getElementsByTagName(\'script\')[0];' +
+							'b.parentNode.insertBefore(a,b);' +
+						'}' +
+					'})(window,document)' +
+					'</script>';
 		
 		textarea = this.createElementWithContent('textarea', 'forms-dialog-export-embedcode', embedCode);
 		textarea.readOnly = true;
@@ -995,7 +996,7 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 	}},
 	createFormPropertiesWrapper: {value: function(model)
 	{
-		var _this, options, nameField, methodField, encodingField, submitButtonLabelField, stylesheetsField, directionField, targetEmailField, layoutIdField;
+		var _this, returnValue, options;
 		
 		barmatz.utils.DataTypes.isNotUndefined(model);
 		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.FormModel);
@@ -1005,31 +1006,38 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		options = new barmatz.forms.ui.TableOptions();
 		options.bodyRows = [];
 		
-		nameField = createField('Name');
-		nameField.value = model.name;
+		returnValue = {};
 		
-		submitButtonLabelField = createField('Submit button label');
-		submitButtonLabelField.value = model.submitButtonLabel;
+		returnValue.nameField = createField('Name');
+		returnValue.nameField.value = model.name;
 		
-		targetEmailField = createField('Target email');
-		targetEmailField.value = model.targetEmail;
+		returnValue.submitButtonLabelField = createField('Submit button label');
+		returnValue.submitButtonLabelField.value = model.submitButtonLabel;
 		
-		directionField = createDropbox('Direction', 'formDirection', [barmatz.forms.Directions.LTR, barmatz.forms.Directions.RTL]);
-		directionField.value = model.direction;
+		returnValue.targetEmailField = createField('Target email');
+		returnValue.targetEmailField.value = model.targetEmail;
 		
-		layoutIdField = createDropbox('Layout', 'formLayoutId', ['1', '2']);
-		layoutIdField.value = model.layoutId;
+		returnValue.directionField = createDropbox('Direction', 'formDirection', [barmatz.forms.Directions.LTR, barmatz.forms.Directions.RTL]);
+		returnValue.directionField.value = model.direction;
 		
-		stylesheetsField = createField('Stylesheets');
-		stylesheetsField.value = model.stylesheets.join(' ');
+		returnValue.languageField = createDropbox('Language', 'formlanguage', ['en', 'he']);
+		returnValue.languageField.value = model.langauge;
 		
-		methodField = createDropbox('Method', 'formMethod', ['GET', 'POST']);
-		methodField.value = model.method;
+		returnValue.layoutIdField = createDropbox('Layout', 'formLayoutId', ['1', '2']);
+		returnValue.layoutIdField.value = model.layoutId;
 		
-		encodingField = createDropbox('Encoding', 'formEncoding', [barmatz.net.Encoding.FORM, barmatz.net.Encoding.FILES]);
-		encodingField.value = model.encoding;
+		returnValue.stylesheetsField = createField('Stylesheets');
+		returnValue.stylesheetsField.value = model.stylesheets.join(' ');
 		
-		return {wrapper: this.createTable(options), nameField: nameField, submitButtonLabelField: submitButtonLabelField, methodField: methodField, encodingField: encodingField, stylesheetsField: stylesheetsField, directionField: directionField, targetEmailField: targetEmailField, layoutIdField: layoutIdField};
+		returnValue.methodField = createDropbox('Method', 'formMethod', ['GET', 'POST']);
+		returnValue.methodField.value = model.method;
+		
+		returnValue.encodingField = createDropbox('Encoding', 'formEncoding', [barmatz.net.Encoding.FORM, barmatz.net.Encoding.FILES]);
+		returnValue.encodingField.value = model.encoding;
+		
+		returnValue.wrapper = this.createTable(options); 
+		
+		return returnValue;
 		
 		function createField(label, content)
 		{

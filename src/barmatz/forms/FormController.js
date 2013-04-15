@@ -62,7 +62,7 @@ window.barmatz.forms.FormController = function(model, formView, submitButtonView
 	function onModelSubmitted(event)
 	{
 		submittingForm = false;
-		submitButtonView.innerHTML = 'Your form has been submitted';
+		submitButtonView.innerHTML = barmatz.forms.Language.form.submit.success;
 		submitButtonView.disabled = true;
 		removeModelListeners(); 
 		removeLoadingDialog();
@@ -71,7 +71,7 @@ window.barmatz.forms.FormController = function(model, formView, submitButtonView
 	function onModelSubmitionFailed(event)
 	{
 		submittingForm = false;
-		submitButtonView.innerHTML = 'An error has occured! Click to try again';
+		submitButtonView.innerHTML = barmatz.forms.Language.form.submit.error;
 		removeModelListeners();
 		removeLoadingDialog();
 	 }

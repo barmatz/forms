@@ -38,16 +38,6 @@ window.barmatz.forms.fields.FieldValidationOptionsController = function(model, o
 		barmatz.utils.DataTypes.isNotUndefined(bit);
 		barmatz.utils.DataTypes.isInstanceOf(option, HTMLInputElement);
 		barmatz.utils.DataTypes.isTypeOf(bit, 'number');
-
-		if(option.checked)
-		{
-			if(model.validator.code)
-				bit = barmatz.utils.Bitwise.concat(model.validator.code, bit);
-		}
-		else
-			bit = barmatz.utils.Bitwise.slice(model.validator.code, bit); 
-		
-		model.validator.code = bit; 
 		
 		switch(bit)
 		{
@@ -70,6 +60,16 @@ window.barmatz.forms.fields.FieldValidationOptionsController = function(model, o
 				getOptionParameters(option, 'Lesser than', 'lesserThan', true);
 				break;
 		}
+
+		if(option.checked)
+		{
+			if(model.validator.code)
+				bit = barmatz.utils.Bitwise.concat(model.validator.code, bit);
+		}
+		else
+			bit = barmatz.utils.Bitwise.slice(model.validator.code, bit); 
+		
+		model.validator.code = bit; 
 	}
 	
 	function getOptionParameters(option, label, key, isNumber)

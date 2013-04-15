@@ -147,37 +147,37 @@ window.barmatz.forms.fields.FieldController = function(model, fieldView, errorMe
 					case barmatz.forms.Validator.NONE:
 						break;
 					case barmatz.forms.Validator.NOT_EMPTY:
-						errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement('value is empty'));
+						errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement(barmatz.forms.Language.form.field.errors.emptyValue));
 						break;
 					case barmatz.forms.Validator.EQUALS:
-						errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement('invalid value'));
+						errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement(barmatz.forms.Language.form.field.errors.invalidValue));
 						break;
 					case barmatz.forms.Validator.VALID_EMAIL:
-						errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement('invalid email address'));
+						errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement(barmatz.forms.Language.form.field.errors.invalidEmail));
 						break;
 					case barmatz.forms.Validator.VALID_PHONE:
-						errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement('invalid phone number'));
+						errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement(barmatz.forms.Language.form.field.errors.invalidPhone));
 						break;
 					case barmatz.forms.Validator.MIN_LENGTH:
-						errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement('value must be ' + model.validator.minLength + ' characters minimum'));
+						errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement(barmatz.forms.Language.form.field.errors.minimumLength.replace(/\$\{1\}/, model.validator.minLength)));
 						break;
 					case barmatz.forms.Validator.MAX_LENGTH:
-						errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement('value must be ' + model.validator.maxLength + ' characters maximum'));
+						errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement(barmatz.forms.Language.form.field.errors.maximumLength.replace(/\$\{1\}/, model.validator.maxLength)));
 						break;
 					case barmatz.forms.Validator.EXACT_LENGTH:
-						errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement('value must be exactly ' + model.validator.exactLength + ' characters'));
+						errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement(barmatz.forms.Language.form.field.errors.exactLength.replace(/\$\{1\}/, model.validator.exactLength)));
 						break;
 					case barmatz.forms.Validator.GREATER_THAN:
-						errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement('value must be greater than ' + model.validator.greaterThan));
+						errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement(barmatz.forms.Language.form.field.errors.greaterThan.replace(/\$\{1\}/, model.validator.greaterThan)));
 						break;
 					case barmatz.forms.Validator.LESSER_THAN:
-						errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement('valud must be lesser than ' + model.validator.lesserThan));
+						errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement(barmatz.forms.Language.form.field.errors.lesserThan.replace(/\$\{1\}/, model.validator.lesserThan)));
 						break;
 					case barmatz.forms.Validator.DIGITS_ONLY:
-						errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement('only digits are allowed'));
+						errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement(barmatz.forms.Language.form.field.errors.digitsOnly));
 						break;
 					case barmatz.forms.Validator.NOT_DIGITS:
-						errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement('cannot contain digits'));
+						errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement(barmatz.forms.Language.form.field.errors.noDigits));
 						break;
 				}
 			
