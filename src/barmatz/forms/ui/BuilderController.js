@@ -57,6 +57,7 @@ window.barmatz.forms.ui.BuilderController = function(formModel, userModel, conta
 		addMenuItem('Export', onMenuExportClick);
 		addMenuItem('Delete', onMenuDeleteClick);
 		addMenuItem('Properties', onMenuPropertiesClick);
+		addMenuItem('Logout', onMenuLogoutClick);
 		containerView.appendChild(menuView);
 	}
 	
@@ -334,6 +335,37 @@ window.barmatz.forms.ui.BuilderController = function(formModel, userModel, conta
 			formModel.layoutId = parseInt(wrapper.layoutIdField.value);
 			formModel.language = wrapper.languageField.value;
 		}
+	}
+	
+	function onMenuLogoutClick(event)
+	{
+		barmatz.forms.factories.ControllerFactory.createJQueryDialogController(
+			barmatz.forms.factories.DOMFactory.createPromptDialog('Logout', 'Are you sure you want to logout?', onLogoutConfrim, true)
+		);
+	}
+	
+	function onLogoutConfrim(event)
+	{
+		userModel.addEventListener(barmatz.events.UserModelEvent.LOGOUT_SUCCESS, onUserModelLogoutSuccess);
+		userModel.addEventListener(barmatz.events.UserModelEvent.LOGOUT_FAIL, onUserModelLogoutFail);
+		userModel.logout();
+	}
+	
+	function onUserModelLogoutSuccess(event)
+	{
+		userModel.removeEventListener(barmatz.events.UserModelEvent.LOGOUT_SUCCESS, onUserModelLogoutSuccess);
+		userModel.removeEventListener(barmatz.events.UserModelEvent.LOGOUT_FAIL, onUserModelLogoutFail);
+		barmatz.forms.factories.ControllerFactory.createJQueryDialogController(
+			barmatz.forms.factories.DOMFactory.createAlertPromptDialog('Logout', 'You have successfully logged out', true)
+		);
+		location.href = barmatz.forms.Config.BASE_URL + '/login.php';
+	}
+	
+	function onUserModelLogoutFail(event)
+	{
+		barmatz.forms.factories.ControllerFactory.createJQueryDialogController(
+			barmatz.forms.factories.DOMFactory.createAlertPromptDialog('Logout', 'An error has occurred, please try again', true)
+		);
 	}
 	
 	function onDeleteFormConfirm(event)

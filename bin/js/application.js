@@ -1111,11 +1111,15 @@ window.barmatz.events.UserModelEvent = function(type)
 	barmatz.events.Event.call(this, type);
 	
 	this._forms = null;
+	this._targetURL = null;
 	
 	switch(type)
 	{
 		case barmatz.events.UserModelEvent.GET_FORMS_SUCCESS:
 			this._forms = arguments[1];
+			break;
+		case barmatz.events.UserModelEvent.LOGIN_SUCCESS:
+			this._targetURL = arguments[1];
 			break;
 	}
 };
@@ -1127,6 +1131,8 @@ Object.defineProperties(barmatz.events.UserModelEvent,
 {
 	LOGIN_SUCCESS: {value: 'loginSuccess'},
 	LOGIN_FAIL: {value: 'loginFail'},
+	LOGOUT_SUCCESS: {value: 'logoutSuccess'},
+	LOGOUT_FAIL: {value: 'logoutFail'},
 	DATA_LOAD_SUCCESS: {value: 'dataLoadSuccess'},
 	DATA_LOAD_FAIL: {value: 'dataLoadFail'},
 	GET_FORMS_SUCCESS: {value: 'getFormsSuccess'},
@@ -1138,6 +1144,10 @@ Object.defineProperties(barmatz.events.UserModelEvent.prototype,
 	{
 		return this._forms;
 	}},
+	targetURL: {get: function()
+	{
+		return this._targetURL;
+	}},
 	clone: {value: function()
 	{
 		var event = new barmatz.events.UserModelEvent(this.type);
@@ -1147,6 +1157,9 @@ Object.defineProperties(barmatz.events.UserModelEvent.prototype,
 		{
 			case barmatz.events.UserModelEvent.GET_FORMS_SUCCESS:
 				event._forms = this.forms;
+				break;
+			case barmatz.events.UserModelEvent.LOGIN_SUCCESS:
+				event._targetURL = this.targetURL;
 				break;
 		}
 		
@@ -1161,6 +1174,9 @@ Object.defineProperties(barmatz.events.UserModelEvent.prototype,
 				break;
 			case barmatz.events.UserModelEvent.GET_FORMS_SUCCESS:
 				return this.formatToString('UserModelEvent', 'type', 'forms');
+				break;
+			case barmatz.events.UserModelEvent.LOGIN_SUCCESS:
+				return this.formatToString('UserModelEvent', 'type', 'targetURL');
 				break;
 		}
 	}}
@@ -4457,6 +4473,7 @@ window.barmatz.forms.ui.BuilderController = function(formModel, userModel, conta
 		addMenuItem('Export', onMenuExportClick);
 		addMenuItem('Delete', onMenuDeleteClick);
 		addMenuItem('Properties', onMenuPropertiesClick);
+		addMenuItem('Logout', onMenuLogoutClick);
 		containerView.appendChild(menuView);
 	}
 	
@@ -4734,6 +4751,37 @@ window.barmatz.forms.ui.BuilderController = function(formModel, userModel, conta
 			formModel.layoutId = parseInt(wrapper.layoutIdField.value);
 			formModel.language = wrapper.languageField.value;
 		}
+	}
+	
+	function onMenuLogoutClick(event)
+	{
+		barmatz.forms.factories.ControllerFactory.createJQueryDialogController(
+			barmatz.forms.factories.DOMFactory.createPromptDialog('Logout', 'Are you sure you want to logout?', onLogoutConfrim, true)
+		);
+	}
+	
+	function onLogoutConfrim(event)
+	{
+		userModel.addEventListener(barmatz.events.UserModelEvent.LOGOUT_SUCCESS, onUserModelLogoutSuccess);
+		userModel.addEventListener(barmatz.events.UserModelEvent.LOGOUT_FAIL, onUserModelLogoutFail);
+		userModel.logout();
+	}
+	
+	function onUserModelLogoutSuccess(event)
+	{
+		userModel.removeEventListener(barmatz.events.UserModelEvent.LOGOUT_SUCCESS, onUserModelLogoutSuccess);
+		userModel.removeEventListener(barmatz.events.UserModelEvent.LOGOUT_FAIL, onUserModelLogoutFail);
+		barmatz.forms.factories.ControllerFactory.createJQueryDialogController(
+			barmatz.forms.factories.DOMFactory.createAlertPromptDialog('Logout', 'You have successfully logged out', true)
+		);
+		location.href = barmatz.forms.Config.BASE_URL + '/login.php';
+	}
+	
+	function onUserModelLogoutFail(event)
+	{
+		barmatz.forms.factories.ControllerFactory.createJQueryDialogController(
+			barmatz.forms.factories.DOMFactory.createAlertPromptDialog('Logout', 'An error has occurred, please try again', true)
+		);
 	}
 	
 	function onDeleteFormConfirm(event)
@@ -6321,7 +6369,7 @@ window.barmatz.forms.Config = function(){};
 
 Object.defineProperties(barmatz.forms.Config,
 {
-	BASE_URL: {value: 'http://www.quiz.co.il'}
+	BASE_URL: {value: 'http://localhost:8080/clients/ofirvardi/forms'}
 });
 /** barmatz.forms.Directions **/
 window.barmatz.forms.Directions = function(){};
@@ -7121,7 +7169,10 @@ window.barmatz.forms.users.LogingController = function(model, userNameFieldView,
 	
 	function onModelLoginSuccess(event)
 	{
-		location.href = 'builder.php';
+		barmatz.utils.DataTypes.isNotUndefined(event);
+		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.UserModelEvent);
+		
+		location.href = event.targetURL;
 		hideLoading();
 		hideErrorFieldView();
 		waitingForInput();
@@ -7424,14 +7475,51 @@ Object.defineProperties(barmatz.forms.users.UserModel.prototype,
 				return;
 			}
 			
-			_this.set('id', data.id);
-			_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.UserModelEvent.LOGIN_SUCCESS));
+			_this.set('id', data.user.id);
+			_this.dispatchEvent(new barmatz.events.UserModelEvent(barmatz.events.UserModelEvent.LOGIN_SUCCESS, data.target));
 		}
 		
 		function onLoaderError(event)
 		{
 			removeLoaderListeners();
-			_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.UserModelEvent.LOGIN_FAIL));
+			_this.dispatchEvent(new barmatz.events.UserModelEvent(barmatz.events.UserModelEvent.LOGIN_FAIL));
+		}
+	}},
+	logout: {value: function()
+	{
+		var _this, request, loader;
+		
+		_this = this;
+		
+		request = new barmatz.net.Request(barmatz.forms.Config.BASE_URL + '/api/user/logout.php');
+		request.method = barmatz.net.Methods.POST;
+		
+		loader = new barmatz.net.Loader();
+		addLoaderListeners();
+		loader.load(request);
+		
+		function addLoaderListeners()
+		{
+			loader.addEventListener(barmatz.events.LoaderEvent.SUCCESS, onLoaderSuccess);
+			loader.addEventListener(barmatz.events.LoaderEvent.ERROR, onLoaderError);
+		}
+		
+		function removeLoaderListeners()
+		{
+			loader.removeEventListener(barmatz.events.LoaderEvent.SUCCESS, onLoaderSuccess);
+			loader.removeEventListener(barmatz.events.LoaderEvent.ERROR, onLoaderError);
+		}
+		
+		function onLoaderSuccess(event)
+		{
+			removeLoaderListeners();
+			_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.UserModelEvent.LOGOUT_SUCCESS));
+		}
+		
+		function onLoaderError(event)
+		{
+			removeLoaderListeners();
+			_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.UserModelEvent.LOGOUT_FAIL));
 		}
 	}}
 });

@@ -287,14 +287,51 @@ Object.defineProperties(barmatz.forms.users.UserModel.prototype,
 				return;
 			}
 			
-			_this.set('id', data.id);
-			_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.UserModelEvent.LOGIN_SUCCESS));
+			_this.set('id', data.user.id);
+			_this.dispatchEvent(new barmatz.events.UserModelEvent(barmatz.events.UserModelEvent.LOGIN_SUCCESS, data.target));
 		}
 		
 		function onLoaderError(event)
 		{
 			removeLoaderListeners();
-			_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.UserModelEvent.LOGIN_FAIL));
+			_this.dispatchEvent(new barmatz.events.UserModelEvent(barmatz.events.UserModelEvent.LOGIN_FAIL));
+		}
+	}},
+	logout: {value: function()
+	{
+		var _this, request, loader;
+		
+		_this = this;
+		
+		request = new barmatz.net.Request(barmatz.forms.Config.BASE_URL + '/api/user/logout.php');
+		request.method = barmatz.net.Methods.POST;
+		
+		loader = new barmatz.net.Loader();
+		addLoaderListeners();
+		loader.load(request);
+		
+		function addLoaderListeners()
+		{
+			loader.addEventListener(barmatz.events.LoaderEvent.SUCCESS, onLoaderSuccess);
+			loader.addEventListener(barmatz.events.LoaderEvent.ERROR, onLoaderError);
+		}
+		
+		function removeLoaderListeners()
+		{
+			loader.removeEventListener(barmatz.events.LoaderEvent.SUCCESS, onLoaderSuccess);
+			loader.removeEventListener(barmatz.events.LoaderEvent.ERROR, onLoaderError);
+		}
+		
+		function onLoaderSuccess(event)
+		{
+			removeLoaderListeners();
+			_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.UserModelEvent.LOGOUT_SUCCESS));
+		}
+		
+		function onLoaderError(event)
+		{
+			removeLoaderListeners();
+			_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.UserModelEvent.LOGOUT_FAIL));
 		}
 	}}
 });

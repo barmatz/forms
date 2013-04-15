@@ -6,11 +6,15 @@ window.barmatz.events.UserModelEvent = function(type)
 	barmatz.events.Event.call(this, type);
 	
 	this._forms = null;
+	this._targetURL = null;
 	
 	switch(type)
 	{
 		case barmatz.events.UserModelEvent.GET_FORMS_SUCCESS:
 			this._forms = arguments[1];
+			break;
+		case barmatz.events.UserModelEvent.LOGIN_SUCCESS:
+			this._targetURL = arguments[1];
 			break;
 	}
 };
@@ -22,6 +26,8 @@ Object.defineProperties(barmatz.events.UserModelEvent,
 {
 	LOGIN_SUCCESS: {value: 'loginSuccess'},
 	LOGIN_FAIL: {value: 'loginFail'},
+	LOGOUT_SUCCESS: {value: 'logoutSuccess'},
+	LOGOUT_FAIL: {value: 'logoutFail'},
 	DATA_LOAD_SUCCESS: {value: 'dataLoadSuccess'},
 	DATA_LOAD_FAIL: {value: 'dataLoadFail'},
 	GET_FORMS_SUCCESS: {value: 'getFormsSuccess'},
@@ -33,6 +39,10 @@ Object.defineProperties(barmatz.events.UserModelEvent.prototype,
 	{
 		return this._forms;
 	}},
+	targetURL: {get: function()
+	{
+		return this._targetURL;
+	}},
 	clone: {value: function()
 	{
 		var event = new barmatz.events.UserModelEvent(this.type);
@@ -42,6 +52,9 @@ Object.defineProperties(barmatz.events.UserModelEvent.prototype,
 		{
 			case barmatz.events.UserModelEvent.GET_FORMS_SUCCESS:
 				event._forms = this.forms;
+				break;
+			case barmatz.events.UserModelEvent.LOGIN_SUCCESS:
+				event._targetURL = this.targetURL;
 				break;
 		}
 		
@@ -56,6 +69,9 @@ Object.defineProperties(barmatz.events.UserModelEvent.prototype,
 				break;
 			case barmatz.events.UserModelEvent.GET_FORMS_SUCCESS:
 				return this.formatToString('UserModelEvent', 'type', 'forms');
+				break;
+			case barmatz.events.UserModelEvent.LOGIN_SUCCESS:
+				return this.formatToString('UserModelEvent', 'type', 'targetURL');
 				break;
 		}
 	}}

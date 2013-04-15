@@ -1,8 +1,6 @@
 <?php
-require_once dirname(__FILE__) . '/api/user/UserModel.php';
-
-if(!\api\user\UserModel::isAuthenticated())
-	header('Location: login.php');
+require_once dirname(__FILE__) . '/api/user/AuthenticationModel.php';
+\api\user\AuthenticationModel::authenticate('builder.php');
 ?>
 <!DOCTYPE html>
 <html>

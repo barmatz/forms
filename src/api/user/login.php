@@ -13,7 +13,16 @@ function login()
 	if($model->exsits())
 	{
 		$model->login();
-		echo json_encode($model->getData());
+		
+		if(!session_id())
+			session_start();
+		
+		if(!isset($_SESSION['targetURL']))
+			$_SESSION['targetURL'] = 'builder.php';
+		
+		echo json_encode(array('user'=>$model->getData(), 'target'=>$_SESSION['targetURL']));
+		
+		unset($_SESSION['targetURL']);
 	}
 	else
 		\api\errors\Errors::internalServerError('User not found');

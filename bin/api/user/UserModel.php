@@ -61,6 +61,9 @@ class UserModel extends \api\database\DatabaseTableModel
 	
 	public function logout()
 	{
+		if(session_id() == '')
+			session_start();
+		
 		unset($_SESSION['userId']);
 		$_SESSION['auth'] = false;
 	}

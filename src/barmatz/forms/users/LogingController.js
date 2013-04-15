@@ -82,7 +82,10 @@ window.barmatz.forms.users.LogingController = function(model, userNameFieldView,
 	
 	function onModelLoginSuccess(event)
 	{
-		location.href = 'builder.php';
+		barmatz.utils.DataTypes.isNotUndefined(event);
+		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.UserModelEvent);
+		
+		location.href = event.targetURL;
 		hideLoading();
 		hideErrorFieldView();
 		waitingForInput();
