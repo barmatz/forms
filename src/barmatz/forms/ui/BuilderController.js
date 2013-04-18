@@ -305,7 +305,7 @@ window.barmatz.forms.ui.BuilderController = function(formModel, userModel, conta
 		var dialog;
 		
 		if(barmatz.utils.DataTypes.applySilent('isValid', formModel.fingerprint))
-			dialog = barmatz.forms.factories.DOMFactory.createExportPromptDialog(formModel.fingerprint, barmatz.forms.Language.form.loading, true);
+			dialog = barmatz.forms.factories.DOMFactory.createExportPromptDialog(formModel.fingerprint, 'Loading...', true);
 		else
 			dialog = barmatz.forms.factories.DOMFactory.createAlertPromptDialog('Failed to export', 'You must save the form before exporting!', true);
 		
@@ -371,7 +371,7 @@ window.barmatz.forms.ui.BuilderController = function(formModel, userModel, conta
 	function onDeleteFormConfirm(event)
 	{
 		addFromModelDeleteEventListeners();
-		formModel.delete();
+		formModel.deleteForm();
 		formModel.reset();
 		formModel.name = 'Unnamed form';
 	}

@@ -207,7 +207,7 @@ Object.defineProperties(barmatz.utils.DataTypes,
 		}
 		
 		if(errors == collection.length)
-			if(!this.throw(TypeError, errorMessage))
+			if(!this.throwError(TypeError, errorMessage))
 				return false;
 		
 		return true;
@@ -232,7 +232,7 @@ Object.defineProperties(barmatz.utils.DataTypes,
 		
 		return returnValue;
 	}},
-	throw: {value: function(error, message)
+	throwError: {value: function(error, message)
 	{
 		if(this.silent)
 			return false;
@@ -245,21 +245,21 @@ Object.defineProperties(barmatz.utils.DataTypes,
 	isNotUndefined: {value: function(value)
 	{
 		if(value === undefined)
-			if(!this.throw(ReferenceError, this.UNDEFINED_ERROR))
+			if(!this.throwError(ReferenceError, this.UNDEFINED_ERROR))
 				return false;
 		return true;
 	}},
 	isValid: {value: function(value)
 	{
 		if(value == null)
-			if(!this.throw(TypeError, this.INVALID_VALUE_ERROR))
+			if(!this.throwError(TypeError, this.INVALID_VALUE_ERROR))
 				return false;
 		return true;
 	}},
 	isAllowNull: {value: function(value)
 	{
 		if(value == null)
-			if(!this.throw(TypeError, this.VALUE_NULL))
+			if(!this.throwError(TypeError, this.VALUE_NULL))
 			return false;
 		return true;
 	}},
@@ -270,7 +270,7 @@ Object.defineProperties(barmatz.utils.DataTypes,
 		else if(allowNull && value == null)
 			return true;
 		if(typeof value != type)
-			if(!this.throw(TypeError, this.WRONG_TYPE))
+			if(!this.throwError(TypeError, this.WRONG_TYPE))
 				return false;
 		return true;
 	}},
@@ -286,7 +286,7 @@ Object.defineProperties(barmatz.utils.DataTypes,
 		else if(allowNull && instance == null)
 			return true;
 		if(!(instance instanceof object))
-			if(!this.throw(TypeError, this.WRONG_INSTANCE))
+			if(!this.throwError(TypeError, this.WRONG_INSTANCE))
 				return false;
 		return true;
 	}},
@@ -302,7 +302,7 @@ Object.defineProperties(barmatz.utils.DataTypes,
 		else if(allowNull && value == null)
 			return true;
 		if(typeof value != type || !(value instanceof object))
-			if(!this.throw(TypeError, this.WRONG_TYPE_INSTANCE))
+			if(!this.throwError(TypeError, this.WRONG_TYPE_INSTANCE))
 				return false;
 		return true;
 	}},
@@ -327,7 +327,7 @@ Object.defineProperties(barmatz.utils.DataTypes,
 		catch(error){}
 		
 		if(!isType && !isInstance)
-			if(!this.throw(TypeError, this.WRONG_TYPE_INSTANCE))
+			if(!this.throwError(TypeError, this.WRONG_TYPE_INSTANCE))
 				return false;
 		return true;
 	}}
@@ -632,6 +632,15 @@ window.barmatz.events.FormModelEvent = function(type)
 	barmatz.utils.DataTypes.isNotUndefined(type);
 	barmatz.utils.DataTypes.isTypeOf(type, 'string');
 	barmatz.events.Event.call(this, type);
+
+	this._leads = null;
+	
+	switch(type)
+	{
+		case barmatz.events.FormModelEvent.GET_LEADS_SUCCESS:
+			this._leads = arguments[1];
+			break;
+	}
 };
 
 barmatz.events.FormModelEvent.prototype = new barmatz.events.Event(null);
@@ -650,19 +659,41 @@ Object.defineProperties(barmatz.events.FormModelEvent,
 	DELETION_FAIL: {value: 'deletionFail'},
 	SUBMITTING: {value: 'submitting'},
 	SUBMITTED: {value: 'submitted'},
-	SUBMISSION_FAILED: {value: 'submissionFailed'}
+	SUBMISSION_FAILED: {value: 'submissionFailed'},
+	GET_LEADS_SUCCESS: {value: 'getLeadsSuccess'},
+	GET_LEADS_FAIL: {value: 'getLeadsFail'}
 }); 
 Object.defineProperties(barmatz.events.FormModelEvent.prototype, 
 {
+	leads: {get: function()
+	{
+		return this._leads;
+	}},
 	clone: {value: function()
 	{
 		var event = new FormModelEvent(type);
 		event._target = this.target;
+		
+		switch(type)
+		{
+			case barmatz.events.FormModelEvent.GET_LEADS_SUCCESS:
+				event._leads = this.leads;
+				break;
+		}
+		
 		return event;
 	}},
 	toString: {value: function()
 	{
-		return this.formatToString('FormModelEvent', 'type');
+		switch(type)
+		{
+			default:
+				return this.formatToString('FormModelEvent', 'type');
+				break;
+			case barmatz.events.FormModelEvent.GET_LEADS_SUCCESS:
+				return this.formatToString('FormModelEvent', 'type', 'leads');
+				break;
+		}
 	}}
 });
 /** barmatz.events.LoaderEvent **/
@@ -971,7 +1002,8 @@ window.barmatz.forms.Config = function(){};
 
 Object.defineProperties(barmatz.forms.Config,
 {
-	BASE_URL: {value: 'http://localhost:8080/clients/ofirvardi/forms'}
+	//BASE_URL: {value: 'http://localhost:8080/clients/ofirvardi/forms'}
+	BASE_URL: {value: 'http://www.quiz.co.il'}
 });
 /** barmatz.forms.Directions **/
 window.barmatz.forms.Directions = function(){};
@@ -1068,7 +1100,6 @@ Object.defineProperties(barmatz.forms.FormController.prototype, {});
 window.barmatz.forms.FormModel = function()
 {
 	barmatz.forms.CollectionModel.call(this);
-	this.set('id', '');
 	this.set('name', '');
 	this.set('submitButtonLabel', 'Submit');
 	this.set('method', barmatz.forms.Methods.GET);
@@ -1280,7 +1311,6 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 	}},
 	reset: {value: function()
 	{
-		this.set('id', '');
 		this.set('name', '');
 		this.set('method', barmatz.forms.Methods.GET);
 		this.set('encoding', barmatz.net.Encoding.FORM);
@@ -1358,7 +1388,6 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.users.UserModel);
 		barmatz.utils.DataTypes.isNotUndefined(name);
 		barmatz.utils.DataTypes.isTypeOf(name, 'string');
-		this.set('id', null);
 		this.set('name', name);
 		this.save(model);
 	}},
@@ -1389,7 +1418,7 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 		function loadLanguage()
 		{
 			stage = 2;
-			request.url = barmatz.forms.Config.BASE_URL + '/lang/form_' + _this.language + '.json';
+			request.url = barmatz.forms.Config.BASE_URL + '/lang/form_' + _this.language + '.php';
 			request.data = null;
 			addLoaderListeners();
 			loader.load(request);
@@ -1446,7 +1475,7 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 			_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.LOADING_FORM_ERROR));
 		}
 	}},
-	delete: {value: function()
+	deleteForm: {value: function()
 	{
 		var _this, request, loader;
 		
@@ -1550,6 +1579,52 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 			removeLoaderListeners();
 			_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.SUBMISSION_FAILED));
 		}
+	}},
+	getLeads: {value: function()
+	{
+		var _this, request, loader;
+		
+		_this = this;
+		
+		request = new barmatz.net.Request(barmatz.forms.Config.BASE_URL + '/api/form/leads.php');
+		request.method = barmatz.net.Methods.GET;
+		request.data = {f: this.fingerprint};
+		
+		loader = new barmatz.net.Loader();
+		addLoaderListeners();
+		loader.load(request);
+		
+		function addLoaderListeners()
+		{
+			loader.addEventListener(barmatz.events.LoaderEvent.SUCCESS, onLoaderSuccess);
+			loader.addEventListener(barmatz.events.LoaderEvent.ERROR, onLoaderError);
+		}
+		
+		function removeLoaderListeners()
+		{
+			loader.removeEventListener(barmatz.events.LoaderEvent.SUCCESS, onLoaderSuccess);
+			loader.removeEventListener(barmatz.events.LoaderEvent.ERROR, onLoaderError);
+		}
+		
+		function onLoaderSuccess(event)
+		{
+			var data;
+			
+			barmatz.utils.DataTypes.isNotUndefined(event);
+			barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.LoaderEvent);
+			
+			data = JSON.parse(event.response.data);
+			
+			removeLoaderListeners();
+			_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.GET_LEADS_SUCCESS, data));
+		}
+		
+		function onLoaderError(event)
+		{
+			removeLoaderListeners();
+			_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.GET_LEADS_FAIL));
+		}
+		
 	}},
 	copy: {value: function(fingerprint, data)
 	{
@@ -1999,6 +2074,41 @@ Object.defineProperties(barmatz.forms.factories.ControllerFactory,
 		barmatz.utils.DataTypes.isNotUndefined(view);
 		barmatz.utils.DataTypes.isInstanceOf(view, HTMLElement);
 		return new barmatz.forms.ui.JQueryDialogController(view);
+	}},
+	createLeadsController: {value: function(userModel, formsListModel, formsListView, leadsListModel, leadsListWrapperView, leadsListView, containerView, panelsView)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(userModel);
+		barmatz.utils.DataTypes.isNotUndefined(formsListModel);
+		barmatz.utils.DataTypes.isNotUndefined(formsListView);
+		barmatz.utils.DataTypes.isNotUndefined(leadsListModel);
+		barmatz.utils.DataTypes.isNotUndefined(leadsListWrapperView);
+		barmatz.utils.DataTypes.isNotUndefined(leadsListView);
+		barmatz.utils.DataTypes.isNotUndefined(containerView);
+		barmatz.utils.DataTypes.isNotUndefined(panelsView);
+		barmatz.utils.DataTypes.isInstanceOf(userModel, barmatz.forms.users.UserModel);
+		barmatz.utils.DataTypes.isInstanceOf(formsListModel, barmatz.forms.CollectionModel);
+		barmatz.utils.DataTypes.isInstanceOf(leadsListModel, barmatz.forms.CollectionModel);
+		barmatz.utils.DataTypes.isInstanceOf(leadsListWrapperView, HTMLElement);
+		barmatz.utils.DataTypes.isInstanceOf(leadsListView, HTMLElement);
+		barmatz.utils.DataTypes.isInstanceOf(containerView, HTMLElement);
+		barmatz.utils.DataTypes.isInstanceOf(panelsView, HTMLElement);
+		return new barmatz.forms.ui.LeadsController(userModel, formsListModel, formsListView, leadsListModel, leadsListWrapperView, leadsListView, containerView, panelsView);
+	}},
+	createLeadsListController: {value: function(model, view)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(model);
+		barmatz.utils.DataTypes.isNotUndefined(view);
+		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.CollectionModel);
+		barmatz.utils.DataTypes.isInstanceOf(view, HTMLElement);
+		return new barmatz.forms.ui.LeadsListController(model, view);
+	}},
+	createLeadsFormsListController: {value: function(model, view)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(model);
+		barmatz.utils.DataTypes.isNotUndefined(view);
+		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.CollectionModel);
+		barmatz.utils.DataTypes.isInstanceOf(view, HTMLElement);
+		return new barmatz.forms.ui.LeadsFormsListController(model, view);
 	}}
 });
 /** barmatz.forms.factories.DOMFactory **/
@@ -3221,9 +3331,50 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		textArea.id = 'htmlContentEditor' + tinymce.editors.length;
 		textArea.innerHTML = content || '';
 		parent.appendChild(textArea);
-		tinymce.init({selector: '#' + textArea.id, theme: 'modern', oninit: initHandler});
-		
+		tinymce.init({
+			selector: '#' + textArea.id, 
+	        theme: 'modern',
+			plugins: [
+	        	'advlist autolink lists link image charmap print preview hr anchor pagebreak',
+				'searchreplace wordcount visualblocks visualchars code fullscreen',
+				'insertdatetime media nonbreaking save table contextmenu directionality',
+				'emoticons template paste'
+			],
+			toolbar1: 'insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image',
+			oninit: initHandler
+		});
+			
 		return textArea;
+	}},
+	createLeadsFormsListElement: {value: function()
+	{
+		return this.createElement('ul');
+	}},
+	createLeadsFormsListItem: {value: function(model)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(model);
+		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.FormModel);
+		return this.createElementWithContent('li', 'forms-leads-forms-list-item', model.name);
+	}},
+	createLeadsListWrapper: {value: function()
+	{
+		var options, table;
+		
+		options = new barmatz.forms.ui.TableOptions();
+		options.headRowClassName = 'forms-leads-list-head';
+		options.headColumns.push('Received', 'Referer', 'IP');
+		
+		table = this.createTable(options);
+		
+		return {wrapper: this.createElementWithContent('div', 'forms-leads-list-wrapper', table), table: table, body: table.getElementsByTagName('tbody')[0]};
+	}},
+	createLeadsListItem: {value: function(model, index)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(model);
+		barmatz.utils.DataTypes.isNotUndefined(index);
+		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.LeadModel);
+		barmatz.utils.DataTypes.isTypeOf(index, 'number');
+		return this.createTableRow([barmatz.utils.Date.toString(model.created, 'dd/mm/yyyy hh:ii'), model.referer, model.ip], [], 'forms-leads-list-item ' + (index % 2 == 0 ? 'even' : 'odd'));
 	}}
 });
 /** barmatz.forms.factories.ModelFactory **/
@@ -3342,6 +3493,10 @@ Object.defineProperties(barmatz.forms.factories.ModelFactory,
 	{
 		barmatz.utils.DataTypes.isTypeOf(data, 'object', true);
 		return new barmatz.forms.fields.ValidatorModel(data);
+	}},
+	createLeadModel: {value: function()
+	{
+		return new barmatz.forms.LeadModel();
 	}}
 });
 /** barmatz.forms.fields.FormItemModel **/

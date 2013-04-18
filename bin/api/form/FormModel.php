@@ -68,7 +68,7 @@ class FormModel extends \api\database\DatabaseTableModel
 	
 	public function getFormsByUser($id)
 	{
-		$result = $this->query("select `name`, `created`, `fingerprint`, `email` from `{$this->name}` where `user`=$id");
+		$result = $this->query("select `{$this->name}`.`name`, `{$this->name}`.`created`, `{$this->name}`.`fingerprint`, `{$this->name}`.`email` from  `{$this->name}` where `{$this->name}`.`user` = $id;");
 
 		if($result)
 		{
@@ -105,5 +105,15 @@ class FormModel extends \api\database\DatabaseTableModel
 	{
 		if(!$this->query("delete from `{$this->name}` where  fingerprint='$fingerprint' limit 1"))
 			\api\errors\Errors::internalServerError('Cannot delete form');
+	}
+	
+	public function getIdByFingerprint($fingerprint)
+	{
+		$result = $this->query("select `id` from `{$this->name}` where `fingerprint`='$fingerprint'");
+		
+		if($result && mysql_num_rows($result) > 0)
+			return mysql_fetch_object($result)->id;
+		else
+			\api\errors\Errors::internalServerError('Error getting id');
 	}
 }

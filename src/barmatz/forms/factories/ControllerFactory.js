@@ -185,5 +185,40 @@ Object.defineProperties(barmatz.forms.factories.ControllerFactory,
 		barmatz.utils.DataTypes.isNotUndefined(view);
 		barmatz.utils.DataTypes.isInstanceOf(view, HTMLElement);
 		return new barmatz.forms.ui.JQueryDialogController(view);
+	}},
+	createLeadsController: {value: function(userModel, formsListModel, formsListView, leadsListModel, leadsListWrapperView, leadsListView, containerView, panelsView)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(userModel);
+		barmatz.utils.DataTypes.isNotUndefined(formsListModel);
+		barmatz.utils.DataTypes.isNotUndefined(formsListView);
+		barmatz.utils.DataTypes.isNotUndefined(leadsListModel);
+		barmatz.utils.DataTypes.isNotUndefined(leadsListWrapperView);
+		barmatz.utils.DataTypes.isNotUndefined(leadsListView);
+		barmatz.utils.DataTypes.isNotUndefined(containerView);
+		barmatz.utils.DataTypes.isNotUndefined(panelsView);
+		barmatz.utils.DataTypes.isInstanceOf(userModel, barmatz.forms.users.UserModel);
+		barmatz.utils.DataTypes.isInstanceOf(formsListModel, barmatz.forms.CollectionModel);
+		barmatz.utils.DataTypes.isInstanceOf(leadsListModel, barmatz.forms.CollectionModel);
+		barmatz.utils.DataTypes.isInstanceOf(leadsListWrapperView, HTMLElement);
+		barmatz.utils.DataTypes.isInstanceOf(leadsListView, HTMLElement);
+		barmatz.utils.DataTypes.isInstanceOf(containerView, HTMLElement);
+		barmatz.utils.DataTypes.isInstanceOf(panelsView, HTMLElement);
+		return new barmatz.forms.ui.LeadsController(userModel, formsListModel, formsListView, leadsListModel, leadsListWrapperView, leadsListView, containerView, panelsView);
+	}},
+	createLeadsListController: {value: function(model, view)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(model);
+		barmatz.utils.DataTypes.isNotUndefined(view);
+		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.CollectionModel);
+		barmatz.utils.DataTypes.isInstanceOf(view, HTMLElement);
+		return new barmatz.forms.ui.LeadsListController(model, view);
+	}},
+	createLeadsFormsListController: {value: function(model, view)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(model);
+		barmatz.utils.DataTypes.isNotUndefined(view);
+		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.CollectionModel);
+		barmatz.utils.DataTypes.isInstanceOf(view, HTMLElement);
+		return new barmatz.forms.ui.LeadsFormsListController(model, view);
 	}}
 });

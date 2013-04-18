@@ -33,7 +33,7 @@ Object.defineProperties(barmatz.utils.DataTypes,
 		}
 		
 		if(errors == collection.length)
-			if(!this.throw(TypeError, errorMessage))
+			if(!this.throwError(TypeError, errorMessage))
 				return false;
 		
 		return true;
@@ -58,7 +58,7 @@ Object.defineProperties(barmatz.utils.DataTypes,
 		
 		return returnValue;
 	}},
-	throw: {value: function(error, message)
+	throwError: {value: function(error, message)
 	{
 		if(this.silent)
 			return false;
@@ -71,21 +71,21 @@ Object.defineProperties(barmatz.utils.DataTypes,
 	isNotUndefined: {value: function(value)
 	{
 		if(value === undefined)
-			if(!this.throw(ReferenceError, this.UNDEFINED_ERROR))
+			if(!this.throwError(ReferenceError, this.UNDEFINED_ERROR))
 				return false;
 		return true;
 	}},
 	isValid: {value: function(value)
 	{
 		if(value == null)
-			if(!this.throw(TypeError, this.INVALID_VALUE_ERROR))
+			if(!this.throwError(TypeError, this.INVALID_VALUE_ERROR))
 				return false;
 		return true;
 	}},
 	isAllowNull: {value: function(value)
 	{
 		if(value == null)
-			if(!this.throw(TypeError, this.VALUE_NULL))
+			if(!this.throwError(TypeError, this.VALUE_NULL))
 			return false;
 		return true;
 	}},
@@ -96,7 +96,7 @@ Object.defineProperties(barmatz.utils.DataTypes,
 		else if(allowNull && value == null)
 			return true;
 		if(typeof value != type)
-			if(!this.throw(TypeError, this.WRONG_TYPE))
+			if(!this.throwError(TypeError, this.WRONG_TYPE))
 				return false;
 		return true;
 	}},
@@ -112,7 +112,7 @@ Object.defineProperties(barmatz.utils.DataTypes,
 		else if(allowNull && instance == null)
 			return true;
 		if(!(instance instanceof object))
-			if(!this.throw(TypeError, this.WRONG_INSTANCE))
+			if(!this.throwError(TypeError, this.WRONG_INSTANCE))
 				return false;
 		return true;
 	}},
@@ -128,7 +128,7 @@ Object.defineProperties(barmatz.utils.DataTypes,
 		else if(allowNull && value == null)
 			return true;
 		if(typeof value != type || !(value instanceof object))
-			if(!this.throw(TypeError, this.WRONG_TYPE_INSTANCE))
+			if(!this.throwError(TypeError, this.WRONG_TYPE_INSTANCE))
 				return false;
 		return true;
 	}},
@@ -153,7 +153,7 @@ Object.defineProperties(barmatz.utils.DataTypes,
 		catch(error){}
 		
 		if(!isType && !isInstance)
-			if(!this.throw(TypeError, this.WRONG_TYPE_INSTANCE))
+			if(!this.throwError(TypeError, this.WRONG_TYPE_INSTANCE))
 				return false;
 		return true;
 	}}

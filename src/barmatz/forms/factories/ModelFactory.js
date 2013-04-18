@@ -114,5 +114,9 @@ Object.defineProperties(barmatz.forms.factories.ModelFactory,
 	{
 		barmatz.utils.DataTypes.isTypeOf(data, 'object', true);
 		return new barmatz.forms.fields.ValidatorModel(data);
+	}},
+	createLeadModel: {value: function()
+	{
+		return new barmatz.forms.LeadModel();
 	}}
 });

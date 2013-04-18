@@ -1218,8 +1218,49 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		textArea.id = 'htmlContentEditor' + tinymce.editors.length;
 		textArea.innerHTML = content || '';
 		parent.appendChild(textArea);
-		tinymce.init({selector: '#' + textArea.id, theme: 'modern', oninit: initHandler});
-		
+		tinymce.init({
+			selector: '#' + textArea.id, 
+	        theme: 'modern',
+			plugins: [
+	        	'advlist autolink lists link image charmap print preview hr anchor pagebreak',
+				'searchreplace wordcount visualblocks visualchars code fullscreen',
+				'insertdatetime media nonbreaking save table contextmenu directionality',
+				'emoticons template paste'
+			],
+			toolbar1: 'insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image',
+			oninit: initHandler
+		});
+			
 		return textArea;
+	}},
+	createLeadsFormsListElement: {value: function()
+	{
+		return this.createElement('ul');
+	}},
+	createLeadsFormsListItem: {value: function(model)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(model);
+		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.FormModel);
+		return this.createElementWithContent('li', 'forms-leads-forms-list-item', model.name);
+	}},
+	createLeadsListWrapper: {value: function()
+	{
+		var options, table;
+		
+		options = new barmatz.forms.ui.TableOptions();
+		options.headRowClassName = 'forms-leads-list-head';
+		options.headColumns.push('Received', 'Referer', 'IP');
+		
+		table = this.createTable(options);
+		
+		return {wrapper: this.createElementWithContent('div', 'forms-leads-list-wrapper', table), table: table, body: table.getElementsByTagName('tbody')[0]};
+	}},
+	createLeadsListItem: {value: function(model, index)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(model);
+		barmatz.utils.DataTypes.isNotUndefined(index);
+		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.LeadModel);
+		barmatz.utils.DataTypes.isTypeOf(index, 'number');
+		return this.createTableRow([barmatz.utils.Date.toString(model.created, 'dd/mm/yyyy hh:ii'), model.referer, model.ip], [], 'forms-leads-list-item ' + (index % 2 == 0 ? 'even' : 'odd'));
 	}}
 });

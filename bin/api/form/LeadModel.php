@@ -67,4 +67,22 @@ class LeadModel extends \api\database\DatabaseTableModel
 			);
 		}
 	}
+	
+	public function getLeadsByForm($id)
+	{
+		$result = $this->query("select `data`, `created`, `referer`, `ip` from `{$this->name}` where `form`=$id order by `created` desc");
+		$leads = array();
+		
+		if($result && mysql_num_rows($result))
+		{
+			while($row = mysql_fetch_object($result))
+			{
+				$row->data = json_decode($row->data);
+				$leads[] = $row;
+			}
+			return $leads;
+		}
+		else
+			\api\errors\Errors::internalServerError('Error getting leads');
+	}
 }

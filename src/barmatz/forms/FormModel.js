@@ -2,7 +2,6 @@
 window.barmatz.forms.FormModel = function()
 {
 	barmatz.forms.CollectionModel.call(this);
-	this.set('id', '');
 	this.set('name', '');
 	this.set('submitButtonLabel', 'Submit');
 	this.set('method', barmatz.forms.Methods.GET);
@@ -214,7 +213,6 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 	}},
 	reset: {value: function()
 	{
-		this.set('id', '');
 		this.set('name', '');
 		this.set('method', barmatz.forms.Methods.GET);
 		this.set('encoding', barmatz.net.Encoding.FORM);
@@ -292,7 +290,6 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.users.UserModel);
 		barmatz.utils.DataTypes.isNotUndefined(name);
 		barmatz.utils.DataTypes.isTypeOf(name, 'string');
-		this.set('id', null);
 		this.set('name', name);
 		this.save(model);
 	}},
@@ -323,7 +320,7 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 		function loadLanguage()
 		{
 			stage = 2;
-			request.url = barmatz.forms.Config.BASE_URL + '/lang/form_' + _this.language + '.json';
+			request.url = barmatz.forms.Config.BASE_URL + '/lang/form_' + _this.language + '.php';
 			request.data = null;
 			addLoaderListeners();
 			loader.load(request);
@@ -380,7 +377,7 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 			_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.LOADING_FORM_ERROR));
 		}
 	}},
-	delete: {value: function()
+	deleteForm: {value: function()
 	{
 		var _this, request, loader;
 		
@@ -484,6 +481,52 @@ Object.defineProperties(barmatz.forms.FormModel.prototype,
 			removeLoaderListeners();
 			_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.SUBMISSION_FAILED));
 		}
+	}},
+	getLeads: {value: function()
+	{
+		var _this, request, loader;
+		
+		_this = this;
+		
+		request = new barmatz.net.Request(barmatz.forms.Config.BASE_URL + '/api/form/leads.php');
+		request.method = barmatz.net.Methods.GET;
+		request.data = {f: this.fingerprint};
+		
+		loader = new barmatz.net.Loader();
+		addLoaderListeners();
+		loader.load(request);
+		
+		function addLoaderListeners()
+		{
+			loader.addEventListener(barmatz.events.LoaderEvent.SUCCESS, onLoaderSuccess);
+			loader.addEventListener(barmatz.events.LoaderEvent.ERROR, onLoaderError);
+		}
+		
+		function removeLoaderListeners()
+		{
+			loader.removeEventListener(barmatz.events.LoaderEvent.SUCCESS, onLoaderSuccess);
+			loader.removeEventListener(barmatz.events.LoaderEvent.ERROR, onLoaderError);
+		}
+		
+		function onLoaderSuccess(event)
+		{
+			var data;
+			
+			barmatz.utils.DataTypes.isNotUndefined(event);
+			barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.LoaderEvent);
+			
+			data = JSON.parse(event.response.data);
+			
+			removeLoaderListeners();
+			_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.GET_LEADS_SUCCESS, data));
+		}
+		
+		function onLoaderError(event)
+		{
+			removeLoaderListeners();
+			_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.GET_LEADS_FAIL));
+		}
+		
 	}},
 	copy: {value: function(fingerprint, data)
 	{
