@@ -1,9 +1,6 @@
 /** barmatz.utils.Window **/
-window.barmatz.utils.Window = function(){};
-
-Object.defineProperties(barmatz.utils.Window, 
-{
-	height: {get: function()
+barmatz.utils.Window = {
+	getHeight: function()
 	{
 		if(document.body && document.body.offsetHeight)
 			return document.body.offsetHeight;
@@ -13,8 +10,8 @@ Object.defineProperties(barmatz.utils.Window,
 			return window.innerHeight;
 		else
 			return NaN;
-	}},
-	width: {get: function()
+	},
+	getWidth: function()
 	{
 		if(document.body && document.body.offsetWidth)
 			return document.body.offsetWidth;
@@ -24,5 +21,5 @@ Object.defineProperties(barmatz.utils.Window,
 			return window.innerWidth;
 		else
 			return NaN;
-	}}
-});
+	}
+};

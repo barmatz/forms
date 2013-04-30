@@ -1,5 +1,5 @@
 /** barmatz.forms.fields.FieldModel **/
-window.barmatz.forms.fields.FieldModel = function(type, name)
+barmatz.forms.fields.FieldModel = function(type, name)
 {
 	barmatz.utils.DataTypes.isNotUndefined(type);
 	barmatz.utils.DataTypes.isNotUndefined(name);
@@ -17,164 +17,173 @@ window.barmatz.forms.fields.FieldModel = function(type, name)
 
 barmatz.forms.fields.FieldModel.prototype = new barmatz.forms.fields.FormItemModel(null);
 barmatz.forms.fields.FieldModel.prototype.constructor = barmatz.forms.fields.FieldModel;
-
-Object.defineProperties(barmatz.forms.fields.FieldModel.prototype,
+barmatz.forms.fields.FieldModel.prototype.getName = function()
 {
-	name: {get: function()
+	return this.get('name');
+};
+barmatz.forms.fields.FieldModel.prototype.setName = function(value)
+{
+	barmatz.utils.DataTypes.isTypeOf(value, 'string');
+	this.set('name', value);
+};
+barmatz.forms.fields.FieldModel.prototype.getLabel = function()
+{
+	return this.get('label');
+};
+barmatz.forms.fields.FieldModel.prototype.setLabel = function(value)
+{
+	barmatz.utils.DataTypes.isTypeOf(value, 'string');
+	this.set('label', value);
+};
+barmatz.forms.fields.FieldModel.prototype.getMandatory = function()
+{
+	return this.get('mandatory');
+};
+barmatz.forms.fields.FieldModel.prototype.setMandatory = function(value)
+{
+	barmatz.utils.DataTypes.isTypeOf(value, 'boolean');
+	this.set('mandatory', value);
+};
+barmatz.forms.fields.FieldModel.prototype.getValue = function()
+{
+	return this.get('value');
+};
+barmatz.forms.fields.FieldModel.prototype.setValue = function(value)
+{
+	this.set('value', value);
+};
+barmatz.forms.fields.FieldModel.prototype.getEnabled = function()
+{
+	return this.get('enabled');
+};
+barmatz.forms.fields.FieldModel.prototype.setEnabled = function(value)
+{
+	barmatz.utils.DataTypes.isTypeOf(value, 'boolean');
+	this.set('enabled', value);
+};
+barmatz.forms.fields.FieldModel.prototype.getAvailableValidators = function()
+{
+	return barmatz.forms.Validator.EQUALS +
+		   barmatz.forms.Validator.VALID_EMAIL +
+		   barmatz.forms.Validator.VALID_PHONE +
+		   barmatz.forms.Validator.MIN_LENGTH +
+		   barmatz.forms.Validator.MAX_LENGTH +
+		   barmatz.forms.Validator.EXACT_LENGTH +
+		   barmatz.forms.Validator.GREATER_THAN +
+		   barmatz.forms.Validator.LESSER_THAN +
+		   barmatz.forms.Validator.DIGITS_ONLY +
+		   barmatz.forms.Validator.NOT_DIGITS;
+};
+barmatz.forms.fields.FieldModel.prototype.getValidator = function()
+{
+	return this.get('validator');
+};
+barmatz.forms.fields.FieldModel.prototype.setValidator = function(value)
+{
+	barmatz.utils.DataTypes.isInstanceOf(value, barmatz.forms.fields.ValidatorModel);
+	this.set('validator', value);
+};
+barmatz.forms.fields.FieldModel.prototype.getWidth = function()
+{
+	return this.get('width');
+};
+barmatz.forms.fields.FieldModel.prototype.setWidth = function(value)
+{
+	barmatz.utils.DataTypes.isTypeOf(value, 'number');
+	this.set('width', value);
+};
+barmatz.forms.fields.FieldModel.prototype.validate = function()
+{
+	var errors, code, bits, value, i;
+	
+	errors = 0;
+	
+	if(this.getMandatory())
+		if(!barmatz.forms.Validator.notEmpty(this.getValue()))
+			errors = barmatz.utils.Bitwise.concat(errors, barmatz.forms.Validator.NOT_EMPTY);
+	
+	code = this.getValidator().getCode();
+	
+	if(code)
 	{
-		return this.get('name');
-	}, set: function(value)
-	{
-		barmatz.utils.DataTypes.isTypeOf(value, 'string');
-		this.set('name', value);
-	}},
-	label: {get: function()
-	{
-		return this.get('label');
-	}, set: function(value)
-	{
-		barmatz.utils.DataTypes.isTypeOf(value, 'string');
-		this.set('label', value);
-	}},
-	mandatory: {get: function()
-	{
-		return this.get('mandatory');
-	}, set: function(value)
-	{
-		barmatz.utils.DataTypes.isTypeOf(value, 'boolean');
-		this.set('mandatory', value);
-	}},
-	value: {get: function()
-	{
-		return this.get('value');
-	}, set: function(value)
-	{
-		this.set('value', value);
-	}},
-	enabled: {get: function()
-	{
-		return this.get('enabled');
-	}, set: function(value)
-	{
-		barmatz.utils.DataTypes.isTypeOf(value, 'boolean');
-		this.set('enabled', value);
-	}},
-	availableValidators: {get: function()
-	{
-		return barmatz.forms.Validator.EQUALS +
-			   barmatz.forms.Validator.VALID_EMAIL +
-			   barmatz.forms.Validator.VALID_PHONE +
-			   barmatz.forms.Validator.MIN_LENGTH +
-			   barmatz.forms.Validator.MAX_LENGTH +
-			   barmatz.forms.Validator.EXACT_LENGTH +
-			   barmatz.forms.Validator.GREATER_THAN +
-			   barmatz.forms.Validator.LESSER_THAN +
-			   barmatz.forms.Validator.DIGITS_ONLY +
-			   barmatz.forms.Validator.NOT_DIGITS;
-	}},
-	validator: {get: function()
-	{
-		return this.get('validator');
-	}, set: function(value)
-	{
-		barmatz.utils.DataTypes.isInstanceOf(value, barmatz.forms.fields.ValidatorModel);
-		this.set('validator', value);
-	}},
-	width: {get: function()
-	{
-		return this.get('width');
-	}, set: function(value)
-	{
-		barmatz.utils.DataTypes.isTypeOf(value, 'number');
-		this.set('width', value);
-	}},
-	validate: {value: function()
-	{
-		var errors, bits, i;
+		bits = barmatz.utils.Bitwise.parseBit(code);
+		value = this.getValue();
 		
-		errors = 0;
-		
-		if(this.mandatory)
-			if(!barmatz.forms.Validator.notEmpty(this.value))
-				errors = barmatz.utils.Bitwise.concat(errors, barmatz.forms.Validator.NOT_EMPTY);
-		
-		if(this.validator.code)
-		{
-			bits = barmatz.utils.Bitwise.parseBit(this.validator.code);
-			
-			for(i = 0; i < bits.length; i++)
-				switch(bits[i])
-				{
-					default:
-						throw new Error('Unknown validation code');
-						break;
-					case barmatz.forms.Validator.NONE:
-					case barmatz.forms.Validator.NOT_EMPTY:
-						break;
-					case barmatz.forms.Validator.EQUALS:
-						if(!barmatz.forms.Validator.equals(this.value, this.validator.equals))
-							errors = barmatz.utils.Bitwise.concat(errors, barmatz.forms.Validator.EQUALS);
-						break;
-					case barmatz.forms.Validator.VALID_EMAIL:
-						if(!barmatz.forms.Validator.validEmail(this.value))
-							errors = barmatz.utils.Bitwise.concat(errors, barmatz.forms.Validator.VALID_EMAIL);
-						break;
-					case barmatz.forms.Validator.VALID_PHONE:
-						if(!barmatz.forms.Validator.validPhone(this.value))
-							errors = barmatz.utils.Bitwise.concat(errors, barmatz.forms.Validator.VALID_PHONE);
-						break;
-					case barmatz.forms.Validator.MIN_LENGTH:
-						if(!barmatz.forms.Validator.minLength(this.value, this.validator.minLength))
-							errors = barmatz.utils.Bitwise.concat(errors, barmatz.forms.Validator.MIN_LENGTH);
-						break;
-					case barmatz.forms.Validator.MAX_LENGTH:
-						if(!barmatz.forms.Validator.maxLength(this.value, this.validator.maxLength))
-							errors = barmatz.utils.Bitwise.concat(errors, barmatz.forms.Validator.MAX_LENGTH);
-						break;
-					case barmatz.forms.Validator.EXACT_LENGTH:
-						if(!barmatz.forms.Validator.exactLength(this.value, this.validator.exactLength))
-							errors = barmatz.utils.Bitwise.concat(errors, barmatz.forms.Validator.EXACT_LENGTH);
-						break;
-					case barmatz.forms.Validator.GREATER_THAN:
-						if(!barmatz.forms.Validator.greaterThan(parseFloat(this.value), this.validator.greaterThan))
-							errors = barmatz.utils.Bitwise.concat(errors, barmatz.forms.Validator.GREATER_THAN);
-						break;
-					case barmatz.forms.Validator.LESSER_THAN:
-						if(!barmatz.forms.Validator.lesserThan(parseFloat(this.value), this.validator.lesserThan))
-							errors = barmatz.utils.Bitwise.concat(errors, barmatz.forms.Validator.LESSER_THAN);
-						break;
-					case barmatz.forms.Validator.DIGITS_ONLY:
-						if(!barmatz.forms.Validator.digitsOnly(this.value))
-							errors = barmatz.utils.Bitwise.concat(errors, barmatz.forms.Validator.DIGITS_ONLY);
-						break;
-					case barmatz.forms.Validator.NOT_DIGITS:
-						if(!barmatz.forms.Validator.notDigits(this.value))
-							errors = barmatz.utils.Bitwise.concat(errors, barmatz.forms.Validator.NOT_DIGITS);
-						break;
-				}
-		}
-		
-		if(errors > 0)
-		{
-			this.dispatchEvent(new barmatz.events.FieldModelEvent(barmatz.events.FieldModelEvent.INVALID, errors));
-			return false;
-		}
-		else
-		{
-			this.dispatchEvent(new barmatz.events.FieldModelEvent(barmatz.events.FieldModelEvent.VALID));
-			return true;
-		}
-			
-	}},
-	clone: {value: function()
+		for(i = 0; i < bits.length; i++)
+			switch(bits[i])
+			{
+				default:
+					throw new Error('Unknown validation code');
+					break;
+				case barmatz.forms.Validator.NONE:
+					break;
+				case barmatz.forms.Validator.NOT_EMPTY:
+					if(!this.getMandatory() && !barmatz.forms.Validator.notEmpty(this.getValue()))
+						errors = barmatz.utils.Bitwise.concat(errors, barmatz.forms.Validator.NOT_EMPTY);
+					break;
+				case barmatz.forms.Validator.EQUALS:
+					if(!barmatz.forms.Validator.equals(value, this.getValidator().equals))
+						errors = barmatz.utils.Bitwise.concat(errors, barmatz.forms.Validator.EQUALS);
+					break;
+				case barmatz.forms.Validator.VALID_EMAIL:
+					if(!barmatz.forms.Validator.validEmail(value))
+						errors = barmatz.utils.Bitwise.concat(errors, barmatz.forms.Validator.VALID_EMAIL);
+					break;
+				case barmatz.forms.Validator.VALID_PHONE:
+					if(!barmatz.forms.Validator.validPhone(value))
+						errors = barmatz.utils.Bitwise.concat(errors, barmatz.forms.Validator.VALID_PHONE);
+					break;
+				case barmatz.forms.Validator.MIN_LENGTH:
+					if(!barmatz.forms.Validator.minLength(value, this.getValidator().minLength))
+						errors = barmatz.utils.Bitwise.concat(errors, barmatz.forms.Validator.MIN_LENGTH);
+					break;
+				case barmatz.forms.Validator.MAX_LENGTH:
+					if(!barmatz.forms.Validator.maxLength(value, this.getValidator().maxLength))
+						errors = barmatz.utils.Bitwise.concat(errors, barmatz.forms.Validator.MAX_LENGTH);
+					break;
+				case barmatz.forms.Validator.EXACT_LENGTH:
+					if(!barmatz.forms.Validator.exactLength(value, this.getValidator().exactLength))
+						errors = barmatz.utils.Bitwise.concat(errors, barmatz.forms.Validator.EXACT_LENGTH);
+					break;
+				case barmatz.forms.Validator.GREATER_THAN:
+					if(!barmatz.forms.Validator.greaterThan(parseFloat(value), this.getValidator().greaterThan))
+						errors = barmatz.utils.Bitwise.concat(errors, barmatz.forms.Validator.GREATER_THAN);
+					break;
+				case barmatz.forms.Validator.LESSER_THAN:
+					if(!barmatz.forms.Validator.lesserThan(parseFloat(value), this.getValidator().lesserThan))
+						errors = barmatz.utils.Bitwise.concat(errors, barmatz.forms.Validator.LESSER_THAN);
+					break;
+				case barmatz.forms.Validator.DIGITS_ONLY:
+					if(!barmatz.forms.Validator.digitsOnly(value))
+						errors = barmatz.utils.Bitwise.concat(errors, barmatz.forms.Validator.DIGITS_ONLY);
+					break;
+				case barmatz.forms.Validator.NOT_DIGITS:
+					if(!barmatz.forms.Validator.notDigits(value))
+						errors = barmatz.utils.Bitwise.concat(errors, barmatz.forms.Validator.NOT_DIGITS);
+					break;
+			}
+	}
+	
+	if(errors > 0)
 	{
-		var clone = new barmatz.forms.fields.FieldModel(this.type, this.name);
-		clone.label = this.label;
-		clone.mandatory = this.mandatory;
-		clone.value = this.value;
-		clone.enabled = this.enabled;
-		clone.validator = this.validator.clone();
-		clone.width = this.width;
-		return clone;
-	}}
-});
+		this.dispatchEvent(new barmatz.events.FieldEvent(barmatz.events.FieldEvent.INVALID, errors));
+		return false;
+	}
+	else
+	{
+		this.dispatchEvent(new barmatz.events.FieldEvent(barmatz.events.FieldEvent.VALID));
+		return true;
+	}
+		
+};
+barmatz.forms.fields.FieldModel.prototype.clone = function()
+{
+	var clone = new barmatz.forms.fields.FieldModel(this.getType(), this.getName());
+	clone.setLabel(this.getLabel());
+	clone.setMandatory(this.getMandatory());
+	clone.setValue(this.getValue());
+	clone.setEnabled(this.getEnabled());
+	clone.setValidator(this.getValidator().clone());
+	clone.setWidth(this.getWidth());
+	return clone;
+};

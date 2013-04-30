@@ -1,2 +1,2 @@
 /** barmatz.mvc.Controller **/
-window.barmatz.mvc.Controller = function(){};
+barmatz.mvc.Controller = function(){};

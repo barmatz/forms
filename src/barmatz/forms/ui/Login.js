@@ -1,5 +1,5 @@
 /** barmatz.forms.ui.Login **/
-window.barmatz.forms.ui.Login = function()
+barmatz.forms.ui.Login = function()
 {
 	var loginFormWrapper = barmatz.forms.factories.DOMFactory.createLoginFormDialogWrapper();
 	barmatz.forms.factories.ControllerFactory.createJQueryDialogController(loginFormWrapper.dialog);

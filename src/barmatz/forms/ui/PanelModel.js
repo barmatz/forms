@@ -1,34 +1,20 @@
 /** barmatz.forms.ui.PanelModel **/
-window.barmatz.forms.ui.PanelModel = function(className, content)
+barmatz.forms.ui.PanelModel = function(className, content)
 {
-	barmatz.utils.DataTypes.isNotUndefined(className);
-	barmatz.utils.DataTypes.isNotUndefined(content);
 	barmatz.utils.DataTypes.isTypeOf(className, 'string');
-	barmatz.utils.DataTypes.isTypesOrInstances(content, ['string'], [HTMLElement, Array]);
-	barmatz.mvc.Model.call(this);
+	barmatz.utils.DataTypes.isTypesOrInstances(content, ['string'], [window.HTMLElement, window.Array]);
+	barmatz.forms.ContentModel.call(this);
 	this.set('className', className);
 	this.set('content', content);
 };
-
-barmatz.forms.ui.PanelModel.prototype = new barmatz.mvc.Model();
+barmatz.forms.ui.PanelModel.prototype = new barmatz.forms.ContentModel();
 barmatz.forms.ui.PanelModel.prototype.constructor = barmatz.forms.ui.PanelModel;
-
-Object.defineProperties(barmatz.forms.ui.PanelModel.prototype,
+barmatz.forms.ui.PanelModel.prototype.getClassName = function()
 {
-	className: {get: function()
-	{
-		return this.get('className');
-	}, set: function(value)
-	{
-		barmatz.utils.DataTypes.isTypeOf(className, 'string', true);
-		this.set('className', value);
-	}},
-	content: {get: function()
-	{
-		return this.get('content');
-	}, set: function(value)
-	{
-		barmatz.utils.DataTypes.isTypesOrInstances(content, ['string'], [HTMLElement, Array], true);
-		this.set('content', value);
-	}}
-});
+	return this.get('className');
+};
+barmatz.forms.ui.PanelModel.prototype.setClassName = function(value)
+{
+	barmatz.utils.DataTypes.isTypeOf(className, 'string', true);
+	this.set('className', value);
+};

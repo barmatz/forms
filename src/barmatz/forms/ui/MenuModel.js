@@ -1,55 +1,45 @@
 /** barmatz.forms.ui.MenuModel **/
-window.barmatz.forms.ui.MenuModel = function()
+barmatz.forms.ui.MenuModel = function()
 {
 	barmatz.forms.CollectionModel.call(this);
-	this.set('opened', false);
+	this.set('open', false);
 };
-
 barmatz.forms.ui.MenuModel.prototype = new barmatz.forms.CollectionModel();
 barmatz.forms.ui.MenuModel.prototype.constructor = barmatz.forms.ui.MenuModel;
-
-Object.defineProperties(barmatz.forms.ui.MenuModel.prototype,
+barmatz.forms.ui.MenuModel.prototype.isOpen = function()
 {
-	opened: {get: function()
-	{
-		return this.get('opened');
-	}},
-	addItem: {value: function(item)
-	{
-		barmatz.utils.DataTypes.isNotUndefined(item);
-		barmatz.utils.DataTypes.isInstanceOf(item, barmatz.forms.ui.MenuItemModel);
-		barmatz.forms.CollectionModel.prototype.addItem.call(this, item);
-	}},
-	removeItem: {value: function(item)
-	{
-		barmatz.utils.DataTypes.isNotUndefined(item);
-		barmatz.utils.DataTypes.isInstanceOf(item, barmatz.forms.ui.MenuItemModel);
-		barmatz.forms.CollectionModel.prototype.removeItem.call(this, item);
-	}},
-	getItemIndex: {value: function(item)
-	{
-		barmatz.utils.DataTypes.isNotUndefined(item);
-		barmatz.utils.DataTypes.isInstanceOf(item, barmatz.forms.ui.MenuItemModel);
-		return barmatz.forms.CollectionModel.prototype.getItemIndex.call(this, item);
-	}},
-	setItemIndex: {value: function(item, index)
-	{
-		barmatz.utils.DataTypes.isNotUndefined(item);
-		barmatz.utils.DataTypes.isNotUndefined(index);
-		barmatz.utils.DataTypes.isInstanceOf(item, barmatz.forms.ui.MenuItemModel);
-		barmatz.utils.DataTypes.isTypeOf(index, 'number');
-		return barmatz.forms.CollectionModel.prototype.setItemIndex.call(this, item, index);
-	}},
-	toggle: {value: function()
-	{
-		this.opened ? this.hide() : this.show();
-	}},
-	show: {value: function()
-	{
-		this.set('opened', true);
-	}},
-	hide: {value: function()
-	{
-		this.set('opened', false);
-	}}
-});
+	return this.get('open');
+};
+barmatz.forms.ui.MenuModel.prototype.addItem = function(item)
+{
+	barmatz.utils.DataTypes.isInstanceOf(item, barmatz.forms.ui.MenuItemModel);
+	barmatz.forms.CollectionModel.prototype.addItem.call(this, item);
+};
+barmatz.forms.ui.MenuModel.prototype.removeItem = function(item)
+{
+	barmatz.utils.DataTypes.isInstanceOf(item, barmatz.forms.ui.MenuItemModel);
+	barmatz.forms.CollectionModel.prototype.removeItem.call(this, item);
+};
+barmatz.forms.ui.MenuModel.prototype.getItemIndex = function(item)
+{
+	barmatz.utils.DataTypes.isInstanceOf(item, barmatz.forms.ui.MenuItemModel);
+	return barmatz.forms.CollectionModel.prototype.getItemIndex.call(this, item);
+};
+barmatz.forms.ui.MenuModel.prototype.setItemIndex = function(item, index)
+{
+	barmatz.utils.DataTypes.isInstanceOf(item, barmatz.forms.ui.MenuItemModel);
+	barmatz.utils.DataTypes.isTypeOf(index, 'number');
+	return barmatz.forms.CollectionModel.prototype.setItemIndex.call(this, item, index);
+};
+barmatz.forms.ui.MenuModel.prototype.toggle = function()
+{
+	this.isOpen() ? this.hide() : this.show();
+};
+barmatz.forms.ui.MenuModel.prototype.show = function()
+{
+	this.set('open', true);
+};
+barmatz.forms.ui.MenuModel.prototype.hide = function()
+{
+	this.set('open', false);
+};

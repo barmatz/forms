@@ -11,38 +11,58 @@
 		<mkdir dir="${BIN_DIR}"/>
 		<mkdir dir="${BIN_DIR}/js"/>
 		<mkdir dir="${BIN_DIR}/css"/>
-		<mkdir dir="${BIN_DIR}/tests"/>
 	</target>
 	
 	<target name="build" depends="init">
-		<concat destfile="${BIN_DIR}/js/application.js" fixlastline="yes">
+		<concat destfile="${BIN_DIR}/js/login.js" fixlastline="yes">
 			<fileset dir="${SRC_DIR}" includes="namespaces.js"/>
-			<fileset dir="${SRC_DIR}/barmatz/utils" includes="**/*.js"/>
+			<fileset dir="${SRC_DIR}/barmatz/utils" includes="DataTypes.js"/>
 			<fileset dir="${SRC_DIR}/barmatz/events" includes="Event.js"/>
-			<fileset dir="${SRC_DIR}/barmatz/events" includes="**/*.js" excludes="Event.js"/>
-			<fileset dir="${SRC_DIR}/barmatz/mvc" includes="**/*.js"/>
-			<fileset dir="${SRC_DIR}/barmatz/forms/factories" includes="**/*.js"/>
-			<fileset dir="${SRC_DIR}/barmatz/forms" includes="TypeModel.js CollectionController.js CollectionModel.js Validator.js"/>
-			<fileset dir="${SRC_DIR}/barmatz/forms/fields" includes="ValidatorModel.js FormItemModel.js"/>
-			<fileset dir="${SRC_DIR}/barmatz/forms/fields" includes="FieldModel.js TextFieldModel.js"/>
-			<fileset dir="${SRC_DIR}/barmatz/forms/fields" includes="**/*.js" excludes="FormItemModel.js FieldModel.js TextFieldModel.js ValidatorModel.js"/>
-			<fileset dir="${SRC_DIR}/barmatz/forms/ui" includes="DialogController.js PromptDialogController.js"/>
+			<fileset dir="${SRC_DIR}/barmatz/events" includes="EventDispatcher.js ModelEvent.js UserEvent.js LoaderEvent.js"/>
+			<fileset dir="${SRC_DIR}/barmatz/mvc" includes="Model.js Controller.js"/>
+			<fileset dir="${SRC_DIR}/barmatz/net" includes="Request.js Loader.js Methods.js Encoding.js Response.js"/>
+			<fileset dir="${SRC_DIR}/barmatz/forms" includes="CollectionModel.js Config.js"/>
+			<fileset dir="${SRC_DIR}/barmatz/forms/factories" includes="ModelFactory.js DOMFactory.js ControllerFactory.js"/>
+			<fileset dir="${SRC_DIR}/barmatz/forms/ui" includes="TableOptions.js Login.js JQueryDialogController.js"/>
+			<fileset dir="${SRC_DIR}/barmatz/forms/users" includes="UserModel.js LoginController.js"/>
+			<fileset dir="${SRC_DIR}" includes="login.js"/>
+		</concat>
+		<concat destfile="${BIN_DIR}/js/builder.js" fixlastline="yes">
+			<fileset dir="${SRC_DIR}" includes="namespaces.js"/>
+			<fileset dir="${SRC_DIR}/barmatz/utils" includes="DataTypes.js CSS.js DOM.js Date.js String.js Bitwise.js Dictionary.js"/>
+			<fileset dir="${SRC_DIR}/barmatz/events" includes="Event.js"/>
+			<fileset dir="${SRC_DIR}/barmatz/events" includes="EventDispatcher.js ModelEvent.js LoaderEvent.js UserEvent.js CollectionEvent.js FormEvent.js FieldEvent.js"/>
+			<fileset dir="${SRC_DIR}/barmatz/mvc" includes="Model.js Controller.js"/>
+			<fileset dir="${SRC_DIR}/barmatz/forms" includes="CollectionModel.js CollectionController.js Config.js FormModel.js Methods.js Directions.js ContentModel.js TypeModel.js Validator.js"/>
+			<fileset dir="${SRC_DIR}/barmatz/forms/ui" includes="DialogController.js"/>
+			<fileset dir="${SRC_DIR}/barmatz/forms/ui" includes="PromptDialogController.js"/>
 			<fileset dir="${SRC_DIR}/barmatz/forms/ui" includes="JQueryPromptDialogController.js"/>
-			<fileset dir="${SRC_DIR}/barmatz/forms/ui" includes="**/*.js" excludes="DialogController.js PromptDialogController.js JQueryDialogController"/>
-			<fileset dir="${SRC_DIR}/barmatz/forms" includes="**/*.js" excludes="TypeModel.js CollectionController.js CollectionModel.js Validator.js factories/**/*.js fields/**/*.js ui/**/*.js"/>
-			<fileset dir="${SRC_DIR}/barmatz/net" includes="**/*.js"/>
+			<fileset dir="${SRC_DIR}/barmatz/forms/ui" includes="Builder.js BuilderController.js MenuModel.js MenuController.js ToolboxModel.js ToolboxController.js WorkspaceController.js PropertiesController.js PanelModel.js TableOptions.js MenuItemModel.js ToolboxItemModel.js JQueryDialogController.js UserFormsListController.js UserFormsListItemController.js WorkspaceItemController.js NewFieldDialogController.js"/>
+			<fileset dir="${SRC_DIR}/barmatz/forms/factories" includes="ModelFactory.js DOMFactory.js ControllerFactory.js"/>
+			<fileset dir="${SRC_DIR}/barmatz/forms/users" includes="UserModel.js"/>
+			<fileset dir="${SRC_DIR}/barmatz/forms/fields" includes="FormItemModel.js"/>
+			<fileset dir="${SRC_DIR}/barmatz/forms/fields" includes="FieldModel.js FieldController.js ValidatorModel.js"/>
+			<fileset dir="${SRC_DIR}/barmatz/forms/fields" includes="TextFieldModel.js "/>
+			<fileset dir="${SRC_DIR}/barmatz/forms/fields" includes="FieldTypes.js HTMLContentModel.js TextAreaFieldModel.js DropboxModel.js PasswordFieldModel.js CheckboxFieldModel.js RadioFieldModel.js FileFieldModel.js HiddenFieldModel.js PhoneFieldModel.js DropboxItemModel.js FieldValidationOptionsController.js DropboxItemsListController.js DropboxItemsListItemController.js PhonePrefixes.js"/>
+			<fileset dir="${SRC_DIR}/barmatz/net" includes="Request.js Loader.js Methods.js Encoding.js Response.js"/>
+			<fileset dir="${SRC_DIR}" includes="builder.js"/>
+		</concat>
+		<concat destfile="${BIN_DIR}/js/leads.js" fixlastline="yes">
+			<fileset dir="${SRC_DIR}" includes="namespaces.js"/>
+			<fileset dir="${SRC_DIR}" includes="leads.js"/>
 		</concat>
 		<concat destfile="${BIN_DIR}/js/embed.js" fixlastline="yes">
 			<fileset dir="${SRC_DIR}" includes="namespaces.js"/>
-			<fileset dir="${SRC_DIR}/barmatz/utils" includes="Bitwise.js DataTypes.js Dictionary.js CSS.js"/>
+			<fileset dir="${SRC_DIR}/barmatz/utils" includes="Bitwise.js DataTypes.js Dictionary.js CSS.js Date.js"/>
 			<fileset dir="${SRC_DIR}/barmatz/events" includes="Event.js"/>
-			<fileset dir="${SRC_DIR}/barmatz/events" includes="EventDispatcher.js ModelEvent.js Event.js FormModelEvent.js FieldModelEvent.js LoaderEvent.js CollectionEvent.js" excludes="Event.js"/>
+			<fileset dir="${SRC_DIR}/barmatz/events" includes="EventDispatcher.js ModelEvent.js FormEvent.js FieldEvent.js LoaderEvent.js CollectionEvent.js"/>
 			<fileset dir="${SRC_DIR}/barmatz/mvc" includes="Model.js Controller.js"/>
 			<fileset dir="${SRC_DIR}/barmatz/forms" includes="FormModel.js FormController.js CollectionModel.js CollectionController.js Methods.js TypeModel.js Validator.js Directions.js Config.js"/>
 			<fileset dir="${SRC_DIR}/barmatz/forms/factories" includes="ModelFactory.js DOMFactory.js ControllerFactory.js"/>
-			<fileset dir="${SRC_DIR}/barmatz/forms/fields" includes="ValidatorModel.js FormItemModel.js"/>
-			<fileset dir="${SRC_DIR}/barmatz/forms/fields" includes="FieldModel.js TextFieldModel.js"/>
-			<fileset dir="${SRC_DIR}/barmatz/forms/fields" includes="**/*.js" excludes="ValidatorModel.js FormItemModel.js FieldModel.js TextFieldModel.js"/>
+			<fileset dir="${SRC_DIR}/barmatz/forms/fields" includes="FormItemModel.js"/>
+			<fileset dir="${SRC_DIR}/barmatz/forms/fields" includes="FieldModel.js FieldController.js ValidatorModel.js"/>
+			<fileset dir="${SRC_DIR}/barmatz/forms/fields" includes="TextFieldModel.js "/>
+			<fileset dir="${SRC_DIR}/barmatz/forms/fields" includes="FieldTypes.js HTMLContentModel.js TextAreaFieldModel.js DropboxModel.js PasswordFieldModel.js CheckboxFieldModel.js RadioFieldModel.js FileFieldModel.js HiddenFieldModel.js PhoneFieldModel.js DropboxItemModel.js FieldValidationOptionsController.js DropboxItemsListController.js DropboxItemsListItemController.js PhonePrefixes.js"/>
 			<fileset dir="${SRC_DIR}/barmatz/net" includes="Encoding.js Request.js RequestHeader.js Methods.js Loader.js Response.js"/>
 			<fileset dir="${SRC_DIR}" includes="embed.js"/>
 		</concat>
@@ -61,9 +81,6 @@
 		</copy>
 		<copy todir="${BIN_DIR}">
 			<fileset dir="${LIB_DIR}"/>
-		</copy>
-		<copy todir="${BIN_DIR}/tests">
-			<fileset dir="${TEST_DIR}"/>
 		</copy>
 	</target>
 

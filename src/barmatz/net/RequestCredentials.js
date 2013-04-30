@@ -1,28 +1,27 @@
 /** barmatz.net.RequestCredentials **/
-window.barmatz.net.RequestCredentials = function()
+barmatz.net.RequestCredentials = function()
 {
 	barmatz.mvc.Model.call(this);
+	this.set('user', null);
+	this.set('password', null);
 };
-
 barmatz.net.RequestCredentials.prototype = new barmatz.mvc.Model();
 barmatz.net.RequestCredentials.prototype.constructor = barmatz.net.RequestCredentials;
-
-Object.defineProperties(barmatz.net.RequestCredentials.prototype,
+barmatz.net.RequestCredentials.prototype.getUser = function()
 {
-	user: {get: function()
-	{
-		return this.get('user');
-	}, set: function(value)
-	{
-		barmatz.utils.DataTypes.isTypeOf(value, 'string');
-		this.set('user', value);
-	}},
-	password: {get: function()
-	{
-		return this.get('password');
-	}, set: function(value)
-	{
-		barmatz.utils.DataTypes.isTypeOf(value, 'string');
-		this.set('password', value);
-	}}
-});
+	return this.get('user');
+};
+barmatz.net.RequestCredentials.prototype.setUser = function(value)
+{
+	barmatz.utils.DataTypes.isTypeOf(value, 'string');
+	this.set('user', value);
+};
+barmatz.net.RequestCredentials.prototype.getPassword = function()
+{
+	return this.get('password');
+};
+barmatz.net.RequestCredentials.prototype.setPassword = function(value)
+{
+	barmatz.utils.DataTypes.isTypeOf(value, 'string');
+	this.set('password', value);
+};

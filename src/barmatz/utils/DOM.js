@@ -1,16 +1,11 @@
 /** barmatz.utils.DOM **/
-window.barmatz.utils.DOM = function(){};
-
-Object.defineProperties(barmatz.utils.DOM,
-{
-	isChildOf: {value: function(child, parent)
+barmatz.utils.DOM = {
+	isChildOf: function(child, parent)
 	{
 		var element;
 		
-		barmatz.utils.DataTypes.isNotUndefined(child);
-		barmatz.utils.DataTypes.isNotUndefined(parent);
-		barmatz.utils.DataTypes.isInstanceOf(child, HTMLElement);
-		barmatz.utils.DataTypes.isInstanceOf(parent, HTMLElement);
+		barmatz.utils.DataTypes.isInstancesOf(child, [window.HTMLElement, Window]);
+		barmatz.utils.DataTypes.isInstancesOf(parent, [window.HTMLElement, Window]);
 
 		element = child.parentElement;
 		
@@ -22,26 +17,23 @@ Object.defineProperties(barmatz.utils.DOM,
 		}
 		
 		return false;
-	}},
-	removeAllChildren: {value: function(element)
+	},
+	removeAllChildren: function(element)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(element);
-		barmatz.utils.DataTypes.isInstanceOf(element, HTMLElement);
-		while(element.childNodes.length > 0)
+		barmatz.utils.DataTypes.isInstanceOf(element, window.HTMLElement);
+		while(element.children.length > 0)
 			element.removeChild(element.lastChild);
-	}},
-	sort: {value: function(element, compareFunction)
+	},
+	sort: function(element, compareFunction)
 	{
 		var children, i;
 
-		barmatz.utils.DataTypes.isNotUndefined(element);
-		barmatz.utils.DataTypes.isNotUndefined(compareFunction);
-		barmatz.utils.DataTypes.isInstanceOf(element, HTMLElement);
+		barmatz.utils.DataTypes.isInstanceOf(element, window.HTMLElement);
 		barmatz.utils.DataTypes.isTypeOf(compareFunction, 'function');
 		
-		children = Array.prototype.slice.call(element.childNodes).sort(compareFunction);
+		children = window.Array.prototype.slice.call(element.children).sort(compareFunction);
 		
 		for(i = 0; i < children.length; i++)
 			element.appendChild(children[i]);
-	}}
-});
+	}
+};

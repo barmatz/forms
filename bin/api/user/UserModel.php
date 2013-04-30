@@ -89,7 +89,7 @@ class UserModel extends \api\database\DatabaseTableModel
 	
 	public function getData()
 	{
-		$result = $this->query("select `id`, `username`, `first_name`, `last_name`, `created`, `active` from `{$this->name}` where `id`={$this->getId()}");
+		$result = $this->query("select `username`, `first_name`, `last_name`, `created`, `active` from `{$this->name}` where `id`={$this->getId()}");
 		
 		if($result && mysql_num_rows($result) > 0)
 			return mysql_fetch_object($result);

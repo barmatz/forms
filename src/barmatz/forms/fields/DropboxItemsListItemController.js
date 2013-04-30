@@ -1,53 +1,50 @@
 /** barmatz.forms.fields.DropboxItemsListItemController **/
-window.barmatz.forms.fields.DropboxItemsListItemController = function(model, labelView, valueView, editButtonView)
+barmatz.forms.fields.DropboxItemsListItemController = function(model, labelView, valueView, editButtonView, dialogContainerView)
 {
-	barmatz.utils.DataTypes.isNotUndefined(model);
-	barmatz.utils.DataTypes.isNotUndefined(labelView);
-	barmatz.utils.DataTypes.isNotUndefined(valueView);
-	barmatz.utils.DataTypes.isNotUndefined(editButtonView);
 	barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.DropboxItemModel);
-	barmatz.utils.DataTypes.isInstanceOf(labelView, HTMLElement);
-	barmatz.utils.DataTypes.isInstanceOf(valueView, HTMLElement);
-	barmatz.utils.DataTypes.isInstanceOf(editButtonView, HTMLElement);
+	barmatz.utils.DataTypes.isInstanceOf(labelView, window.HTMLElement);
+	barmatz.utils.DataTypes.isInstanceOf(valueView, window.HTMLElement);
+	barmatz.utils.DataTypes.isInstanceOf(editButtonView, window.HTMLElement);
+	barmatz.utils.DataTypes.isInstanceOf(dialogContainerView, window.HTMLElement, true);
 	barmatz.mvc.Controller.call(this);
 	
-	labelView.innerHTML = model.label;
-	valueView.innerHTML = model.value;
+	labelView.innerHTML = model.getLabel();
+	valueView.innerHTML = model.getValue();
 	
 	model.addEventListener(barmatz.events.ModelEvent.VALUE_CHANGED, onModelValueChanged);
 	editButtonView.addEventListener('click', onEditButtonViewClick);
 	
 	function onModelValueChanged(event)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(event);
+		var value;
+		
 		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.ModelEvent);
 		
-		switch(event.key)
+		value = event.getValue();
+		
+		switch(event.getKey())
 		{
 			case 'label':
-				labelView.innerHTML = event.value;
+				labelView.innerHTML = value;
 				break;
 			case 'value':
-				valueView.innerHTML = event.value;
+				valueView.innerHTML = value;
 				break;
 		}
 	}
 	
 	function onEditButtonViewClick(event)
 	{
-		barmatz.forms.factories.ControllerFactory.createJQueryDialogController(barmatz.forms.factories.DOMFactory.createDropboxItemDialog(model.label, model.value, onEditConfirm));
+		barmatz.forms.factories.ControllerFactory.createJQueryDialogController(barmatz.forms.factories.DOMFactory.createDropboxItemDialog(model.getLabel(), model.getValue(), onEditConfirm, true, dialogContainerView));
 	}
 	
 	function onEditConfirm(label, value)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(label);
-		barmatz.utils.DataTypes.isNotUndefined(value);
 		barmatz.utils.DataTypes.isTypeOf(label, 'string');
 		barmatz.utils.DataTypes.isTypeOf(value, 'string');
-		model.label = label;
-		model.value = value;
+		model.setLabel(label);
+		model.setValue(value);
 	}
 };
-
 barmatz.forms.fields.DropboxItemsListItemController.prototype = new barmatz.mvc.Controller();
 barmatz.forms.fields.DropboxItemsListItemController.prototype.constructor = barmatz.forms.fields.DropboxItemsListItemController;

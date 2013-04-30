@@ -1,5 +1,5 @@
 /** barmatz.events.ModelEvent **/
-window.barmatz.events.ModelEvent = function(type)
+barmatz.events.ModelEvent = function(type)
 {
 	barmatz.events.Event.call(this, type);
 	
@@ -11,34 +11,26 @@ window.barmatz.events.ModelEvent = function(type)
 			break;
 	}
 };
-
+barmatz.events.ModelEvent.VALUE_CHANGED = 'valueChanged';
 barmatz.events.ModelEvent.prototype = new barmatz.events.Event(null);
 barmatz.events.ModelEvent.prototype.constructor = barmatz.events.ModelEvent;
-
-Object.defineProperties(barmatz.events.ModelEvent, 
+barmatz.events.ModelEvent.prototype.getKey = function()
 {
-	VALUE_CHANGED: {value: 'valueChanged'}
-});
-Object.defineProperties(barmatz.events.ModelEvent.prototype, 
+	return this._key;
+};
+barmatz.events.ModelEvent.prototype.getValue = function()
 {
-	key: {get: function()
-	{
-		return this._key;
-	}},
-	value: {get: function()
-	{
-		return this._value;
-	}},
-	clone: {value: function(type)
-	{
-		var event = new barmatz.events.ModelEvent(type);
-		event._target = this.target;
-		event._key = this.key;
-		event._value = this.value;
-		return event;
-	}},
-	toString: {value: function()
-	{
-		return this.formatToString('ModelEvent', 'type', 'key', 'value');
-	}}
-});
+	return this._value;
+};
+barmatz.events.ModelEvent.prototype.clone = function()
+{
+	var event = new barmatz.events.ModelEvent(this.getType());
+	event._target = this.getTarget();
+	event._key = this.getKey();
+	event._value = this.getValue();
+	return event;
+};
+barmatz.events.ModelEvent.prototype.toString = function()
+{
+	return this.formatToString('ModelEvent', 'type', 'key', 'value');
+};

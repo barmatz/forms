@@ -1,131 +1,140 @@
 /** barmatz.forms.ui.PropertiesController **/
-window.barmatz.forms.ui.PropertiesController = function(view)
+barmatz.forms.ui.PropertiesController = function(view)
 {
-	barmatz.utils.DataTypes.isNotUndefined(view);
-	barmatz.utils.DataTypes.isInstanceOf(view, HTMLElement);
+	barmatz.utils.DataTypes.isInstanceOf(view, window.HTMLElement);
 	barmatz.mvc.Controller.call(this);
 	this._view = view;
-	this.model = null;
+	this.setModel(null);
 };
-
 barmatz.forms.ui.PropertiesController.prototype = new barmatz.mvc.Controller();
 barmatz.forms.ui.PropertiesController.prototype.constructor = barmatz.forms.ui.PropertiesController;
-
-Object.defineProperties(barmatz.forms.ui.PropertiesController.prototype,
+barmatz.forms.ui.PropertiesController.prototype.getModel = function()
 {
-	model: {get: function()
+	return this._model;
+};
+barmatz.forms.ui.PropertiesController.prototype.setModel = function(value)
+{
+	var _this, itemsWrapper, dialogWrapper;
+	
+	barmatz.utils.DataTypes.isInstanceOf(value, barmatz.forms.fields.FormItemModel, true);
+	
+	_this = this;
+	
+	if(this._model)
+		this._model.removeEventListener(barmatz.events.ModelEvent.VALUE_CHANGED, onModelValueChanged);
+	
+	this._model = value;
+	this._view.innerHTML = '';
+	
+	if(this._model)
 	{
-		return this._model;
-	}, set: function(value)
+		itemsWrapper = barmatz.forms.factories.DOMFactory.createPropertiesItemWarpper(this._model);
+		
+		if(itemsWrapper.validationOptionsButton)
+			itemsWrapper.validationOptionsButton.addEventListener('click', onItemsWrapperValidationOptionsButtonClick);
+		
+		if(itemsWrapper.editItemsButton)
+			itemsWrapper.editItemsButton.addEventListener('click', onItemsWrapperEditItemsButtonClick);
+		
+		if(itemsWrapper.editContentButton)
+		{
+			if(!this._model.getContent())
+				openHTMLContentEditor();
+			itemsWrapper.editContentButton.addEventListener('click', onItemsWrapperEditContentButtonClick);
+		}
+		
+		this._model.addEventListener(barmatz.events.ModelEvent.VALUE_CHANGED, onModelValueChanged);
+		this._view.appendChild(itemsWrapper.wrapper);
+	}
+	else
+		this._view.appendChild(barmatz.forms.factories.DOMFactory.createElementWithContent('h2', 'forms-filler', 'No item selected'));
+	
+	function openHTMLContentEditor()
 	{
-		var _this, itemsWrapper, dialogWrapper;
+		dialogWrapper = barmatz.forms.factories.DOMFactory.createHTMLContentEditorDialogWrapper(_this._model.getContent(), onEditContentConfrim);
+		barmatz.forms.factories.ControllerFactory.createJQueryDialogController(dialogWrapper.dialog);
+	}
+	
+	function onItemsWrapperValidationOptionsButtonClick(event)
+	{
+		model = _this._model;
+		dialogWrapper = barmatz.forms.factories.DOMFactory.createFieldValidationOptionsDialogWrapper(model);
+		barmatz.forms.factories.ControllerFactory.createJQueryDialogController(dialogWrapper.dialog);
+		barmatz.forms.factories.ControllerFactory.createFieldValidationOptionsController(model, dialogWrapper.options);
+	}
+	
+	function onItemsWrapperEditItemsButtonClick(event)
+	{
+		dialogWrapper = barmatz.forms.factories.DOMFactory.createDropboxItemsListDialogWrapper();
+		barmatz.forms.factories.ControllerFactory.createJQueryDialogController(dialogWrapper.dialog);
+		barmatz.forms.factories.ControllerFactory.createDropboxItemsListController(_this._model, dialogWrapper.dialog.getElementsByTagName('tbody')[0], dialogWrapper.addButton, dialogWrapper.resetButton);
+	}
+	
+	function onItemsWrapperEditContentButtonClick(event)
+	{
+		openHTMLContentEditor();
+	}
+	
+	function onEditContentConfrim(event)
+	{
+		_this._model.setContent(tinymce.get(dialogWrapper.editor.id).getContent());
+	}
+	
+	function onModelValueChanged(event)
+	{
+		var value;
 		
-		barmatz.utils.DataTypes.isInstanceOf(value, barmatz.forms.fields.FormItemModel, true);
+		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.ModelEvent);
 		
-		_this = this;
+		value = event.getValue();
 		
-		if(this._model)
-			this._model.removeEventListener(barmatz.events.ModelEvent.VALUE_CHANGED, onModelValueChanged);
-		
-		this._model = value;
-		this._view.innerHTML = '';
-		
-		if(this._model)
+		switch(event.getKey())
 		{
-			itemsWrapper = barmatz.forms.factories.DOMFactory.createPropertiesItemWarpper(this._model);
-			
-			if(itemsWrapper.validationOptionsButton)
-				itemsWrapper.validationOptionsButton.addEventListener('click', onItemsWrapperValidationOptionsButtonClick);
-			
-			if(itemsWrapper.editItemsButton)
-				itemsWrapper.editItemsButton.addEventListener('click', onItemsWrapperEditItemsButtonClick);
-			
-			if(itemsWrapper.editContentButton)
-				itemsWrapper.editContentButton.addEventListener('click', onItemsWrapperEditContentButtonClick);
-			
-			this._model.addEventListener(barmatz.events.ModelEvent.VALUE_CHANGED, onModelValueChanged);
-			this._view.appendChild(itemsWrapper.wrapper);
+			default:
+				throw new Error('unknown key');
+				break;
+			case 'value':
+			case 'content':
+			case 'prefix':
+				break;
+			case 'name':
+				itemsWrapper.nameField.value = value ;
+				break;
+			case 'label':
+				itemsWrapper.labelField.value = value ;
+				break;
+			case 'mandatory':
+				itemsWrapper.mandatoryField.value = value ;
+				break;
+			case 'enabled':
+				itemsWrapper.enabledField.value = value ;
+				break;
+			case 'max':
+				itemsWrapper.maxField.value = isNaN(value ) ? '' : value ;
+				break;
+			case 'checked':
+				itemsWrapper.checkedField.value = value ;
+				break;
+			case 'accept':
+				itemsWrapper.acceptField.value = value .join(', ');
+				break;
+			case 'rows':
+				itemsWrapper.rowsField.value = value;
+				break;
+			case 'cols':
+				itemsWrapper.colsField.value = value;
+				break;
+			case 'multiple':
+				itemsWrapper.multipleField.value = value;
+				break;
+			case 'validator':
+				break;
+			case 'width':
+				itemsWrapper.widthField.value = value;
+				break;
+			case 'description':
+				itemsWrapper.descriptionField.value = value;
+				break;
 		}
-		else
-			this._view.appendChild(barmatz.forms.factories.DOMFactory.createElementWithContent('h2', 'forms-filler', 'No item selected'));
-		
-		function onItemsWrapperValidationOptionsButtonClick(event)
-		{
-			dialogWrapper = barmatz.forms.factories.DOMFactory.createFieldValidationOptionsDialogWrapper(_this._model);
-			barmatz.forms.factories.ControllerFactory.createJQueryDialogController(dialogWrapper.dialog);
-			barmatz.forms.factories.ControllerFactory.createFieldValidationOptionsController(_this.model, dialogWrapper.options);
-		}
-		
-		function onItemsWrapperEditItemsButtonClick(event)
-		{
-			dialogWrapper = barmatz.forms.factories.DOMFactory.createDropboxItemsListDialogWrapper();
-			barmatz.forms.factories.ControllerFactory.createJQueryDialogController(dialogWrapper.dialog);
-			barmatz.forms.factories.ControllerFactory.createDropboxItemsListController(_this._model, dialogWrapper.dialog.getElementsByTagName('tbody')[0], dialogWrapper.addButton, dialogWrapper.resetButton);
-		}
-		
-		function onItemsWrapperEditContentButtonClick(event)
-		{
-			dialogWrapper = barmatz.forms.factories.DOMFactory.createHTMLContentEditorDialogWrapper(onEditContentConfrim, _this._model.content);
-			barmatz.forms.factories.ControllerFactory.createJQueryDialogController(dialogWrapper.dialog);
-		}
-		
-		function onEditContentConfrim(event)
-		{
-			_this._model.content = tinymce.get(dialogWrapper.editor.id).getContent();
-		}
-		
-		function onModelValueChanged(event)
-		{
-			barmatz.utils.DataTypes.isNotUndefined(event);
-			barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.ModelEvent);
-			
-			switch(event.key)
-			{
-				default:
-					throw new Error('unknown key');
-					break;
-				case 'value':
-				case 'content':
-					break;
-				case 'name':
-					itemsWrapper.nameField.value = event.value;
-					break;
-				case 'label':
-					itemsWrapper.labelField.value = event.value;
-					break;
-				case 'mandatory':
-					itemsWrapper.mandatoryField.value = event.value;
-					break;
-				case 'enabled':
-					itemsWrapper.enabledField.value = event.value;
-					break;
-				case 'max':
-					itemsWrapper.maxField.value = isNaN(event.value) ? '' : event.value;
-					break;
-				case 'checked':
-					itemsWrapper.checkedField.value = event.value;
-					break;
-				case 'accept':
-					itemsWrapper.acceptField.value = event.value.join(', ');
-					break;
-				case 'rows':
-					itemsWrapper.rowsField.value = event.value;
-					break;
-				case 'cols':
-					itemsWrapper.colsField.value = event.value;
-					break;
-				case 'multiple':
-					itemsWrapper.multipleField.value = event.value;
-					break;
-				case 'validator':
-					break;
-				case 'width':
-					itemsWrapper.widthField.value = event.value;
-					break;
-				case 'description':
-					itemsWrapper.descriptionField.value = event.value;
-					break;
-			}
-		}
-	}}
-});
+	}
+};

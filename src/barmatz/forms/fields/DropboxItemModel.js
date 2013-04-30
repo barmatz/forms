@@ -1,5 +1,5 @@
 /** barmatz.forms.fields.DropboxItemModel **/
-window.barmatz.forms.fields.DropboxItemModel = function(label, value)
+barmatz.forms.fields.DropboxItemModel = function(label, value)
 {
 	barmatz.utils.DataTypes.isNotUndefined(label);
 	barmatz.utils.DataTypes.isTypeOf(label, 'string');
@@ -7,29 +7,26 @@ window.barmatz.forms.fields.DropboxItemModel = function(label, value)
 	this.set('label', label);
 	this.set('value', barmatz.utils.DataTypes.applySilent('isNotUndefined', value) ? value : null);
 };
-
 barmatz.forms.fields.DropboxItemModel.prototype = new barmatz.mvc.Model();
 barmatz.forms.fields.DropboxItemModel.prototype.constructor = barmatz.forms.fields.DropboxItemModel;
-
-Object.defineProperties(barmatz.forms.fields.DropboxItemModel.prototype, 
+barmatz.forms.fields.DropboxItemModel.prototype.getLabel = function()
 {
-	label: {get: function()
-	{
-		return this.get('label');
-	}, set: function(value)
-	{
-		barmatz.utils.DataTypes.isTypeOf(value, 'string');
-		this.set('label', value);
-	}},
-	value: {get: function()
-	{
-		return this.get('value');
-	}, set: function(value)
-	{
-		this.set('value', value);
-	}},
-	toString: {value: function()
-	{
-		return this.label + '=' + this.value;
-	}}
-});
+	return this.get('label');
+};
+barmatz.forms.fields.DropboxItemModel.prototype.setLabel = function(value)
+{
+	barmatz.utils.DataTypes.isTypeOf(value, 'string');
+	this.set('label', value);
+};
+barmatz.forms.fields.DropboxItemModel.prototype.getValue = function()
+{
+	return this.get('value');
+};
+barmatz.forms.fields.DropboxItemModel.prototype.setValue = function(value)
+{
+	this.set('value', value);
+};
+barmatz.forms.fields.DropboxItemModel.prototype.toString = function()
+{
+	return this.getLabel() + '=' + this.getValue();
+};

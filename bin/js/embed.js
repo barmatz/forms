@@ -1,5 +1,5 @@
 /** namespaces **/
-window.barmatz = {
+barmatz = {
 	events: {},
 	forms: {
 		factories: {},
@@ -12,16 +12,11 @@ window.barmatz = {
 	utils: {}
 };
 /** barmatz.utils.Bitwise **/
-window.barmatz.utils.Bitwise = function(){};
-
-Object.defineProperties(barmatz.utils.Bitwise,
-{
-	slice: {value: function(bitA, bitB)
+barmatz.utils.Bitwise = {
+	slice: function(bitA, bitB)
 	{
 		var bitsA, bitsB, index, i;
 		
-		barmatz.utils.DataTypes.isNotUndefined(bitA);
-		barmatz.utils.DataTypes.isNotUndefined(bitB);
 		barmatz.utils.DataTypes.isTypeOf(bitA, 'number');
 		barmatz.utils.DataTypes.isTypeOf(bitB, 'number');
 		
@@ -37,8 +32,8 @@ Object.defineProperties(barmatz.utils.Bitwise,
 		}
 		
 		return this.concat.apply(this, bitsA);
-	}},
-	concat: {value: function()
+	},
+	concat: function()
 	{
 		var result, filterredBits, bits, i;
 		
@@ -58,12 +53,11 @@ Object.defineProperties(barmatz.utils.Bitwise,
 			result += filterredBits[i];
 		
 		return result;
-	}},
-	parseBit: {value: function(bit)
+	},
+	parseBit: function(bit)
 	{
 		var bits, i;
 		
-		barmatz.utils.DataTypes.isNotUndefined(bit);
 		barmatz.utils.DataTypes.isTypeOf(bit, 'number');
 		
 		bits = [];
@@ -73,21 +67,17 @@ Object.defineProperties(barmatz.utils.Bitwise,
 				bits.push(i);
 		
 		return bits;
-	}},
-	contains: {value: function(bitA, bitB)
+	},
+	contains: function(bitA, bitB)
 	{
 		return bitA & bitB ? true : false;
-	}}
-});
+	}
+};
 /** barmatz.utils.CSS **/
-window.barmatz.utils.CSS = function(){};
-
-Object.defineProperties(barmatz.utils.CSS, 
-{
-	getStyle: {value: function(element)
+barmatz.utils.CSS = { 
+	getStyle: function(element)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(element);
-		barmatz.utils.DataTypes.isInstanceOf(element, HTMLElement);
+		barmatz.utils.DataTypes.isInstanceOf(element, window.HTMLElement);
 		
 		if(element.currentStyle)
 			return element.currentStyle;
@@ -95,95 +85,73 @@ Object.defineProperties(barmatz.utils.CSS,
 			return document.defaultView.getComputedStyle(element);
 		else
 			return element.style;
-	}},
-	unitToPixal: {value: function(element, value)
+	},
+	unitToPixal: function(element, value)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(element);
-		barmatz.utils.DataTypes.isNotUndefined(value);
-		barmatz.utils.DataTypes.isInstanceOf(element, HTMLElement);
+		barmatz.utils.DataTypes.isInstanceOf(element, window.HTMLElement);
 		barmatz.utils.DataTypes.isTypeOf(value, 'string');
-		
-		if(/em/.test(value))
-			return this.emToPixal(element, parseFloat(value));
-		else if(/px/.test(value))
-			return parseFloat(value);
-		else
-			return 0;
-	}},
-	emToPixal: {value: function(element, value)
+		return /em/.test(value) ? parseFloat(this.emToPixal(element, parseFloat(value))) : /px/.test(value) ? parseFloat(value) : 0;
+	},
+	emToPixal: function(element, value)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(element);
-		barmatz.utils.DataTypes.isNotUndefined(value);
-		barmatz.utils.DataTypes.isInstanceOf(element, HTMLElement);
+		barmatz.utils.DataTypes.isInstanceOf(element, window.HTMLElement);
 		barmatz.utils.DataTypes.isTypeOf(value, 'number');
 		return parseFloat(this.getStyle(element).fontSize) * value;
-	}},
-	absoluteHeight: {value: function(element)
+	},
+	absoluteHeight: function(element)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(element);
-		barmatz.utils.DataTypes.isInstanceOf(element, HTMLElement);
-		return element.offsetHeight + this.unitToPixal(element, this.getStyle(element).marginTop) + this.unitToPixal(element, this.getStyle(element).marginBottom) + this.unitToPixal(element, this.getStyle(element).borderTop) + this.unitToPixal(element, this.getStyle(element).borderBottom);
-	}},
-	absoluteWidth: {value: function(element)
+		barmatz.utils.DataTypes.isInstanceOf(element, window.HTMLElement);
+		return element.offsetHeight + this.unitToPixal(element, this.getStyle(element).marginTop) + this.unitToPixal(element, this.getStyle(element).marginBottom);
+	},
+	absoluteWidth: function(element)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(element);
-		barmatz.utils.DataTypes.isInstanceOf(element, HTMLElement);
-		return element.offsetWidth + this.unitToPixal(element, this.getStyle(element).marginLeft) + this.unitToPixal(element, this.getStyle(element).marginRight) + this.unitToPixal(element, this.getStyle(element).borderLeft) + this.unitToPixal(element, this.getStyle(element).borderRight);
-	}},
-	verticalAlign: {value: function(element)
+		barmatz.utils.DataTypes.isInstanceOf(element, window.HTMLElement);
+		return element.offsetWidth + this.unitToPixal(element, this.getStyle(element).marginLeft) + this.unitToPixal(element, this.getStyle(element).marginRight);
+	},
+	verticalAlign: function(element)
 	{
 		var parent;
 		
-		barmatz.utils.DataTypes.isNotUndefined(element);
-		barmatz.utils.DataTypes.isInstanceOf(element, HTMLElement);
+		barmatz.utils.DataTypes.isInstanceOf(element, window.HTMLElement);
 		
 		parent = element.parentElement;
 		
 		if(parent)
-			element.style.marginTop = ((parent.offsetHeight * .5) - (this.absoluteHeight(element) * .5)) + 'px';
-	}},
-	verticalAlignChildren: {value: function(element)
+			element.style.top = ((parent.offsetHeight * .5) - (this.absoluteHeight(element) * .5)) + 'px';
+	},
+	verticalAlignChildren: function(element)
 	{
 		var i;
 		
-		barmatz.utils.DataTypes.isNotUndefined(element);
-		barmatz.utils.DataTypes.isInstanceOf(element, HTMLElement);
+		barmatz.utils.DataTypes.isInstanceOf(element, window.HTMLElement);
 		
-		for(i = 0; i < element.childNodes.length; i++)
-			this.verticalAlign(element.childNodes[i]);
-	}},
-	addClass: {value: function(element, className)
+		for(i = 0; i < element.children.length; i++)
+			this.verticalAlign(element.children[i]);
+	},
+	addClass: function(element, className)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(element);
-		barmatz.utils.DataTypes.isNotUndefined(className);
-		barmatz.utils.DataTypes.isInstanceOf(element, HTMLElement);
+		barmatz.utils.DataTypes.isInstanceOf(element, window.HTMLElement);
 		barmatz.utils.DataTypes.isTypeOf(className, 'string');
 		
 		if(element.className.indexOf(className) == -1)
 			element.className += ' ' + className;
-	}},
-	removeClass: {value: function(element, className)
+	},
+	removeClass: function(element, className)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(element);
-		barmatz.utils.DataTypes.isNotUndefined(className);
-		barmatz.utils.DataTypes.isInstanceOf(element, HTMLElement);
+		barmatz.utils.DataTypes.isInstanceOf(element, window.HTMLElement);
 		barmatz.utils.DataTypes.isTypeOf(className, 'string');
-		
 		element.className = element.className.replace(new RegExp('^' + className + '\\s?|\\s' + className + '[^\\S]?', 'g'), ' ').replace(/\s+/g, ' ').replace(/^\s+|\s+$/, '');
-	}}
-});
+	}
+};
 /** barmatz.utils.DataTypes **/
-window.barmatz.utils.DataTypes = function(){};
-
-Object.defineProperties(barmatz.utils.DataTypes, 
-{
-	UNDEFINED_ERROR: {value: 'expected property is undefined'},
-	INVALID_VALUE_ERROR: {value: 'value is not valid'},
-	WRONG_TYPE: {value: 'data type is wrong'},
-	WRONG_INSTANCE: {value: 'instance is wrong object'},
-	WRONG_TYPE_INSTANCE: {value: 'data type is wrong or instance is wrong object'},
-	VALUE_NULL: {value: 'value is null'},
-	_recursiveVlidation: {value: function(value, collection, method, errorMessage, allowNull)
+barmatz.utils.DataTypes = {
+	UNDEFINED_ERROR: 'expected property is undefined',
+	INVALID_VALUE_ERROR: 'value is not valid',
+	WRONG_TYPE: 'data type is wrong',
+	WRONG_INSTANCE: 'instance is wrong object',
+	WRONG_TYPE_INSTANCE: 'data type is wrong or instance is wrong object',
+	VALUE_NULL: 'value is null',
+	_recursiveVlidation: function(value, collection, method, errorMessage, allowNull)
 	{
 		var errors, i;
 
@@ -211,59 +179,59 @@ Object.defineProperties(barmatz.utils.DataTypes,
 				return false;
 		
 		return true;
-	}},
-	_silent: {value: false, writable: true},
-	silent: {get: function()
+	},
+	getSilent: function()
 	{
-		return this._silent;
-	}, set: function(value)
+		return this._silent || false;
+	}, 
+	setSilent: function(value)
 	{
 		this._silent = value;
-	}},
-	applySilent: {value: function(method)
+	},
+	applySilent: function(method)
 	{
 		var returnValue, args;
 		
-		args = Array.prototype.slice.call(arguments, 1, arguments.length);
+		args = window.Array.prototype.slice.call(arguments, 1, arguments.length);
 		
-		this.silent = true;
+		this.setSilent(true);
 		returnValue = this[method].apply(this, args);
-		this.silent = false;
+		this.setSilent(false);
 		
 		return returnValue;
-	}},
-	throwError: {value: function(error, message)
+	},
+	throwError: function(error, message)
 	{
-		if(this.silent)
+		if(this.getSilent())
 			return false;
 		else
 		{
 			throw new error(message);
 			return true;
 		}
-	}},
-	isNotUndefined: {value: function(value)
+	},
+	isNotUndefined: function(value)
 	{
 		if(value === undefined)
 			if(!this.throwError(ReferenceError, this.UNDEFINED_ERROR))
 				return false;
 		return true;
-	}},
-	isValid: {value: function(value)
+	},
+	isValid: function(value)
 	{
 		if(value == null)
 			if(!this.throwError(TypeError, this.INVALID_VALUE_ERROR))
 				return false;
 		return true;
-	}},
-	isAllowNull: {value: function(value)
+	},
+	isAllowNull: function(value)
 	{
-		if(value == null)
+		if(value === null)
 			if(!this.throwError(TypeError, this.VALUE_NULL))
 			return false;
 		return true;
-	}},
-	isTypeOf: {value: function(value, type, allowNull)
+	},
+	isTypeOf: function(value, type, allowNull)
 	{
 		if(!allowNull)
 			this.isValid(value);
@@ -273,13 +241,13 @@ Object.defineProperties(barmatz.utils.DataTypes,
 			if(!this.throwError(TypeError, this.WRONG_TYPE))
 				return false;
 		return true;
-	}},
-	isTypesOf: {value: function(value, types, allowNull)
+	},
+	isTypesOf: function(value, types, allowNull)
 	{
 		this._recursiveVlidation(value, types, this.isTypeOf, this.WRONG_INSTANCE, allowNull);
 		return true;
-	}},
-	isInstanceOf: {value: function(instance, object, allowNull)
+	},
+	isInstanceOf: function(instance, object, allowNull)
 	{
 		if(!allowNull)
 			this.isValid(instance);
@@ -289,13 +257,13 @@ Object.defineProperties(barmatz.utils.DataTypes,
 			if(!this.throwError(TypeError, this.WRONG_INSTANCE))
 				return false;
 		return true;
-	}},
-	isInstancesOf: {value: function(instances, objects, allowNull)
+	},
+	isInstancesOf: function(instances, objects, allowNull)
 	{
 		this._recursiveVlidation(instances, objects, this.isInstanceOf, this.WRONG_INSTANCE, allowNull);
 		return true;
-	}},
-	isTypeOrInstance: {value: function(value, type, object, allowNull)
+	},
+	isTypeOrInstance: function(value, type, object, allowNull)
 	{
 		if(!allowNull)
 			this.isValid(value);
@@ -305,8 +273,8 @@ Object.defineProperties(barmatz.utils.DataTypes,
 			if(!this.throwError(TypeError, this.WRONG_TYPE_INSTANCE))
 				return false;
 		return true;
-	}},
-	isTypesOrInstances: {value: function(value, types, objects, allowNull)
+	},
+	isTypesOrInstances: function(value, types, objects, allowNull)
 	{
 		var isType, isInstance;
 		
@@ -330,18 +298,91 @@ Object.defineProperties(barmatz.utils.DataTypes,
 			if(!this.throwError(TypeError, this.WRONG_TYPE_INSTANCE))
 				return false;
 		return true;
-	}}
-});
+	}
+};
+/** barmatz.utils.Date **/
+barmatz.utils.Date = {
+	isInvalid: function(date)
+	{
+		barmatz.utils.DataTypes.isInstanceOf(date, Date);
+		return isNaN(date.getTime()) ? true : false;
+	},
+	toDate: function(string)
+	{
+		var isoExp, date, month, parts;
+		
+		barmatz.utils.DataTypes.isTypeOf(string, 'string');
+		
+		isoExp = /^(\d{4})-(\d{2})-(\d{2})\s(\d{2}):(\d{2}):(\d{2})$/;
+        date = new Date(NaN);
+        parts = isoExp.exec(string);
+
+		if(parts)
+		{
+			month = +parts[2];
+			date.setFullYear(parts[1], month - 1, parts[3]);
+			date.setHours(parts[4]);
+			date.setMinutes(parts[5]);
+			date.setSeconds(parts[6]);
+		}
+		return date;
+	},
+	toString: function(date, format)
+	{
+		barmatz.utils.DataTypes.isInstanceOf(date, Date, true);
+		barmatz.utils.DataTypes.isTypeOf(format, 'string');
+		
+		if(!date || this.isInvalid(date))
+			return 'Invalid date';
+		else
+			return format.replace(/d{2}/, leadingZero(date.getDate())).
+				   replace(/d{1}/, date.getDate()).
+				   replace(/n{1}/, date.getDay() + 1).
+				   replace(/m{3}/, leadingDoubleZero(date.getMilliseconds())).
+				   replace(/m{2}/, leadingZero(date.getMonth() + 1)).
+				   replace(/m{1}/, date.getMonth() + 1).
+				   replace(/y{4}/, date.getFullYear()).
+				   replace(/y{2}/, date.getFullYear().toString().substring(2, 4)).
+				   replace(/h{2}/, leadingZero(date.getHours())).
+				   replace(/h{1}/, date.getHours()).
+				   replace(/H{1}/, (date.getHours() % 12)).
+				   replace(/i{2}/, leadingZero(date.getMinutes())).
+				   replace(/i{1}/, date.getMinutes()).
+				   replace(/s{2}/, leadingZero(date.getSeconds())).
+				   replace(/s{1}/, date.getSeconds()).
+				   replace(/D{1}/, this.getDayName(date)).
+				   replace(/M{1}/, this.getMonthName(date)).
+				   replace(/A{1}/, date.getHours() < 13 ? 'am' : 'pm');
+			   
+		function leadingZero(number)
+		{
+			return (number < 10 ? '0': '') + number.toString();
+		}
+		
+		function leadingDoubleZero(number)
+		{
+			return (number < 100 ? '00': '') + number.toString();
+		}
+	},
+	getDayName: function(date)
+	{
+		barmatz.utils.DataTypes.isInstanceOf(date, Date);
+		return  ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][date.getDay()];
+	},
+	getMonthName: function(date)
+	{
+		barmatz.utils.DataTypes.isInstanceOf(date, Date);
+		return  ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][date.getMonth()];
+	}
+};
 /** barmatz.utils.Dictionary **/
-window.barmatz.utils.Dictionary = function()
+barmatz.utils.Dictionary = function()
 {
 	this._keys = [];
 	this._values = [];
 };
-
-Object.defineProperties(barmatz.utils.Dictionary.prototype,
-{
-	add: {value: function(key, value)
+barmatz.utils.Dictionary.prototype = {
+	add: function(key, value)
 	{
 		var keyIndex = this._keys.indexOf(key);
 		
@@ -356,8 +397,8 @@ Object.defineProperties(barmatz.utils.Dictionary.prototype,
 			throw new Error('an error has occured');
 		
 		return value;
-	}},
-	remove: {value: function(key)
+	},
+	remove: function(key)
 	{
 		var keyIndex, value;
 		keyIndex = this._keys.indexOf(key);
@@ -365,80 +406,86 @@ Object.defineProperties(barmatz.utils.Dictionary.prototype,
 		this._keys.splice(keyIndex, 1);
 		this._values.splice(keyIndex, 1);
 		return value;
-	}},
-	get: {value: function(key)
+	},
+	get: function(key)
 	{
 		return this._values[this._keys.indexOf(key)];
-	}},
-	getNext: {value: function(key)
+	},
+	getNext: function(key)
 	{
 		return this._values[this._keys.indexOf(key) + 1];
-	}},
-	getPrev: {value: function(key)
+	},
+	getPrev: function(key)
 	{
 		return this._values[this._keys.indexOf(key) - 1];
-	}},
-	reset: {value: function()
+	},
+	reset: function()
 	{
 		this._keys.splice(0, this._keys.length);
 		this._values.splice(0, this._values.length);
-	}},
-	forEach: {value: function(callback)
+	},
+	forEach: function(callback)
 	{
 		var i;
 		for(i = 0; i < this._keys.length; i++)
-			callback(this._values[i], this._keys[i], this._values);
-	}},
-	find: {value: function(value)
+			callback(this._values[i], this._keys[i]);
+	},
+	find: function(value)
 	{
 		if(value === undefined)
 			throw new ReferenceError('expected property value is undefined');
 		
 		return this._keys[this._values.indexOf(value)];
-	}}
-});
+	}
+};
 /** barmatz.events.Event **/
-window.barmatz.events.Event = function(type)
+barmatz.events.Event = function(type)
 {
 	barmatz.utils.DataTypes.isNotUndefined(type);
 	barmatz.utils.DataTypes.isTypeOf(type, 'string', true);
 	this._type = type;
 };
 
-Object.defineProperties(barmatz.events.Event.prototype,
-{
-	target: {get: function()
+barmatz.events.Event.prototype = {
+	getTarget: function()
 	{
 		return this._target;
-	}},
-	type: {get: function()
+	},
+	getType: function()
 	{
 		return this._type;
-	}},
-	clone: {value: function(type)
+	},
+	clone: function()
 	{
-		var event = new barmatz.events.Event(type);
-		event._target = this.target;
+		var event = new barmatz.events.Event(this.getType());
+		event._target = this.getTarget();
 		return event;
-	}},
-	formatToString: {value: function(className)
+	},
+	formatToString: function(className)
 	{
-		var parameters = [], i;
+		var parameters = [], key, i;
 		
-		arguments = Array.prototype.slice.call(arguments);
+		arguments = window.Array.prototype.slice.call(arguments);
 		
 		for(i = 1; i < arguments.length; i++)
-			parameters.push(arguments[i] + '=' + this[arguments[i]]);
+		{
+			key = arguments[i];
+			
+			if(!this.hasOwnProperty(key))
+				key = '_' + key;
+				
+			parameters.push(arguments[i] + '=' + this[key]);
+		}
 		
 		return '[' + className + '(' + parameters.join(', ') + ')]';
-	}},
-	toString: {value: function()
+	},
+	toString: function()
 	{
 		return this.formatToString('Event', 'type');
-	}}
-});
+	}
+};
 /** barmatz.events.CollectionEvent **/
-window.barmatz.events.CollectionEvent = function(type)
+barmatz.events.CollectionEvent = function(type)
 {
 	barmatz.utils.DataTypes.isNotUndefined(type);
 	barmatz.utils.DataTypes.isTypeOf(type, 'string');
@@ -456,63 +503,57 @@ window.barmatz.events.CollectionEvent = function(type)
 			break;
 	}
 };
-
+barmatz.events.CollectionEvent.ITEM_ADDED = 'itemAdded';
+barmatz.events.CollectionEvent.ITEM_REMOVED = 'itemRemoved';
 barmatz.events.CollectionEvent.prototype = new barmatz.events.Event(null);
 barmatz.events.CollectionEvent.prototype.constructor = barmatz.events.CollectionEvent;
-
-Object.defineProperties(barmatz.events.CollectionEvent,
+barmatz.events.CollectionEvent.prototype.getItem = function()
 {
-	ITEM_ADDED: {value: 'itemAdded'},
-	ITEM_REMOVED: {value: 'itemRemoved'}
-});
-Object.defineProperties(barmatz.events.CollectionEvent.prototype,
+	return this._item;
+};
+barmatz.events.CollectionEvent.prototype.getIndex = function()
 {
-	item: {get: function()
+	return this._index;
+};
+barmatz.events.CollectionEvent.prototype.clone = function()
+{
+	var event = new barmatz.events.CollectionEvent(this.getType());
+	
+	event._target = this.target;
+	
+	switch(event.getType())
 	{
-		return this._item;
-	}},
-	index: {get: function()
+		case barmatz.events.CollectionEvent.ITEM_ADDED:
+		case barmatz.events.CollectionEvent.ITEM_REMOVED:
+			event._item = this.getItem();
+			event._index = this.getIndex();
+			break;
+	}
+	
+	return event;
+};
+barmatz.events.CollectionEvent.prototype.toString = function()
+{
+	switch(this.getType())
 	{
-		return this._index;
-	}},
-	clone: {value: function(type)
-	{
-		var event = new barmatz.events.CollectionEvent(type);
-		event._target = this.target;
-		switch(type)
-		{
-			case barmatz.events.CollectionEvent.ITEM_ADDED:
-			case barmatz.events.CollectionEvent.ITEM_REMOVED:
-				event._field = this.field;
-				event._index = this.index;
-				break;
-		}
-		return event;
-	}},
-	toString: {value: function()
-	{
-		switch(type)
-		{
-			default:
-				return this.formatToString('CollectionEvent', 'type');
-				break;
-			case barmatz.events.CollectionEvent.ITEM_ADDED:
-			case barmatz.events.CollectionEvent.ITEM_REMOVED:
-				return this.formatToString('CollectionEvent', 'type', 'item', 'index');
-				break;
-		}
-	}}
-});
+		default:
+			return this.formatToString('CollectionEvent', 'type');
+			break;
+		case barmatz.events.CollectionEvent.ITEM_ADDED:
+		case barmatz.events.CollectionEvent.ITEM_REMOVED:
+			return this.formatToString('CollectionEvent', 'type', 'item', 'index');
+			break;
+	}
+};
 /** barmatz.events.EventDispatcher **/
-window.barmatz.events.EventDispatcher = function(target)
+barmatz.events.EventDispatcher = function(target)
 {
 	this._target = target || this;
 	this._listeners = {};
 };
 
-Object.defineProperties(barmatz.events.EventDispatcher.prototype, 
-{
-	addEventListener: {value: function(type, listener)
+barmatz.events.EventDispatcher.prototype = {
+	addEventListener: function(type, listener)
 	{
 		barmatz.utils.DataTypes.isTypeOf(type, 'string');
 		barmatz.utils.DataTypes.isTypeOf(listener, 'function');
@@ -521,10 +562,10 @@ Object.defineProperties(barmatz.events.EventDispatcher.prototype,
 			this._listeners[type] = [];
 		
 		this._listeners[type].push(listener);
-	}},
-	dispatchEvent: {value: function(event)
+	},
+	dispatchEvent: function(event)
 	{
-		var i, c;
+		var queue, i, c;
 		
 		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.Event);
 		
@@ -532,20 +573,23 @@ Object.defineProperties(barmatz.events.EventDispatcher.prototype,
 		
 		for(i in this._listeners)
 		{
-			if(i === event.type)
+			if(i === event.getType())
+			{
+				queue = [];
+				
 				for(c = 0; c < this._listeners[i].length; c++)
-				{
-					this._listeners[i][c].call(this, event);
-					if(!this._listeners[i])
-						break;
-				}
+					queue.push(this._listeners[i][c]);
+				
+				for(c = 0; c < queue.length; c++)
+					queue[c].call(this, event);
+			}
 		}
-	}},
-	hasEventListener: {value: function(type)
+	},
+	hasEventListener: function(type)
 	{
 		return this._listeners[type] ? true : false;
-	}},
-	removeEventListener: {value: function(type, listener)
+	},
+	removeEventListener: function(type, listener)
 	{
 		var i;
 		
@@ -558,8 +602,8 @@ Object.defineProperties(barmatz.events.EventDispatcher.prototype,
 			if(this._listeners[type].length == 0)
 				delete this._listeners[type];
 		}
-	}},
-	toJSON: {value: function()
+	},
+	toJSON: function()
 	{
 		var object, i;
 		
@@ -572,11 +616,10 @@ Object.defineProperties(barmatz.events.EventDispatcher.prototype,
 		delete object._listeners;
 		
 		return object;
-	}}
-});
-
-/** barmatz.events.FieldModelEvent **/
-window.barmatz.events.FieldModelEvent = function(type)
+	}
+};
+/** barmatz.events.FieldEvent **/
+barmatz.events.FieldEvent = function(type)
 {
 	barmatz.utils.DataTypes.isNotUndefined(type);
 	barmatz.utils.DataTypes.isTypeOf(type, 'string');
@@ -586,48 +629,40 @@ window.barmatz.events.FieldModelEvent = function(type)
 	
 	switch(type)
 	{
-		case barmatz.events.FieldModelEvent.INVALID:
+		case barmatz.events.FieldEvent.INVALID:
 			this._errors = arguments[1];
 			break;
 	}
 };
-
-barmatz.events.FieldModelEvent.prototype = new barmatz.events.Event(null);
-barmatz.events.FieldModelEvent.prototype.constructor = barmatz.events.FieldModelEvent;
-
-Object.defineProperties(barmatz.events.FieldModelEvent,
+barmatz.events.FieldEvent.VALID = 'valid';
+barmatz.events.FieldEvent.INVALID = 'invalid';
+barmatz.events.FieldEvent.prototype = new barmatz.events.Event(null);
+barmatz.events.FieldEvent.prototype.constructor = barmatz.events.FieldEvent;
+barmatz.events.FieldEvent.prototype.getErrors = function()
 {
-	VALID: {value: 'valid'},
-	INVALID: {value: 'invalid'}
-}); 
-Object.defineProperties(barmatz.events.FieldModelEvent.prototype, 
+	return this._errors;
+};
+barmatz.events.FieldEvent.prototype.clone = function()
 {
-	errors: {get: function()
+	var event = new barmatz.events.FieldEvent(this.getType());
+	event._target = this.getTarget();
+	event._errors = this.getErrors();
+	return event;
+};
+barmatz.events.FieldEvent.prototype.toString = function()
+{
+	switch(this.type)
 	{
-		return this._errors;
-	}},
-	clone: {value: function()
-	{
-		var event = new FieldModelEvent(type);
-		event._target = this.target;
-		event._errors = this.errors;
-		return event;
-	}},
-	toString: {value: function()
-	{
-		switch(this.type)
-		{
-			default:
-				return this.formatToString('FieldModelEvent', 'type');
-				break;
-			case barmatz.events.FieldModelEvent.INVALID:
-				return this.formatToString('FieldModelEvent', 'type', 'errors');
-				break;
-		}
-	}}
-});
-/** barmatz.events.FormModelEvent **/
-window.barmatz.events.FormModelEvent = function(type)
+		default:
+			return this.formatToString('FieldEvent', 'type');
+			break;
+		case barmatz.events.FieldEvent.INVALID:
+			return this.formatToString('FieldEvent', 'type', 'errors');
+			break;
+	}
+};
+/** barmatz.events.FormEvent **/
+barmatz.events.FormEvent = function(type)
 {
 	barmatz.utils.DataTypes.isNotUndefined(type);
 	barmatz.utils.DataTypes.isTypeOf(type, 'string');
@@ -637,67 +672,59 @@ window.barmatz.events.FormModelEvent = function(type)
 	
 	switch(type)
 	{
-		case barmatz.events.FormModelEvent.GET_LEADS_SUCCESS:
+		case barmatz.events.FormEvent.GET_LEADS_SUCCESS:
 			this._leads = arguments[1];
 			break;
 	}
 };
-
-barmatz.events.FormModelEvent.prototype = new barmatz.events.Event(null);
-barmatz.events.FormModelEvent.prototype.constructor = barmatz.events.FormModelEvent;
-
-Object.defineProperties(barmatz.events.FormModelEvent,
+barmatz.events.FormEvent.SAVING = 'saving';
+barmatz.events.FormEvent.SAVED = 'saved';
+barmatz.events.FormEvent.ERROR_SAVING = 'errorSaving';
+barmatz.events.FormEvent.LOADING_FORM = 'loadingForm';
+barmatz.events.FormEvent.LOADING_FORM_COMPLETE = 'loadingFormComplete';
+barmatz.events.FormEvent.LOADING_FORM_ERROR = 'loadingFormError';
+barmatz.events.FormEvent.DELETING = 'deleting';
+barmatz.events.FormEvent.DELETED = 'deleted';
+barmatz.events.FormEvent.DELETION_FAIL = 'deletionFail';
+barmatz.events.FormEvent.SUBMITTING = 'submitting';
+barmatz.events.FormEvent.SUBMITTED = 'submitted';
+barmatz.events.FormEvent.SUBMISSION_FAILED = 'submissionFailed';
+barmatz.events.FormEvent.GET_LEADS_SUCCESS = 'getLeadsSuccess';
+barmatz.events.FormEvent.GET_LEADS_FAIL = 'getLeadsFail';
+barmatz.events.FormEvent.prototype = new barmatz.events.Event(null);
+barmatz.events.FormEvent.prototype.constructor = barmatz.events.FormEvent;
+barmatz.events.FormEvent.prototype.getLeads = function()
 {
-	SAVING: {value: 'saving'},
-	SAVED: {value: 'saved'},
-	ERROR_SAVING: {value: 'errorSaving'},
-	LOADING_FORM: {value: 'loadingForm'},
-	LOADING_FORM_COMPLETE: {value: 'loadingFormComplete'},
-	LOADING_FORM_ERROR: {value: 'loadingFormError'},
-	DELETING: {value: 'deleting'},
-	DELETED: {value: 'deleted'},
-	DELETION_FAIL: {value: 'deletionFail'},
-	SUBMITTING: {value: 'submitting'},
-	SUBMITTED: {value: 'submitted'},
-	SUBMISSION_FAILED: {value: 'submissionFailed'},
-	GET_LEADS_SUCCESS: {value: 'getLeadsSuccess'},
-	GET_LEADS_FAIL: {value: 'getLeadsFail'}
-}); 
-Object.defineProperties(barmatz.events.FormModelEvent.prototype, 
+	return this._leads;
+};
+barmatz.events.FormEvent.prototype.clone = function()
 {
-	leads: {get: function()
+	var event = new barmatz.events.FormEvent(this.getType());
+	event._target = this.getTarget();
+	
+	switch(event.getType())
 	{
-		return this._leads;
-	}},
-	clone: {value: function()
+		case barmatz.events.FormEvent.GET_LEADS_SUCCESS:
+			event._leads = this.getLeads();
+			break;
+	}
+	
+	return event;
+};
+barmatz.events.FormEvent.prototype.toString = function()
+{
+	switch(this.getType())
 	{
-		var event = new FormModelEvent(type);
-		event._target = this.target;
-		
-		switch(type)
-		{
-			case barmatz.events.FormModelEvent.GET_LEADS_SUCCESS:
-				event._leads = this.leads;
-				break;
-		}
-		
-		return event;
-	}},
-	toString: {value: function()
-	{
-		switch(type)
-		{
-			default:
-				return this.formatToString('FormModelEvent', 'type');
-				break;
-			case barmatz.events.FormModelEvent.GET_LEADS_SUCCESS:
-				return this.formatToString('FormModelEvent', 'type', 'leads');
-				break;
-		}
-	}}
-});
+		default:
+			return this.formatToString('FormEvent', 'type');
+			break;
+		case barmatz.events.FormEvent.GET_LEADS_SUCCESS:
+			return this.formatToString('FormEvent', 'type', 'leads');
+			break;
+	}
+};
 /** barmatz.events.LoaderEvent **/
-window.barmatz.events.LoaderEvent = function(type)
+barmatz.events.LoaderEvent = function(type)
 {
 	barmatz.events.Event.call(this, type);
 	
@@ -719,60 +746,52 @@ window.barmatz.events.LoaderEvent = function(type)
 	}
 };
 
+barmatz.events.LoaderEvent.UNSENT = 'unsent';
+barmatz.events.LoaderEvent.OPENED = 'opened';
+barmatz.events.LoaderEvent.HEADERS_RECEIVED = 'headersReceived';
+barmatz.events.LoaderEvent.LOADING = 'loading';
+barmatz.events.LoaderEvent.COMPLETE = 'complete';
+barmatz.events.LoaderEvent.SUCCESS = 'success';
+barmatz.events.LoaderEvent.ERROR = 'error';
 barmatz.events.LoaderEvent.prototype = new barmatz.events.Event(null);
 barmatz.events.LoaderEvent.prototype.constructor = barmatz.events.LoaderEvent;
-
-Object.defineProperties(barmatz.events.LoaderEvent,
+barmatz.events.LoaderEvent.prototype.getRequest = function()
 {
-	UNSENT: {value: 'unsent'},
-	OPENED: {value: 'opened'},
-	HEADERS_RECEIVED: {value: 'headersReceived'},
-	LOADING: {value: 'loading'},
-	COMPLETE: {value: 'complete'},
-	SUCCESS: {value: 'success'},
-	ERROR: {value: 'error'}
-});
-
-Object.defineProperties(barmatz.events.LoaderEvent.prototype,
+	return this._request;
+};
+barmatz.events.LoaderEvent.prototype.getResponse = function()
 {
-	request: {get: function()
+	return this._response;
+};
+barmatz.events.LoaderEvent.prototype.clone = function()
+{
+	var event = new barmatz.events.LoaderEvent(this.getType());
+	event._target = this.getTarget();
+	event._request = this.getRequest();
+	event._response = this.getResponse();
+	return event;
+};
+barmatz.events.LoaderEvent.prototype.toString = function()
+{
+	switch(this.getType())
 	{
-		return this._request;
-	}},
-	response: {get: function()
-	{
-		return this._response;
-	}},
-	clone: {value: function(type)
-	{
-		var event = new barmatz.events.LoaderEvent(type);
-		event._target = this.target;
-		event._request = this.request;
-		event._response = this.response;
-		return event;
-	}},
-	toString: {value: function()
-	{
-		switch(type)
-		{
-			default:
-				return this.formatToString('LoaderEvent', 'type');
-				break;
-			case barmatz.events.LoaderEvent.UNSENT:
-			case barmatz.events.LoaderEvent.OPENED:
-				return this.formatToString('LoaderEvent', 'type', 'request');
-			case barmatz.events.LoaderEvent.HEADERS_RECEIVED:
-			case barmatz.events.LoaderEvent.LOADING:
-			case barmatz.events.LoaderEvent.COMPLETE:
-			case barmatz.events.LoaderEvent.SUCCESS:
-			case barmatz.events.LoaderEvent.ERROR:
-				return this.formatToString('LoaderEvent', 'type', 'response');
-				break;
-		}
-	}}
-});
+		default:
+			return this.formatToString('LoaderEvent', 'type');
+			break;
+		case barmatz.events.LoaderEvent.UNSENT:
+		case barmatz.events.LoaderEvent.OPENED:
+			return this.formatToString('LoaderEvent', 'type', 'request');
+		case barmatz.events.LoaderEvent.HEADERS_RECEIVED:
+		case barmatz.events.LoaderEvent.LOADING:
+		case barmatz.events.LoaderEvent.COMPLETE:
+		case barmatz.events.LoaderEvent.SUCCESS:
+		case barmatz.events.LoaderEvent.ERROR:
+			return this.formatToString('LoaderEvent', 'type', 'response');
+			break;
+	}
+};
 /** barmatz.events.ModelEvent **/
-window.barmatz.events.ModelEvent = function(type)
+barmatz.events.ModelEvent = function(type)
 {
 	barmatz.events.Event.call(this, type);
 	
@@ -784,67 +803,58 @@ window.barmatz.events.ModelEvent = function(type)
 			break;
 	}
 };
-
+barmatz.events.ModelEvent.VALUE_CHANGED = 'valueChanged';
 barmatz.events.ModelEvent.prototype = new barmatz.events.Event(null);
 barmatz.events.ModelEvent.prototype.constructor = barmatz.events.ModelEvent;
-
-Object.defineProperties(barmatz.events.ModelEvent, 
+barmatz.events.ModelEvent.prototype.getKey = function()
 {
-	VALUE_CHANGED: {value: 'valueChanged'}
-});
-Object.defineProperties(barmatz.events.ModelEvent.prototype, 
+	return this._key;
+};
+barmatz.events.ModelEvent.prototype.getValue = function()
 {
-	key: {get: function()
-	{
-		return this._key;
-	}},
-	value: {get: function()
-	{
-		return this._value;
-	}},
-	clone: {value: function(type)
-	{
-		var event = new barmatz.events.ModelEvent(type);
-		event._target = this.target;
-		event._key = this.key;
-		event._value = this.value;
-		return event;
-	}},
-	toString: {value: function()
-	{
-		return this.formatToString('ModelEvent', 'type', 'key', 'value');
-	}}
-});
+	return this._value;
+};
+barmatz.events.ModelEvent.prototype.clone = function()
+{
+	var event = new barmatz.events.ModelEvent(this.getType());
+	event._target = this.getTarget();
+	event._key = this.getKey();
+	event._value = this.getValue();
+	return event;
+};
+barmatz.events.ModelEvent.prototype.toString = function()
+{
+	return this.formatToString('ModelEvent', 'type', 'key', 'value');
+};
 /** barmatz.mvc.Controller **/
-window.barmatz.mvc.Controller = function(){};
+barmatz.mvc.Controller = function(){};
 /** barmatz.mvc.Model **/
-window.barmatz.mvc.Model = function()
+barmatz.mvc.Model = function()
 {
 	barmatz.events.EventDispatcher.call(this);
 };
-
 barmatz.mvc.Model.prototype = new barmatz.events.EventDispatcher();
 barmatz.mvc.Model.prototype.constructor = barmatz.mvc.Model;
-
-Object.defineProperties(barmatz.mvc.Model.prototype, 
+barmatz.mvc.Model.prototype.get = function(key)
 {
-	get: {value: function(key)
-	{
-		return this['_' + key];
-	}},
-	set: {value: function(key, value)
-	{
-		this['_' + key] = value;
-		this.dispatchEvent(new barmatz.events.ModelEvent(barmatz.events.ModelEvent.VALUE_CHANGED, key, value));
-	}}
-});
+	return this['_' + key];
+};
+barmatz.mvc.Model.prototype.set = function(key, value)
+{
+	barmatz.utils.DataTypes.isNotUndefined(key);
+	barmatz.utils.DataTypes.isNotUndefined(value);
+	this['_' + key] = value;
+	this.dispatchEvent(new barmatz.events.ModelEvent(barmatz.events.ModelEvent.VALUE_CHANGED, key, value));
+};
 /** barmatz.forms.CollectionController **/
-window.barmatz.forms.CollectionController = function(model, view)
+barmatz.forms.CollectionController = function(model, view)
 {
 	var _this = this;
 	
-	barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.CollectionModel, true);
-	barmatz.utils.DataTypes.isInstanceOf(view, HTMLElement, true);
+	barmatz.utils.DataTypes.isNotUndefined(model);
+	barmatz.utils.DataTypes.isNotUndefined(view);
+	barmatz.utils.DataTypes.isInstanceOf(model, barmatz.mvc.Model, true);
+	barmatz.utils.DataTypes.isInstanceOf(view, window.HTMLElement, true);
 	barmatz.mvc.Controller.call(this);
 
 	this._model = model;
@@ -862,188 +872,168 @@ window.barmatz.forms.CollectionController = function(model, view)
 	
 	function onModelItemAdded(event)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(event);
 		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.CollectionEvent);
-		_this._addItemModelToView(event.item);
+		_this._addItemModelToView(event.getItem());
 	}
 	
 	function onModelItemRemoved(event)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(event);
+		var index;
+		
 		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.CollectionEvent);
 		
-		if(view.childNodes[event.index])
-			view.removeChild(view.childNodes[event.index]);
+		index = event.getIndex();
+		
+		if(view.children[index])
+			view.removeChild(view.children[index]);
 	}
 };
-
 barmatz.forms.CollectionController.prototype = new barmatz.mvc.Controller();
 barmatz.forms.CollectionController.prototype.constructor = barmatz.forms.CollectionController;
-
-Object.defineProperties(barmatz.forms.CollectionController.prototype,
+barmatz.forms.CollectionController.prototype._addItemModelToView = function(model)
 {
-	_addItemModelToView: {value: function(model)
-	{
-		barmatz.utils.DataTypes.isNotUndefined(model);
-		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.mvc.Model);
-		this._view.appendChild(this._createItemViewFromModel(model));
-	}},
-	_createItemViewFromModel: {value: function(model)
-	{
-		throw new Error('method must be overridden');
-	}}
-});
+	var view;
+	
+	barmatz.utils.DataTypes.isInstanceOf(model, barmatz.mvc.Model);
+	
+	view = this._createItemViewFromModel(model);
+	
+	if(view)
+		this._view.appendChild(view);
+};
+barmatz.forms.CollectionController.prototype._createItemViewFromModel = function(model)
+{
+	throw new Error('method must be overridden');
+};
 /** barmatz.forms.CollectionModel **/
-window.barmatz.forms.CollectionModel = function()
+barmatz.forms.CollectionModel = function()
 {
 	barmatz.mvc.Model.call(this);
 	this.set('items', []);
 };
-
 barmatz.forms.CollectionModel.prototype = new barmatz.mvc.Model();
 barmatz.forms.CollectionModel.prototype.constructor = barmatz.forms.CollectionModel;
-
-Object.defineProperties(barmatz.forms.CollectionModel.prototype,
+barmatz.forms.CollectionModel.prototype.getNumItems = function()
 {
-	numItems: {get: function()
-	{
-		var items = this.get('items');
-		return items ? items.length : 0;
-	}},
-	addItem: {value: function(item)
-	{
-		barmatz.utils.DataTypes.isNotUndefined(item);
-		barmatz.utils.DataTypes.isInstanceOf(item, barmatz.mvc.Model);
-		this.addItemAt(item, this.get('items').length);
-	}},
-	addItemAt: {value: function(item, index)
-	{
-		barmatz.utils.DataTypes.isNotUndefined(item);
-		barmatz.utils.DataTypes.isNotUndefined(index);
-		barmatz.utils.DataTypes.isInstanceOf(item, barmatz.mvc.Model);
-		barmatz.utils.DataTypes.isTypeOf(index, 'number');
-		this.get('items').splice(index, 0, item);
-		this.dispatchEvent(new barmatz.events.CollectionEvent(barmatz.events.CollectionEvent.ITEM_ADDED, item, index));
-	}},
-	removeItem: {value: function(item)
-	{
-		barmatz.utils.DataTypes.isNotUndefined(item);
-		barmatz.utils.DataTypes.isInstanceOf(item, barmatz.mvc.Model);
-		this.removeItemAt(this.getItemIndex(item));
-	}},
-	removeItemAt: {value: function(index)
-	{
-		barmatz.utils.DataTypes.isNotUndefined(index);
-		barmatz.utils.DataTypes.isTypeOf(index, 'number');
-		this.dispatchEvent(new barmatz.events.CollectionEvent(barmatz.events.CollectionEvent.ITEM_REMOVED, this.get('items').splice(index, 1)[0], index));
-	}},
-	getItemAt: {value: function(index)
-	{
-		barmatz.utils.DataTypes.isNotUndefined(index);
-		barmatz.utils.DataTypes.isTypeOf(index, 'number');
-		return this.get('items')[index];
-	}},
-	getItemIndex: {value: function(item)
-	{
-		barmatz.utils.DataTypes.isNotUndefined(item);
-		barmatz.utils.DataTypes.isInstanceOf(item, barmatz.mvc.Model);
-		return this.get('items').indexOf(item);
-	}},
-	setItemIndex: {value: function(item, index)
-	{
-		var items;
-		
-		barmatz.utils.DataTypes.isNotUndefined(item);
-		barmatz.utils.DataTypes.isNotUndefined(index);
-		barmatz.utils.DataTypes.isInstanceOf(item, barmatz.mvc.Model);
-		barmatz.utils.DataTypes.isTypeOf(index, 'number');
-		
-		items = this.get('items');
-		items.splice(items.indexOf(item), 1);
-		items.splice(index, 0, item);
-	}},
-	forEach: {value: function(handler)
-	{
-		var items, i;
-		
-		barmatz.utils.DataTypes.isNotUndefined(handler);
-		barmatz.utils.DataTypes.isTypeOf(handler, 'function');
+	var items = this.get('items');
+	return items ? items.length : 0;
+};
+barmatz.forms.CollectionModel.prototype.addItem = function(item)
+{
+	barmatz.utils.DataTypes.isInstanceOf(item, barmatz.mvc.Model);
+	this.addItemAt(item, this.get('items').length);
+};
+barmatz.forms.CollectionModel.prototype.addItemAt = function(item, index)
+{
+	barmatz.utils.DataTypes.isInstanceOf(item, barmatz.mvc.Model);
+	barmatz.utils.DataTypes.isTypeOf(index, 'number');
+	this.get('items').splice(index, 0, item);
+	this.dispatchEvent(new barmatz.events.CollectionEvent(barmatz.events.CollectionEvent.ITEM_ADDED, item, index));
+};
+barmatz.forms.CollectionModel.prototype.removeItem = function(item)
+{
+	barmatz.utils.DataTypes.isInstanceOf(item, barmatz.mvc.Model);
+	this.removeItemAt(this.getItemIndex(item));
+};
+barmatz.forms.CollectionModel.prototype.removeItemAt = function(index)
+{
+	barmatz.utils.DataTypes.isTypeOf(index, 'number');
+	this.dispatchEvent(new barmatz.events.CollectionEvent(barmatz.events.CollectionEvent.ITEM_REMOVED, this.get('items').splice(index, 1)[0], index));
+};
+barmatz.forms.CollectionModel.prototype.getItemAt = function(index)
+{
+	barmatz.utils.DataTypes.isTypeOf(index, 'number');
+	return this.get('items')[index];
+};
+barmatz.forms.CollectionModel.prototype.getItemIndex = function(item)
+{
+	barmatz.utils.DataTypes.isInstanceOf(item, barmatz.mvc.Model);
+	return this.get('items').indexOf(item);
+};
+barmatz.forms.CollectionModel.prototype.setItemIndex = function(item, index)
+{
+	var items;
+	
+	barmatz.utils.DataTypes.isInstanceOf(item, barmatz.mvc.Model);
+	barmatz.utils.DataTypes.isTypeOf(index, 'number');
+	
+	items = this.get('items');
+	items.splice(items.indexOf(item), 1);
+	items.splice(index, 0, item);
+};
+barmatz.forms.CollectionModel.prototype.forEach = function(handler)
+{
+	var items, i;
+	
+	barmatz.utils.DataTypes.isTypeOf(handler, 'function');
 
-		items = this.get('items');
-		
-		for(i = 0; i < items.length; i++)
-			handler(items[i], i, items);
-	}},
-	find: {value: function(filter)
+	items = this.get('items');
+	
+	for(i = 0; i < items.length; i++)
+		handler(items[i], i, items);
+};
+barmatz.forms.CollectionModel.prototype.find = function(filter)
+{
+	
+	barmatz.utils.DataTypes.isTypeOf(filter, 'function');
+	return this.get('items').filter(filter);
+};
+barmatz.forms.CollectionModel.prototype.toString = function()
+{
+	var values = [];
+	
+	this.forEach(function(item, index, collection)
 	{
-		
-		barmatz.utils.DataTypes.isNotUndefined(filter);
-		barmatz.utils.DataTypes.isTypeOf(filter, 'function');
-		return this.get('items').filter(filter);
-	}},
-	toString: {value: function()
-	{
-		var values = [];
-		
-		this.forEach(function(item, index, collection)
-		{
-			values.push(item.toString());
-		});
-		
-		return values.join(', ');
-	}},
-	toArray: {value: function()
-	{
-		return this.get('items').slice(0);
-	}}
-});
+		values.push(item.toString());
+	});
+	
+	return values.join(', ');
+};
+barmatz.forms.CollectionModel.prototype.toArray = function()
+{
+	return this.get('items').slice(0);
+};
+
 /** barmatz.forms.Config **/
-window.barmatz.forms.Config = function(){};
+barmatz.forms.Config = {
+	BASE_URL: 'http://localhost:8080/clients/ofirvardi/forms'
+	//BASE_URL: 'http://www.quiz.co.il'
+};
 
-Object.defineProperties(barmatz.forms.Config,
-{
-	//BASE_URL: {value: 'http://localhost:8080/clients/ofirvardi/forms'}
-	BASE_URL: {value: 'http://www.quiz.co.il'}
-});
 /** barmatz.forms.Directions **/
-window.barmatz.forms.Directions = function(){};
+barmatz.forms.Directions = {
+	RTL: 'right',
+	LTR: 'left'
+};
 
-Object.defineProperties(barmatz.forms.Directions,
-{
-	RTL: {value: 'right'},
-	LTR: {value: 'left'}
-});
 /** barmatz.forms.FormController **/
-window.barmatz.forms.FormController = function(model, formView, submitButtonView)
+barmatz.forms.FormController = function(model, formView, submitButtonView)
 {
 	var submittingForm, loadingDialog;
 
-	barmatz.utils.DataTypes.isNotUndefined(model);
-	barmatz.utils.DataTypes.isNotUndefined(formView);
-	barmatz.utils.DataTypes.isNotUndefined(submitButtonView);
 	barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.FormModel);
 	barmatz.utils.DataTypes.isInstanceOf(formView, HTMLFormElement);
-	barmatz.utils.DataTypes.isInstanceOf(submitButtonView, HTMLElement);
+	barmatz.utils.DataTypes.isInstanceOf(submitButtonView, window.HTMLElement);
 	barmatz.mvc.Controller.call(this);
 	
-	formView.name = model.name;
-	formView.method = model.method;
-	formView.encoding = model.encoding;
+	formView.name = model.getName();
+	formView.method = model.getMethod();
+	formView.encoding = model.getEncoding();
 	formView.setAttribute('onsubmit', 'return false;');
 	formView.addEventListener('submit', onViewSubmit);
 	
 	function addModelListeners()
 	{
-		model.addEventListener(barmatz.events.FormModelEvent.SUBMITTING, onModelSubmitting);
-		model.addEventListener(barmatz.events.FormModelEvent.SUBMITTED, onModelSubmitted);
-		model.addEventListener(barmatz.events.FormModelEvent.SUBMISSION_FAILED, onModelSubmitionFailed);
+		model.addEventListener(barmatz.events.FormEvent.SUBMITTING, onModelSubmitting);
+		model.addEventListener(barmatz.events.FormEvent.SUBMITTED, onModelSubmitted);
+		model.addEventListener(barmatz.events.FormEvent.SUBMISSION_FAILED, onModelSubmitionFailed);
 	}
 	 
 	function removeModelListeners()
 	{
-		model.removeEventListener(barmatz.events.FormModelEvent.SUBMITTING, onModelSubmitting);
-		model.removeEventListener(barmatz.events.FormModelEvent.SUBMITTED, onModelSubmitted);
-		model.removeEventListener(barmatz.events.FormModelEvent.SUBMISSION_FAILED, onModelSubmitionFailed);
+		model.removeEventListener(barmatz.events.FormEvent.SUBMITTING, onModelSubmitting);
+		model.removeEventListener(barmatz.events.FormEvent.SUBMITTED, onModelSubmitted);
+		model.removeEventListener(barmatz.events.FormEvent.SUBMISSION_FAILED, onModelSubmitionFailed);
 	}
 	 
 	function addLoadingDialog()
@@ -1056,16 +1046,21 @@ window.barmatz.forms.FormController = function(model, formView, submitButtonView
 		barmatz.forms.factories.DOMFactory.destroyLoadingDialog(loadingDialog);
 		loadingDialog = null;
 	}
-	 
-	function onViewSubmit(event)
+	
+	function submit()
 	{
 		if(!submittingForm)
 		{
 			addModelListeners();
 			
-			if(model.isValid)
+			if(model.isValid())
 				model.submit();
 		}
+	}
+	 
+	function onViewSubmit(event)
+	{
+		submit();
 	}
 	 
 	function onModelSubmitting(event)
@@ -1091,1052 +1086,906 @@ window.barmatz.forms.FormController = function(model, formView, submitButtonView
 		removeLoadingDialog();
 	 }
 };
-
 barmatz.forms.FormController.prototype = new barmatz.mvc.Controller();
 barmatz.forms.FormController.prototype.constructor = barmatz.forms.FormController;
-
-Object.defineProperties(barmatz.forms.FormController.prototype, {});
 /** barmatz.forms.FormModel **/
-window.barmatz.forms.FormModel = function()
+barmatz.forms.FormModel = function()
 {
 	barmatz.forms.CollectionModel.call(this);
 	this.set('name', '');
 	this.set('submitButtonLabel', 'Submit');
 	this.set('method', barmatz.forms.Methods.GET);
 	this.set('encoding', barmatz.net.Encoding.FORM);
-	this.set('created', null);
+	this.set('created', new Date('Invalid'));
 	this.set('fingerprint', null);
+	this.set('stylesheets', []);
 	this.set('direction', barmatz.forms.Directions.LTR);
 	this.set('targetEmail', '');
 	this.set('layoutId', 1);
 	this.set('language', 'en');
 };
-
 barmatz.forms.FormModel.prototype = new barmatz.forms.CollectionModel();
 barmatz.forms.FormModel.prototype.constructor = barmatz.forms.FormModel;
-
-Object.defineProperties(barmatz.forms.FormModel.prototype, 
+barmatz.forms.FormModel.prototype.getName = function()
 {
-	name: {get: function()
-	{
-		return this.get('name');
-	}, set: function(value)
-	{
-		barmatz.utils.DataTypes.isTypeOf(value, 'string');
-		this.set('name', value);
-	}},
-	submitButtonLabel: {get: function()
-	{
-		return this.get('submitButtonLabel');
-	}, set: function(value)
-	{
-		barmatz.utils.DataTypes.isTypeOf(value, 'string');
-		this.set('submitButtonLabel', value);
-	}},
-	method: {get: function()
-	{
-		return this.get('method');
-	}, set: function(value)
-	{
-		barmatz.utils.DataTypes.isTypeOf(value, 'string');
-		this.set('method', value);
-	}},
-	encoding: {get: function()
-	{
-		return this.get('encoding');
-	}, set: function(value)
-	{
-		barmatz.utils.DataTypes.isTypeOf(value, 'string');
-		this.set('encoding', value);
-	}},
-	created: {get: function()
-	{
-		return this.get('created');
-	}, set: function(value)
-	{
-		barmatz.utils.DataTypes.isInstanceOf(value, Date);
-		this.set('created', value);
-	}},
-	fingerprint: {get: function()
-	{
-		return this.get('fingerprint');
-	}, set: function(value)
-	{
-		barmatz.utils.DataTypes.isTypeOf(value, 'string');
+	return this.get('name');
+};
+barmatz.forms.FormModel.prototype.setName = function(value)
+{
+	barmatz.utils.DataTypes.isTypeOf(value, 'string');
+	this.set('name', value);
+};
+barmatz.forms.FormModel.prototype.getSubmitButtonLabel = function()
+{
+	return this.get('submitButtonLabel');
+};
+barmatz.forms.FormModel.prototype.setSubmitButtonLabel = function(value)
+{
+	barmatz.utils.DataTypes.isTypeOf(value, 'string');
+	this.set('submitButtonLabel', value);
+};
+barmatz.forms.FormModel.prototype.getMethod = function()
+{
+	return this.get('method');
+};
+barmatz.forms.FormModel.prototype.setMethod = function(value)
+{
+	barmatz.utils.DataTypes.isTypeOf(value, 'string');
+	this.set('method', value);
+};
+barmatz.forms.FormModel.prototype.getEncoding = function()
+{
+	return this.get('encoding');
+};
+barmatz.forms.FormModel.prototype.setEncoding = function(value)
+{
+	barmatz.utils.DataTypes.isTypeOf(value, 'string');
+	this.set('encoding', value);
+};
+barmatz.forms.FormModel.prototype.getCreated = function()
+{
+	return this.get('created');
+};
+barmatz.forms.FormModel.prototype.setCreated = function(value)
+{
+	barmatz.utils.DataTypes.isInstanceOf(value, Date);
+	this.set('created', value);
+};
+barmatz.forms.FormModel.prototype.getFingerprint = function()
+{
+	return this.get('fingerprint');
+};
+barmatz.forms.FormModel.prototype.setFingerprint = function(value)
+{
+	barmatz.utils.DataTypes.isTypeOf(value, 'string');
 
-		if(!this.fingerprint)
-			this.set('fingerprint', value);
-	}},
-	stylesheets: {get: function()
+	if(!this.fingerprint)
+		this.set('fingerprint', value);
+};
+barmatz.forms.FormModel.prototype.getStylesheets = function()
+{
+	return this.get('stylesheets');
+};
+barmatz.forms.FormModel.prototype.setStylesheets = function(value)
+{
+	barmatz.utils.DataTypes.isInstanceOf(value, window.Array);
+	this.set('stylesheets', value);
+};
+barmatz.forms.FormModel.prototype.getDirection = function()
+{
+	return this.get('direction');
+};
+barmatz.forms.FormModel.prototype.setDirection = function(value)
+{
+	barmatz.utils.DataTypes.isTypeOf(value, 'string');
+	this.set('direction', value);
+};
+barmatz.forms.FormModel.prototype.getTargetEmail = function()
+{
+	return this.get('targetEmail');
+};
+barmatz.forms.FormModel.prototype.setTargetEmail = function(value)
+{
+	barmatz.utils.DataTypes.isTypeOf(value, 'string');
+	this.set('targetEmail', value);
+};
+barmatz.forms.FormModel.prototype.getLayoutId = function()
+{
+	return this.get('layoutId');
+};
+barmatz.forms.FormModel.prototype.setLayoutId = function(value)
+{
+	barmatz.utils.DataTypes.isTypeOf(value, 'number');
+	this.set('layoutId', value);
+};
+barmatz.forms.FormModel.prototype.getLanguage = function()
+{
+	return this.get('language');
+};
+barmatz.forms.FormModel.prototype.setLanguage = function(value)
+{
+	barmatz.utils.DataTypes.isTypeOf(value, 'string');
+	this.set('language', value);
+};
+barmatz.forms.FormModel.prototype.addItem = function(item)
+{
+	barmatz.utils.DataTypes.isInstanceOf(item, barmatz.forms.fields.FormItemModel);
+	barmatz.forms.CollectionModel.prototype.addItem.call(this, item);
+};
+barmatz.forms.FormModel.prototype.addItemAt = function(item, index)
+{
+	barmatz.utils.DataTypes.isInstanceOf(item, barmatz.forms.fields.FormItemModel);
+	barmatz.utils.DataTypes.isTypeOf(index, 'number');
+	barmatz.forms.CollectionModel.prototype.addItemAt.call(this, item, index);
+};
+barmatz.forms.FormModel.prototype.removeItem = function(item)
+{
+	barmatz.utils.DataTypes.isInstanceOf(item, barmatz.forms.fields.FormItemModel);
+	barmatz.forms.CollectionModel.prototype.removeItem.call(this, item);
+};
+barmatz.forms.FormModel.prototype.getItemIndex = function(item)
+{
+	barmatz.utils.DataTypes.isInstanceOf(item, barmatz.forms.fields.FormItemModel);
+	return barmatz.forms.CollectionModel.prototype.getItemIndex.call(this, item);
+};
+barmatz.forms.FormModel.prototype.setItemIndex = function(item, index)
+{
+	barmatz.utils.DataTypes.isInstanceOf(item, barmatz.forms.fields.FormItemModel);
+	barmatz.utils.DataTypes.isTypeOf(index, 'number');
+	return barmatz.forms.CollectionModel.prototype.setItemIndex.call(this, item, index);
+};
+barmatz.forms.FormModel.prototype.toJSON = function()
+{
+	var object = {
+		name: this.getName(), 
+		submitButtonLabel: this.getSubmitButtonLabel(), 
+		method: this.getMethod(), 
+		encoding: this.getEncoding(), 
+		created: this.getCreated().valueOf(), 
+		fingerprint: this.getFingerprint(), 
+		stylesheets: this.getStylesheets(), 
+		direction: this.getDirection(), 
+		targetEmail: this.getTargetEmail(), 
+		layoutId: this.getLayoutId(), 
+		language: this.getLanguage(), 
+		fields: []
+	};
+	
+	this.forEach(function(item, index, collection)
 	{
-		if(!this.get('stylesheets'))
-			this.set('stylesheets', []);
-		return this.get('stylesheets');
-	}, set: function(value)
-	{
-		barmatz.utils.DataTypes.isInstanceOf(value, Array);
-		this.set('stylesheets', value);
-	}},
-	direction: {get: function()
-	{
-		return this.get('direction');
-	}, set: function(value)
-	{
-		barmatz.utils.DataTypes.isTypeOf(value, 'string');
-		this.set('direction', value);
-	}},
-	targetEmail: {get: function()
-	{
-		return this.get('targetEmail');
-	}, set: function(value)
-	{
-		barmatz.utils.DataTypes.isTypeOf(value, 'string');
-		this.set('targetEmail', value);
-	}},
-	layoutId: {get: function()
-	{
-		return this.get('layoutId');
-	}, set: function(value)
-	{
-		barmatz.utils.DataTypes.isTypeOf(value, 'number');
-		this.set('layoutId', value);
-	}},
-	language: {get: function()
-	{
-		return this.get('language');
-	}, set: function(value)
-	{
-		barmatz.utils.DataTypes.isTypeOf(value, 'string');
-		this.set('language', value);
-	}},
-	addItem: {value: function(item)
-	{
-		barmatz.utils.DataTypes.isNotUndefined(item);
-		barmatz.utils.DataTypes.isInstanceOf(item, barmatz.forms.fields.FormItemModel);
-		barmatz.forms.CollectionModel.prototype.addItem.call(this, item);
-	}},
-	addItemAt: {value: function(item, index)
-	{
-		barmatz.utils.DataTypes.isNotUndefined(item);
-		barmatz.utils.DataTypes.isNotUndefined(index);
-		barmatz.utils.DataTypes.isInstanceOf(item, barmatz.forms.fields.FormItemModel);
-		barmatz.utils.DataTypes.isTypeOf(index, 'number');
-		barmatz.forms.CollectionModel.prototype.addItemAt.call(this, item, index);
-	}},
-	removeItem: {value: function(item)
-	{
-		barmatz.utils.DataTypes.isNotUndefined(item);
-		barmatz.utils.DataTypes.isInstanceOf(item, barmatz.forms.fields.FormItemModel);
-		barmatz.forms.CollectionModel.prototype.removeItem.call(this, item);
-	}},
-	getItemIndex: {value: function(item)
-	{
-		barmatz.utils.DataTypes.isNotUndefined(item);
-		barmatz.utils.DataTypes.isInstanceOf(item, barmatz.forms.fields.FormItemModel);
-		return barmatz.forms.CollectionModel.prototype.getItemIndex.call(this, item);
-	}},
-	setItemIndex: {value: function(item, index)
-	{
-		barmatz.utils.DataTypes.isNotUndefined(item);
-		barmatz.utils.DataTypes.isNotUndefined(index);
-		barmatz.utils.DataTypes.isInstanceOf(item, barmatz.forms.fields.FormItemModel);
-		barmatz.utils.DataTypes.isTypeOf(index, 'number');
-		return barmatz.forms.CollectionModel.prototype.setItemIndex.call(this, item, index);
-	}},
-	toJSON: {value: function()
-	{
-		var object = {
-			name: this.name, 
-			submitButtonLabel: this.submitButtonLabel, 
-			method: this.method, 
-			encoding: this.encoding, 
-			created: this.created ? this.created.valueOf() : NaN, 
-			fingerprint: this.fingerprint, 
-			stylesheets: this.stylesheets, 
-			direction: this.direction, 
-			targetEmail: this.targetEmail, 
-			layoutId: this.layoutId, 
-			language: this.language, 
-			fields: []
-		};
+		var field = {type: item.getType()};
 		
-		this.forEach(function(item, index, collection)
+		if(item instanceof barmatz.forms.fields.FieldModel)
 		{
-			var field = {type: item.type};
-			
-			if(item instanceof barmatz.forms.fields.FieldModel)
+			field.name = item.getName();
+			field.label = item.getLabel();
+			field.mandatory = item.getMandatory();
+			field.enabled = item.getEnabled();
+			field.validator = item.getValidator();
+			field.width = item.getWidth();
+		}
+		
+		if(item instanceof barmatz.forms.fields.FileFieldModel)
+			field.accept = item.getAccept();
+
+		if(item instanceof barmatz.forms.fields.TextFieldModel)
+		{
+			field.max = item.getMax();
+			field.description = item.getDescription();
+		}
+		
+		if(item instanceof barmatz.forms.fields.TextAreaFieldModel)
+		{
+			field.rows = item.getRows();
+			field.cols = item.getCols();
+		}
+		
+		if(item instanceof barmatz.forms.fields.CheckboxFieldModel)
+			field.checked = item.getChecked();
+		
+		if(item instanceof barmatz.forms.fields.DropboxModel)
+		{
+			field.items = [];
+			item.forEach(function(item, index, collection)
 			{
-				field.name = item.name;
-				field.label = item.label;
-				field.mandatory = item.mandatory;
-				field.enabled = item.enabled;
-				field.validator = item.validator;
-				field.width = item.width;
-			}
-			
-			if(item instanceof barmatz.forms.fields.FileFieldModel)
-				field.accept = item.accept;
-
-			if(item instanceof barmatz.forms.fields.TextFieldModel)
-			{
-				field.max = item.max;
-				field.description = item.description;
-			}
-			
-			if(item instanceof barmatz.forms.fields.TextAreaFieldModel)
-			{
-				field.rows = item.rows;
-				field.cols = item.cols;
-			}
-			
-			if(item instanceof barmatz.forms.fields.CheckboxFieldModel)
-				field.checked = item.checked;
-			
-			if(item instanceof barmatz.forms.fields.DropboxModel)
-			{
-				field.items = [];
-				item.forEach(function(item, index, collection)
-				{
-					field.items.push({label: item.label, value: item.value});
-				});
-			}
-			
-			if(item instanceof barmatz.forms.fields.HTMLContentModel)
-				field.content = item.content;
-			
-			object.fields.push(field);
-		});
-		
-		return JSON.stringify(object);
-	}},
-	reset: {value: function()
-	{
-		this.set('name', '');
-		this.set('method', barmatz.forms.Methods.GET);
-		this.set('encoding', barmatz.net.Encoding.FORM);
-		this.set('created', null);
-		this.set('fingerprint', null);
-		this.set('stylesheets', []);
-		this.set('direction', barmatz.forms.Directions.LTR);
-		this.set('targetEmail', '');
-		this.set('layoutId', 1);
-		this.set('language', 'en');
-		while(this.numItems > 0)
-			this.removeItemAt(this.numItems - 1);
-	}},
-	save: {value: function(model)
-	{
-		var _this = this, request, loader;
-
-		barmatz.utils.DataTypes.isNotUndefined(model);
-		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.users.UserModel);
-		
-		this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.SAVING));
-
-		request = new barmatz.net.Request(barmatz.forms.Config.BASE_URL + '/api/form/save.php');
-		request.method = barmatz.net.Methods.POST;
-		request.data = {f: this.fingerprint || null, n: this.name, e: this.targetEmail, d: this.toJSON()};
-		loader = new barmatz.net.Loader();
-		addLoaderListeners();
-		loader.load(request);
-
-		function addLoaderListeners()
-		{
-			loader.addEventListener(barmatz.events.LoaderEvent.SUCCESS, onLoaderSuccess);
-			loader.addEventListener(barmatz.events.LoaderEvent.ERROR, onLoaderError);
-		}
-		
-		function removeLoaderListeners()
-		{
-			loader.removeEventListener(barmatz.events.LoaderEvent.SUCCESS, onLoaderSuccess);
-			loader.removeEventListener(barmatz.events.LoaderEvent.ERROR, onLoaderError);
-		}
-		
-		function onLoaderSuccess(event)
-		{
-			var data;
-			
-			barmatz.utils.DataTypes.isNotUndefined(event);
-			barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.LoaderEvent);
-			
-			removeLoaderListeners();
-			
-			try
-			{
-				data = JSON.parse(event.response.data);
-			}
-			catch(error)
-			{
-				return;
-			}
-				
-			if(data.fingerprint)
-				_this.set('fingerprint', data.fingerprint);
-			
-			_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.SAVED));
-		}
-		
-		function onLoaderError(event)
-		{
-			removeLoaderListeners();
-			_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.ERROR_SAVING));
-		}
-	}},
-	saveAs: {value: function(model, name)
-	{
-		barmatz.utils.DataTypes.isNotUndefined(model);
-		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.users.UserModel);
-		barmatz.utils.DataTypes.isNotUndefined(name);
-		barmatz.utils.DataTypes.isTypeOf(name, 'string');
-		this.set('name', name);
-		this.save(model);
-	}},
-	loadByFingerprint: {value: function(fingerprint)
-	{
-		var _this, request, loader, stage;
-		
-		barmatz.utils.DataTypes.isNotUndefined(fingerprint);	
-		barmatz.utils.DataTypes.isTypeOf(fingerprint, 'string');
-		
-		_this = this;
-		
-		this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.LOADING_FORM));
-		
-		loadData();
-		
-		function loadData()
-		{
-			stage = 1;
-			request = new barmatz.net.Request(barmatz.forms.Config.BASE_URL + '/api/form.php');
-			request.method = barmatz.net.Methods.GET;
-			request.data = {f: fingerprint};
-			loader = new barmatz.net.Loader();
-			addLoaderListeners();
-			loader.load(request);
-		}
-		
-		function loadLanguage()
-		{
-			stage = 2;
-			request.url = barmatz.forms.Config.BASE_URL + '/lang/form_' + _this.language + '.php';
-			request.data = null;
-			addLoaderListeners();
-			loader.load(request);
-		}
-
-		function addLoaderListeners()
-		{
-			loader.addEventListener(barmatz.events.LoaderEvent.SUCCESS, onLoaderSuccess);
-			loader.addEventListener(barmatz.events.LoaderEvent.ERROR, onLoaderError);
-		}
-		
-		function removeLoaderListeners()
-		{
-			loader.removeEventListener(barmatz.events.LoaderEvent.SUCCESS, onLoaderSuccess);
-			loader.removeEventListener(barmatz.events.LoaderEvent.ERROR, onLoaderError);
-		}
-		
-		function onLoaderSuccess(event)
-		{
-			var data;
-
-			barmatz.utils.DataTypes.isNotUndefined(event);
-			barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.LoaderEvent);
-
-			removeLoaderListeners();
-			
-			try
-			{
-				data = JSON.parse(event.response.data);
-			}
-			catch(error)
-			{
-				onLoaderError(event);
-				return;
-			}
-			
-			switch(stage)
-			{
-				case 1:
-					_this.copy(data.fingerprint, data.data);
-					loadLanguage();
-					break;
-				case 2:
-					barmatz.forms.Language = data;
-					_this.submitButtonLabel = barmatz.forms.Language.form.submit.label; 
-					_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.LOADING_FORM_COMPLETE));
-					break;
-			}
-		}
-		
-		function onLoaderError(event)
-		{
-			removeLoaderListeners();
-			_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.LOADING_FORM_ERROR));
-		}
-	}},
-	deleteForm: {value: function()
-	{
-		var _this, request, loader;
-		
-		_this = this;
-		
-		this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.DELETING));
-
-		request = new barmatz.net.Request(barmatz.forms.Config.BASE_URL + '/api/form/delete.php');
-		request.method = barmatz.net.Methods.POST;
-		request.data = {f: this.fingerprint};
-		
-		loader = new barmatz.net.Loader();
-		addLoaderListeners();
-		loader.load(request);
-
-		function addLoaderListeners()
-		{
-			loader.addEventListener(barmatz.events.LoaderEvent.SUCCESS, onLoaderSuccess);
-			loader.addEventListener(barmatz.events.LoaderEvent.ERROR, onLoaderError);
-		}
-		
-		function removeLoaderListeners()
-		{
-			loader.removeEventListener(barmatz.events.LoaderEvent.SUCCESS, onLoaderSuccess);
-			loader.removeEventListener(barmatz.events.LoaderEvent.ERROR, onLoaderError);
-		}
-		
-		function onLoaderSuccess(event)
-		{
-			barmatz.utils.DataTypes.isNotUndefined(event);
-			barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.LoaderEvent);
-			
-			removeLoaderListeners();
-			_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.DELETED));
-		}
-		
-		function onLoaderError(event)
-		{
-			removeLoaderListeners();
-			_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.DELETION_FAIL));
-		}
-	}},
-	isValid: {get: function()
-	{
-		var validFields = 0;
-		
-		this.forEach(function(item, index, collection)
-		{
-			validFields += item.validate() ? 1 : 0;
-		});
-		
-		return validFields == this.numItems;
-	}},
-	submit: {value: function()
-	{
-		var _this, request, loader, data;
-		
-		_this = this;
-		data = {};
-		
-		this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.SUBMITTING));
-		this.forEach(function(item, index, collection)
-		{
-			if(item instanceof barmatz.forms.fields.CheckboxFieldModel)
-				data[item.name] = item.checked ? 'yes' : 'no';
-			else
-				data[item.name] = item.value;
-		});
-
-		request = new barmatz.net.Request(barmatz.forms.Config.BASE_URL + '/api/form/submit.php');
-		request.method = this.method;
-		request.data = {f: this.fingerprint, d: JSON.stringify(data)};
-		request.headers = [new barmatz.net.RequestHeader('Content-Type', this.encoding)];
-		
-		loader = new barmatz.net.Loader();
-		addLoaderListeners();
-		loader.load(request);
-
-		function addLoaderListeners()
-		{
-			loader.addEventListener(barmatz.events.LoaderEvent.SUCCESS, onLoaderSuccess);
-			loader.addEventListener(barmatz.events.LoaderEvent.ERROR, onLoaderError);
-		}
-		
-		function removeLoaderListeners()
-		{
-			loader.removeEventListener(barmatz.events.LoaderEvent.SUCCESS, onLoaderSuccess);
-			loader.removeEventListener(barmatz.events.LoaderEvent.ERROR, onLoaderError);
-		}
-		
-		function onLoaderSuccess(event)
-		{
-			barmatz.utils.DataTypes.isNotUndefined(event);
-			barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.LoaderEvent);
-			removeLoaderListeners();
-			_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.SUBMITTED));
-		}
-		
-		function onLoaderError(event)
-		{
-			removeLoaderListeners();
-			_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.SUBMISSION_FAILED));
-		}
-	}},
-	getLeads: {value: function()
-	{
-		var _this, request, loader;
-		
-		_this = this;
-		
-		request = new barmatz.net.Request(barmatz.forms.Config.BASE_URL + '/api/form/leads.php');
-		request.method = barmatz.net.Methods.GET;
-		request.data = {f: this.fingerprint};
-		
-		loader = new barmatz.net.Loader();
-		addLoaderListeners();
-		loader.load(request);
-		
-		function addLoaderListeners()
-		{
-			loader.addEventListener(barmatz.events.LoaderEvent.SUCCESS, onLoaderSuccess);
-			loader.addEventListener(barmatz.events.LoaderEvent.ERROR, onLoaderError);
-		}
-		
-		function removeLoaderListeners()
-		{
-			loader.removeEventListener(barmatz.events.LoaderEvent.SUCCESS, onLoaderSuccess);
-			loader.removeEventListener(barmatz.events.LoaderEvent.ERROR, onLoaderError);
-		}
-		
-		function onLoaderSuccess(event)
-		{
-			var data;
-			
-			barmatz.utils.DataTypes.isNotUndefined(event);
-			barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.LoaderEvent);
-			
-			data = JSON.parse(event.response.data);
-			
-			removeLoaderListeners();
-			_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.GET_LEADS_SUCCESS, data));
-		}
-		
-		function onLoaderError(event)
-		{
-			removeLoaderListeners();
-			_this.dispatchEvent(new barmatz.events.FormModelEvent(barmatz.events.FormModelEvent.GET_LEADS_FAIL));
-		}
-		
-	}},
-	copy: {value: function(fingerprint, data)
-	{
-		var _this, field, fieldData, i;
-		
-		barmatz.utils.DataTypes.isNotUndefined(fingerprint);
-		barmatz.utils.DataTypes.isNotUndefined(data);
-		barmatz.utils.DataTypes.isTypeOf(fingerprint, 'string');
-		barmatz.utils.DataTypes.isTypeOf(data, 'object');
-
-		_this = this;
-		this.name = data.name || '';
-		this.submitButtonLabel = data.submitButtonLabel || 'Submit';
-		this.created = new Date(data.created);
-		this.method = data.method || barmatz.forms.Methods.GET;
-		this.encoding = data.encoding || barmatz.net.Encoding.FORM;
-		this.direction = data.direction || barmatz.forms.Directions.LTR;
-		this.targetEmail = data.targetEmail || '';
-		this.layoutId = data.layoutId || 1;
-		this.language = data.language || 'en';
-		this.set('fingerprint', fingerprint);
-		this.set('stylesheets', data.stylesheets || []);
-		
-
-		while(this.numItems > 0)
-			this.removeItemAt(this.numItems - 1);
-		
-		if(data instanceof barmatz.forms.FormModel)
-			data.forEach(function(item, index, collection)
-			{
-				addField(item);
+				field.items.push({label: item.getLabel(), value: item.getValue()});
 			});
-		else
-			for(i = 0; i < data.fields.length; i++)
-				addField(data.fields[i]);
-		
-		function addField(fieldData)
-		{
-			var name, dataItem, i;
-
-			barmatz.utils.DataTypes.isNotUndefined(fieldData);
-			barmatz.utils.DataTypes.isTypeOf(fieldData, 'object');
-			
-			name = fieldData.name;
-			
-			switch(fieldData.type)
-			{
-				default:
-					throw new Error('Unknown type');
-					break;
-				case barmatz.forms.fields.FieldTypes.HTML_CONTENT:
-					field = new barmatz.forms.fields.HTMLContentModel();
-					break;
-				case barmatz.forms.fields.FieldTypes.TEXT_AREA:
-					field = new barmatz.forms.fields.TextAreaFieldModel(name);
-					break;
-				case barmatz.forms.fields.FieldTypes.TEXT_FIELD:
-					field = new barmatz.forms.fields.TextFieldModel(name);
-					break;
-				case barmatz.forms.fields.FieldTypes.DROPBOX:
-					field = new barmatz.forms.fields.DropboxModel(name);
-					break;
-				case barmatz.forms.fields.FieldTypes.PASSWORD:
-					field = new barmatz.forms.fields.PasswordFieldModel(name);
-					break;
-				case barmatz.forms.fields.FieldTypes.CHECKBOX:
-					field = new barmatz.forms.fields.CheckboxFieldModel(name);
-					break;
-				case barmatz.forms.fields.FieldTypes.RADIO:
-					field = new barmatz.forms.fields.RadioFieldModel(name);
-					break;
-				case barmatz.forms.fields.FieldTypes.FILE:
-					field = new barmatz.forms.fields.FileFieldModel(name);
-					break;
-				case barmatz.forms.fields.FieldTypes.HIDDEN:
-					field = new barmatz.forms.fields.HiddenFieldModel(name);
-					break;
-				case barmatz.forms.fields.FieldTypes.PHONE:
-					field = new barmatz.forms.fields.PhoneFieldModel(name);
-					break;
-			}
-			
-			if(field instanceof barmatz.forms.fields.HTMLContentModel)
-				field.content = fieldData.content || '';
-
-			if(field instanceof barmatz.forms.fields.FieldModel)
-			{
-				field.label = fieldData.label || '';
-				field.mandatory = fieldData.mandatory || false;
-				field.enabled = fieldData.enabled || true;
-				field.validator = barmatz.forms.factories.ModelFactory.createValidatorModel(fieldData.validator || null);
-				field.width = fieldData.width || NaN;
-			}
-			
-			if(field instanceof barmatz.forms.fields.FileFieldModel)
-				field.accept = fieldData.accept;
-
-			if(field instanceof barmatz.forms.fields.TextFieldModel)
-			{
-				field.max = parseInt(fieldData.max || NaN);
-				field.description = fieldData.description || '';
-			}
-			
-			if(field instanceof barmatz.forms.fields.CheckboxFieldModel)
-				field.checked = fieldData.checked;
-			
-			if(field instanceof barmatz.forms.fields.DropboxModel)
-				if(fieldData instanceof barmatz.forms.fields.DropboxModel)
-					fieldData.forEach(function(item, index, collection)
-					{
-						addItemToField(field, item);
-					});
-				else
-					for(i = 0; i < fieldData.items.length; i++)
-						addItemToField(field, fieldData.items[i]);
-			
-			_this.addItem(field);
 		}
 		
-		function addItemToField(field, item)
-		{
-			barmatz.utils.DataTypes.isNotUndefined(item);
-			barmatz.utils.DataTypes.isTypeOf(item, 'object');
-			field.addItem(barmatz.forms.factories.ModelFactory.createDropboxItemModel(item.label, item.value));
-		}
-	}}
-});
-/** barmatz.forms.Methods **/
-window.barmatz.forms.Methods = function(){};
-
-Object.defineProperties(barmatz.forms.Methods,
+		if(item instanceof barmatz.forms.fields.HTMLContentModel)
+			field.content = item.getContent();
+		
+		object.fields.push(field);
+	});
+	
+	return JSON.stringify(object);
+};
+barmatz.forms.FormModel.prototype.reset = function()
 {
-	GET: {value: 'GET'},
-	POST: {value: 'POST'}
-});
+	this.set('name', '');
+	this.set('method', barmatz.forms.Methods.GET);
+	this.set('encoding', barmatz.net.Encoding.FORM);
+	this.set('created', new Date('Invalid'));
+	this.set('fingerprint', null);
+	this.set('stylesheets', []);
+	this.set('direction', barmatz.forms.Directions.LTR);
+	this.set('targetEmail', '');
+	this.set('layoutId', 1);
+	this.set('language', 'en');
+	while(this.getNumItems() > 0)
+		this.removeItemAt(this.getNumItems() - 1);
+};
+barmatz.forms.FormModel.prototype.save = function(model)
+{
+	var _this = this, request, loader;
+
+	barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.users.UserModel);
+	
+	this.dispatchEvent(new barmatz.events.FormEvent(barmatz.events.FormEvent.SAVING));
+
+	request = new barmatz.net.Request(barmatz.forms.Config.BASE_URL + '/api/form/save.php');
+	request.setMethod(barmatz.net.Methods.POST);
+	request.setData({f: this.getFingerprint() || null, n: this.getName(), e: this.getTargetEmail(), d: this.toJSON()});
+	loader = new barmatz.net.Loader();
+	addLoaderListeners();
+	loader.load(request);
+
+	function addLoaderListeners()
+	{
+		loader.addEventListener(barmatz.events.LoaderEvent.SUCCESS, onLoaderSuccess);
+		loader.addEventListener(barmatz.events.LoaderEvent.ERROR, onLoaderError);
+	}
+	
+	function removeLoaderListeners()
+	{
+		loader.removeEventListener(barmatz.events.LoaderEvent.SUCCESS, onLoaderSuccess);
+		loader.removeEventListener(barmatz.events.LoaderEvent.ERROR, onLoaderError);
+	}
+	
+	function onLoaderSuccess(event)
+	{
+		var data;
+		
+		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.LoaderEvent);
+		
+		removeLoaderListeners();
+		
+		try
+		{
+			data = JSON.parse(event.getResponse().getData());
+		}
+		catch(error)
+		{
+			return;
+		}
+			
+		if(data.fingerprint)
+			_this.set('fingerprint', data.fingerprint);
+		
+		_this.dispatchEvent(new barmatz.events.FormEvent(barmatz.events.FormEvent.SAVED));
+	}
+	
+	function onLoaderError(event)
+	{
+		removeLoaderListeners();
+		_this.dispatchEvent(new barmatz.events.FormEvent(barmatz.events.FormEvent.ERROR_SAVING));
+	}
+};
+barmatz.forms.FormModel.prototype.saveAs = function(model, name)
+{
+	barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.users.UserModel);
+	barmatz.utils.DataTypes.isNotUndefined(name);
+	barmatz.utils.DataTypes.isTypeOf(name, 'string');
+	this.set('name', name);
+	this.save(model);
+};
+barmatz.forms.FormModel.prototype.loadByFingerprint = function(fingerprint)
+{
+	var _this, request, loader, stage;
+	
+	barmatz.utils.DataTypes.isTypeOf(fingerprint, 'string');
+	
+	_this = this;
+	
+	this.dispatchEvent(new barmatz.events.FormEvent(barmatz.events.FormEvent.LOADING_FORM));
+	
+	loadData();
+	
+	function loadData()
+	{
+		stage = 1;
+		request = new barmatz.net.Request(barmatz.forms.Config.BASE_URL + '/api/form.php');
+		request.setMethod(barmatz.net.Methods.GET);
+		request.setData({f: fingerprint});
+		loader = new barmatz.net.Loader();
+		addLoaderListeners();
+		loader.load(request);
+	}
+	
+	function loadLanguage()
+	{
+		stage = 2;
+		request.setURL(barmatz.forms.Config.BASE_URL + '/lang/form_' + _this.getLanguage() + '.php');
+		request.setData(null);
+		addLoaderListeners();
+		loader.load(request);
+	}
+
+	function addLoaderListeners()
+	{
+		loader.addEventListener(barmatz.events.LoaderEvent.SUCCESS, onLoaderSuccess);
+		loader.addEventListener(barmatz.events.LoaderEvent.ERROR, onLoaderError);
+	}
+	
+	function removeLoaderListeners()
+	{
+		loader.removeEventListener(barmatz.events.LoaderEvent.SUCCESS, onLoaderSuccess);
+		loader.removeEventListener(barmatz.events.LoaderEvent.ERROR, onLoaderError);
+	}
+	
+	function objectToFormModel(data)
+	{
+		var model, fieldModel, fieldData, itemData, i, c;
+		
+		barmatz.utils.DataTypes.isTypeOf(data, 'object');
+		
+		model = barmatz.forms.factories.ModelFactory.createFormModel();
+		model.setCreated(barmatz.utils.Date.toDate(data.created));
+		model.setDirection(data.direction);
+		model.setEncoding(data.encoding);
+		model.setLanguage(data.language);
+		model.setLayoutId(data.layoutId);
+		model.setMethod(data.method);
+		model.setName(data.name);
+		model.setStylesheets(data.stylesheets);
+		model.setSubmitButtonLabel(data.submitButtonLabel);
+		model.setTargetEmail(data.targetEmail);
+
+		for(i = 0; i < data.fields.length; i++)
+		{
+			fieldData = data.fields[i];
+			fieldModel = barmatz.forms.factories.ModelFactory.createFieldModel(fieldData.type, fieldData.name);
+			
+			if(fieldModel instanceof barmatz.forms.fields.FieldModel)
+			{
+				fieldModel.setLabel(fieldData.label || '');
+				fieldModel.setMandatory(fieldData.mandatory || false);
+				fieldModel.setEnabled(fieldData.enabled || true);
+				fieldModel.setValidator(barmatz.forms.factories.ModelFactory.createValidatorModel(fieldData.validator));
+				fieldModel.setWidth(fieldData.width || NaN);
+			}
+			
+			if(fieldModel instanceof barmatz.forms.fields.FileFieldModel)
+				fieldModel.setAccept(fieldData.accept || []);
+
+			if(fieldModel instanceof barmatz.forms.fields.TextFieldModel)
+			{
+				fieldModel.setMax(fieldData.max || NaN);
+				fieldModel.setDescription(fieldData.description || '');
+			}
+			
+			if(fieldModel instanceof barmatz.forms.fields.TextAreaFieldModel)
+			{
+				fieldModel.setRows(fieldData.rows || 2);
+				fieldModel.setCols(fieldData.cols || 20);
+			}
+			
+			if(fieldModel instanceof barmatz.forms.fields.CheckboxFieldModel)
+				fieldModel.setChecked(fieldData.checked || false);
+			
+			if(fieldModel instanceof barmatz.forms.fields.DropboxModel)
+			{
+				for(c = 0; c < fieldData.items.length; c++)
+				{
+					itemData = fieldData.items[c];
+					fieldModel.addItem(new barmatz.forms.fields.DropboxItemModel(itemData.label || '', itemData.value || ''))
+				}
+			}
+			
+			if(fieldModel instanceof barmatz.forms.fields.HTMLContentModel)
+				fieldModel.setContent(fieldData.content || '');
+
+			model.addItem(fieldModel);
+		}
+		
+		return model;
+	}
+	
+	function onLoaderSuccess(event)
+	{
+		var data;
+
+		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.LoaderEvent);
+
+		removeLoaderListeners();
+		
+		try
+		{
+			data = JSON.parse(event.getResponse().getData());
+		}
+		catch(error)
+		{
+			onLoaderError(event);
+			return;
+		}
+		
+		switch(stage)
+		{
+			case 1:
+				data.data.created = data.created;
+				_this.copy(data.fingerprint, objectToFormModel(data.data));
+				loadLanguage();
+				break;
+			case 2:
+				barmatz.forms.Language = data;
+				_this.submitButtonLabel = barmatz.forms.Language.form.submit.label; 
+				_this.dispatchEvent(new barmatz.events.FormEvent(barmatz.events.FormEvent.LOADING_FORM_COMPLETE));
+				break;
+		}
+	}
+	
+	function onLoaderError(event)
+	{
+		removeLoaderListeners();
+		_this.dispatchEvent(new barmatz.events.FormEvent(barmatz.events.FormEvent.LOADING_FORM_ERROR));
+	}
+};
+barmatz.forms.FormModel.prototype.deleteForm = function()
+{
+	var _this, request, loader;
+	
+	_this = this;
+	
+	this.dispatchEvent(new barmatz.events.FormEvent(barmatz.events.FormEvent.DELETING));
+
+	request = new barmatz.net.Request(barmatz.forms.Config.BASE_URL + '/api/form/delete.php');
+	request.setMethod(barmatz.net.Methods.POST);
+	request.setData({f: this.getFingerprint()});
+	
+	loader = new barmatz.net.Loader();
+	addLoaderListeners();
+	loader.load(request);
+
+	function addLoaderListeners()
+	{
+		loader.addEventListener(barmatz.events.LoaderEvent.SUCCESS, onLoaderSuccess);
+		loader.addEventListener(barmatz.events.LoaderEvent.ERROR, onLoaderError);
+	}
+	
+	function removeLoaderListeners()
+	{
+		loader.removeEventListener(barmatz.events.LoaderEvent.SUCCESS, onLoaderSuccess);
+		loader.removeEventListener(barmatz.events.LoaderEvent.ERROR, onLoaderError);
+	}
+	
+	function onLoaderSuccess(event)
+	{
+		barmatz.utils.DataTypes.isNotUndefined(event);
+		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.LoaderEvent);
+		
+		removeLoaderListeners();
+		_this.dispatchEvent(new barmatz.events.FormEvent(barmatz.events.FormEvent.DELETED));
+	}
+	
+	function onLoaderError(event)
+	{
+		removeLoaderListeners();
+		_this.dispatchEvent(new barmatz.events.FormEvent(barmatz.events.FormEvent.DELETION_FAIL));
+	}
+};
+barmatz.forms.FormModel.prototype.isValid = function()
+{
+	var invalidFields = 0;
+	
+	this.forEach(function(item, index, collection)
+	{
+		if(!(item instanceof barmatz.forms.fields.HTMLContentModel) && !item.validate())
+			invalidFields++;
+	});
+	
+	return invalidFields == 0;
+};
+barmatz.forms.FormModel.prototype.submit = function()
+{
+	var _this, request, loader, data;
+	
+	_this = this;
+	data = {};
+	
+	this.dispatchEvent(new barmatz.events.FormEvent(barmatz.events.FormEvent.SUBMITTING));
+	this.forEach(function(item, index, collection)
+	{
+		if(!(item instanceof barmatz.forms.fields.HTMLContentModel))
+			data[item.getName()] = item.getValue();
+	});
+
+	request = new barmatz.net.Request(barmatz.forms.Config.BASE_URL + '/api/form/submit.php');
+	request.setMethod(this.getMethod());
+	request.setData({f: this.getFingerprint(), d: JSON.stringify(data)});
+	request.getHeaders().push(new barmatz.net.RequestHeader('Content-Type', this.getEncoding()));
+	
+	loader = new barmatz.net.Loader();
+	addLoaderListeners();
+	loader.load(request);
+
+	function addLoaderListeners()
+	{
+		loader.addEventListener(barmatz.events.LoaderEvent.SUCCESS, onLoaderSuccess);
+		loader.addEventListener(barmatz.events.LoaderEvent.ERROR, onLoaderError);
+	}
+	
+	function removeLoaderListeners()
+	{
+		loader.removeEventListener(barmatz.events.LoaderEvent.SUCCESS, onLoaderSuccess);
+		loader.removeEventListener(barmatz.events.LoaderEvent.ERROR, onLoaderError);
+	}
+	
+	function onLoaderSuccess(event)
+	{
+		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.LoaderEvent);
+		removeLoaderListeners();
+		_this.dispatchEvent(new barmatz.events.FormEvent(barmatz.events.FormEvent.SUBMITTED));
+	}
+	
+	function onLoaderError(event)
+	{
+		removeLoaderListeners();
+		_this.dispatchEvent(new barmatz.events.FormEvent(barmatz.events.FormEvent.SUBMISSION_FAILED));
+	}
+};
+barmatz.forms.FormModel.prototype.getLeads = function()
+{
+	var _this, request, loader;
+	
+	_this = this;
+	
+	request = new barmatz.net.Request(barmatz.forms.Config.BASE_URL + '/api/form/leads.php');
+	request.setMethod(barmatz.net.Methods.GET);
+	request.setData({f: this.getFingerprint()});
+	
+	loader = new barmatz.net.Loader();
+	addLoaderListeners();
+	loader.load(request);
+	
+	function addLoaderListeners()
+	{
+		loader.addEventListener(barmatz.events.LoaderEvent.SUCCESS, onLoaderSuccess);
+		loader.addEventListener(barmatz.events.LoaderEvent.ERROR, onLoaderError);
+	}
+	
+	function removeLoaderListeners()
+	{
+		loader.removeEventListener(barmatz.events.LoaderEvent.SUCCESS, onLoaderSuccess);
+		loader.removeEventListener(barmatz.events.LoaderEvent.ERROR, onLoaderError);
+	}
+	
+	function onLoaderSuccess(event)
+	{
+		var data;
+		
+		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.LoaderEvent);
+		
+		data = JSON.parse(event.getResponse().getData());
+		
+		removeLoaderListeners();
+		_this.dispatchEvent(new barmatz.events.FormEvent(barmatz.events.FormEvent.GET_LEADS_SUCCESS, data));
+	}
+	
+	function onLoaderError(event)
+	{
+		removeLoaderListeners();
+		_this.dispatchEvent(new barmatz.events.FormEvent(barmatz.events.FormEvent.GET_LEADS_FAIL));
+	}
+	
+};
+barmatz.forms.FormModel.prototype.copy = function(fingerprint, data)
+{
+	var _this, field, fieldData, i;
+	
+	barmatz.utils.DataTypes.isTypeOf(fingerprint, 'string');
+	barmatz.utils.DataTypes.isInstanceOf(data, barmatz.forms.FormModel);
+
+	_this = this;
+	this.setName(data.getName() || '');
+	this.setSubmitButtonLabel(data.getSubmitButtonLabel() || 'Submit');
+	this.setCreated(new Date(data.getCreated().getTime()));
+	this.setMethod(data.getMethod() || barmatz.forms.Methods.GET);
+	this.setEncoding(data.getEncoding() || barmatz.net.Encoding.FORM);
+	this.setDirection(data.getDirection() || barmatz.forms.Directions.LTR);
+	this.setTargetEmail(data.getTargetEmail() || '');
+	this.setLayoutId(data.getLayoutId() || 1);
+	this.setLanguage(data.getLanguage() || 'en');
+	this.setFingerprint(fingerprint);
+	this.setStylesheets(data.getStylesheets().slice(0) || []);
+
+	while(this.getNumItems() > 0)
+		this.removeItemAt(this.getNumItems() - 1);
+	
+	data.forEach(function(item, index, collection)
+	{
+		addField(item);
+	});
+	
+	function addField(model)
+	{
+		var field, name, dataItem, i;
+
+		barmatz.utils.DataTypes.isInstancesOf(model, [barmatz.forms.fields.FieldModel, barmatz.forms.fields.HTMLContentModel]);
+		
+		if(!(model instanceof barmatz.forms.fields.HTMLContentModel))
+			name = model.getName();
+		
+		switch(model.getType())
+		{
+			default:
+				throw new Error('Unknown type');
+				break;
+			case barmatz.forms.fields.FieldTypes.HTML_CONTENT:
+				field = new barmatz.forms.fields.HTMLContentModel();
+				break;
+			case barmatz.forms.fields.FieldTypes.TEXT_AREA:
+				field = new barmatz.forms.fields.TextAreaFieldModel(name);
+				break;
+			case barmatz.forms.fields.FieldTypes.TEXT_FIELD:
+				field = new barmatz.forms.fields.TextFieldModel(name);
+				break;
+			case barmatz.forms.fields.FieldTypes.DROPBOX:
+				field = new barmatz.forms.fields.DropboxModel(name);
+				break;
+			case barmatz.forms.fields.FieldTypes.PASSWORD:
+				field = new barmatz.forms.fields.PasswordFieldModel(name);
+				break;
+			case barmatz.forms.fields.FieldTypes.CHECKBOX:
+				field = new barmatz.forms.fields.CheckboxFieldModel(name);
+				break;
+			case barmatz.forms.fields.FieldTypes.RADIO:
+				field = new barmatz.forms.fields.RadioFieldModel(name);
+				break;
+			case barmatz.forms.fields.FieldTypes.FILE:
+				field = new barmatz.forms.fields.FileFieldModel(name);
+				break;
+			case barmatz.forms.fields.FieldTypes.HIDDEN:
+				field = new barmatz.forms.fields.HiddenFieldModel(name);
+				break;
+			case barmatz.forms.fields.FieldTypes.PHONE:
+				field = new barmatz.forms.fields.PhoneFieldModel(name);
+				break;
+		}
+		
+		if(field instanceof barmatz.forms.fields.HTMLContentModel)
+			field.setContent(model.getContent() || '');
+
+		if(field instanceof barmatz.forms.fields.FieldModel)
+		{
+			field.setLabel(model.getLabel() || '');
+			field.setMandatory(model.getMandatory() || false);
+			field.setEnabled(model.getEnabled() || true);
+			field.setValidator(barmatz.forms.factories.ModelFactory.createValidatorModel(model.getValidator() || null));
+			field.setWidth(model.getWidth() || NaN);
+		}
+		
+		if(field instanceof barmatz.forms.fields.FileFieldModel)
+			field.setAccept(model.getAccept());
+
+		if(field instanceof barmatz.forms.fields.TextFieldModel)
+		{
+			field.setMax(parseInt(model.getMax() || NaN));
+			field.setDescription(model.getDescription() || '');
+		}
+		
+		if(field instanceof barmatz.forms.fields.CheckboxFieldModel)
+			field.setChecked(model.getChecked());
+		
+		if(field instanceof barmatz.forms.fields.DropboxModel)
+			model.forEach(function(item, index, collection)
+			{
+				field.addItem(barmatz.forms.factories.ModelFactory.createDropboxItemModel(item.getLabel(), item.getValue()));
+			});
+		
+		_this.addItem(field);
+	}
+};
+/** barmatz.forms.Methods **/
+barmatz.forms.Methods = {
+	GET: 'GET',
+	POST: 'POST'
+};
 /** barmatz.forms.TypeModel **/
-window.barmatz.forms.TypeModel = function(type)
+barmatz.forms.TypeModel = function(type)
 {
 	barmatz.utils.DataTypes.isNotUndefined(type);
 	barmatz.utils.DataTypes.isTypeOf(type, 'string', true);
 	barmatz.mvc.Model.call(this);
 	this.set('type', type);
 };
-
 barmatz.forms.TypeModel.prototype = new barmatz.mvc.Model();
 barmatz.forms.TypeModel.prototype.constructor = barmatz.forms.TypeModel;
-
-Object.defineProperties(barmatz.forms.TypeModel.prototype, 
+barmatz.forms.TypeModel.prototype.getType = function()
 {
-	type: {get: function()
-	{
-		return this.get('type');
-	}}
-});
-/** barmatz.forms.Validator **/
-window.barmatz.forms.Validator = function()
-{
-	barmatz.mvc.Model.call(this);
+	return this.get('type');
 };
-
-barmatz.forms.Validator.prototype = new barmatz.mvc.Model();
-barmatz.forms.Validator.prototype.constructor = barmatz.forms.Validator;
-
-Object.defineProperties(barmatz.forms.Validator,
-{
-	NONE: {value: 0X0},
-	NOT_EMPTY: {value: 0X1},
-	EQUALS: {value: 0x2},
-	VALID_EMAIL: {value: 0x4},
-	VALID_PHONE: {value: 0x8},
-	MIN_LENGTH: {value: 0x10},
-	MAX_LENGTH: {value: 0x20},
-	EXACT_LENGTH: {value: 0x40},
-	GREATER_THAN: {value: 0x80},
-	LESSER_THAN: {value: 0x100},
-	DIGITS_ONLY: {value: 0x200},
-	NOT_DIGITS: {value: 0x400},
-	trim: {value: function(string)
+/** barmatz.forms.Validator **/
+barmatz.forms.Validator = {
+	NONE: 0X0,
+	NOT_EMPTY: 0X1,
+	EQUALS: 0x2,
+	VALID_EMAIL: 0x4,
+	VALID_PHONE: 0x8,
+	MIN_LENGTH: 0x10,
+	MAX_LENGTH: 0x20,
+	EXACT_LENGTH: 0x40,
+	GREATER_THAN: 0x80,
+	LESSER_THAN: 0x100,
+	DIGITS_ONLY: 0x200,
+	NOT_DIGITS: 0x400,
+	trim: function(string)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(string);
 		barmatz.utils.DataTypes.isTypeOf(string, 'string');
 		return string.replace(/(^\s+|\s+$)/g, '');
-	}},
-	notEmpty: {value: function(value)
+	},
+	notEmpty: function(value)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(value);
 		barmatz.utils.DataTypes.isTypeOf(value, 'string');
 		return this.trim(value).length != 0;
-	}},
-	equals: {value: function(value, pattern)
+	},
+	equals: function(value, pattern)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(value);
-		barmatz.utils.DataTypes.isNotUndefined(pattern);
 		barmatz.utils.DataTypes.isTypeOf(value, 'string');
 		barmatz.utils.DataTypes.isTypesOrInstances(pattern, ['string'], [RegExp]);
 		return new RegExp(pattern).test(value);
-	}},
-	validEmail: {value: function(value)
+	},
+	validEmail: function(value)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(value);
 		barmatz.utils.DataTypes.isTypeOf(value, 'string');
-		return this.equals(value, /^[a-z0-9!#$%&'*+\/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+\/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+([a-z].+)\b$/);
-	}},
-	validPhone: {value: function(value)
+		return this.equals(value, /^[a-z0-9!#$%&'*+\/=?^_`"{|}~-]+(?:\.[a-z0-9!#$%&'*+\/=?^_`"{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+([a-z].+)\b$/);
+	},
+	validPhone: function(value)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(value);
 		barmatz.utils.DataTypes.isTypeOf(value, 'string');
-		return this.equals(value, new RegExp('^(' + barmatz.forms.fields.PhonePrefixes.ALL.join('|') + ')[2-9][0-9]{6}$'));
-	}},
-	maxLength: {value: function(value, length)
+		return this.equals(value, new RegExp('^(' + barmatz.forms.fields.PhonePrefixes.join('|') + ')[2-9][0-9]{6}$'));
+	},
+	maxLength: function(value, length)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(value);
-		barmatz.utils.DataTypes.isNotUndefined(length);
 		barmatz.utils.DataTypes.isTypeOf(value, 'string');
 		barmatz.utils.DataTypes.isTypeOf(length, 'number');
 		return value.length <= length;
-	}},
-	minLength: {value: function(value, length)
+	},
+	minLength: function(value, length)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(value);
-		barmatz.utils.DataTypes.isNotUndefined(length);
 		barmatz.utils.DataTypes.isTypeOf(value, 'string');
 		barmatz.utils.DataTypes.isTypeOf(length, 'number');
 		return value.length >= length;
-	}},
-	exactLength: {value: function(value, length)
+	},
+	exactLength: function(value, length)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(value);
-		barmatz.utils.DataTypes.isNotUndefined(length);
 		barmatz.utils.DataTypes.isTypeOf(value, 'string');
 		barmatz.utils.DataTypes.isTypeOf(length, 'number');
 		return value.length == length;
-	}},
-	greaterThan: {value: function(valueA, valueB)
+	},
+	greaterThan: function(valueA, valueB)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(valueA);
-		barmatz.utils.DataTypes.isNotUndefined(valueB);
 		barmatz.utils.DataTypes.isTypeOf(valueA, 'number');
 		barmatz.utils.DataTypes.isTypeOf(valueB, 'number');
 		return valueA > valueB;
-	}},
-	lesserThan: {value: function(valueA, valueB)
+	},
+	lesserThan: function(valueA, valueB)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(valueA);
-		barmatz.utils.DataTypes.isNotUndefined(valueB);
 		barmatz.utils.DataTypes.isTypeOf(valueA, 'number');
 		barmatz.utils.DataTypes.isTypeOf(valueB, 'number');
 		return valueA < valueB;
-	}},
-	digitsOnly: {value: function(value)
+	},
+	digitsOnly: function(value)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(value);
 		barmatz.utils.DataTypes.isTypeOf(value, 'string');
 		return this.equals(value, /^\d*$/);
-	}},
-	notDigits: {value: function(value)
+	},
+	notDigits: function(value)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(value);
 		barmatz.utils.DataTypes.isTypeOf(value, 'string');
 		return this.equals(value, /^\D*$/);
-	}}
-});
+	}
+};
 /** barmatz.forms.factories.ControllerFactory **/
-window.barmatz.forms.factories.ControllerFactory = function(){};
-
-Object.defineProperties(barmatz.forms.factories.ControllerFactory,
-{
-	createLoginController: {value: function(model, userNameFieldView, passwordFieldView, submitButtonView, errorFieldView)
+barmatz.forms.factories.ControllerFactory = {
+	createLoginController: function(model, userNameFieldView, passwordFieldView, submitButtonView, errorFieldView, dialogContainerView)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(model);
-		barmatz.utils.DataTypes.isNotUndefined(userNameFieldView);
-		barmatz.utils.DataTypes.isNotUndefined(passwordFieldView);
-		barmatz.utils.DataTypes.isNotUndefined(submitButtonView);
-		barmatz.utils.DataTypes.isNotUndefined(errorFieldView);
-		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.users.UserModel);
-		barmatz.utils.DataTypes.isInstanceOf(userNameFieldView, HTMLElement);
-		barmatz.utils.DataTypes.isInstanceOf(passwordFieldView, HTMLElement);
-		barmatz.utils.DataTypes.isInstanceOf(submitButtonView, HTMLElement);
-		barmatz.utils.DataTypes.isInstanceOf(errorFieldView, HTMLElement);
-		return new barmatz.forms.users.LogingController(model, userNameFieldView, passwordFieldView, submitButtonView, errorFieldView);
-	}},
-	createToolboxController: {value: function(model, view)
+		return new barmatz.forms.users.LoginController(model, userNameFieldView, passwordFieldView, submitButtonView, errorFieldView, dialogContainerView);
+	},
+	createToolboxController: function(model, view)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(model);
-		barmatz.utils.DataTypes.isNotUndefined(view);
-		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.CollectionModel);
-		barmatz.utils.DataTypes.isInstanceOf(view, HTMLElement);
 		return new barmatz.forms.ui.ToolboxController(model, view);
-	}},
-	createWorkspaceController: {value: function(model, view)
+	},
+	createWorkspaceController: function(model, view, dialogContainerView)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(model);
-		barmatz.utils.DataTypes.isNotUndefined(view);
-		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.CollectionModel);
-		barmatz.utils.DataTypes.isInstanceOf(view, HTMLElement);
-		return new barmatz.forms.ui.WorkspaceController(model, view);
-	}},
-	createPropertiesController: {value: function(view)
+		return new barmatz.forms.ui.WorkspaceController(model, view, dialogContainerView);
+	},
+	createPropertiesController: function(view)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(view);
-		barmatz.utils.DataTypes.isInstanceOf(view, HTMLElement);
 		return new barmatz.forms.ui.PropertiesController(view);
-	}},
-	createBuilderController: {value: function(formModel, userModel, containerView, panelsView, formNameView, saveStatusView, menuModel, menuView, toolboxModel, toolboxView, workspaceView, propertiesController)
+	},
+	createBuilderController: function(formModel, userModel, containerView, panelsView, formNameView, saveStatusView, menuModel, menuView, toolboxModel, toolboxView, workspaceView, propertiesController, dialogContainerView)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(formModel);
-		barmatz.utils.DataTypes.isNotUndefined(userModel);
-		barmatz.utils.DataTypes.isNotUndefined(containerView);
-		barmatz.utils.DataTypes.isNotUndefined(panelsView);
-		barmatz.utils.DataTypes.isNotUndefined(formNameView);
-		barmatz.utils.DataTypes.isNotUndefined(saveStatusView);
-		barmatz.utils.DataTypes.isNotUndefined(menuModel);
-		barmatz.utils.DataTypes.isNotUndefined(menuView);
-		barmatz.utils.DataTypes.isNotUndefined(toolboxModel);
-		barmatz.utils.DataTypes.isNotUndefined(toolboxView);
-		barmatz.utils.DataTypes.isNotUndefined(workspaceView);
-		barmatz.utils.DataTypes.isNotUndefined(propertiesController);
-		barmatz.utils.DataTypes.isInstanceOf(formModel, barmatz.forms.FormModel);
-		barmatz.utils.DataTypes.isInstanceOf(userModel, barmatz.forms.users.UserModel);
-		barmatz.utils.DataTypes.isInstanceOf(containerView, HTMLElement);
-		barmatz.utils.DataTypes.isInstanceOf(panelsView, HTMLElement);
-		barmatz.utils.DataTypes.isInstanceOf(formNameView, HTMLElement);
-		barmatz.utils.DataTypes.isInstanceOf(saveStatusView, HTMLElement);
-		barmatz.utils.DataTypes.isInstanceOf(menuModel, barmatz.forms.ui.MenuModel);
-		barmatz.utils.DataTypes.isInstanceOf(menuView, HTMLElement);
-		barmatz.utils.DataTypes.isInstanceOf(toolboxModel, barmatz.forms.ui.ToolboxModel);
-		barmatz.utils.DataTypes.isInstanceOf(toolboxView, HTMLElement);
-		barmatz.utils.DataTypes.isInstanceOf(workspaceView, HTMLElement);
-		barmatz.utils.DataTypes.isInstanceOf(propertiesController, barmatz.forms.ui.PropertiesController);
-		return new barmatz.forms.ui.BuilderController(formModel, userModel, containerView, panelsView, formNameView, saveStatusView, menuModel, menuView, toolboxModel, toolboxView, workspaceView, propertiesController);
-	}},
-	createWorkspaceItemController: {value: function(model, labelView, fieldView, mandatoryView, deleteButtonView)
+		return new barmatz.forms.ui.BuilderController(formModel, userModel, containerView, panelsView, formNameView, saveStatusView, menuModel, menuView, toolboxModel, toolboxView, workspaceView, propertiesController, dialogContainerView);
+	},
+	createWorkspaceItemController: function(model, labelView, fieldView, mandatoryView, deleteButtonView)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(model);
-		barmatz.utils.DataTypes.isNotUndefined(labelView);
-		barmatz.utils.DataTypes.isNotUndefined(fieldView);
-		barmatz.utils.DataTypes.isNotUndefined(mandatoryView);
-		barmatz.utils.DataTypes.isNotUndefined(deleteButtonView);
-		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FormItemModel);
-		barmatz.utils.DataTypes.isInstanceOf(labelView, HTMLElement);
-		barmatz.utils.DataTypes.isInstanceOf(fieldView, HTMLElement);
-		barmatz.utils.DataTypes.isInstanceOf(mandatoryView, HTMLElement);
-		barmatz.utils.DataTypes.isInstanceOf(deleteButtonView, HTMLElement);
 		return new barmatz.forms.ui.WorkspaceItemController(model, labelView, fieldView, mandatoryView, deleteButtonView);
-	}},
-	createNewFieldDialogController: {value: function(model, view, nameFieldView, labelFieldView)
+	},
+	createNewFieldDialogController: function(model, view, nameFieldView, labelFieldView, dialogContainerView)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(model);
-		barmatz.utils.DataTypes.isNotUndefined(view);
-		barmatz.utils.DataTypes.isNotUndefined(nameFieldView);
-		barmatz.utils.DataTypes.isNotUndefined(labelFieldView);
-		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.mvc.Model);
-		barmatz.utils.DataTypes.isInstanceOf(view, HTMLElement);
-		barmatz.utils.DataTypes.isInstanceOf(nameFieldView, HTMLInputElement);
-		barmatz.utils.DataTypes.isInstanceOf(labelFieldView, HTMLInputElement);
-		return new barmatz.forms.ui.NewFieldDialogController(model, view, nameFieldView, labelFieldView);
-	}},
-	createMenuController: {value: function(model, iconView, itemsView)
+		return new barmatz.forms.ui.NewFieldDialogController(model, view, nameFieldView, labelFieldView, dialogContainerView);
+	},
+	createMenuController: function(model, iconView, itemsView)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(model);
-		barmatz.utils.DataTypes.isNotUndefined(iconView);
-		barmatz.utils.DataTypes.isNotUndefined(itemsView);
-		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.ui.MenuModel);
-		barmatz.utils.DataTypes.isInstanceOf(iconView, HTMLElement);
-		barmatz.utils.DataTypes.isInstanceOf(itemsView, HTMLElement);
 		return new barmatz.forms.ui.MenuController(model, iconView, itemsView);
-	}},
-	createUserFormsListController: {value: function(formModel, userModel, view, dialogView)
+	},
+	createUserFormsListController: function(formModel, userModel, view, dialogView, dialogContainerView)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(formModel);
-		barmatz.utils.DataTypes.isNotUndefined(userModel);
-		barmatz.utils.DataTypes.isNotUndefined(view);
-		barmatz.utils.DataTypes.isNotUndefined(dialogView);
-		barmatz.utils.DataTypes.isInstanceOf(formModel, barmatz.forms.FormModel);
-		barmatz.utils.DataTypes.isInstanceOf(userModel, barmatz.forms.users.UserModel);
-		barmatz.utils.DataTypes.isInstanceOf(view, HTMLElement);
-		barmatz.utils.DataTypes.isInstanceOf(dialogView, HTMLElement);
-		return new barmatz.forms.ui.UserFormsListController(formModel, userModel, view, dialogView);
-	}},
-	createUserFormsListItemController: {value: function(model, view, nameView, createdView, fingerprintView)
+		return new barmatz.forms.ui.UserFormsListController(formModel, userModel, view, dialogView, dialogContainerView);
+	},
+	createUserFormsListItemController: function(model, view, nameView, createdView, fingerprintView, dialogContainerView)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(model);
-		barmatz.utils.DataTypes.isNotUndefined(view);
-		barmatz.utils.DataTypes.isNotUndefined(nameView);
-		barmatz.utils.DataTypes.isNotUndefined(createdView);
-		barmatz.utils.DataTypes.isNotUndefined(fingerprintView);
-		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.FormModel);
-		barmatz.utils.DataTypes.isInstanceOf(view, HTMLElement);
-		barmatz.utils.DataTypes.isInstanceOf(nameView, HTMLElement);
-		barmatz.utils.DataTypes.isInstanceOf(createdView, HTMLElement);
-		barmatz.utils.DataTypes.isInstanceOf(fingerprintView, HTMLElement);
-		return new barmatz.forms.ui.UserFormsListItemController(model, view, nameView, createdView, fingerprintView);
-	}},
-	createFormController: {value: function(model, formView, submitButtonView)
+		return new barmatz.forms.ui.UserFormsListItemController(model, view, nameView, createdView, fingerprintView, dialogContainerView);
+	},
+	createFormController: function(model, formView, submitButtonView)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(model);
-		barmatz.utils.DataTypes.isNotUndefined(formView);
-		barmatz.utils.DataTypes.isNotUndefined(submitButtonView);
-		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.FormModel);
-		barmatz.utils.DataTypes.isInstanceOf(formView, HTMLFormElement);
-		barmatz.utils.DataTypes.isInstanceOf(submitButtonView, HTMLElement);
 		return new barmatz.forms.FormController(model, formView, submitButtonView);
-	}},
-	createDropboxItemsListController: {value: function(model, view, addButtonView, resetButtonView)
+	},
+	createDropboxItemsListController: function(model, view, addButtonView, resetButtonView, dialogContainerView)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(model);
-		barmatz.utils.DataTypes.isNotUndefined(view);
-		barmatz.utils.DataTypes.isNotUndefined(addButtonView);
-		barmatz.utils.DataTypes.isNotUndefined(resetButtonView);
-		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.DropboxModel);
-		barmatz.utils.DataTypes.isInstanceOf(view, HTMLElement);
-		barmatz.utils.DataTypes.isInstanceOf(addButtonView, HTMLElement);
-		barmatz.utils.DataTypes.isInstanceOf(resetButtonView, HTMLElement);
-		return new barmatz.forms.fields.DropboxItemsListController(model, view, addButtonView, resetButtonView);
-	}},
-	createDropboxItemsListItemController: {value: function(model, labelView, valueView, editButtonView)
+		return new barmatz.forms.fields.DropboxItemsListController(model, view, addButtonView, resetButtonView, dialogContainerView);
+	},
+	createDropboxItemsListItemController: function(model, labelView, valueView, editButtonView, dialogContainerView)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(model);
-		barmatz.utils.DataTypes.isNotUndefined(labelView);
-		barmatz.utils.DataTypes.isNotUndefined(valueView);
-		barmatz.utils.DataTypes.isNotUndefined(editButtonView);
-		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.DropboxItemModel);
-		barmatz.utils.DataTypes.isInstanceOf(labelView, HTMLElement);
-		barmatz.utils.DataTypes.isInstanceOf(valueView, HTMLElement);
-		barmatz.utils.DataTypes.isInstanceOf(editButtonView, HTMLElement);
-		return new barmatz.forms.fields.DropboxItemsListItemController(model, labelView, valueView, editButtonView);
-	}},
-	createFieldValidationOptionsController: {value: function(model, options)
+		return new barmatz.forms.fields.DropboxItemsListItemController(model, labelView, valueView, editButtonView, dialogContainerView);
+	},
+	createFieldValidationOptionsController: function(model, options, dialogContainerView)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(model);
-		barmatz.utils.DataTypes.isNotUndefined(options);
-		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FieldModel);
-		barmatz.utils.DataTypes.isTypeOf(options, 'object');
-		return new barmatz.forms.fields.FieldValidationOptionsController(model, options);
-	}},
-	createFieldController: {value: function(model, fieldView, errorMessageView)
+		return new barmatz.forms.fields.FieldValidationOptionsController(model, options, dialogContainerView);
+	},
+	createFieldController: function(model, fieldView, errorMessageView)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(model);
-		barmatz.utils.DataTypes.isNotUndefined(fieldView);
-		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FieldModel);
-		barmatz.utils.DataTypes.isInstanceOf(fieldView, HTMLElement);
-		barmatz.utils.DataTypes.isInstanceOf(errorMessageView, HTMLElement, true);
 		return new barmatz.forms.fields.FieldController(model, fieldView, errorMessageView);
-	}},
-	createJQueryDialogController: {value: function(view)
+	},
+	createJQueryDialogController: function(view)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(view);
-		barmatz.utils.DataTypes.isInstanceOf(view, HTMLElement);
 		return new barmatz.forms.ui.JQueryDialogController(view);
-	}},
-	createLeadsController: {value: function(userModel, formsListModel, formsListView, leadsListModel, leadsListWrapperView, leadsListView, containerView, panelsView)
+	},
+	createLeadsController: function(userModel, formsListModel, formsListView, leadsListModel, leadsListWrapperView, leadsListView, containerView, panelsView, dialogContainerView)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(userModel);
-		barmatz.utils.DataTypes.isNotUndefined(formsListModel);
-		barmatz.utils.DataTypes.isNotUndefined(formsListView);
-		barmatz.utils.DataTypes.isNotUndefined(leadsListModel);
-		barmatz.utils.DataTypes.isNotUndefined(leadsListWrapperView);
-		barmatz.utils.DataTypes.isNotUndefined(leadsListView);
-		barmatz.utils.DataTypes.isNotUndefined(containerView);
-		barmatz.utils.DataTypes.isNotUndefined(panelsView);
-		barmatz.utils.DataTypes.isInstanceOf(userModel, barmatz.forms.users.UserModel);
-		barmatz.utils.DataTypes.isInstanceOf(formsListModel, barmatz.forms.CollectionModel);
-		barmatz.utils.DataTypes.isInstanceOf(leadsListModel, barmatz.forms.CollectionModel);
-		barmatz.utils.DataTypes.isInstanceOf(leadsListWrapperView, HTMLElement);
-		barmatz.utils.DataTypes.isInstanceOf(leadsListView, HTMLElement);
-		barmatz.utils.DataTypes.isInstanceOf(containerView, HTMLElement);
-		barmatz.utils.DataTypes.isInstanceOf(panelsView, HTMLElement);
-		return new barmatz.forms.ui.LeadsController(userModel, formsListModel, formsListView, leadsListModel, leadsListWrapperView, leadsListView, containerView, panelsView);
-	}},
-	createLeadsListController: {value: function(model, view)
+		return new barmatz.forms.ui.LeadsController(userModel, formsListModel, formsListView, leadsListModel, leadsListWrapperView, leadsListView, containerView, panelsView, dialogContainerView);
+	},
+	createLeadsListController: function(model, view)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(model);
-		barmatz.utils.DataTypes.isNotUndefined(view);
-		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.CollectionModel);
-		barmatz.utils.DataTypes.isInstanceOf(view, HTMLElement);
 		return new barmatz.forms.ui.LeadsListController(model, view);
-	}},
-	createLeadsFormsListController: {value: function(model, view)
+	},
+	createLeadsFormsListController: function(model, view)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(model);
-		barmatz.utils.DataTypes.isNotUndefined(view);
-		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.CollectionModel);
-		barmatz.utils.DataTypes.isInstanceOf(view, HTMLElement);
 		return new barmatz.forms.ui.LeadsFormsListController(model, view);
-	}}
-});
+	}
+}
 /** barmatz.forms.factories.DOMFactory **/
-window.barmatz.forms.factories.DOMFactory = function(){};
-
-Object.defineProperties(barmatz.forms.factories.DOMFactory,
-{
-	BODY_ELEMENT: {get: function()
+barmatz.forms.factories.DOMFactory = {
+	getBodyElement: function()
 	{
 		if(!this._bodyElement)
 			this._bodyElement = document.getElementsByTagName('body')[0];
 		return this._bodyElement;
-	}},
-	createStylesheet: {value: function(href)
+	},
+	createStylesheet: function(href)
 	{
 		var link;
 		
 		barmatz.utils.DataTypes.isNotUndefined(href);
 		barmatz.utils.DataTypes.isTypeOf(href, 'string');
 		
-		
 		link = this.createElement('link');
 		link.rel = 'stylesheet';
 		link.type = 'text/css';
 		link.href = href;
 		return link;
-	}},
-	createElement: {value: function(tagName, className)
+	},
+	createElement: function(tagName, className)
 	{
 		var element;
 		
@@ -2150,15 +1999,15 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 			element.className = className;
 		
 		return element;
-	}},
-	createElementWithContent: {value: function(tagName, className, content, appendChildWrapper)
+	},
+	createElementWithContent: function(tagName, className, content, appendChildWrapper)
 	{
 		var _this, element;
 		
 		barmatz.utils.DataTypes.isNotUndefined(tagName);
 		barmatz.utils.DataTypes.isTypeOf(tagName, 'string');
 		barmatz.utils.DataTypes.isTypeOf(className, 'string', true);
-		barmatz.utils.DataTypes.isTypesOrInstances(content, ['string'], [HTMLElement, Array]);
+		barmatz.utils.DataTypes.isTypesOrInstances(content, ['string'], [window.HTMLElement, window.Array]);
 		barmatz.utils.DataTypes.isTypeOf(appendChildWrapper, 'function', true);
 		
 		_this = this;
@@ -2178,29 +2027,33 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 				else
 					parent.innerHTML = content;
 			}
-			else if(barmatz.utils.DataTypes.applySilent('isInstanceOf', content, HTMLElement))
+			else if(barmatz.utils.DataTypes.applySilent('isInstanceOf', content, window.HTMLElement))
 				parent.appendChild(appendChildWrapper != null ? appendChildWrapper(content) : content);
-			else if(barmatz.utils.DataTypes.applySilent('isInstanceOf', content, Array))
+			else if(barmatz.utils.DataTypes.applySilent('isInstanceOf', content, window.Array))
 			{
 				for(i = 0; i < content.length; i++)
 					addContent(content[i], parent, 'span');
 			}
 		}
-	}},
-	createButton: {value: function(label, className)
+	},
+	createButton: function(label, clickHandler, className)
 	{
 		var button;
 		
-		barmatz.utils.DataTypes.isNotUndefined(label);
 		barmatz.utils.DataTypes.isTypeOf(label, 'string');
+		barmatz.utils.DataTypes.isTypeOf(clickHandler, 'function', true);
 		barmatz.utils.DataTypes.isTypeOf(className, 'string', true);
 		
 		button = this.createElementWithContent('button', className || '', label);
+		
+		if(clickHandler != null)
+			button.addEventListener('click', clickHandler);
+		
 		jQuery(button).button();
 		
 		return button;
-	}},
-	createDropboxElement: {value: function(model, selectedIndex)
+	},
+	createDropboxElement: function(model, selectedIndex)
 	{
 		var _this, dropbox;
 		
@@ -2210,7 +2063,7 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		
 		_this = this;
 		dropbox = this.createElement('select');
-		dropbox.name = model.name;
+		dropbox.name = model.getName();
 		
 		model.forEach(function(item, index, collection)
 		{
@@ -2221,34 +2074,35 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 			dropbox.selectedIndex = selectedIndex;
 		
 		return dropbox;
-	}},
-	createDropboxItemElement: {value: function(model)
+	},
+	createDropboxItemElement: function(model)
 	{
 		var item;
-
+	
 		barmatz.utils.DataTypes.isNotUndefined(model);
 		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.DropboxItemModel);
 		
-		item = this.createElementWithContent('option', '', model.label);
-		item.value = model.value;
+		item = this.createElementWithContent('option', '', model.getLabel());
+		item.value = model.getValue();
 		
 		return item;
-	}},
-	createFormFieldElement: {value: function(model)
+	},
+	createFormFieldElement: function(model)
 	{
-		var _this, field;
+		var _this, field, type;
 		
 		barmatz.utils.DataTypes.isNotUndefined(model);
 		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FormItemModel);
 		
 		_this = this;
-		field = this.createElement(getElementTagName(model.type || barmatz.forms.fields.FieldTypes.HTML_CONTENT));
+		type = model.getType();
+		field = this.createElement(getElementTagName(type || barmatz.forms.fields.FieldTypes.HTML_CONTENT));
 		
 		if(model instanceof barmatz.forms.fields.PhoneFieldModel)
 			createPhoneField();
 		
 		if(field.tagName.toLowerCase() == 'input')
-			field.type = model.type;
+			field.type = type;
 		
 		setFieldPropertiesByModel(field, model);
 		
@@ -2256,35 +2110,41 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		
 		function setFieldPropertiesByModel(field, model)
 		{
+			var max, prefix;
+			
 			barmatz.utils.DataTypes.isNotUndefined(field);
 			barmatz.utils.DataTypes.isNotUndefined(model);
-			barmatz.utils.DataTypes.isInstanceOf(field, HTMLElement);
+			barmatz.utils.DataTypes.isInstanceOf(field, window.HTMLElement);
 			barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FormItemModel);
 			
-			if(!(model instanceof barmatz.forms.fields.PhoneFieldModel))
-				field.value = model.value;
+			if(field.hasOwnProperty('value'))
+				field.value = model.getValue();
 			
-			field.enabled = model.enabled;
+			if(field.hasOwnProperty('enabled'))
+				field.enabled = model.getEnabled();
 			
 			if(model instanceof barmatz.forms.fields.TextFieldModel)
-				if(!isNaN(model.max))
-					field.maxLength = model.max;
+			{
+				max = model.getMax();
+				if(!isNaN(max))
+					field.maxLength = max;
+			}
 			
 			if(model instanceof barmatz.forms.fields.CheckboxFieldModel)
-				field.checked = model.checked;
+				field.checked = model.getChecked();
 			
 			if(model instanceof barmatz.forms.fields.FileFieldModel)
-				field.accept = model.accept;
+				field.accept = model.getAccept();
 			
 			if(model instanceof barmatz.forms.fields.TextAreaFieldModel)
 			{
-				field.rows = model.rows;
-				field.cols = model.cols;
+				field.rows = model.getRows();
+				field.cols = model.getCols();
 			}
 			
 			if(model instanceof barmatz.forms.fields.DropboxModel)
 			{
-				field.multiple = model.multiple;
+				field.multiple = model.getMultiple();
 				
 				model.forEach(function(item, index, collection)
 				{
@@ -2294,9 +2154,13 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 			
 			if(model instanceof barmatz.forms.fields.PhoneFieldModel)
 			{
-				field.getElementsByTagName('select')[0].value = model.prefix;
-				field.getElementsByTagName('input')[0].value = model.value.replace(model.prefix, '');
+				prefix = model.getPrefix();
+				field.getElementsByTagName('select')[0].value = prefix;
+				field.getElementsByTagName('input')[0].value = model.getValue().replace(prefix, '');
 			}
+
+			if(model instanceof barmatz.forms.fields.HTMLContentModel)
+				field.innerHTML = model.getContent();
 		}
 		
 		function getElementTagName(type)
@@ -2347,14 +2211,14 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 			{
 				prefixModel.addItem(barmatz.forms.factories.ModelFactory.createDropboxItemModel(prefix, prefix));
 			});
-
+	
 			barmatz.utils.CSS.addClass(field, 'forms-phone-field');
 			field.dir = 'ltr';
 			field.appendChild(_this.createDropboxElement(prefixModel));
 			field.appendChild(phoneField)
 		}
-	}},
-	createFieldWrapper: {value: function(model, className)
+	},
+	createFieldWrapper: function(model, className)
 	{
 		var wrapper, label, field, mandatory;
 		
@@ -2363,13 +2227,13 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		barmatz.utils.DataTypes.isTypeOf(className, 'string', true);
 		
 		wrapper = this.createElement('div', className);
-		label = wrapper.appendChild(this.createElementWithContent('label', '', model.label ? model.label : ''));
+		label = wrapper.appendChild(this.createElementWithContent('label', '', model.getLabel() || ''));
 		field = wrapper.appendChild(this.createFormFieldElement(model));
-		mandatory = wrapper.appendChild(this.createElementWithContent('span', '', mandatory ? '*' : ''));
-
+		mandatory = wrapper.appendChild(this.createElementWithContent('span', '', model.getMandatory() ? '*' : ''));
+	
 		return {wrapper: wrapper, label: label, field: field, mandatory: mandatory};
-	}},
-	createSubmitButton: {value: function(label, clickHandler)
+	},
+	createSubmitButton: function(label, clickHandler)
 	{
 		var wrapper, button;
 		
@@ -2381,12 +2245,12 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		wrapper.appendChild(button);
 		
 		return wrapper;
-	}},
-	createToolbox: {value: function()
+	},
+	createToolbox: function()
 	{
 		return this.createElement('ul');
-	}},
-	createWorkspaceWrapper: {value: function(formName, saveStatus)
+	},
+	createWorkspaceWrapper: function(formName, saveStatus)
 	{
 		var formNameElement, saveStatusElement, workspaceElement;
 		
@@ -2396,20 +2260,20 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		formNameElement = this.createElementWithContent('h1', 'forms-workspace-header-form-name', formName || '');
 		saveStatusElement = this.createElementWithContent('h3', 'forms-workspace-header-save-status', saveStatus || '');
 		workspaceElement = this.createElement('table', 'forms-workspace-items');
-
+	
 		return {wrapper: this.createElementWithContent('div', 'forms-workspace-wrapper', [this.createElementWithContent('div', 'forms-workspace-header', [formNameElement, saveStatusElement]), workspaceElement]), formName: formNameElement, saveStatus: saveStatusElement, workspace: workspaceElement};
-	}},
-	createProperties: {value: function()
+	},
+	createProperties: function()
 	{
 		return this.createElement('div');
-	}},
-	createToolboxItem: {value: function(label)
+	},
+	createToolboxItem: function(label)
 	{
 		barmatz.utils.DataTypes.isNotUndefined(label);
 		barmatz.utils.DataTypes.isTypeOf(label, 'string');
 		return this.createElementWithContent('li', 'forms-toolbox-item', label);
-	}},
-	createWorkspaceItemWrapper: {value: function(model)
+	},
+	createWorkspaceItemWrapper: function(model)
 	{
 		var _this, isFieldModel, wrapper, grip, label, field, mandatory, deleteButton;
 		
@@ -2420,9 +2284,9 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		isFieldModel = model instanceof barmatz.forms.fields.FieldModel;
 		wrapper = this.createElement('tr', 'forms-workspace-item');
 		grip = this.createElement('span', 'forms-grip ui-icon ui-icon-grip-solid-vertical');
-		label = this.createElementWithContent('label', '', isFieldModel && model.label ? model.label : '');
+		label = this.createElementWithContent('label', '', isFieldModel && model.getLabel() ? model.getLabel() : '');
 		field = this.createFormFieldElement(model);
-		mandatory = this.createElementWithContent('span', 'forms-form-item-mandatory', isFieldModel && model.mandatory ? '*' : '');
+		mandatory = this.createElementWithContent('span', 'forms-form-item-mandatory', isFieldModel && model.getMandatory() ? '*' : '');
 		deleteButton = this.createDeleteButton();
 		
 		addToWrapper('forms-workspace-item-grip', grip);
@@ -2439,8 +2303,8 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 			barmatz.utils.DataTypes.isTypeOf(className, 'string');
 			wrapper.appendChild(_this.createElementWithContent('td', className, content));
 		}
-	}},
-	createPropertiesItemWarpper: {value: function(model)
+	},
+	createPropertiesItemWarpper: function(model)
 	{
 		var _this, returnWrapper, wrapper;
 		
@@ -2451,43 +2315,43 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		returnWrapper = {};
 		
 		wrapper = this.createElement('div');
-		wrapper.appendChild(this.createElementWithContent('h2', 'forms-header', barmatz.utils.String.firstLetterToUpperCase(model.type) + ' field'));
+		wrapper.appendChild(this.createElementWithContent('h2', 'forms-header', barmatz.utils.String.firstLetterToUpperCase(model.getType()) + ' field'));
 		
 		returnWrapper.wrapper = wrapper;
 		
 		if(model instanceof barmatz.forms.fields.FieldModel)
 		{
-			returnWrapper.nameField = addFieldToWrapper('string', 'name', 'name', model.name);
-			returnWrapper.labelField = addFieldToWrapper('string', 'label', 'label', model.label);
-			returnWrapper.mandatoryField = addFieldToWrapper('boolean', 'mandatory', 'mandatory', model.mandatory);
-			returnWrapper.enabledField = addFieldToWrapper('boolean', 'enabled', 'enabled', model.enabled);
-			returnWrapper.widthField = addFieldToWrapper('number', 'width', 'width', model.width);
+			returnWrapper.nameField = addFieldToWrapper('string', 'name', 'name', model.getName());
+			returnWrapper.labelField = addFieldToWrapper('string', 'label', 'label', model.getLabel());
+			returnWrapper.mandatoryField = addFieldToWrapper('boolean', 'mandatory', 'mandatory', model.getMandatory());
+			returnWrapper.enabledField = addFieldToWrapper('boolean', 'enabled', 'enabled', model.getEnabled());
+			returnWrapper.widthField = addFieldToWrapper('number', 'width', 'width', model.getWidth());
 		}
 		
 		if(model instanceof barmatz.forms.fields.FileFieldModel)
-			returnWrapper.acceptField = addFieldToWrapper('array', 'accept', 'accept', model.accept);
-
+			returnWrapper.acceptField = addFieldToWrapper('string', 'accept', 'accept', model.getAccept().toString());
+	
 		if(model instanceof barmatz.forms.fields.TextFieldModel)
 		{
-			returnWrapper.descriptionField = addFieldToWrapper('string', 'description', 'description', model.description);
-			returnWrapper.maxField = addFieldToWrapper('number', 'max', 'max', model.max);
+			returnWrapper.descriptionField = addFieldToWrapper('string', 'description', 'description', model.getDescription());
+			returnWrapper.maxField = addFieldToWrapper('number', 'max', 'max', model.getMax());
 		}
 		
 		if(model instanceof barmatz.forms.fields.TextAreaFieldModel)
 		{
-			returnWrapper.rowsField = addFieldToWrapper('number', 'rows', 'rows', model.rows);
-			returnWrapper.colsField = addFieldToWrapper('number', 'cols', 'columns', model.cols);
+			returnWrapper.rowsField = addFieldToWrapper('number', 'rows', 'rows', model.getRows());
+			returnWrapper.colsField = addFieldToWrapper('number', 'cols', 'columns', model.getCols());
 		}
 		
 		if(model instanceof barmatz.forms.fields.CheckboxFieldModel)
-			returnWrapper.checkedField = addFieldToWrapper('boolean', 'checked', 'checked', model.checked);
+			returnWrapper.checkedField = addFieldToWrapper('boolean', 'checked', 'checked', model.getChecked());
 		
 		if(model instanceof barmatz.forms.fields.DropboxModel)
 		{
-			returnWrapper.multipleField = addFieldToWrapper('boolean', 'multiple', 'multiple', model.multiple);
+			returnWrapper.multipleField = addFieldToWrapper('boolean', 'multiple', 'multiple', model.getMultiple());
 			returnWrapper.editItemsButton = addFieldToWrapper('button', '', 'Edit items');
 		}
-
+	
 		if(model instanceof barmatz.forms.fields.FieldModel)
 			returnWrapper.validationOptionsButton = addFieldToWrapper('button', '', 'Validation options');
 		
@@ -2500,13 +2364,10 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		{
 			var fieldWrapper;
 			
-			barmatz.utils.DataTypes.isNotUndefined(type);
-			barmatz.utils.DataTypes.isNotUndefined(name);
-			barmatz.utils.DataTypes.isNotUndefined(label);
 			barmatz.utils.DataTypes.isTypeOf(type, 'string');
 			barmatz.utils.DataTypes.isTypeOf(name, 'string');
 			barmatz.utils.DataTypes.isTypeOf(label, 'string');
-
+	
 			fieldWrapper = _this.createPropertiesItemFieldWrapper(type, name, label, value, onFieldValueChange);
 			wrapper.appendChild(fieldWrapper.wrapper);
 			return fieldWrapper.field;
@@ -2514,61 +2375,49 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		
 		function onFieldValueChange(event)
 		{
+			var key, value;
+			
 			barmatz.utils.DataTypes.isNotUndefined(event);
 			barmatz.utils.DataTypes.isInstanceOf(event, Event);
-
+			
+			key = 'set' + barmatz.utils.String.firstLetterToUpperCase(event.target.name);
+			value = event.target.value;
+	
 			try
 			{
-				assignString();
+				model[key](value);
 			}
 			catch(error)
 			{
 				try
 				{
-					assignArray();
+					model[key](value.replace(/(^\s+|(,)\s+|\s+$)/g, '$2').split(','));
 				}
 				catch(error)
 				{
 					try
 					{
-						assignBoolean();
+						model[key](value == true || value == 'true' ? true : false);
 					}
 					catch(error)
 					{
-						assignNumber();
+						try
+						{
+							model[key](parseFloat(value));
+						}
+						catch(error)
+						{
+							throw new Error('Unable to assign value to model. ' + error.message);
+						}
 					}
 				}
 			}
-			
-			function assignString()
-			{
-				model[event.target.name] = event.target.value;
-			}
-			
-			function assignArray()
-			{
-				model[event.target.name] = event.target.value.replace(/(^\s+|(,)\s+|\s+$)/g, '$2').split(',');
-			}
-			
-			function assignBoolean()
-			{
-				model[event.target.name] = event.target.value == true || event.target.value == 'true' ? true : false;
-			}
-			
-			function assignNumber()
-			{
-				model[event.target.name] = parseFloat(event.target.value);
-			}
 		}
-	}},
-	createPropertiesItemFieldWrapper: {value: function(type, name, label, value, changeHandler)
+	},
+	createPropertiesItemFieldWrapper: function(type, name, label, value, changeHandler)
 	{
 		var content, field, i;
 		
-		barmatz.utils.DataTypes.isNotUndefined(type);
-		barmatz.utils.DataTypes.isNotUndefined(name);
-		barmatz.utils.DataTypes.isNotUndefined(label);
-		barmatz.utils.DataTypes.isNotUndefined(changeHandler);
 		barmatz.utils.DataTypes.isTypeOf(type, 'string');
 		barmatz.utils.DataTypes.isTypeOf(name, 'string');
 		barmatz.utils.DataTypes.isTypeOf(label, 'string');
@@ -2617,54 +2466,58 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		field.addEventListener('change', changeHandler);
 		
 		content = [];
-
+	
 		if(type != 'button')
 			content.push(this.createElementWithContent('label', '', label));
 		
 		content.push(field);
-
+	
 		return {wrapper: this.createElementWithContent('div', 'forms-item', content), field: field};
-	}},
-	createDialog: {value: function(title, content, open, container)
+	},
+	createDialog: function(title, content, open, container)
 	{
 		var dialog;
 		
-		barmatz.utils.DataTypes.isNotUndefined(title);
-		barmatz.utils.DataTypes.isNotUndefined(content);
 		barmatz.utils.DataTypes.isTypeOf(title, 'string');
-		barmatz.utils.DataTypes.isTypesOrInstances(content, ['string'], [HTMLElement, Array]);
+		barmatz.utils.DataTypes.isTypesOrInstances(content, ['string'], [window.HTMLElement, window.Array]);
 		barmatz.utils.DataTypes.isTypeOf(open, 'boolean', true);
-		barmatz.utils.DataTypes.isInstanceOf(container, HTMLElement, true);
+		barmatz.utils.DataTypes.isInstanceOf(container, window.HTMLElement, true);
 		
 		dialog = this.createElementWithContent('div', 'forms-dialog', content);
 		dialog.title = title;
-		(container || this.BODY_ELEMENT).appendChild(dialog);
-		jQuery(dialog).dialog({autoOpen: open || false, draggable: false, modal: true});
+		(container || this.getBodyElement()).appendChild(dialog);
+		jQuery(dialog).dialog({appendTo: dialog.parentElement, autoOpen: open === undefined ? true : open, modal: true});
 		return dialog;
-	}},
-	destroyDialog: {value: function(dialog)
+	},
+	isDialog: function(dialog)
+	{
+		return /forms\-dialog/.test(dialog.className);
+	},
+	destroyDialog: function(dialog)
 	{
 		jQuery(dialog).dialog('destroy');
+		barmatz.utils.CSS.removeClass(dialog, 'forms-dialog');
 		dialog.parentElement.removeChild(dialog);
-	}},
-	createNewFieldDialogWrapper: {value: function(model)
+	},
+	createNewFieldDialogWrapper: function(model, open, container)
 	{
 		var _this, dialog, nameField, labelField, wrapper, form, formTableOptions;
-
+	
 		barmatz.utils.DataTypes.isNotUndefined(model);
 		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FieldModel);
+		barmatz.utils.DataTypes.isTypeOf(open, 'boolean', true);
+		barmatz.utils.DataTypes.isInstanceOf(container, window.HTMLElement, true);
 		
 		_this = this;
-		nameField = getField(model.name);
-		labelField = getField(model.label);
+		nameField = getField(model.getName());
+		labelField = getField(model.getLabel());
 		
 		formTableOptions = new barmatz.forms.ui.TableOptions();
-		formTableOptions.bodyRows.push(getRowContent('Name', nameField));
-		formTableOptions.bodyRows.push(getRowContent('Label', labelField));
+		formTableOptions.getBodyRows().push(getRowContent('Name', nameField), getRowContent('Label', labelField));
 		
 		form = this.createTable(formTableOptions);
 		wrapper = this.createElementWithContent('div', '', form);
-		dialog = this.createDialog('New Field', wrapper);
+		dialog = this.createDialog('New Field', wrapper, open, container);
 		
 		jQuery(dialog).dialog({
 			closeOnEscape: false,
@@ -2678,14 +2531,14 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 			barmatz.utils.DataTypes.isNotUndefined(label);
 			barmatz.utils.DataTypes.isNotUndefined(field);
 			barmatz.utils.DataTypes.isTypeOf(label, 'string');
-			barmatz.utils.DataTypes.isInstanceOf(field, HTMLElement);
+			barmatz.utils.DataTypes.isInstanceOf(field, window.HTMLElement);
 			return [_this.createElementWithContent('label', '', label), field];
 		}
 		
 		function getField(value)
 		{
 			var field;
-
+	
 			barmatz.utils.DataTypes.isNotUndefined(value);
 			barmatz.utils.DataTypes.isTypeOf(value, 'string');
 			
@@ -2694,21 +2547,22 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 			field.value = value;
 			return field;
 		}
-	}},
-	createPromptDialog: {value: function(title, content, confirmHandler, open)
+	},
+	createPromptDialog: function(title, content, confirmHandler, open, container)
 	{
 		var _this, dialog;
-
+	
 		barmatz.utils.DataTypes.isNotUndefined(title);
 		barmatz.utils.DataTypes.isNotUndefined(content);
 		barmatz.utils.DataTypes.isNotUndefined(confirmHandler);
 		barmatz.utils.DataTypes.isTypeOf(title, 'string');
-		barmatz.utils.DataTypes.isTypesOrInstances(content, ['string'], [HTMLElement, Array]);
+		barmatz.utils.DataTypes.isTypesOrInstances(content, ['string'], [window.HTMLElement, window.Array]);
 		barmatz.utils.DataTypes.isTypeOf(confirmHandler, 'function');
 		barmatz.utils.DataTypes.isTypeOf(open, 'boolean', true);
+		barmatz.utils.DataTypes.isInstanceOf(container, window.HTMLElement, true);
 		
 		_this = this;
-		dialog = this.createDialog(title, content, open);
+		dialog = this.createDialog(title, content, open, container);
 		
 		jQuery(dialog).dialog({
 			buttons: {OK: onOKButtonClick, Cancel: onCancelButtonClick}
@@ -2726,17 +2580,18 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		{
 			_this.destroyDialog(dialog);
 		}
-	}},
-	createExportPromptDialog: {value: function(fingerprint, loadingMessage, open)
+	},
+	createExportPromptDialog: function(fingerprint, loadingMessage, open, container)
 	{
 		var dir, embedCode, textarea;
 		
 		barmatz.utils.DataTypes.isNotUndefined(fingerprint);
 		barmatz.utils.DataTypes.isTypeOf(loadingMessage, 'string', true);
 		barmatz.utils.DataTypes.isTypeOf(open, 'boolean', true);
+		barmatz.utils.DataTypes.isInstanceOf(container, window.HTMLElement, true);
 		
 		dir = location.href.replace(location.hash, '').replace(location.search, '').replace(/(^\w+:\/\/.+)\/.+\..+$/, '$1') + '/js'; 
-		embedCode = '<div name="formContainer" fingerprint="' + fingerprint + '">' + (loadingMessage || '') + '</div>' +
+		embedCode = '<div id="formContainer" name="formContainer" fingerprint="' + fingerprint + '">' + (loadingMessage || '') + '</div>' +
 					'<script type="text/javascript">' +
 					'(function(w,d)' +
 					'{' +
@@ -2764,39 +2619,37 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		return this.createAlertPromptDialog('Export', this.createElementWithContent('div', '', [
 			this.createElementWithContent('div', '', 'Copy past this code into your site inside the body tag where you want the form to appear:'),
 			textarea
-		]), open);
-	}},
-	createChangePropertyPromptDialogWrapper: {value: function(title, key, value, confirmHandler, open)
+		]), open, container);
+	},
+	createChangePropertyPromptDialogWrapper: function(title, key, value, confirmHandler, open, container)
 	{
 		var field, wrapper;
-
-		barmatz.utils.DataTypes.isNotUndefined(title);
-		barmatz.utils.DataTypes.isNotUndefined(key);
-		barmatz.utils.DataTypes.isNotUndefined(value);
-		barmatz.utils.DataTypes.isNotUndefined(confirmHandler);
+	
 		barmatz.utils.DataTypes.isTypeOf(title, 'string');
 		barmatz.utils.DataTypes.isTypeOf(key, 'string');
 		barmatz.utils.DataTypes.isTypeOf(confirmHandler, 'function');
 		barmatz.utils.DataTypes.isTypeOf(open, 'boolean', true);
+		barmatz.utils.DataTypes.isInstanceOf(container, window.HTMLElement, true);
 		
 		field = this.createElement('input');
 		field.type = 'text';
 		field.value = value;
 		wrapper = this.createElementWithContent('div', '', [this.createElementWithContent('label', '', key), field]);
-		return {wrapper: wrapper, dialog: this.createPromptDialog(title, wrapper, confirmHandler, open), field: field};
-	}},
-	createAlertPromptDialog: {value: function(title, content, open)
+		return {wrapper: wrapper, dialog: this.createPromptDialog(title, wrapper, confirmHandler, open, container), field: field};
+	},
+	createAlertPromptDialog: function(title, content, open, container)
 	{
 		var _this, dialog;
 		
 		barmatz.utils.DataTypes.isNotUndefined(title);
 		barmatz.utils.DataTypes.isNotUndefined(content);
 		barmatz.utils.DataTypes.isTypeOf(title, 'string');
-		barmatz.utils.DataTypes.isTypesOrInstances(content, ['string'], [HTMLElement, Array]);
+		barmatz.utils.DataTypes.isTypesOrInstances(content, ['string'], [window.HTMLElement, window.Array]);
 		barmatz.utils.DataTypes.isTypeOf(open, 'boolean', true);
+		barmatz.utils.DataTypes.isInstanceOf(container, window.HTMLElement, true);
 		
 		_this = this;
-		dialog = this.createDialog(title, content, open);
+		dialog = this.createDialog(title, content, open, container);
 		
 		jQuery(dialog).dialog({
 			buttons: {OK: onOKButtonClick}
@@ -2809,66 +2662,67 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		
 		return dialog;
 		
-	}},
-	createConfirmPromptDialog: {value: function(message, confirmHandler, open)
+	},
+	createConfirmPromptDialog: function(message, confirmHandler, open, container)
 	{
 		barmatz.utils.DataTypes.isNotUndefined(message);
 		barmatz.utils.DataTypes.isNotUndefined(confirmHandler);
 		barmatz.utils.DataTypes.isTypeOf(message, 'string');
 		barmatz.utils.DataTypes.isTypeOf(confirmHandler, 'function');
 		barmatz.utils.DataTypes.isTypeOf(open, 'boolean', true);
-		return this.createPromptDialog('Confirm', message, confirmHandler, open);
-	}},
-	createPanels: {value: function(panels)
+		barmatz.utils.DataTypes.isInstanceOf(container, window.HTMLElement, true);
+		return this.createPromptDialog('Confirm', message, confirmHandler, open, container);
+	},
+	createPanels: function(panels)
 	{
 		var options, model, i; 
 		
 		barmatz.utils.DataTypes.isNotUndefined(panels);
-		barmatz.utils.DataTypes.isInstanceOf(panels, Array);
+		barmatz.utils.DataTypes.isInstanceOf(panels, window.Array);
 		
 		options = new barmatz.forms.ui.TableOptions();
-		options.className = 'forms-wrapper';
-		options.bodyRows.push([]);
+		options.setClassName('forms-wrapper');
+		options.getBodyRows().push([]);
 		
 		for(i = 0; i < panels.length; i++)
 		{
 			model = panels[i];
-			options.bodyRows[0].push(model.content);
-			options.bodyColumnsClassNames.push(model.className);
+			options.getBodyRows()[0].push(model.getContent());
+			options.getBodyColumnsClassNames().push(model.getClassName());
 		}
 		
 		return this.createTable(options);
-	}},
-	createMenuWrapper: {value: function()
+	},
+	createMenuWrapper: function()
 	{
 		var icon, menu, wrapper;
 		icon = this.createMenuIcon();
 		menu = this.createMenu();
 		wrapper = this.createElementWithContent('div', 'forms-menu', [icon, menu]);
 		return {wrapper: wrapper, icon: icon, menu: menu};
-	}},
-	createMenuIcon: {value: function()
+	},
+	createMenuIcon: function()
 	{
 		return this.createSettingsButton();
-	}},
-	createMenu: {value: function()
+	},
+	createMenu: function()
 	{
 		return this.createElement('ul');
-	}},
-	createMenuItem: {value: function(model)
+	},
+	createMenuItem: function(model)
 	{
 		var anchor;
-
+	
 		barmatz.utils.DataTypes.isNotUndefined(model);
 		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.ui.MenuItemModel);
-
-		anchor = this.createElementWithContent('a', '', model.label);
+	
+		anchor = this.createElementWithContent('a', '', model.getLabel());
 		anchor.href = 'javascript:void(0);';
-		anchor.addEventListener('click', model.clickHandler);
+		anchor.addEventListener('click', model.getClickHandler());
 		
 		return this.createElementWithContent('li', '', anchor);
-	}},
-	createIconButton: {value: function(name)
+	},
+	createIconButton: function(name)
 	{
 		var button;
 		
@@ -2879,33 +2733,37 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		jQuery(button).button();
 		
 		return button;
-	}},
-	createEditButton: {value: function()
+	},
+	createEditButton: function()
 	{
 		return this.createIconButton('pencil');
-	}},
-	createDeleteButton: {value: function()
+	},
+	createDeleteButton: function()
 	{
 		return this.createIconButton('trash');
-	}},
-	createSettingsButton: {value: function()
+	},
+	createSettingsButton: function()
 	{
 		return this.createIconButton('gear');
-	}},
-	createLoadingDialog: {value: function(container)
+	},
+	createLoadingDialog: function(container)
 	{
-		barmatz.utils.DataTypes.isInstanceOf(container, HTMLElement, true);
-		return (container || barmatz.forms.factories.DOMFactory.BODY_ELEMENT).appendChild(this.createElement('div', 'loading-image ui-front'));
-	}},
-	destroyLoadingDialog: {value: function(dialog)
+		barmatz.utils.DataTypes.isInstanceOf(container, window.HTMLElement, true);
+		return (container || barmatz.forms.factories.DOMFactory.getBodyElement()).appendChild(this.createElement('div', 'loading-image ui-front'));
+	},
+	destroyLoadingDialog: function(dialog)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(dialog);
-		barmatz.utils.DataTypes.isInstanceOf(dialog, HTMLElement);
-		dialog.parentElement.removeChild(dialog);
-	}},
-	createLoginFormDialogWrapper: {value: function()
+		barmatz.utils.DataTypes.isInstanceOf(dialog, window.HTMLElement);
+		
+		if(dialog.parentElement)
+			dialog.parentElement.removeChild(dialog);
+	},
+	createLoginFormDialogWrapper: function(open, container)
 	{
 		var _this, dialog, wrapper, wrapperOptions, userNameField, passwordField, errorField;
+
+		barmatz.utils.DataTypes.isTypeOf(open, 'boolean', true);
+		barmatz.utils.DataTypes.isInstanceOf(container, window.HTMLElement, true);
 		
 		_this = this;
 		wrapperOptions = new barmatz.forms.ui.TableOptions();
@@ -2913,12 +2771,12 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		passwordField = addField('password', 'Password', 'password');
 		wrapper = this.createTable(wrapperOptions);
 		errorField = this.createElementWithContent('div', 'forms-error-wrapper ui-state-error ui-corner-all', [this.createElement('span', 'ui-icon ui-icon-alert'), this.createElementWithContent('span', '', 'Username and/or password are incorrect')]);
-		dialog = this.createDialog('Login', [wrapper, errorField]);
-
-		jQuery(dialog).dialog({autoOpen: true, dialogClass: 'forms-dialog-prompt', buttons: {Submit: function(){}}});
+		dialog = this.createDialog('Login', [wrapper, errorField], open, container);
+	
+		jQuery(dialog).dialog({dialogClass: 'forms-dialog-prompt', buttons: {Submit: function(){}}});
 		
 		return {dialog: dialog, userNameField: userNameField, passwordField: passwordField, submitButton: dialog.parentElement.getElementsByTagName('button')[1], errorField: errorField};
-
+	
 		function addField(name, label, type)
 		{
 			var field;
@@ -2933,73 +2791,82 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 			field = _this.createElement('input');
 			field.name = name;
 			field.type = type;
-			wrapperOptions.bodyRows.push([_this.createElementWithContent('label', '', label), field]);
+			wrapperOptions.getBodyRows().push([_this.createElementWithContent('label', '', label), field]);
 			
 			return field;
 		}
-	}},
-	createCollectionListDialog: {value: function(title, content, className)
+	},
+	createCollectionListDialog: function(title, content, className, open, container)
 	{
 		var dialog;
 		
 		barmatz.utils.DataTypes.isNotUndefined(title);
 		barmatz.utils.DataTypes.isNotUndefined(content);
 		barmatz.utils.DataTypes.isTypeOf(title, 'string');
-		barmatz.utils.DataTypes.isTypesOrInstances(content, ['string'], [HTMLElement, Array]);
+		barmatz.utils.DataTypes.isTypesOrInstances(content, ['string'], [window.HTMLElement, window.Array]);
 		barmatz.utils.DataTypes.isTypeOf(className, 'string', true);
+		barmatz.utils.DataTypes.isTypeOf(open, 'boolean', true);
+		barmatz.utils.DataTypes.isInstanceOf(container, window.HTMLElement, true);
 		
-		dialog = this.createDialog(title, content);
+		dialog = this.createDialog(title, content, open, container);
 		jQuery(dialog).dialog({autoOpen: true, dialogClass: 'forms-dialog-collection-list' + (className ? ' ' + className : '')});
 		return dialog;
-	}},
-	createUserFormsListDialog: {value: function()
+	},
+	createUserFormsListDialog: function(open, container)
 	{
-		return this.createCollectionListDialog('Your forms', this.createUserFormsList(), 'forms-dialog-user-forms forms-clickable-td');
-	}},
-	createUserFormsList: {value: function()
+		barmatz.utils.DataTypes.isTypeOf(open, 'boolean', true);
+		barmatz.utils.DataTypes.isInstanceOf(container, window.HTMLElement, true);
+		return this.createCollectionListDialog('Your forms', this.createUserFormsList(), 'forms-dialog-user-forms forms-clickable-td', open, container);
+	},
+	createUserFormsList: function()
 	{
 		var options = new barmatz.forms.ui.TableOptions();
-		options.headColumns.push('Name');
-		options.headColumns.push('Created');
-		options.headColumns.push('Fingerprint');
+		options.getHeadColumns().push('Name');
+		options.getHeadColumns().push('Created');
+		options.getHeadColumns().push('Fingerprint');
 		return this.createTable(options);
-	}},
-	createUserFormsListItem: {value: function(index)
+	},
+	createUserFormsListItem: function(index)
 	{
 		barmatz.utils.DataTypes.isNotUndefined(index);
 		barmatz.utils.DataTypes.isTypeOf(index, 'number');
 		return this.createElementWithContent('tr', 'ui-widget ui-state-default ui-corner-all ui-button-text-only ' + (index % 2 == 0 ? 'even' : 'odd'), [this.createElement('td'), this.createElement('td'), this.createElement('td')]);
-	}},
-	createDropboxItemsListDialogWrapper: {value: function()
+	},
+	createDropboxItemsListDialogWrapper: function(open, container)
 	{
 		var addButton, resetButton;
+		
+		barmatz.utils.DataTypes.isTypeOf(open, 'boolean', true);
+		barmatz.utils.DataTypes.isInstanceOf(container, window.HTMLElement, true);
 		
 		addButton = this.createButton('Add item');
 		resetButton = this.createButton('Reset');
 		
-		return {dialog: this.createCollectionListDialog('Items', [this.createDropboxItemsList(), this.createElementWithContent('div', 'forms-dialog-footer', [addButton, resetButton])], 'forms-dialog-dropbox-items'), addButton: addButton, resetButton: resetButton};
-	}},
-	createDropboxItemsList: {value: function()
+		return {dialog: this.createCollectionListDialog('Items', [this.createDropboxItemsList(), this.createElementWithContent('div', 'forms-dialog-footer', [addButton, resetButton])], 'forms-dialog-dropbox-items', open, container), addButton: addButton, resetButton: resetButton};
+	},
+	createDropboxItemsList: function()
 	{
 		var options = new barmatz.forms.ui.TableOptions();
-		options.headColumns.push('Key', 'Value', '');
+		options.getHeadColumns().push('Key', 'Value', '');
 		return this.createTable(options);
-	}},
-	createDropboxItemDialog: {value: function(labelValue, valueValue, confirmHandler)
+	},
+	createDropboxItemDialog: function(label, value, confirmHandler, open, container)
 	{
 		var _this, options, keyField, valueField;
 		
-		barmatz.utils.DataTypes.isNotUndefined(labelValue);
-		barmatz.utils.DataTypes.isNotUndefined(valueValue);
+		barmatz.utils.DataTypes.isNotUndefined(label);
+		barmatz.utils.DataTypes.isNotUndefined(value);
 		barmatz.utils.DataTypes.isNotUndefined(confirmHandler);
-		barmatz.utils.DataTypes.isTypeOf(labelValue, 'string', true);
+		barmatz.utils.DataTypes.isTypeOf(label, 'string', true);
 		barmatz.utils.DataTypes.isTypeOf(confirmHandler, 'function');
+		barmatz.utils.DataTypes.isTypeOf(open, 'boolean', true);
+		barmatz.utils.DataTypes.isInstanceOf(container, window.HTMLElement, true);
 		
 		_this = this;
 		options = new barmatz.forms.ui.TableOptions();
-		labelField = addRow('label', labelValue || '');
-		valueField = addRow('Value', valueValue || '');
-		return this.createPromptDialog(labelField != null ? 'Edit item' : 'New item', this.createTable(options), onConfirm, true);
+		labelField = addRow('label', label || '');
+		valueField = addRow('Value', value || '');
+		return this.createPromptDialog(labelField != null ? 'Edit item' : 'New item', this.createTable(options), onConfirm, open, container);
 		
 		function addRow(key, value)
 		{
@@ -3011,7 +2878,7 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 			
 			field = _this.createElement('input');
 			field.value = value;
-			options.bodyRows.push([_this.createElementWithContent('label', '', key), field]);
+			options.getBodyRows().push([_this.createElementWithContent('label', '', key), field]);
 			
 			return field;
 		}
@@ -3020,8 +2887,8 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		{
 			confirmHandler(labelField.value, valueField.value);
 		}
-	}},
-	createDropboxItemsListItemWrapper: {value: function(index)
+	},
+	createDropboxItemsListItemWrapper: function(index)
 	{
 		var wrapper, labelElement, valueElement, editButton, deleteButton;
 		
@@ -3035,118 +2902,115 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		wrapper = this.createTableRow([labelElement, valueElement, this.createElementWithContent('div', '', [editButton, deleteButton])], ['', '', 'forms-list-actions'], 'ui-widget ui-state-default ui-corner-all ui-button-text-only ' + (index % 2 == 0 ? 'even' : 'odd'));
 		
 		return {wrapper: wrapper, labelElement: labelElement, valueElement: valueElement, editButton: editButton, deleteButton: deleteButton};
-	}},
-	createTable: {value: function(options)
+	},
+	createTable: function(options)
 	{
-		var _this, content;
+		var _this, headColumns, content;
 		
-		barmatz.utils.DataTypes.isNotUndefined(options);
 		barmatz.utils.DataTypes.isInstanceOf(options, barmatz.forms.ui.TableOptions);
 		
 		_this = this;
+		headColumns = options.getHeadColumns();
 		content = [];
 		
-		if(options.headColumns && options.headColumns.length > 0)
-			content.push(this.createElementWithContent('thead', options.headClassName, this.createTableRow(options.headColumns, options.headColumnsClassNames, options.headRowClassName, true)));
+		if(headColumns.length > 0)
+			content.push(this.createElementWithContent('thead', options.getHeadClassName(), this.createTableRow(headColumns, options.getHeadColumnsClassNames(), options.getHeadRowClassName(), true)));
 		
-		content.push(this.createElementWithContent('tbody', options.bodyClassName, getBodyRows()));
+		content.push(this.createElementWithContent('tbody', options.getBodyClassName(), getBodyRows()));
 		
-		return this.createElementWithContent('table', options.className, content);
+		return this.createElementWithContent('table', options.getClassName(), content);
 		
 		function getBodyRows()
 		{
-			var rows = [], i;
+			var rows = [], bodyRows, bodyRowsClassNames, i;
 			
-			for(i = 0; i < options.bodyRows.length; i++)
-				rows.push(_this.createTableRow(options.bodyRows[i], options.bodyColumnsClassNames, options.bodyRowsClassNames[i % options.bodyRowsClassNames.length]));
+			bodyRows = options.getBodyRows();
+			bodyRowsClassNames = options.getBodyRowsClassNames();
+			
+			for(i = 0; i < bodyRows.length; i++)
+				rows.push(_this.createTableRow(bodyRows[i], options.getBodyColumnsClassNames(), bodyRowsClassNames[i % bodyRowsClassNames.length]));
 			
 			return rows;
 		}
-	}},
-	createTableRow: {value: function(content, contentClassNames, className, isHead)
+	},
+	createTableRow: function(content, contentClassNames, className, isHead)
 	{
 		var columns, i;
 		
-		barmatz.utils.DataTypes.isNotUndefined(content);
-		barmatz.utils.DataTypes.isInstanceOf(content, Array);
-		barmatz.utils.DataTypes.isInstanceOf(contentClassNames, Array, true);
+		barmatz.utils.DataTypes.isInstanceOf(content, window.Array);
+		barmatz.utils.DataTypes.isInstanceOf(contentClassNames, window.Array, true);
 		barmatz.utils.DataTypes.isTypeOf(className, 'string', true);
 		barmatz.utils.DataTypes.isTypeOf(isHead, 'boolean', true);
 		
 		columns = [];
 		
 		for(i = 0; i < content.length; i++)
-			columns.push(this.createTableColumn(content[i], contentClassNames[i % contentClassNames.length], isHead)); 
+			columns.push(this.createTableColumn(content[i], contentClassNames ? contentClassNames[i % contentClassNames.length] : null, isHead)); 
 		
 		return this.createElementWithContent('tr', className, columns);
-	}},
-	createTableColumn: {value: function(content, className, isHead)
+	},
+	createTableColumn: function(content, className, isHead)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(content);
-		barmatz.utils.DataTypes.isTypesOrInstances(content, ['string'], [HTMLElement, Array]);
+		barmatz.utils.DataTypes.isTypesOrInstances(content, ['string'], [window.HTMLElement, window.Array]);
 		barmatz.utils.DataTypes.isTypeOf(className, 'string', true);
 		barmatz.utils.DataTypes.isTypeOf(isHead, 'boolean', true);
 		return this.createElementWithContent(isHead ? 'th' : 'td', className, content);
-	}},
-	createFormPropertiesDialogWrapper: {value: function(model, confirmHandler, open)
+	},
+	createFormPropertiesDialogWrapper: function(model, confirmHandler, open, container)
 	{
 		var properties, dialog;
-
-		barmatz.utils.DataTypes.isNotUndefined(model);
-		barmatz.utils.DataTypes.isNotUndefined(confirmHandler);
+	
 		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.FormModel);
 		barmatz.utils.DataTypes.isTypeOf(confirmHandler, 'function');
 		barmatz.utils.DataTypes.isTypeOf(open, 'boolean', true);
+		barmatz.utils.DataTypes.isInstanceOf(container, window.HTMLElement, true);
 		
 		properties = this.createFormPropertiesWrapper(model);
-		dialog = this.createPromptDialog('Properties', properties.wrapper, confirmHandler, open);
+		dialog = this.createPromptDialog('Properties', properties.wrapper, confirmHandler, open, container);
 		properties.dialog = dialog;
 		
 		jQuery(dialog).dialog({dialogClass: 'forms-dialog-form-properties'});
 		
 		return properties;
 		
-	}},
-	createFormPropertiesWrapper: {value: function(model)
+	},
+	createFormPropertiesWrapper: function(model)
 	{
 		var _this, returnValue, options;
 		
 		barmatz.utils.DataTypes.isNotUndefined(model);
 		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.FormModel);
-
+	
 		_this = this;
-		
 		options = new barmatz.forms.ui.TableOptions();
-		options.bodyRows = [];
-		
 		returnValue = {};
 		
 		returnValue.nameField = createField('Name');
-		returnValue.nameField.value = model.name;
+		returnValue.nameField.value = model.getName();
 		
 		returnValue.submitButtonLabelField = createField('Submit button label');
-		returnValue.submitButtonLabelField.value = model.submitButtonLabel;
+		returnValue.submitButtonLabelField.value = model.getSubmitButtonLabel();
 		
 		returnValue.targetEmailField = createField('Target email');
-		returnValue.targetEmailField.value = model.targetEmail;
+		returnValue.targetEmailField.value = model.getTargetEmail();
 		
 		returnValue.directionField = createDropbox('Direction', 'formDirection', [barmatz.forms.Directions.LTR, barmatz.forms.Directions.RTL]);
-		returnValue.directionField.value = model.direction;
+		returnValue.directionField.value = model.getDirection();
 		
 		returnValue.languageField = createDropbox('Language', 'formlanguage', ['en', 'he']);
-		returnValue.languageField.value = model.langauge;
+		returnValue.languageField.value = model.getLanguage();
 		
 		returnValue.layoutIdField = createDropbox('Layout', 'formLayoutId', ['1', '2']);
-		returnValue.layoutIdField.value = model.layoutId;
+		returnValue.layoutIdField.value = model.getLayoutId();
 		
 		returnValue.stylesheetsField = createField('Stylesheets');
-		returnValue.stylesheetsField.value = model.stylesheets.join(' ');
+		returnValue.stylesheetsField.value = model.getStylesheets().join(' ');
 		
-		returnValue.methodField = createDropbox('Method', 'formMethod', ['GET', 'POST']);
-		returnValue.methodField.value = model.method;
+		returnValue.methodField = createDropbox('Method', 'formMethod', [barmatz.forms.Methods.GET, barmatz.forms.Methods.POST]);
+		returnValue.methodField.value = model.getMethod();
 		
 		returnValue.encodingField = createDropbox('Encoding', 'formEncoding', [barmatz.net.Encoding.FORM, barmatz.net.Encoding.FILES]);
-		returnValue.encodingField.value = model.encoding;
+		returnValue.encodingField.value = model.getEncoding();
 		
 		returnValue.wrapper = this.createTable(options); 
 		
@@ -3161,7 +3025,7 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 			
 			field = content || _this.createElement('input');
 			row = [_this.createElementWithContent('label', '', label), field];
-			options.bodyRows.push(row);
+			options.getBodyRows().push(row);
 			return field;
 		}
 		
@@ -3174,32 +3038,37 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 			barmatz.utils.DataTypes.isNotUndefined(values);
 			barmatz.utils.DataTypes.isTypeOf(label, 'string');
 			barmatz.utils.DataTypes.isTypeOf(name, 'string');
-			barmatz.utils.DataTypes.isTypesOrInstances(values, ['object'], [Array]);
+			barmatz.utils.DataTypes.isTypesOrInstances(values, ['object'], [window.Array]);
 			
 			model = barmatz.forms.factories.ModelFactory.createDropboxModel(name);
 			
-			if(values instanceof Array)
+			if(values instanceof window.Array)
 				for(key = 0; key < values.length; key++)
-					model.addItem(barmatz.forms.factories.ModelFactory.createDropboxItemModel(values instanceof Array ? values[key] : key, values[key]));
+					model.addItem(barmatz.forms.factories.ModelFactory.createDropboxItemModel(values instanceof window.Array ? values[key] : key, values[key]));
 			else
 				for(key in values)
-					model.addItem(barmatz.forms.factories.ModelFactory.createDropboxItemModel(values instanceof Array ? values[key] : key, values[key]));
-
+					model.addItem(barmatz.forms.factories.ModelFactory.createDropboxItemModel(values instanceof window.Array ? values[key] : key, values[key]));
+	
 			return createField(label, _this.createDropboxElement(model));
 		}
-	}},
-	createFieldValidationOptionsDialogWrapper: {value: function(model)
+	},
+	createFieldValidationOptionsDialogWrapper: function(model, open, container)
 	{
 		var fieldValidationOptionsWrapper;
 		
 		barmatz.utils.DataTypes.isNotUndefined(model);
 		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FieldModel);
+		barmatz.utils.DataTypes.isTypeOf(open, 'boolean', true);
+		barmatz.utils.DataTypes.isInstanceOf(container, window.HTMLElement, true);
 		
 		fieldValidationOptionsWrapper = this.createFieldValidationOptionsWrapper(model);
 		
-		return {dialog: this.createDialog(barmatz.utils.String.firstLetterToUpperCase(model.type) + ' field "' + model.name + '" validation options', fieldValidationOptionsWrapper.wrapper, true), options: fieldValidationOptionsWrapper.options};
-	}},
-	createFieldValidationOptionsWrapper: {value: function(model)
+		return {
+			dialog: this.createDialog(barmatz.utils.String.firstLetterToUpperCase(model.getType()) + ' field "' + model.getName() + '" validation options', fieldValidationOptionsWrapper.wrapper, open, container), 
+			options: fieldValidationOptionsWrapper.options
+		};
+	},
+	createFieldValidationOptionsWrapper: function(model)
 	{
 		var wrapper, options, fieldValidatorWrapper, bits, i;
 		
@@ -3207,7 +3076,7 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FieldModel);
 		
 		wrapper = this.createElement('div');
-		bits = barmatz.utils.Bitwise.parseBit(model.availableValidators);
+		bits = barmatz.utils.Bitwise.parseBit(model.getAvailableValidators());
 		options = {};
 		
 		for(i = 0; i < bits.length; i++)
@@ -3226,10 +3095,10 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 			
 			return a > b ? 1 : a < b ? -1 : 0;
 		});
-
+	
 		return {wrapper: wrapper, options: options};
-	}},
-	createFieldValidatorWrapper: {value: function(bit)
+	},
+	createFieldValidatorWrapper: function(bit)
 	{
 		var wrapper, checkbox, label;
 		
@@ -3283,115 +3152,114 @@ Object.defineProperties(barmatz.forms.factories.DOMFactory,
 		}
 		
 		return {wrapper: wrapper, checkbox: checkbox}; 
-	}},
-	createFormFieldErrorMessageElement: {value: function()
+	},
+	createFormFieldErrorMessageElement: function()
 	{
 		return this.createElement('ul', 'forms-form-item-error-message');
-	}},
-	createFormFieldErrorMessageItemElement: {value: function(message)
+	},
+	createFormFieldErrorMessageItemElement: function(message)
 	{
 		barmatz.utils.DataTypes.isNotUndefined(message);
 		barmatz.utils.DataTypes.isTypeOf(message, 'string');
 		return this.createElementWithContent('li', 'forms-form-item-error-message-item', message);
-	}},
-	createHTMLContentEditorDialogWrapper: {value: function(confirmHandler, content)
+	},
+	createHTMLContentEditorDialogWrapper: function(content, confirmHandler, open, container, initHandler)
 	{
 		var wrapper, dialog, editor;
 		
-		barmatz.utils.DataTypes.isNotUndefined(confirmHandler);
-		barmatz.utils.DataTypes.isTypeOf(confirmHandler, 'function');
 		barmatz.utils.DataTypes.isTypeOf(content, 'string', true);
+		barmatz.utils.DataTypes.isTypeOf(confirmHandler, 'function');
+		barmatz.utils.DataTypes.isTypeOf(open, 'boolean', true);
+		barmatz.utils.DataTypes.isInstanceOf(container, window.HTMLElement, true);
+		barmatz.utils.DataTypes.isTypeOf(initHandler, 'function', true);
 		
 		wrapper = this.createElement('div');
-		dialog = this.createPromptDialog('HTML content editor', wrapper, confirmHandler, true);
+		dialog = this.createPromptDialog('HTML content editor', wrapper, confirmHandler, open, container);
 		editor = this.createHTMLContentEditor(wrapper, content, onEditorInit);
 		
 		jQuery(dialog).dialog({dialogClass: 'forms-dialog-html-content-editor'});
-
+	
 		return {dialog: dialog, editor: editor};
 		
-		function onEditorInit()
+		function onEditorInit(event)
 		{
 			setTimeout(function()
 			{
 				jQuery(dialog).dialog('close').dialog('open');
+
+				if(initHandler != null)
+					initHandler(event);
 			},1);
 		}
-	}},
-	createHTMLContentEditor: {value: function(parent, content, initHandler)
+	},
+	createHTMLContentEditor: function(parent, content, initHandler)
 	{
 		var editor, textArea;
 		
-		barmatz.utils.DataTypes.isNotUndefined(parent);
-		barmatz.utils.DataTypes.isInstanceOf(parent, HTMLElement);
+		barmatz.utils.DataTypes.isInstanceOf(parent, window.HTMLElement);
 		barmatz.utils.DataTypes.isTypeOf(content, 'string', true);
 		barmatz.utils.DataTypes.isTypeOf(initHandler, 'function', true);
-
+	
 		textArea = this.createElement('textarea');
-		textArea.id = 'htmlContentEditor' + tinymce.editors.length;
+		textArea.id = 'htmlContentEditor' + new Date().getTime();
 		textArea.innerHTML = content || '';
 		parent.appendChild(textArea);
-		tinymce.init({
-			selector: '#' + textArea.id, 
-	        theme: 'modern',
-			plugins: [
-	        	'advlist autolink lists link image charmap print preview hr anchor pagebreak',
-				'searchreplace wordcount visualblocks visualchars code fullscreen',
-				'insertdatetime media nonbreaking save table contextmenu directionality',
-				'emoticons template paste'
-			],
-			toolbar1: 'insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image',
-			oninit: initHandler
-		});
+		editor = new tinymce.Editor(textArea.id, {
+			plugins: 'advlist autolink lists link image charmap print preview hr anchor pagebreak ' +
+					 'searchreplace wordcount visualblocks visualchars code fullscreen ' +
+					 'insertdatetime media nonbreaking save table contextmenu directionality ' +
+					 'emoticons template paste',
+			toolbar1: 'insertfile undo redo | styleselect | bold italic | alignleft aligncenter ' +
+					  'alignright alignjustify | bullist numlist outdent indent | link image'
+		}, tinymce.EditorManager);
+		editor.on('init', initHandler);
+		editor.render();
 			
 		return textArea;
-	}},
-	createLeadsFormsListElement: {value: function()
+	},
+	destroyHTMLContentEditor: function(editor)
+	{
+		barmatz.utils.DataTypes.isInstanceOf(editor, tinymce.Editor);
+		editor.destroy(true);
+	},
+	createLeadsFormsListElement: function()
 	{
 		return this.createElement('ul');
-	}},
-	createLeadsFormsListItem: {value: function(model)
+	},
+	createLeadsFormsListItem: function(model)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(model);
 		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.FormModel);
-		return this.createElementWithContent('li', 'forms-leads-forms-list-item', model.name);
-	}},
-	createLeadsListWrapper: {value: function()
+		return this.createElementWithContent('li', 'forms-leads-forms-list-item', model.getName());
+	},
+	createLeadsListWrapper: function()
 	{
 		var options, table;
 		
 		options = new barmatz.forms.ui.TableOptions();
-		options.headRowClassName = 'forms-leads-list-head';
-		options.headColumns.push('Received', 'Referer', 'IP');
+		options.setHeadRowClassName('forms-leads-list-head');
+		options.getHeadColumns().push('Received', 'Referer', 'IP');
 		
 		table = this.createTable(options);
 		
 		return {wrapper: this.createElementWithContent('div', 'forms-leads-list-wrapper', table), table: table, body: table.getElementsByTagName('tbody')[0]};
-	}},
-	createLeadsListItem: {value: function(model, index)
+	},
+	createLeadsListItem: function(model, index)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(model);
-		barmatz.utils.DataTypes.isNotUndefined(index);
 		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.LeadModel);
 		barmatz.utils.DataTypes.isTypeOf(index, 'number');
-		return this.createTableRow([barmatz.utils.Date.toString(model.created, 'dd/mm/yyyy hh:ii'), model.referer, model.ip], [], 'forms-leads-list-item ' + (index % 2 == 0 ? 'even' : 'odd'));
-	}}
-});
+		return this.createTableRow([barmatz.utils.Date.toString(model.getCreated(), 'dd/mm/yyyy hh:ii'), model.getReferer() || '', model.getIP() || ''], [], 'forms-leads-list-item ' + (index % 2 == 0 ? 'even' : 'odd'));
+	}
+}
 /** barmatz.forms.factories.ModelFactory **/
-window.barmatz.forms.factories.ModelFactory = function(){};
-
-Object.defineProperties(barmatz.forms.factories.ModelFactory,
-{
-	createUserModel: {value: function()
+barmatz.forms.factories.ModelFactory = {
+	createUserModel: function()
 	{
 		return new barmatz.forms.users.UserModel();
-	}},
-	createFieldModel: {value: function(type, name)
+	},
+	createFieldModel: function(type, name)
 	{
 		barmatz.utils.DataTypes.isNotUndefined(type);
-		barmatz.utils.DataTypes.isNotUndefined(name);
 		barmatz.utils.DataTypes.isTypeOf(type, 'string');
-		barmatz.utils.DataTypes.isTypeOf(name, 'string');
 		
 		switch(type)
 		{
@@ -3429,741 +3297,77 @@ Object.defineProperties(barmatz.forms.factories.ModelFactory,
 				return new barmatz.forms.fields.PhoneFieldModel(name);
 				break;
 		}
-	}},
-	createToolboxModel: {value: function()
+	},
+	createToolboxModel: function()
 	{
 		return new barmatz.forms.ui.ToolboxModel();
-	}},
-	createToolboxItemModel: {value: function(type, label, fieldModel)
+	},
+	createToolboxItemModel: function(type, label, fieldModel)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(type);
-		barmatz.utils.DataTypes.isNotUndefined(label);
-		barmatz.utils.DataTypes.isNotUndefined(fieldModel);
-		barmatz.utils.DataTypes.isTypeOf(type, 'string');
-		barmatz.utils.DataTypes.isTypeOf(label, 'string');
-		barmatz.utils.DataTypes.isInstanceOf(fieldModel, barmatz.forms.fields.FormItemModel);
 		return new barmatz.forms.ui.ToolboxItemModel(type, label, fieldModel);
-	}},
-	createCollectionModel: {value: function()
+	},
+	createCollectionModel: function()
 	{
 		return new barmatz.forms.CollectionModel();
-	}},
-	createDropboxItemModel: {value: function(label, value)
+	},
+	createDropboxItemModel: function(label, value)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(label);
-		barmatz.utils.DataTypes.isTypeOf(label, 'string');
 		return new barmatz.forms.fields.DropboxItemModel(label, value);
-	}},
-	createDropboxModel: {value: function(name, items)
+	},
+	createDropboxModel: function(name, items)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(name);
-		barmatz.utils.DataTypes.isTypeOf(name, 'string', true);
-		barmatz.utils.DataTypes.isInstanceOf(items, Array, true);
 		return new barmatz.forms.fields.DropboxModel(name, items);
-	}},
-	createBuilderModel: {value: function()
+	},
+	createBuilderModel: function()
 	{
 		return new barmatz.forms.ui.BuilderModel();
-	}},
-	createMenuModel: {value: function()
+	},
+	createMenuModel: function()
 	{
 		return new barmatz.forms.ui.MenuModel();
-	}},
-	createMenuItemModel: {value: function(label, clickHandler)
+	},
+	createMenuItemModel: function(label, clickHandler)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(label);
-		barmatz.utils.DataTypes.isNotUndefined(clickHandler);
-		barmatz.utils.DataTypes.isTypeOf(label, 'string');
-		barmatz.utils.DataTypes.isTypeOf(clickHandler, 'function');
 		return new barmatz.forms.ui.MenuItemModel(label, clickHandler);
-	}},
-	createFormModel: {value: function()
+	},
+	createFormModel: function()
 	{
 		return new barmatz.forms.FormModel();
-	}},
-	createPanelModel: {value: function(className, content)
+	},
+	createPanelModel: function(className, content)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(className);
-		barmatz.utils.DataTypes.isNotUndefined(content);
-		barmatz.utils.DataTypes.isTypeOf(className, 'string');
-		barmatz.utils.DataTypes.isTypesOrInstances(content, ['string'], [HTMLElement, Array]);
 		return new barmatz.forms.ui.PanelModel(className, content);
-	}},
-	createValidatorModel: {value: function(data)
+	},
+	createValidatorModel: function(data)
 	{
-		barmatz.utils.DataTypes.isTypeOf(data, 'object', true);
 		return new barmatz.forms.fields.ValidatorModel(data);
-	}},
-	createLeadModel: {value: function()
+	},
+	createLeadModel: function()
 	{
 		return new barmatz.forms.LeadModel();
-	}}
-});
+	}
+}
 /** barmatz.forms.fields.FormItemModel **/
-window.barmatz.forms.fields.FormItemModel = function(type)
+barmatz.forms.fields.FormItemModel = function(type)
 {
-	barmatz.utils.DataTypes.isNotUndefined(type);
 	barmatz.utils.DataTypes.isTypeOf(type, 'string', true);
 	barmatz.forms.TypeModel.call(this, type);
 };
-
 barmatz.forms.fields.FormItemModel.prototype = new barmatz.forms.TypeModel(null);
 barmatz.forms.fields.FormItemModel.prototype.constructor = barmatz.forms.fields.FormItemModel;
-
-Object.defineProperties(barmatz.forms.fields.FormItemModel.prototype, {});
-/** barmatz.forms.fields.ValidatorModel **/
-window.barmatz.forms.fields.ValidatorModel = function(data)
-{
-	var i;
-	
-	barmatz.utils.DataTypes.isTypeOf(data, 'object', true);
-	barmatz.mvc.Model.call(this);
-	this.set('code', barmatz.forms.Validator.NONE);
-
-	if(data)
-	{
-		if(data.code)
-			this.set('code', data.code);
-		
-		for(i in data)
-			this[i] = data[i];
-	}
-};
-
-barmatz.forms.fields.ValidatorModel.prototype = new barmatz.mvc.Model();
-barmatz.forms.fields.ValidatorModel.prototype.constructor = barmatz.forms.fields.ValidatorModel;
-
-Object.defineProperties(barmatz.forms.fields.ValidatorModel.prototype,
-{
-	code: {get: function()
-	{
-		return this.get('code');
-	}, set: function(value)
-	{
-		barmatz.utils.DataTypes.isTypeOf(value, 'number');
-		this.set('code', value);
-	}},
-	clone: {value: function()
-	{
-		var object, i;
-		
-		object = new barmatz.forms.fields.ValidatorModel();
-		object.code = this.code;
-		
-		for(i in this)
-			object[i] = this[i];
-		
-		return object;
-	}},
-	toJSON: {value: function()
-	{
-		var object, i;
-		
-		object = {code: this.code};
-		
-		for(i in this)
-			if(typeof this[i] != 'function' && /^[^_]/.test(i))
-				object[i] = this[i];
-		
-		return object;
-	}}
-});
-/** barmatz.forms.fields.FieldModel **/
-window.barmatz.forms.fields.FieldModel = function(type, name)
-{
-	barmatz.utils.DataTypes.isNotUndefined(type);
-	barmatz.utils.DataTypes.isNotUndefined(name);
-	barmatz.utils.DataTypes.isTypeOf(type, 'string', true);
-	barmatz.utils.DataTypes.isTypeOf(name, 'string', true);
-	barmatz.forms.fields.FormItemModel.call(this, type);
-	this.set('name', name);
-	this.set('label', '');
-	this.set('mandatory', false);
-	this.set('value', '');
-	this.set('enabled', true);
-	this.set('validator', barmatz.forms.factories.ModelFactory.createValidatorModel());
-	this.set('width', NaN);
-};
-
-barmatz.forms.fields.FieldModel.prototype = new barmatz.forms.fields.FormItemModel(null);
-barmatz.forms.fields.FieldModel.prototype.constructor = barmatz.forms.fields.FieldModel;
-
-Object.defineProperties(barmatz.forms.fields.FieldModel.prototype,
-{
-	name: {get: function()
-	{
-		return this.get('name');
-	}, set: function(value)
-	{
-		barmatz.utils.DataTypes.isTypeOf(value, 'string');
-		this.set('name', value);
-	}},
-	label: {get: function()
-	{
-		return this.get('label');
-	}, set: function(value)
-	{
-		barmatz.utils.DataTypes.isTypeOf(value, 'string');
-		this.set('label', value);
-	}},
-	mandatory: {get: function()
-	{
-		return this.get('mandatory');
-	}, set: function(value)
-	{
-		barmatz.utils.DataTypes.isTypeOf(value, 'boolean');
-		this.set('mandatory', value);
-	}},
-	value: {get: function()
-	{
-		return this.get('value');
-	}, set: function(value)
-	{
-		this.set('value', value);
-	}},
-	enabled: {get: function()
-	{
-		return this.get('enabled');
-	}, set: function(value)
-	{
-		barmatz.utils.DataTypes.isTypeOf(value, 'boolean');
-		this.set('enabled', value);
-	}},
-	availableValidators: {get: function()
-	{
-		return barmatz.forms.Validator.EQUALS +
-			   barmatz.forms.Validator.VALID_EMAIL +
-			   barmatz.forms.Validator.VALID_PHONE +
-			   barmatz.forms.Validator.MIN_LENGTH +
-			   barmatz.forms.Validator.MAX_LENGTH +
-			   barmatz.forms.Validator.EXACT_LENGTH +
-			   barmatz.forms.Validator.GREATER_THAN +
-			   barmatz.forms.Validator.LESSER_THAN +
-			   barmatz.forms.Validator.DIGITS_ONLY +
-			   barmatz.forms.Validator.NOT_DIGITS;
-	}},
-	validator: {get: function()
-	{
-		return this.get('validator');
-	}, set: function(value)
-	{
-		barmatz.utils.DataTypes.isInstanceOf(value, barmatz.forms.fields.ValidatorModel);
-		this.set('validator', value);
-	}},
-	width: {get: function()
-	{
-		return this.get('width');
-	}, set: function(value)
-	{
-		barmatz.utils.DataTypes.isTypeOf(value, 'number');
-		this.set('width', value);
-	}},
-	validate: {value: function()
-	{
-		var errors, bits, i;
-		
-		errors = 0;
-		
-		if(this.mandatory)
-			if(!barmatz.forms.Validator.notEmpty(this.value))
-				errors = barmatz.utils.Bitwise.concat(errors, barmatz.forms.Validator.NOT_EMPTY);
-		
-		if(this.validator.code)
-		{
-			bits = barmatz.utils.Bitwise.parseBit(this.validator.code);
-			
-			for(i = 0; i < bits.length; i++)
-				switch(bits[i])
-				{
-					default:
-						throw new Error('Unknown validation code');
-						break;
-					case barmatz.forms.Validator.NONE:
-					case barmatz.forms.Validator.NOT_EMPTY:
-						break;
-					case barmatz.forms.Validator.EQUALS:
-						if(!barmatz.forms.Validator.equals(this.value, this.validator.equals))
-							errors = barmatz.utils.Bitwise.concat(errors, barmatz.forms.Validator.EQUALS);
-						break;
-					case barmatz.forms.Validator.VALID_EMAIL:
-						if(!barmatz.forms.Validator.validEmail(this.value))
-							errors = barmatz.utils.Bitwise.concat(errors, barmatz.forms.Validator.VALID_EMAIL);
-						break;
-					case barmatz.forms.Validator.VALID_PHONE:
-						if(!barmatz.forms.Validator.validPhone(this.value))
-							errors = barmatz.utils.Bitwise.concat(errors, barmatz.forms.Validator.VALID_PHONE);
-						break;
-					case barmatz.forms.Validator.MIN_LENGTH:
-						if(!barmatz.forms.Validator.minLength(this.value, this.validator.minLength))
-							errors = barmatz.utils.Bitwise.concat(errors, barmatz.forms.Validator.MIN_LENGTH);
-						break;
-					case barmatz.forms.Validator.MAX_LENGTH:
-						if(!barmatz.forms.Validator.maxLength(this.value, this.validator.maxLength))
-							errors = barmatz.utils.Bitwise.concat(errors, barmatz.forms.Validator.MAX_LENGTH);
-						break;
-					case barmatz.forms.Validator.EXACT_LENGTH:
-						if(!barmatz.forms.Validator.exactLength(this.value, this.validator.exactLength))
-							errors = barmatz.utils.Bitwise.concat(errors, barmatz.forms.Validator.EXACT_LENGTH);
-						break;
-					case barmatz.forms.Validator.GREATER_THAN:
-						if(!barmatz.forms.Validator.greaterThan(parseFloat(this.value), this.validator.greaterThan))
-							errors = barmatz.utils.Bitwise.concat(errors, barmatz.forms.Validator.GREATER_THAN);
-						break;
-					case barmatz.forms.Validator.LESSER_THAN:
-						if(!barmatz.forms.Validator.lesserThan(parseFloat(this.value), this.validator.lesserThan))
-							errors = barmatz.utils.Bitwise.concat(errors, barmatz.forms.Validator.LESSER_THAN);
-						break;
-					case barmatz.forms.Validator.DIGITS_ONLY:
-						if(!barmatz.forms.Validator.digitsOnly(this.value))
-							errors = barmatz.utils.Bitwise.concat(errors, barmatz.forms.Validator.DIGITS_ONLY);
-						break;
-					case barmatz.forms.Validator.NOT_DIGITS:
-						if(!barmatz.forms.Validator.notDigits(this.value))
-							errors = barmatz.utils.Bitwise.concat(errors, barmatz.forms.Validator.NOT_DIGITS);
-						break;
-				}
-		}
-		
-		if(errors > 0)
-		{
-			this.dispatchEvent(new barmatz.events.FieldModelEvent(barmatz.events.FieldModelEvent.INVALID, errors));
-			return false;
-		}
-		else
-		{
-			this.dispatchEvent(new barmatz.events.FieldModelEvent(barmatz.events.FieldModelEvent.VALID));
-			return true;
-		}
-			
-	}},
-	clone: {value: function()
-	{
-		var clone = new barmatz.forms.fields.FieldModel(this.type, this.name);
-		clone.label = this.label;
-		clone.mandatory = this.mandatory;
-		clone.value = this.value;
-		clone.enabled = this.enabled;
-		clone.validator = this.validator.clone();
-		clone.width = this.width;
-		return clone;
-	}}
-});
-/** barmatz.forms.fields.TextFieldModel **/
-window.barmatz.forms.fields.TextFieldModel = function(name)
-{
-	barmatz.utils.DataTypes.isNotUndefined(name);
-	barmatz.utils.DataTypes.isTypeOf(name, 'string', true);
-	barmatz.forms.fields.FieldModel.call(this, barmatz.forms.fields.FieldTypes.TEXT_FIELD, name);
-	this.set('max', NaN);
-	this.set('description', '');
-};
-
-barmatz.forms.fields.TextFieldModel.prototype = new barmatz.forms.fields.FieldModel(null, null);
-barmatz.forms.fields.TextFieldModel.prototype.constructor = barmatz.forms.fields.TextFieldModel;
-
-Object.defineProperties(barmatz.forms.fields.TextFieldModel.prototype,
-{
-	max: {get: function()
-	{
-		return this.get('max');
-	}, set: function(value)
-	{
-		barmatz.utils.DataTypes.isTypeOf(value, 'number');
-		this.set('max', value);
-	}},
-	description: {get: function()
-	{
-		return this.get('description');
-	}, set: function(value)
-	{
-		this.set('description', value);
-	}},
-	clone: {value: function()
-	{
-		var clone = new barmatz.forms.fields.TextFieldModel(this.name);
-		clone.label = this.label;
-		clone.mandatory = this.mandatory;
-		clone.value = this.value;
-		clone.enabled = this.enabled;
-		clone.validator = this.validator.clone();
-		clone.max = this.max;
-		clone.description = this.description;
-		return clone;
-	}}
-});
-/** barmatz.forms.fields.CheckboxFieldModel **/
-window.barmatz.forms.fields.CheckboxFieldModel = function(name)
-{
-	barmatz.utils.DataTypes.isNotUndefined(name);
-	barmatz.utils.DataTypes.isTypeOf(name, 'string', true);
-	barmatz.forms.fields.FieldModel.call(this, barmatz.forms.fields.FieldTypes.CHECKBOX, name);
-	this.set('checked', false);
-};
-
-barmatz.forms.fields.CheckboxFieldModel.prototype = new barmatz.forms.fields.FieldModel(null, null);
-barmatz.forms.fields.CheckboxFieldModel.prototype.constructor = barmatz.forms.fields.CheckboxFieldModel;
-
-Object.defineProperties(barmatz.forms.fields.CheckboxFieldModel.prototype, 
-{
-	checked: {get: function()
-	{
-		return this.get('checked');
-	}, set: function(value)
-	{
-		barmatz.utils.DataTypes.isTypeOf(value, 'boolean');
-		this.set('checked', value);
-	}},
-	value: {get: function()
-	{
-		return this.checked ? this.get('value') : '';
-	}},
-	clone: {value: function()
-	{
-		var clone = new barmatz.forms.fields.CheckboxFieldModel(this.name);
-		clone.label = this.label;
-		clone.mandatory = this.mandatory;
-		clone.value = this.value;
-		clone.enabled = this.enabled;
-		clone.validator = this.validator.clone();
-		clone.checked = this.checked;
-		return clone;
-	}}
-});
-/** barmatz.forms.fields.DropboxItemModel **/
-window.barmatz.forms.fields.DropboxItemModel = function(label, value)
-{
-	barmatz.utils.DataTypes.isNotUndefined(label);
-	barmatz.utils.DataTypes.isTypeOf(label, 'string');
-	barmatz.mvc.Model.call(this);
-	this.set('label', label);
-	this.set('value', barmatz.utils.DataTypes.applySilent('isNotUndefined', value) ? value : null);
-};
-
-barmatz.forms.fields.DropboxItemModel.prototype = new barmatz.mvc.Model();
-barmatz.forms.fields.DropboxItemModel.prototype.constructor = barmatz.forms.fields.DropboxItemModel;
-
-Object.defineProperties(barmatz.forms.fields.DropboxItemModel.prototype, 
-{
-	label: {get: function()
-	{
-		return this.get('label');
-	}, set: function(value)
-	{
-		barmatz.utils.DataTypes.isTypeOf(value, 'string');
-		this.set('label', value);
-	}},
-	value: {get: function()
-	{
-		return this.get('value');
-	}, set: function(value)
-	{
-		this.set('value', value);
-	}},
-	toString: {value: function()
-	{
-		return this.label + '=' + this.value;
-	}}
-});
-/** barmatz.forms.fields.DropboxItemsListController **/
-window.barmatz.forms.fields.DropboxItemsListController = function(model, view, addButtonView, resetButtonView)
-{
-	var cachedResetButtonViewDisplay, itemsDictionary, itemsDeleteButtonDictionary;
-	
-	barmatz.utils.DataTypes.isNotUndefined(model);
-	barmatz.utils.DataTypes.isNotUndefined(view);
-	barmatz.utils.DataTypes.isNotUndefined(addButtonView);
-	barmatz.utils.DataTypes.isNotUndefined(resetButtonView);
-	barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.DropboxModel);
-	barmatz.utils.DataTypes.isInstanceOf(view, HTMLElement);
-	barmatz.utils.DataTypes.isInstanceOf(addButtonView, HTMLElement);
-	barmatz.utils.DataTypes.isInstanceOf(resetButtonView, HTMLElement);
-	barmatz.forms.CollectionController.call(this);
-	
-	itemsDictionary = new barmatz.utils.Dictionary();
-	itemsDeleteButtonDictionary = new barmatz.utils.Dictionary();
-	
-	model.forEach(function(item, index, collection)
-	{
-		addItem(item);
-	});
-	model.addEventListener(barmatz.events.CollectionEvent.ITEM_ADDED, onModelItemAdded);
-	model.addEventListener(barmatz.events.CollectionEvent.ITEM_REMOVED, onModelItemRemoved);
-	addButtonView.addEventListener('click', onAddButtonViewClick);
-	resetButtonView.addEventListener('click', onResetButtonViewClick);
-
-	if(model.numItems == 0)
-		hideResetButtonView();
-	
-	function showResetButtonView()
-	{
-		resetButtonView.style.display = cachedResetButtonViewDisplay;
-		cachedResetButtonViewDisplay = null;
-	}
-	
-	function hideResetButtonView()
-	{
-		cachedResetButtonViewDisplay = resetButtonView.style.display;
-		resetButtonView.style.display = 'none';
-	}
-	
-	function addItem(itemModel)
-	{
-		var itemViewWrapper;
-		
-		barmatz.utils.DataTypes.isNotUndefined(itemModel);
-		barmatz.utils.DataTypes.isInstanceOf(itemModel, barmatz.forms.fields.DropboxItemModel);
-		
-		itemViewWrapper = barmatz.forms.factories.DOMFactory.createDropboxItemsListItemWrapper(model.getItemIndex(itemModel));
-		itemViewWrapper.deleteButton.addEventListener('click', onItemDeleteButtonClick);
-		itemsDeleteButtonDictionary.add(itemViewWrapper.deleteButton, itemModel);
-		itemsDictionary.add(itemModel, view.appendChild(itemViewWrapper.wrapper));
-		barmatz.forms.factories.ControllerFactory.createDropboxItemsListItemController(itemModel, itemViewWrapper.labelElement, itemViewWrapper.valueElement, itemViewWrapper.editButton);
-	}
-	
-	function removeItem(itemModel)
-	{
-		barmatz.utils.DataTypes.isNotUndefined(itemModel);
-		barmatz.utils.DataTypes.isInstanceOf(itemModel, barmatz.forms.fields.DropboxItemModel);
-		view.removeChild(itemsDictionary.get(itemModel));
-	}
-	
-	function onItemDeleteButtonClick(event)
-	{
-		model.removeItem(itemsDeleteButtonDictionary.get(event.currentTarget));
-	}
-	
-	function onModelItemAdded(event)
-	{
-		barmatz.utils.DataTypes.isNotUndefined(event);
-		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.CollectionEvent);
-		addItem(event.item);
-		
-		if(model.numItems > 0 && resetButtonView.style.display == 'none')
-			showResetButtonView();
-	}
-	
-	function onModelItemRemoved(event)
-	{
-		barmatz.utils.DataTypes.isNotUndefined(event);
-		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.CollectionEvent);
-		
-		removeItem(event.item);
-
-		if(model.numItems == 0)
-			hideResetButtonView();
-	}
-	
-	function onAddButtonViewClick(event)
-	{
-		barmatz.forms.factories.ControllerFactory.createJQueryDialogController(barmatz.forms.factories.DOMFactory.createDropboxItemDialog(null, null, onAddItemConfirm));
-	}
-	
-	function onResetButtonViewClick(event)
-	{
-		while(model.numItems > 0)
-			model.removeItemAt(model.numItems - 1);
-	}
-	
-	function onAddItemConfirm(key, value)
-	{
-		barmatz.utils.DataTypes.isNotUndefined(key);
-		barmatz.utils.DataTypes.isNotUndefined(value);
-		barmatz.utils.DataTypes.isTypeOf(key, 'string');
-		model.addItem(barmatz.forms.factories.ModelFactory.createDropboxItemModel(key, value));
-	}
-};
-
-barmatz.forms.fields.DropboxItemsListController.prototype = new barmatz.forms.CollectionController();
-barmatz.forms.fields.DropboxItemsListController.prototype.constructor = barmatz.forms.fields.DropboxItemsListController;
-/** barmatz.forms.fields.DropboxItemsListItemController **/
-window.barmatz.forms.fields.DropboxItemsListItemController = function(model, labelView, valueView, editButtonView)
-{
-	barmatz.utils.DataTypes.isNotUndefined(model);
-	barmatz.utils.DataTypes.isNotUndefined(labelView);
-	barmatz.utils.DataTypes.isNotUndefined(valueView);
-	barmatz.utils.DataTypes.isNotUndefined(editButtonView);
-	barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.DropboxItemModel);
-	barmatz.utils.DataTypes.isInstanceOf(labelView, HTMLElement);
-	barmatz.utils.DataTypes.isInstanceOf(valueView, HTMLElement);
-	barmatz.utils.DataTypes.isInstanceOf(editButtonView, HTMLElement);
-	barmatz.mvc.Controller.call(this);
-	
-	labelView.innerHTML = model.label;
-	valueView.innerHTML = model.value;
-	
-	model.addEventListener(barmatz.events.ModelEvent.VALUE_CHANGED, onModelValueChanged);
-	editButtonView.addEventListener('click', onEditButtonViewClick);
-	
-	function onModelValueChanged(event)
-	{
-		barmatz.utils.DataTypes.isNotUndefined(event);
-		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.ModelEvent);
-		
-		switch(event.key)
-		{
-			case 'label':
-				labelView.innerHTML = event.value;
-				break;
-			case 'value':
-				valueView.innerHTML = event.value;
-				break;
-		}
-	}
-	
-	function onEditButtonViewClick(event)
-	{
-		barmatz.forms.factories.ControllerFactory.createJQueryDialogController(barmatz.forms.factories.DOMFactory.createDropboxItemDialog(model.label, model.value, onEditConfirm));
-	}
-	
-	function onEditConfirm(label, value)
-	{
-		barmatz.utils.DataTypes.isNotUndefined(label);
-		barmatz.utils.DataTypes.isNotUndefined(value);
-		barmatz.utils.DataTypes.isTypeOf(label, 'string');
-		barmatz.utils.DataTypes.isTypeOf(value, 'string');
-		model.label = label;
-		model.value = value;
-	}
-};
-
-barmatz.forms.fields.DropboxItemsListItemController.prototype = new barmatz.mvc.Controller();
-barmatz.forms.fields.DropboxItemsListItemController.prototype.constructor = barmatz.forms.fields.DropboxItemsListItemController;
-/** barmatz.forms.fields.DropboxModel **/
-window.barmatz.forms.fields.DropboxModel = function(name, items)
-{
-	var _this;
-	
-	barmatz.utils.DataTypes.isNotUndefined(name);
-	barmatz.utils.DataTypes.isTypeOf(name, 'string', true);
-	barmatz.utils.DataTypes.isInstanceOf(items, Array, true);
-	barmatz.forms.fields.FieldModel.call(this, barmatz.forms.fields.FieldTypes.DROPBOX, name);
-	
-	_this = this;
-	
-	this.set('multiple', false);
-	this.set('items', new barmatz.forms.CollectionModel());
-	this.get('items').addEventListener(barmatz.events.CollectionEvent.ITEM_ADDED, onItemsItemAdded);
-	this.get('items').addEventListener(barmatz.events.CollectionEvent.ITEM_REMOVED, onItemsItemRemoved);
-	
-	if(items)
-		while(items.length > this.numItems)
-			this.addItem(items[this.numItems]);
-	
-	function onItemsItemAdded(event)
-	{
-		_this.dispatchEvent(event);
-	}
-	
-	function onItemsItemRemoved(event)
-	{
-		_this.dispatchEvent(event);
-	}
-};
-
-barmatz.forms.fields.DropboxModel.prototype = new barmatz.forms.fields.FieldModel(null, null);
-barmatz.forms.fields.DropboxModel.prototype.constructor = barmatz.forms.fields.DropboxModel;
-
-Object.defineProperties(barmatz.forms.fields.DropboxModel.prototype,
-{
-	multiple: {get: function()
-	{
-		return this.get('multiple');
-	}, set: function(value)
-	{
-		barmatz.utils.DataTypes.isTypeOf(value, 'boolean');
-		this.set('multiple', value);
-	}},
-	numItems: {get: function()
-	{
-		return this.get('items').numItems;
-	}},
-	addItem: {value: function(item)
-	{
-		barmatz.utils.DataTypes.isNotUndefined(item);
-		barmatz.utils.DataTypes.isInstanceOf(item, barmatz.forms.fields.DropboxItemModel);
-		return this.get('items').addItem(item);
-	}},
-	addItemAt: {value: function(item, index)
-	{
-		barmatz.utils.DataTypes.isNotUndefined(item);
-		barmatz.utils.DataTypes.isNotUndefined(index);
-		barmatz.utils.DataTypes.isInstanceOf(item, barmatz.forms.fields.DropboxItemModel);
-		barmatz.utils.DataTypes.isTypeOf(index, 'number');
-		return this.get('items').addItemAt(item, index);
-	}},
-	removeItem: {value: function(item)
-	{
-		barmatz.utils.DataTypes.isNotUndefined(item);
-		barmatz.utils.DataTypes.isInstanceOf(item, barmatz.forms.fields.DropboxItemModel);
-		return this.get('items').removeItem(item);
-	}},
-	removeItemAt: {value: function(index)
-	{
-		barmatz.utils.DataTypes.isNotUndefined(index);
-		barmatz.utils.DataTypes.isTypeOf(index, 'number');
-		return this.get('items').removeItemAt(index);
-	}},
-	getItemAt: {value: function(index)
-	{
-		barmatz.utils.DataTypes.isNotUndefined(index);
-		barmatz.utils.DataTypes.isTypeOf(index, 'number');
-		return this.get('items').getItemAt(index);
-	}},
-	getItemIndex: {value: function(item)
-	{
-		barmatz.utils.DataTypes.isNotUndefined(item);
-		barmatz.utils.DataTypes.isInstanceOf(item, barmatz.forms.fields.DropboxItemModel);
-		return this.get('items').getItemIndex(item);
-	}},
-	setItemIndex: {value: function(item, index)
-	{
-		barmatz.utils.DataTypes.isNotUndefined(item);
-		barmatz.utils.DataTypes.isNotUndefined(index);
-		barmatz.utils.DataTypes.isInstanceOf(item, barmatz.forms.fields.DropboxItemModel);
-		barmatz.utils.DataTypes.isTypeOf(index, 'number');
-		return this.get('items').setItemIndex(item, index);
-	}},
-	forEach: {value: function(handler)
-	{
-		barmatz.utils.DataTypes.isNotUndefined(handler);
-		barmatz.utils.DataTypes.isTypeOf(handler, 'function');
-		return this.get('items').forEach(handler);
-	}},
-	find: {value: function(filter)
-	{
-		return this.get('items').find(filter);
-	}},
-	clone: {value: function()
-	{
-		var clone = new barmatz.forms.fields.DropboxModel(this.name, this.get('items').toArray());
-		clone.label = this.label;
-		clone.mandatory = this.mandatory;
-		clone.value = this.value;
-		clone.enabled = this.enabled;
-		clone.validator = this.validator.clone();
-		clone.multiple = this.multiple;
-		return clone;
-	}},
-	toString: {value: function()
-	{
-		return this.get('items').toString();
-	}}
-});
 /** barmatz.forms.fields.FieldController **/
-window.barmatz.forms.fields.FieldController = function(model, fieldView, errorMessageView)
+barmatz.forms.fields.FieldController = function(model, fieldView, errorMessageView)
 {
 	var settingValue, cachedErrorMessageVisibility, valueIsDescription;
 	
-	barmatz.utils.DataTypes.isNotUndefined(model);
-	barmatz.utils.DataTypes.isNotUndefined(fieldView);
 	barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FieldModel);
-	barmatz.utils.DataTypes.isInstanceOf(fieldView, HTMLElement);
-	barmatz.utils.DataTypes.isInstanceOf(errorMessageView, HTMLElement, true);
+	barmatz.utils.DataTypes.isInstancesOf(fieldView, [HTMLInputElement, HTMLTextAreaElement, HTMLSelectElement, HTMLSpanElement]);
+	barmatz.utils.DataTypes.isInstanceOf(errorMessageView, window.HTMLElement, true);
 	barmatz.mvc.Controller.call(this);
 	
 	model.addEventListener(barmatz.events.ModelEvent.VALUE_CHANGED, onModelValueChanged);
-	model.addEventListener(barmatz.events.FieldModelEvent.VALID, onModelValid);
-	model.addEventListener(barmatz.events.FieldModelEvent.INVALID, onModelInvalid);
+	model.addEventListener(barmatz.events.FieldEvent.VALID, onModelValid);
+	model.addEventListener(barmatz.events.FieldEvent.INVALID, onModelInvalid);
 	fieldView.addEventListener('focus', onFieldViewFocus);
 	fieldView.addEventListener('keydown', onFieldViewKeyDown);
 	fieldView.addEventListener('change', onFieldViewChange);
@@ -4178,9 +3382,9 @@ window.barmatz.forms.fields.FieldController = function(model, fieldView, errorMe
 	
 	function addDescription()
 	{
-		if(model instanceof barmatz.forms.fields.TextFieldModel && !barmatz.forms.Validator.notEmpty(model.value))
+		if(model instanceof barmatz.forms.fields.TextFieldModel && !barmatz.forms.Validator.notEmpty(model.getValue()))
 		{
-			fieldView.value = model.description;
+			fieldView.value = model.getDescription();
 			barmatz.utils.CSS.addClass(fieldView, 'forms-empty-field');
 			valueIsDescription = true;
 		}
@@ -4203,14 +3407,13 @@ window.barmatz.forms.fields.FieldController = function(model, fieldView, errorMe
 			settingValue = true;
 			
 			if(model instanceof barmatz.forms.fields.PhoneFieldModel)
-				model.value = fieldView.getElementsByTagName('select')[0].value + fieldView.getElementsByTagName('input')[0].value;
+				model.setValue(fieldView.getElementsByTagName('select')[0].value + fieldView.getElementsByTagName('input')[0].value);
 			else if(model instanceof barmatz.forms.fields.CheckboxFieldModel)
-				model.checked = fieldView.checked;
+				model.setChecked(fieldView.checked);
 			else
-				model.value = fieldView.value;
+				model.setValue(fieldView.value);
 			
 			model.validate();
-			
 			settingValue = false;
 		}
 
@@ -4237,7 +3440,8 @@ window.barmatz.forms.fields.FieldController = function(model, fieldView, errorMe
 	{
 		if(errorMessageView)
 		{
-			cachedErrorMessageVisibility = errorMessageView.style.visibility;
+			if(cachedErrorMessageVisibility == null)
+				cachedErrorMessageVisibility = errorMessageView.style.visibility;
 			errorMessageView.style.visibility = 'hidden';
 		}
 	}
@@ -4249,16 +3453,15 @@ window.barmatz.forms.fields.FieldController = function(model, fieldView, errorMe
 	
 	function onModelValueChanged(event)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(event);
 		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.ModelEvent);
 
-		switch(event.key)
+		switch(event.getKey())
 		{
 			case 'value':
 				if(!settingValue)
 				{
 					settingValue = true;
-					fieldView.value = model.value;
+					fieldView.value = model.getValue();
 					settingValue = false;
 				}
 				break;
@@ -4270,24 +3473,24 @@ window.barmatz.forms.fields.FieldController = function(model, fieldView, errorMe
 	
 	function onModelValid(event)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(event);
-		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.FieldModelEvent);
-
+		if(errorMessageView)
+			errorMessageView.innerHTML = '';
+		
 		if(!isErrorMessageHidden())
 			hideErrorMessage();
 	}
 	
 	function onModelInvalid(event)
 	{
-		var errors, i;
+		var errors, validator, i;
 		
-		barmatz.utils.DataTypes.isNotUndefined(event);
-		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.FieldModelEvent);
+		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.FieldEvent);
 		
 		if(errorMessageView)
 		{
-			errors = barmatz.utils.Bitwise.parseBit(event.errors);
+			errors = barmatz.utils.Bitwise.parseBit(event.getErrors());
 			errorMessageView.innerHTML = '';
+			validator = model.getValidator();
 			
 			for(i = 0; i < errors.length; i++)
 				switch(errors[i])
@@ -4310,19 +3513,19 @@ window.barmatz.forms.fields.FieldController = function(model, fieldView, errorMe
 						errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement(barmatz.forms.Language.form.field.errors.invalidPhone));
 						break;
 					case barmatz.forms.Validator.MIN_LENGTH:
-						errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement(barmatz.forms.Language.form.field.errors.minimumLength.replace(/\$\{1\}/, model.validator.minLength)));
+						errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement(barmatz.forms.Language.form.field.errors.minimumLength.replace(/\$\{1\}/, validator.minLength)));
 						break;
 					case barmatz.forms.Validator.MAX_LENGTH:
-						errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement(barmatz.forms.Language.form.field.errors.maximumLength.replace(/\$\{1\}/, model.validator.maxLength)));
+						errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement(barmatz.forms.Language.form.field.errors.maximumLength.replace(/\$\{1\}/, validator.maxLength)));
 						break;
 					case barmatz.forms.Validator.EXACT_LENGTH:
-						errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement(barmatz.forms.Language.form.field.errors.exactLength.replace(/\$\{1\}/, model.validator.exactLength)));
+						errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement(barmatz.forms.Language.form.field.errors.exactLength.replace(/\$\{1\}/, validator.exactLength)));
 						break;
 					case barmatz.forms.Validator.GREATER_THAN:
-						errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement(barmatz.forms.Language.form.field.errors.greaterThan.replace(/\$\{1\}/, model.validator.greaterThan)));
+						errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement(barmatz.forms.Language.form.field.errors.greaterThan.replace(/\$\{1\}/, validator.greaterThan)));
 						break;
 					case barmatz.forms.Validator.LESSER_THAN:
-						errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement(barmatz.forms.Language.form.field.errors.lesserThan.replace(/\$\{1\}/, model.validator.lesserThan)));
+						errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement(barmatz.forms.Language.form.field.errors.lesserThan.replace(/\$\{1\}/, validator.lesserThan)));
 						break;
 					case barmatz.forms.Validator.DIGITS_ONLY:
 						errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement(barmatz.forms.Language.form.field.errors.digitsOnly));
@@ -4367,566 +3570,1124 @@ window.barmatz.forms.fields.FieldController = function(model, fieldView, errorMe
 		setModelValue();
 	}
 };
-
 barmatz.forms.fields.FieldController.prototype = new barmatz.mvc.Controller();
 barmatz.forms.fields.FieldController.prototype.constructor = barmatz.forms.fields.FieldController;
-/** barmatz.forms.fields.FieldTypes **/
-window.barmatz.forms.fields.FieldTypes = function(){};
+/** barmatz.forms.fields.FieldModel **/
+barmatz.forms.fields.FieldModel = function(type, name)
+{
+	barmatz.utils.DataTypes.isNotUndefined(type);
+	barmatz.utils.DataTypes.isNotUndefined(name);
+	barmatz.utils.DataTypes.isTypeOf(type, 'string', true);
+	barmatz.utils.DataTypes.isTypeOf(name, 'string', true);
+	barmatz.forms.fields.FormItemModel.call(this, type);
+	this.set('name', name);
+	this.set('label', '');
+	this.set('mandatory', false);
+	this.set('value', '');
+	this.set('enabled', true);
+	this.set('validator', barmatz.forms.factories.ModelFactory.createValidatorModel());
+	this.set('width', NaN);
+};
 
-Object.defineProperties(barmatz.forms.fields.FieldTypes,
+barmatz.forms.fields.FieldModel.prototype = new barmatz.forms.fields.FormItemModel(null);
+barmatz.forms.fields.FieldModel.prototype.constructor = barmatz.forms.fields.FieldModel;
+barmatz.forms.fields.FieldModel.prototype.getName = function()
 {
-	HTML_CONTENT: {value: 'htmlContent'},
-	TEXT_AREA: {value: 'textArea'},
-	TEXT_FIELD: {value: 'textField'},
-	DROPBOX: {value: 'dropbox'},
-	PASSWORD: {value: 'password'},
-	CHECKBOX: {value: 'checkbox'},
-	RADIO: {value: 'radio'},
-	FILE: {value: 'file'},
-	HIDDEN: {value: 'hidden'},
-	PHONE: {value: 'phone'}
-});
-/** barmatz.forms.fields.FieldValidationOptionsController **/
-window.barmatz.forms.fields.FieldValidationOptionsController = function(model, options)
+	return this.get('name');
+};
+barmatz.forms.fields.FieldModel.prototype.setName = function(value)
 {
-	barmatz.utils.DataTypes.isNotUndefined(model);
-	barmatz.utils.DataTypes.isNotUndefined(options);
-	barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FieldModel);
-	barmatz.utils.DataTypes.isTypeOf(options, 'object');
+	barmatz.utils.DataTypes.isTypeOf(value, 'string');
+	this.set('name', value);
+};
+barmatz.forms.fields.FieldModel.prototype.getLabel = function()
+{
+	return this.get('label');
+};
+barmatz.forms.fields.FieldModel.prototype.setLabel = function(value)
+{
+	barmatz.utils.DataTypes.isTypeOf(value, 'string');
+	this.set('label', value);
+};
+barmatz.forms.fields.FieldModel.prototype.getMandatory = function()
+{
+	return this.get('mandatory');
+};
+barmatz.forms.fields.FieldModel.prototype.setMandatory = function(value)
+{
+	barmatz.utils.DataTypes.isTypeOf(value, 'boolean');
+	this.set('mandatory', value);
+};
+barmatz.forms.fields.FieldModel.prototype.getValue = function()
+{
+	return this.get('value');
+};
+barmatz.forms.fields.FieldModel.prototype.setValue = function(value)
+{
+	this.set('value', value);
+};
+barmatz.forms.fields.FieldModel.prototype.getEnabled = function()
+{
+	return this.get('enabled');
+};
+barmatz.forms.fields.FieldModel.prototype.setEnabled = function(value)
+{
+	barmatz.utils.DataTypes.isTypeOf(value, 'boolean');
+	this.set('enabled', value);
+};
+barmatz.forms.fields.FieldModel.prototype.getAvailableValidators = function()
+{
+	return barmatz.forms.Validator.EQUALS +
+		   barmatz.forms.Validator.VALID_EMAIL +
+		   barmatz.forms.Validator.VALID_PHONE +
+		   barmatz.forms.Validator.MIN_LENGTH +
+		   barmatz.forms.Validator.MAX_LENGTH +
+		   barmatz.forms.Validator.EXACT_LENGTH +
+		   barmatz.forms.Validator.GREATER_THAN +
+		   barmatz.forms.Validator.LESSER_THAN +
+		   barmatz.forms.Validator.DIGITS_ONLY +
+		   barmatz.forms.Validator.NOT_DIGITS;
+};
+barmatz.forms.fields.FieldModel.prototype.getValidator = function()
+{
+	return this.get('validator');
+};
+barmatz.forms.fields.FieldModel.prototype.setValidator = function(value)
+{
+	barmatz.utils.DataTypes.isInstanceOf(value, barmatz.forms.fields.ValidatorModel);
+	this.set('validator', value);
+};
+barmatz.forms.fields.FieldModel.prototype.getWidth = function()
+{
+	return this.get('width');
+};
+barmatz.forms.fields.FieldModel.prototype.setWidth = function(value)
+{
+	barmatz.utils.DataTypes.isTypeOf(value, 'number');
+	this.set('width', value);
+};
+barmatz.forms.fields.FieldModel.prototype.validate = function()
+{
+	var errors, code, bits, value, i;
+	
+	errors = 0;
+	
+	if(this.getMandatory())
+		if(!barmatz.forms.Validator.notEmpty(this.getValue()))
+			errors = barmatz.utils.Bitwise.concat(errors, barmatz.forms.Validator.NOT_EMPTY);
+	
+	code = this.getValidator().getCode();
+	
+	if(code)
+	{
+		bits = barmatz.utils.Bitwise.parseBit(code);
+		value = this.getValue();
+		
+		for(i = 0; i < bits.length; i++)
+			switch(bits[i])
+			{
+				default:
+					throw new Error('Unknown validation code');
+					break;
+				case barmatz.forms.Validator.NONE:
+					break;
+				case barmatz.forms.Validator.NOT_EMPTY:
+					if(!this.getMandatory() && !barmatz.forms.Validator.notEmpty(this.getValue()))
+						errors = barmatz.utils.Bitwise.concat(errors, barmatz.forms.Validator.NOT_EMPTY);
+					break;
+				case barmatz.forms.Validator.EQUALS:
+					if(!barmatz.forms.Validator.equals(value, this.getValidator().equals))
+						errors = barmatz.utils.Bitwise.concat(errors, barmatz.forms.Validator.EQUALS);
+					break;
+				case barmatz.forms.Validator.VALID_EMAIL:
+					if(!barmatz.forms.Validator.validEmail(value))
+						errors = barmatz.utils.Bitwise.concat(errors, barmatz.forms.Validator.VALID_EMAIL);
+					break;
+				case barmatz.forms.Validator.VALID_PHONE:
+					if(!barmatz.forms.Validator.validPhone(value))
+						errors = barmatz.utils.Bitwise.concat(errors, barmatz.forms.Validator.VALID_PHONE);
+					break;
+				case barmatz.forms.Validator.MIN_LENGTH:
+					if(!barmatz.forms.Validator.minLength(value, this.getValidator().minLength))
+						errors = barmatz.utils.Bitwise.concat(errors, barmatz.forms.Validator.MIN_LENGTH);
+					break;
+				case barmatz.forms.Validator.MAX_LENGTH:
+					if(!barmatz.forms.Validator.maxLength(value, this.getValidator().maxLength))
+						errors = barmatz.utils.Bitwise.concat(errors, barmatz.forms.Validator.MAX_LENGTH);
+					break;
+				case barmatz.forms.Validator.EXACT_LENGTH:
+					if(!barmatz.forms.Validator.exactLength(value, this.getValidator().exactLength))
+						errors = barmatz.utils.Bitwise.concat(errors, barmatz.forms.Validator.EXACT_LENGTH);
+					break;
+				case barmatz.forms.Validator.GREATER_THAN:
+					if(!barmatz.forms.Validator.greaterThan(parseFloat(value), this.getValidator().greaterThan))
+						errors = barmatz.utils.Bitwise.concat(errors, barmatz.forms.Validator.GREATER_THAN);
+					break;
+				case barmatz.forms.Validator.LESSER_THAN:
+					if(!barmatz.forms.Validator.lesserThan(parseFloat(value), this.getValidator().lesserThan))
+						errors = barmatz.utils.Bitwise.concat(errors, barmatz.forms.Validator.LESSER_THAN);
+					break;
+				case barmatz.forms.Validator.DIGITS_ONLY:
+					if(!barmatz.forms.Validator.digitsOnly(value))
+						errors = barmatz.utils.Bitwise.concat(errors, barmatz.forms.Validator.DIGITS_ONLY);
+					break;
+				case barmatz.forms.Validator.NOT_DIGITS:
+					if(!barmatz.forms.Validator.notDigits(value))
+						errors = barmatz.utils.Bitwise.concat(errors, barmatz.forms.Validator.NOT_DIGITS);
+					break;
+			}
+	}
+	
+	if(errors > 0)
+	{
+		this.dispatchEvent(new barmatz.events.FieldEvent(barmatz.events.FieldEvent.INVALID, errors));
+		return false;
+	}
+	else
+	{
+		this.dispatchEvent(new barmatz.events.FieldEvent(barmatz.events.FieldEvent.VALID));
+		return true;
+	}
+		
+};
+barmatz.forms.fields.FieldModel.prototype.clone = function()
+{
+	var clone = new barmatz.forms.fields.FieldModel(this.getType(), this.getName());
+	clone.setLabel(this.getLabel());
+	clone.setMandatory(this.getMandatory());
+	clone.setValue(this.getValue());
+	clone.setEnabled(this.getEnabled());
+	clone.setValidator(this.getValidator().clone());
+	clone.setWidth(this.getWidth());
+	return clone;
+};
+/** barmatz.forms.fields.ValidatorModel **/
+barmatz.forms.fields.ValidatorModel = function(data)
+{
+	var i;
+	
+	barmatz.utils.DataTypes.isTypeOf(data, 'object', true);
+	barmatz.mvc.Model.call(this);
+	this.set('code', barmatz.forms.Validator.NONE);
+
+	if(data)
+	{
+		if(data.code)
+			this.set('code', data.code);
+		
+		for(i in data)
+			this[i] = data[i];
+	}
+};
+barmatz.forms.fields.ValidatorModel.prototype = new barmatz.mvc.Model();
+barmatz.forms.fields.ValidatorModel.prototype.constructor = barmatz.forms.fields.ValidatorModel;
+barmatz.forms.fields.ValidatorModel.prototype.getCode = function()
+{
+	return this.get('code');
+};
+barmatz.forms.fields.ValidatorModel.prototype.setCode = function(value)
+{
+	barmatz.utils.DataTypes.isTypeOf(value, 'number');
+	this.set('code', value);
+};
+barmatz.forms.fields.ValidatorModel.prototype.clone = function()
+{
+	var object, i;
+	
+	object = new barmatz.forms.fields.ValidatorModel();
+	object.setCode(this.getCode());
+	
+	for(i in this)
+		object[i] = this[i];
+	
+	return object;
+};
+barmatz.forms.fields.ValidatorModel.prototype.toJSON = function()
+{
+	var object, key, getter, i;
+	
+	object = {code: this.getCode()};
+	
+	for(i in this)
+		if(typeof this[i] != 'function' && i != '_target' && i != '_listeners')
+		{
+			if(/^_/.test(i))
+			{
+				key = i.replace('_', '');
+				getter = 'get' + barmatz.utils.String.firstLetterToUpperCase(key);
+				object[key] = /^_/.test(i) && this.hasOwnProperty(getter) ? this[getter]() : this[i];
+			}
+			else
+				object[i] = this[i];
+		}
+	
+	return object;
+};
+/** barmatz.forms.fields.TextFieldModel **/
+barmatz.forms.fields.TextFieldModel = function(name)
+{
+	barmatz.utils.DataTypes.isTypeOf(name, 'string', true);
+	barmatz.forms.fields.FieldModel.call(this, barmatz.forms.fields.FieldTypes.TEXT_FIELD, name);
+	this.set('max', NaN);
+	this.set('description', '');
+};
+barmatz.forms.fields.TextFieldModel.prototype = new barmatz.forms.fields.FieldModel(null, null);
+barmatz.forms.fields.TextFieldModel.prototype.constructor = barmatz.forms.fields.TextFieldModel;
+barmatz.forms.fields.TextFieldModel.prototype.getMax = function()
+{
+	return this.get('max');
+};
+barmatz.forms.fields.TextFieldModel.prototype.setMax = function(value)
+{
+	barmatz.utils.DataTypes.isTypeOf(value, 'number');
+	this.set('max', value);
+};
+barmatz.forms.fields.TextFieldModel.prototype.getDescription = function()
+{
+	return this.get('description');
+};
+barmatz.forms.fields.TextFieldModel.prototype.setDescription = function(value)
+{
+	this.set('description', value);
+};
+barmatz.forms.fields.TextFieldModel.prototype.clone = function()
+{
+	var clone = new barmatz.forms.fields.TextFieldModel(this.getName());
+	clone.setLabel(this.getLabel());
+	clone.setMandatory(this.getMandatory());
+	clone.setValue(this.getValue());
+	clone.setEnabled(this.getEnabled());
+	clone.setValidator(this.getValidator().clone());
+	clone.setMax(this.getMax());
+	clone.setDescription(this.getDescription());
+	return clone;
+};
+/** barmatz.forms.fields.CheckboxFieldModel **/
+barmatz.forms.fields.CheckboxFieldModel = function(name)
+{
+	barmatz.utils.DataTypes.isNotUndefined(name);
+	barmatz.utils.DataTypes.isTypeOf(name, 'string', true);
+	barmatz.forms.fields.FieldModel.call(this, barmatz.forms.fields.FieldTypes.CHECKBOX, name);
+	this.set('checked', false);
+};
+barmatz.forms.fields.CheckboxFieldModel.prototype = new barmatz.forms.fields.FieldModel(null, null);
+barmatz.forms.fields.CheckboxFieldModel.prototype.constructor = barmatz.forms.fields.CheckboxFieldModel;
+barmatz.forms.fields.CheckboxFieldModel.prototype.getChecked = function()
+{
+	return this.get('checked');
+};
+barmatz.forms.fields.CheckboxFieldModel.prototype.setChecked = function(value)
+{
+	barmatz.utils.DataTypes.isTypeOf(value, 'boolean');
+	this.set('checked', value);
+};
+barmatz.forms.fields.CheckboxFieldModel.prototype.getValue = function()
+{
+	return this.getChecked() ? this.get('value') : '';
+};
+barmatz.forms.fields.CheckboxFieldModel.prototype.clone = function()
+{
+	var clone = new barmatz.forms.fields.CheckboxFieldModel(this.getName());
+	clone.setLabel(this.getLabel());
+	clone.setMandatory(this.getMandatory());
+	clone.setValue(this.getValue());
+	clone.setEnabled(this.getEnabled());
+	clone.setValidator(this.getValidator().clone());
+	clone.setChecked(this.getChecked());
+	return clone;
+};
+/** barmatz.forms.fields.DropboxItemModel **/
+barmatz.forms.fields.DropboxItemModel = function(label, value)
+{
+	barmatz.utils.DataTypes.isNotUndefined(label);
+	barmatz.utils.DataTypes.isTypeOf(label, 'string');
+	barmatz.mvc.Model.call(this);
+	this.set('label', label);
+	this.set('value', barmatz.utils.DataTypes.applySilent('isNotUndefined', value) ? value : null);
+};
+barmatz.forms.fields.DropboxItemModel.prototype = new barmatz.mvc.Model();
+barmatz.forms.fields.DropboxItemModel.prototype.constructor = barmatz.forms.fields.DropboxItemModel;
+barmatz.forms.fields.DropboxItemModel.prototype.getLabel = function()
+{
+	return this.get('label');
+};
+barmatz.forms.fields.DropboxItemModel.prototype.setLabel = function(value)
+{
+	barmatz.utils.DataTypes.isTypeOf(value, 'string');
+	this.set('label', value);
+};
+barmatz.forms.fields.DropboxItemModel.prototype.getValue = function()
+{
+	return this.get('value');
+};
+barmatz.forms.fields.DropboxItemModel.prototype.setValue = function(value)
+{
+	this.set('value', value);
+};
+barmatz.forms.fields.DropboxItemModel.prototype.toString = function()
+{
+	return this.getLabel() + '=' + this.getValue();
+};
+/** barmatz.forms.fields.DropboxItemsListController **/
+barmatz.forms.fields.DropboxItemsListController = function(model, view, addButtonView, resetButtonView, dialogContainerView)
+{
+	var _this, cachedResetButtonViewDisplay;
+	
+	barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.DropboxModel);
+	barmatz.utils.DataTypes.isInstanceOf(view, window.HTMLElement);
+	barmatz.utils.DataTypes.isInstanceOf(addButtonView, window.HTMLElement);
+	barmatz.utils.DataTypes.isInstanceOf(resetButtonView, window.HTMLElement);
+	
+	_this = this;
+	this._itemsDictionary = new barmatz.utils.Dictionary();
+	this._itemsDeleteButtonDictionary = new barmatz.utils.Dictionary();
+	this._model = model;
+	this._dialogContainerView = dialogContainerView;
+
+	barmatz.forms.CollectionController.call(this, model, view);
+	
+	model.addEventListener(barmatz.events.CollectionEvent.ITEM_ADDED, onModelItemAdded);
+	model.addEventListener(barmatz.events.CollectionEvent.ITEM_REMOVED, onModelItemRemoved);
+	addButtonView.addEventListener('click', onAddButtonViewClick);
+	resetButtonView.addEventListener('click', onResetButtonViewClick);
+
+	if(model.getNumItems() == 0)
+		hideResetButtonView();
+	
+	function showResetButtonView()
+	{
+		resetButtonView.style.display = cachedResetButtonViewDisplay;
+		cachedResetButtonViewDisplay = null;
+	}
+	
+	function hideResetButtonView()
+	{
+		cachedResetButtonViewDisplay = resetButtonView.style.display;
+		resetButtonView.style.display = 'none';
+	}
+	
+	function onModelItemAdded(event)
+	{
+		if(model.getNumItems() > 0 && resetButtonView.style.display == 'none')
+			showResetButtonView();
+	}
+	
+	function onModelItemRemoved(event)
+	{
+		if(model.getNumItems() == 0)
+			hideResetButtonView();
+	}
+	
+	function onAddButtonViewClick(event)
+	{
+		barmatz.forms.factories.ControllerFactory.createJQueryDialogController(barmatz.forms.factories.DOMFactory.createDropboxItemDialog(null, null, onAddItemConfirm, true, dialogContainerView));
+	}
+	
+	function onResetButtonViewClick(event)
+	{
+		while(model.getNumItems() > 0)
+			model.removeItemAt(model.getNumItems() - 1);
+	}
+	
+	function onAddItemConfirm(key, value)
+	{
+		barmatz.utils.DataTypes.isTypeOf(key, 'string');
+		model.addItem(barmatz.forms.factories.ModelFactory.createDropboxItemModel(key, value));
+	}
+};
+barmatz.forms.fields.DropboxItemsListController.prototype = new barmatz.forms.CollectionController(null, null);
+barmatz.forms.fields.DropboxItemsListController.prototype.constructor = barmatz.forms.fields.DropboxItemsListController;
+barmatz.forms.fields.DropboxItemsListController.prototype._createItemViewFromModel = function(model)
+{
+	var _this, itemViewWrapper;
+	
+	barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.DropboxItemModel);
+	
+	_this = this;
+	itemViewWrapper = barmatz.forms.factories.DOMFactory.createDropboxItemsListItemWrapper(this._model.getItemIndex(model));
+	itemViewWrapper.deleteButton.addEventListener('click', onItemDeleteButtonClick);
+	this._itemsDeleteButtonDictionary.add(itemViewWrapper.deleteButton, model);
+	this._itemsDictionary.add(model, _this._view.appendChild(itemViewWrapper.wrapper));
+	barmatz.forms.factories.ControllerFactory.createDropboxItemsListItemController(model, itemViewWrapper.labelElement, itemViewWrapper.valueElement, itemViewWrapper.editButton, _this._dialogContainerView);
+	
+	return null;
+	
+	function onItemDeleteButtonClick(event)
+	{
+		_this._model.removeItem(_this._itemsDeleteButtonDictionary.get(event.currentTarget));
+	}
+};
+/** barmatz.forms.fields.DropboxItemsListItemController **/
+barmatz.forms.fields.DropboxItemsListItemController = function(model, labelView, valueView, editButtonView, dialogContainerView)
+{
+	barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.DropboxItemModel);
+	barmatz.utils.DataTypes.isInstanceOf(labelView, window.HTMLElement);
+	barmatz.utils.DataTypes.isInstanceOf(valueView, window.HTMLElement);
+	barmatz.utils.DataTypes.isInstanceOf(editButtonView, window.HTMLElement);
+	barmatz.utils.DataTypes.isInstanceOf(dialogContainerView, window.HTMLElement, true);
 	barmatz.mvc.Controller.call(this);
 	
-	initOptions();
+	labelView.innerHTML = model.getLabel();
+	valueView.innerHTML = model.getValue();
 	
-	function initOptions()
+	model.addEventListener(barmatz.events.ModelEvent.VALUE_CHANGED, onModelValueChanged);
+	editButtonView.addEventListener('click', onEditButtonViewClick);
+	
+	function onModelValueChanged(event)
+	{
+		var value;
+		
+		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.ModelEvent);
+		
+		value = event.getValue();
+		
+		switch(event.getKey())
+		{
+			case 'label':
+				labelView.innerHTML = value;
+				break;
+			case 'value':
+				valueView.innerHTML = value;
+				break;
+		}
+	}
+	
+	function onEditButtonViewClick(event)
+	{
+		barmatz.forms.factories.ControllerFactory.createJQueryDialogController(barmatz.forms.factories.DOMFactory.createDropboxItemDialog(model.getLabel(), model.getValue(), onEditConfirm, true, dialogContainerView));
+	}
+	
+	function onEditConfirm(label, value)
+	{
+		barmatz.utils.DataTypes.isTypeOf(label, 'string');
+		barmatz.utils.DataTypes.isTypeOf(value, 'string');
+		model.setLabel(label);
+		model.setValue(value);
+	}
+};
+barmatz.forms.fields.DropboxItemsListItemController.prototype = new barmatz.mvc.Controller();
+barmatz.forms.fields.DropboxItemsListItemController.prototype.constructor = barmatz.forms.fields.DropboxItemsListItemController;
+/** barmatz.forms.fields.DropboxModel **/
+barmatz.forms.fields.DropboxModel = function(name, items)
+{
+	var _this;
+	
+	barmatz.utils.DataTypes.isNotUndefined(name);
+	barmatz.utils.DataTypes.isTypeOf(name, 'string', true);
+	barmatz.utils.DataTypes.isInstanceOf(items, window.Array, true);
+	barmatz.forms.fields.FieldModel.call(this, barmatz.forms.fields.FieldTypes.DROPBOX, name);
+	
+	_this = this;
+	
+	this.set('multiple', false);
+	this.set('items', new barmatz.forms.CollectionModel());
+	this.get('items').addEventListener(barmatz.events.CollectionEvent.ITEM_ADDED, onItemsItemAdded);
+	this.get('items').addEventListener(barmatz.events.CollectionEvent.ITEM_REMOVED, onItemsItemRemoved);
+	
+	if(items)
+		while(items.length > this.getNumItems())
+			this.addItem(items[this.getNumItems()]);
+	
+	function onItemsItemAdded(event)
+	{
+		_this.dispatchEvent(event);
+	}
+	
+	function onItemsItemRemoved(event)
+	{
+		_this.dispatchEvent(event);
+	}
+};
+
+barmatz.forms.fields.DropboxModel.prototype = new barmatz.forms.fields.FieldModel(null, null);
+barmatz.forms.fields.DropboxModel.prototype.constructor = barmatz.forms.fields.DropboxModel;
+barmatz.forms.fields.DropboxModel.prototype.getMultiple = function()
+{
+	return this.get('multiple');
+};
+barmatz.forms.fields.DropboxModel.prototype.setMultiple = function(value)
+{
+	barmatz.utils.DataTypes.isTypeOf(value, 'boolean');
+	this.set('multiple', value);
+};
+barmatz.forms.fields.DropboxModel.prototype.getNumItems = function()
+{
+	return this.get('items').getNumItems();
+};
+barmatz.forms.fields.DropboxModel.prototype.addItem = function(item)
+{
+	barmatz.utils.DataTypes.isNotUndefined(item);
+	barmatz.utils.DataTypes.isInstanceOf(item, barmatz.forms.fields.DropboxItemModel);
+	return this.get('items').addItem(item);
+};
+barmatz.forms.fields.DropboxModel.prototype.addItemAt = function(item, index)
+{
+	barmatz.utils.DataTypes.isNotUndefined(item);
+	barmatz.utils.DataTypes.isNotUndefined(index);
+	barmatz.utils.DataTypes.isInstanceOf(item, barmatz.forms.fields.DropboxItemModel);
+	barmatz.utils.DataTypes.isTypeOf(index, 'number');
+	return this.get('items').addItemAt(item, index);
+};
+barmatz.forms.fields.DropboxModel.prototype.removeItem = function(item)
+{
+	barmatz.utils.DataTypes.isNotUndefined(item);
+	barmatz.utils.DataTypes.isInstanceOf(item, barmatz.forms.fields.DropboxItemModel);
+	return this.get('items').removeItem(item);
+};
+barmatz.forms.fields.DropboxModel.prototype.removeItemAt = function(index)
+{
+	barmatz.utils.DataTypes.isNotUndefined(index);
+	barmatz.utils.DataTypes.isTypeOf(index, 'number');
+	return this.get('items').removeItemAt(index);
+};
+barmatz.forms.fields.DropboxModel.prototype.getItemAt = function(index)
+{
+	barmatz.utils.DataTypes.isNotUndefined(index);
+	barmatz.utils.DataTypes.isTypeOf(index, 'number');
+	return this.get('items').getItemAt(index);
+};
+barmatz.forms.fields.DropboxModel.prototype.getItemIndex = function(item)
+{
+	barmatz.utils.DataTypes.isNotUndefined(item);
+	barmatz.utils.DataTypes.isInstanceOf(item, barmatz.forms.fields.DropboxItemModel);
+	return this.get('items').getItemIndex(item);
+};
+barmatz.forms.fields.DropboxModel.prototype.setItemIndex = function(item, index)
+{
+	barmatz.utils.DataTypes.isNotUndefined(item);
+	barmatz.utils.DataTypes.isNotUndefined(index);
+	barmatz.utils.DataTypes.isInstanceOf(item, barmatz.forms.fields.DropboxItemModel);
+	barmatz.utils.DataTypes.isTypeOf(index, 'number');
+	return this.get('items').setItemIndex(item, index);
+};
+barmatz.forms.fields.DropboxModel.prototype.forEach = function(handler)
+{
+	barmatz.utils.DataTypes.isNotUndefined(handler);
+	barmatz.utils.DataTypes.isTypeOf(handler, 'function');
+	return this.get('items').forEach(handler);
+};
+barmatz.forms.fields.DropboxModel.prototype.find = function(filter)
+{
+	return this.get('items').find(filter);
+};
+barmatz.forms.fields.DropboxModel.prototype.clone = function()
+{
+	var clone = new barmatz.forms.fields.DropboxModel(this.getName(), this.get('items').towindow.Array());
+	clone.setLabel(this.getLabel());
+	clone.setMandatory(this.getMandatory());
+	clone.setValue(this.getValue());
+	clone.setEnabled(this.getEnabled());
+	clone.setValidator(this.getValidator().clone());
+	clone.setMultiple(this.getMultiple());
+	return clone;
+};
+barmatz.forms.fields.DropboxModel.prototype.toString = function()
+{
+	return this.get('items').toString();
+};
+/** barmatz.forms.fields.FieldTypes **/
+barmatz.forms.fields.FieldTypes = {
+	HTML_CONTENT: 'htmlContent',
+	TEXT_AREA: 'textArea',
+	TEXT_FIELD: 'text',
+	DROPBOX: 'dropbox',
+	PASSWORD: 'password',
+	CHECKBOX: 'checkbox',
+	RADIO: 'radio',
+	FILE: 'file',
+	HIDDEN: 'hidden',
+	PHONE: 'phone'
+};
+
+
+/** barmatz.forms.fields.FieldValidationOptionsController **/
+barmatz.forms.fields.FieldValidationOptionsController = function(model, views, dialogContainerView)
+{
+	barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FieldModel);
+	barmatz.utils.DataTypes.isTypeOf(views, 'object');
+	barmatz.utils.DataTypes.isInstanceOf(dialogContainerView, window.HTMLElement, true);
+	barmatz.mvc.Controller.call(this);
+	
+	initViews();
+	
+	function initViews()
 	{
 		var i;
-		for(i in options)
-			initOption(options[i], parseInt(i));
+		for(i in views)
+			initView(views[i], parseInt(i));
 	}
 	
-	function initOption(option, bit)
+	function initView(view, bit)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(option);
-		barmatz.utils.DataTypes.isNotUndefined(bit);
-		barmatz.utils.DataTypes.isInstanceOf(option, HTMLInputElement);
+		var code; 
+		
+		barmatz.utils.DataTypes.isInstanceOf(view, HTMLInputElement);
 		barmatz.utils.DataTypes.isTypeOf(bit, 'number');
+		
+		code = model.getValidator().getCode();
 
-		option.addEventListener('change', onOptionChange);
+		view.addEventListener('click', onViewClick);
 		
-		if(barmatz.utils.Bitwise.contains(model.validator.code, bit))
-			option.checked = true;
+		if(barmatz.utils.Bitwise.contains(code, bit))
+			view.checked = true;
 		
-		if(model instanceof barmatz.forms.fields.PhoneFieldModel && barmatz.utils.Bitwise.contains(model.validator.code, barmatz.forms.Validator.VALID_PHONE))
-			option.disabled = true;
+		if(model instanceof barmatz.forms.fields.PhoneFieldModel && barmatz.utils.Bitwise.contains(code, barmatz.forms.Validator.VALID_PHONE))
+			view.disabled = true;
 	}
 	
-	function changeModelByOption(option, bit)
+	function changeModelByView(view, bit)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(option);
-		barmatz.utils.DataTypes.isNotUndefined(bit);
-		barmatz.utils.DataTypes.isInstanceOf(option, HTMLInputElement);
+		var code;
+		
+		barmatz.utils.DataTypes.isInstanceOf(view, HTMLInputElement);
 		barmatz.utils.DataTypes.isTypeOf(bit, 'number');
+		
+		code = model.getValidator().getCode();
 		
 		switch(bit)
 		{
 			case barmatz.forms.Validator.EQUALS:
-				getOptionParameters(option, 'Equals to', 'equals');
+				setViewParameters(view, 'Equals to', 'equals');
 				break;
 			case barmatz.forms.Validator.EXACT_LENGTH:
-				getOptionParameters(option, 'Exact length', 'exactLength', true);
+				setViewParameters(view, 'Exact length', 'exactLength', true);
 				break;
 			case barmatz.forms.Validator.MAX_LENGTH:
-				getOptionParameters(option, 'Maximum length', 'maxLength', true);
+				setViewParameters(view, 'Maximum length', 'maxLength', true);
 				break;
 			case barmatz.forms.Validator.MIN_LENGTH:
-				getOptionParameters(option, 'Minimum length', 'minLength', true);
+				setViewParameters(view, 'Minimum length', 'minLength', true);
 				break;
 			case barmatz.forms.Validator.GREATER_THAN:
-				getOptionParameters(option, 'Greater than', 'greaterThan', true);
+				setViewParameters(view, 'Greater than', 'greaterThan', true);
 				break;
 			case barmatz.forms.Validator.LESSER_THAN:
-				getOptionParameters(option, 'Lesser than', 'lesserThan', true);
+				setViewParameters(view, 'Lesser than', 'lesserThan', true);
 				break;
 		}
 
-		if(option.checked)
+		if(view.checked)
 		{
-			if(model.validator.code)
-				bit = barmatz.utils.Bitwise.concat(model.validator.code, bit);
+			if(code)
+				bit = barmatz.utils.Bitwise.concat(code, bit);
 		}
 		else
-			bit = barmatz.utils.Bitwise.slice(model.validator.code, bit); 
+			bit = barmatz.utils.Bitwise.slice(code, bit); 
 		
-		model.validator.code = bit; 
+		model.getValidator().setCode(bit); 
 	}
 	
-	function getOptionParameters(option, label, key, isNumber)
+	function setViewParameters(view, label, key, isNumber)
 	{
 		var dialogWrapper, field;
 		
-		barmatz.utils.DataTypes.isNotUndefined(option);
-		barmatz.utils.DataTypes.isNotUndefined(label);
-		barmatz.utils.DataTypes.isNotUndefined(key);
-		barmatz.utils.DataTypes.isInstanceOf(option, HTMLInputElement);
+		barmatz.utils.DataTypes.isInstanceOf(view, HTMLInputElement);
 		barmatz.utils.DataTypes.isTypeOf(label, 'string');
 		barmatz.utils.DataTypes.isTypeOf(key, 'string');
 		
-		if(option.checked)
+		if(view.checked)
 		{
-			dialogWrapper = barmatz.forms.factories.DOMFactory.createChangePropertyPromptDialogWrapper('', label, model.validator[key] || '', function(event)
+			dialogWrapper = barmatz.forms.factories.DOMFactory.createChangePropertyPromptDialogWrapper('', label, model.getValidator()[key] || '', function(event)
 			{
-				model.validator[key] = isNumber ? parseFloat(field.value) : field.value;
-			}, true);
+				model.getValidator()[key] = isNumber ? parseFloat(field.value) : field.value;
+			}, true, dialogContainerView);
 			field = dialogWrapper.field;
 			barmatz.forms.factories.ControllerFactory.createJQueryDialogController(dialogWrapper.dialog);
 		}
 		else
-			delete model.validator[key];
+			delete model.getValidator()[key];
 	}
 	
-	function onOptionChange(event)
+	function onViewClick(event)
 	{
 		var i;
 		
-		barmatz.utils.DataTypes.isNotUndefined(event);
 		barmatz.utils.DataTypes.isInstanceOf(event, Event);
 		
-		for(i in options)
-			if(options[i] == event.currentTarget)
-				changeModelByOption(options[i], parseInt(i));
+		for(i in views)
+			if(views[i] == event.currentTarget)
+				changeModelByView(views[i], parseInt(i));
 	}
 };
-
 barmatz.forms.fields.FieldValidationOptionsController.prototype = new barmatz.mvc.Controller();
 barmatz.forms.fields.FieldValidationOptionsController.prototype.constructor = barmatz.forms.fields.FieldValidationOptionsController;
 /** barmatz.forms.fields.FileFieldModel **/
-window.barmatz.forms.fields.FileFieldModel = function(name)
+barmatz.forms.fields.FileFieldModel = function(name)
 {
-	barmatz.utils.DataTypes.isNotUndefined(name);
 	barmatz.utils.DataTypes.isTypeOf(name, 'string');
-	
 	barmatz.forms.fields.FieldModel.call(this, barmatz.forms.fields.FieldTypes.FILE, name);
-	
 	this.set('accept', []);
 };
-
 barmatz.forms.fields.FileFieldModel.prototype = new barmatz.forms.fields.FieldModel(null, null);
 barmatz.forms.fields.FileFieldModel.prototype.constructor = barmatz.forms.fields.FileFieldModel;
-
-Object.defineProperties(barmatz.forms.fields.FileFieldModel.prototype,
+barmatz.forms.fields.FileFieldModel.prototype.getAccept = function()
 {
-	accept: {get: function()
-	{
-		return this.get('accept');
-	}, set: function(value)
-	{
-		barmatz.utils.DataTypes.isInstanceOf(value, Array);
-		this.set('accept', value);
-	}},
-	clone: {value: function()
-	{
-		var clone = new barmatz.forms.fields.FileFieldModel(this.name);
-		clone.label = this.label;
-		clone.mandatory = this.mandatory;
-		clone.value = this.value;
-		clone.enabled = this.enabled;
-		clone.validator = this.validator.clone();
-		clone.accept = this.accept;
-		return clone;
-	}}
-});
+	return this.get('accept');
+};
+barmatz.forms.fields.FileFieldModel.prototype.setAccept = function(value)
+{
+	barmatz.utils.DataTypes.isInstanceOf(value, window.Array);
+	this.set('accept', value);
+};
+barmatz.forms.fields.FileFieldModel.prototype.clone = function()
+{
+	var clone = new barmatz.forms.fields.FileFieldModel(this.getName());
+	clone.setLabel(this.getLabel());
+	clone.setMandatory(this.getMandatory());
+	clone.setValue(this.getValue());
+	clone.setEnabled(this.getEnabled());
+	clone.setValidator(this.getValidator().clone());
+	clone.setAccept(this.getAccept());
+	return clone;
+};
 /** barmatz.forms.fields.HTMLContentModel **/
-window.barmatz.forms.fields.HTMLContentModel = function()
+barmatz.forms.fields.HTMLContentModel = function()
 {
 	barmatz.forms.fields.FormItemModel.call(this, barmatz.forms.fields.FieldTypes.HTML_CONTENT);
 	this.set('content', '');
 };
-
 barmatz.forms.fields.HTMLContentModel.prototype = new barmatz.forms.fields.FormItemModel(null);
 barmatz.forms.fields.HTMLContentModel.prototype.constructor = barmatz.forms.fields.HTMLContentModel;
-
-Object.defineProperties(barmatz.forms.fields.HTMLContentModel.prototype,
+barmatz.forms.fields.HTMLContentModel.prototype.getContent = function()
 {
-	content: {get: function()
-	{
-		return this.get('content');
-	}, set: function(value)
-	{
-		this.set('content', value);
-	}},
-	clone: {value: function()
-	{
-		var clone = new barmatz.forms.fields.HTMLContentModel();
-		clone.type = this.type;
-		clone.content = this.content;
-		return clone;
-	}}
-});
+	return this.get('content');
+};
+barmatz.forms.fields.HTMLContentModel.prototype.setContent = function(value)
+{
+	this.set('content', value);
+};
+barmatz.forms.fields.HTMLContentModel.prototype.clone = function()
+{
+	var clone = new barmatz.forms.fields.HTMLContentModel();
+	clone.setContent(this.getContent());
+	return clone;
+};
 /** barmatz.forms.fields.HiddenFieldModel **/
-window.barmatz.forms.fields.HiddenFieldModel = function(name)
+barmatz.forms.fields.HiddenFieldModel = function(name)
 {
-	barmatz.utils.DataTypes.isNotUndefined(name);
 	barmatz.utils.DataTypes.isTypeOf(name, 'string');
 	barmatz.forms.fields.FieldModel.call(this, barmatz.forms.fields.FieldTypes.HIDDEN, name);
 };
-
 barmatz.forms.fields.HiddenFieldModel.prototype = new barmatz.forms.fields.FieldModel(null, null);
 barmatz.forms.fields.HiddenFieldModel.prototype.constructor = barmatz.forms.fields.HiddenFieldModel;
-
-Object.defineProperties(barmatz.forms.fields.HiddenFieldModel.prototype,
+barmatz.forms.fields.HiddenFieldModel.prototype.clone = function()
 {
-	clone: {value: function()
-	{
-		var clone = new barmatz.forms.fields.HiddenFieldModel(this.name);
-		clone.label = this.label;
-		clone.mandatory = this.mandatory;
-		clone.value = this.value;
-		clone.enabled = this.enabled;
-		clone.validator = this.validator.clone();
-		return clone;
-	}}	
-});
+	var clone = new barmatz.forms.fields.HiddenFieldModel(this.getName());
+	clone.setLabel(this.getLabel());
+	clone.setMandatory(this.getMandatory());
+	clone.setValue(this.getValue());
+	clone.setEnabled(this.getEnabled());
+	clone.setValidator(this.getValidator().clone());
+	return clone;
+};
 /** barmatz.forms.fields.PasswordFieldModel **/
-window.barmatz.forms.fields.PasswordFieldModel = function(name)
+barmatz.forms.fields.PasswordFieldModel = function(name)
 {
-	barmatz.utils.DataTypes.isNotUndefined(name);
 	barmatz.utils.DataTypes.isTypeOf(name, 'string');
 	barmatz.forms.fields.TextFieldModel.call(this, name);
 	this.set('type', barmatz.forms.fields.FieldTypes.PASSWORD);
 };
-
 barmatz.forms.fields.PasswordFieldModel.prototype = new barmatz.forms.fields.TextFieldModel(null);
 barmatz.forms.fields.PasswordFieldModel.prototype.constructor = barmatz.forms.fields.PasswordFieldModel;
-
-Object.defineProperties(barmatz.forms.fields.PasswordFieldModel.prototype,
+barmatz.forms.fields.PasswordFieldModel.prototype.clone = function()
 {
-	clone: {value: function()
-	{
-		var clone = new barmatz.forms.fields.PasswordFieldModel(this.name);
-		clone.label = this.label;
-		clone.mandatory = this.mandatory;
-		clone.value = this.value;
-		clone.enabled = this.enabled;
-		clone.validator = this.validator.clone();
-		clone.max = this.max;
-		clone.description = this.description;
-		return clone;
-	}}
-});
+	var clone = new barmatz.forms.fields.PasswordFieldModel(this.getName());
+	clone.setLabel(this.getLabel());
+	clone.setMandatory(this.getMandatory());
+	clone.setValue(this.getValue());
+	clone.setEnabled(this.getEnabled());
+	clone.setValidator(this.getValidator().clone());
+	clone.setMax(this.getMax());
+	clone.setDescription(this.getDescription());
+	return clone;
+};
 /** barmatz.forms.fields.PhoneFieldModel **/
-window.barmatz.forms.fields.PhoneFieldModel = function(name)
+barmatz.forms.fields.PhoneFieldModel = function(name)
 {
 	barmatz.utils.DataTypes.isNotUndefined(name);
-	barmatz.utils.DataTypes.isTypeOf(name, 'string', true);
 	barmatz.forms.fields.FieldModel.call(this, barmatz.forms.fields.FieldTypes.PHONE, name);
-	this.validator.code = barmatz.forms.Validator.VALID_PHONE; 
+	this.getValidator().setCode(barmatz.forms.Validator.VALID_PHONE); 
 	this.set('prefix', '');
 };
-
 barmatz.forms.fields.PhoneFieldModel.prototype = new barmatz.forms.fields.FieldModel(null, null);
 barmatz.forms.fields.PhoneFieldModel.prototype.constructor = barmatz.forms.fields.PhoneFieldModel;
-
-Object.defineProperties(barmatz.forms.fields.PhoneFieldModel.prototype,
+barmatz.forms.fields.PhoneFieldModel.prototype.getPrefix = function()
 {
-	prefix: {get: function()
+	return this.get('prefix');
+};
+barmatz.forms.fields.PhoneFieldModel.prototype.getValue = function()
+{
+	return this.get('value');
+};
+barmatz.forms.fields.PhoneFieldModel.prototype.setValue = function(value)
+{
+	var prefixes, prefix, prefixesRegex, maxLength;
+	
+	barmatz.utils.DataTypes.isTypeOf(value, 'string', true);
+	
+	prefixes = [];
+	
+	barmatz.forms.fields.PhonePrefixes.forEach(function(prefix)
 	{
-		return this.get('prefix');
-	}},
-	value: {get: function()
-	{
-		return this.get('value');
-	}, set: function(value)
-	{
-		var prefixes, prefixesRegex, maxLength;
-		
-		barmatz.utils.DataTypes.isTypeOf(value, 'string', true);
-		
-		prefixes = [];
-		
-		barmatz.forms.fields.PhonePrefixes.forEach(function(prefix)
-		{
-			prefixes.push(prefix);
-		});
-		
-		prefixesRegex = '^(' + prefixes.join('|') + ')';
-		
-		if(new RegExp(prefixesRegex).test(value))
-			this.set('prefix', value.replace(new RegExp(prefixesRegex + '.+$'), '$1'));
-		else
-			this.set('prefix', '');
-		
-		maxLength = value.length + this.prefix.length;
-		
-		if(maxLength > 7)
-			value = value.substring(0, maxLength);
-		
-		this.set('value', value);
-	}},
-	clone: {value: function()
-	{
-		var clone = new barmatz.forms.fields.PhoneFieldModel(this.name);
-		clone.label = this.label;
-		clone.mandatory = this.mandatory;
-		clone.value = this.value;
-		clone.enabled = this.enabled;
-		clone.validator = this.validator.clone();
-		return clone;
-	}}
-});
+		prefixes.push(prefix);
+	});
+	
+	prefixesRegex = '^(' + prefixes.join('|') + ')';
+	
+	if(new RegExp(prefixesRegex).test(value))
+		this.set('prefix', value.replace(new RegExp(prefixesRegex + '.+$'), '$1'));
+	else
+		this.set('prefix', '');
+	
+	prefix = this.getPrefix();
+	maxLength = 7;
+	
+	if(value.replace(prefix, '').length > maxLength)
+		value = prefix + value.substring(prefix.length, maxLength);
+	
+	this.set('value', value);
+};
+barmatz.forms.fields.PhoneFieldModel.prototype.clone = function()
+{
+	var clone = new barmatz.forms.fields.PhoneFieldModel(this.getName());
+	clone.setLabel(this.getLabel());
+	clone.setMandatory(this.getMandatory());
+	clone.setValue(this.getValue());
+	clone.setEnabled(this.getEnabled());
+	clone.setValidator(this.getValidator().clone());
+	return clone;
+};
 /** barmatz.forms.fields.PhonePrefixes **/
-window.barmatz.forms.fields.PhonePrefixes = function(){};
-
-Object.defineProperties(barmatz.forms.fields.PhonePrefixes,
+barmatz.forms.fields.PhonePrefixes = [
+	'02', '03', '04', '08', '09', 
+	'050', '052', '053', '054', '055', '056', '057', '058', '059', 
+	'072', '073', '074', '075', '076', '077', '078'
+];
+barmatz.forms.fields.PhonePrefixes.forEach = function(callback)
 {
-	ALL: {value: [
-		'02', '03', '04', '08', '09', 
-		'050', '052', '053', '054', '055', '056', '057', '058', '059', 
-		'072', '073', '074', '075', '076', '077', '078'
-	]},
-	forEach: {value: function(callback)
-	{
-		var i;
-		
-		barmatz.utils.DataTypes.isNotUndefined(callback);
-		barmatz.utils.DataTypes.isTypeOf(callback, 'function');
-		
-		for(i = 0; i < this.ALL.length; i++)
-			callback(this.ALL[i]);
-	}}
-});
+	var i;
+	
+	barmatz.utils.DataTypes.isNotUndefined(callback);
+	barmatz.utils.DataTypes.isTypeOf(callback, 'function');
+	
+	for(i = 0; i < this.length; i++)
+		callback(this[i]);
+};
 /** barmatz.forms.fields.RadioFieldModel **/
-window.barmatz.forms.fields.RadioFieldModel = function(name)
+barmatz.forms.fields.RadioFieldModel = function(name)
 {
-	barmatz.utils.DataTypes.isNotUndefined(name);
 	barmatz.utils.DataTypes.isTypeOf(name, 'string');
 	barmatz.forms.fields.CheckboxFieldModel.call(this, name);
 	this.set('type', barmatz.forms.fields.FieldTypes.RADIO);
 };
-
 barmatz.forms.fields.RadioFieldModel.prototype = new barmatz.forms.fields.CheckboxFieldModel(null);
 barmatz.forms.fields.RadioFieldModel.prototype.constructor = barmatz.forms.fields.RadioFieldModel;
-
-Object.defineProperties(barmatz.forms.fields.RadioFieldModel.prototype,
+barmatz.forms.fields.RadioFieldModel.prototype.clone = function()
 {
-	clone: {value: function()
-	{
-		var clone = new barmatz.forms.fields.RadioFieldModel(this.name);
-		clone.label = this.label;
-		clone.mandatory = this.mandatory;
-		clone.value = this.value;
-		clone.enabled = this.enabled;
-		clone.validator = this.validator.clone();
-		clone.checked = this.checked;
-		return clone;
-	}}
-});
+	var clone = new barmatz.forms.fields.RadioFieldModel(this.getName());
+	clone.setLabel(this.getLabel());
+	clone.setMandatory(this.getMandatory());
+	clone.setValue(this.getValue());
+	clone.setEnabled(this.getEnabled());
+	clone.setValidator(this.getValidator().clone());
+	clone.setChecked(this.getChecked());
+	return clone;
+};
 /** barmatz.forms.fields.TextAreaFieldModel **/
-window.barmatz.forms.fields.TextAreaFieldModel = function(name)
+barmatz.forms.fields.TextAreaFieldModel = function(name)
 {
-	barmatz.utils.DataTypes.isNotUndefined(name);
 	barmatz.utils.DataTypes.isTypeOf(name, 'string', true);
 	barmatz.forms.fields.FieldModel.call(this, barmatz.forms.fields.FieldTypes.TEXT_AREA, name);
 	this.set('rows', 2);
 	this.set('cols', 20);
 };
-
 barmatz.forms.fields.TextAreaFieldModel.prototype = new barmatz.forms.fields.FieldModel(null, null);
 barmatz.forms.fields.TextAreaFieldModel.prototype.constructor = barmatz.forms.fields.TextAreaFieldModel;
-
-Object.defineProperties(barmatz.forms.fields.TextAreaFieldModel.prototype,
+barmatz.forms.fields.TextAreaFieldModel.prototype.getRows = function()
 {
-	rows: {get: function()
-	{
-		return this.get('rows');
-	}, set: function(value)
-	{
-		this.set('rows', value);
-	}},
-	cols: {get: function()
-	{
-		return this.get('cols');
-	}, set: function(value)
-	{
-		this.set('cols', value);
-	}},
-	clone: {value: function()
-	{
-		var clone = new barmatz.forms.fields.TextAreaFieldModel(this.name);
-		clone.label = this.label;
-		clone.mandatory = this.mandatory;
-		clone.value = this.value;
-		clone.enabled = this.enabled;
-		clone.validator = this.validator.clone();
-		clone.rows = this.rows;
-		clone.cols = this.cols;
-		return clone;
-	}}
-});
+	return this.get('rows');
+};
+barmatz.forms.fields.TextAreaFieldModel.prototype.setRows = function(value)
+{
+	this.set('rows', value);
+};
+barmatz.forms.fields.TextAreaFieldModel.prototype.getCols = function()
+{
+	return this.get('cols');
+};
+barmatz.forms.fields.TextAreaFieldModel.prototype.setCols = function(value)
+{
+	this.set('cols', value);
+};
+barmatz.forms.fields.TextAreaFieldModel.prototype.clone = function()
+{
+	var clone = new barmatz.forms.fields.TextAreaFieldModel(this.getName());
+	clone.setLabel(this.getLabel());
+	clone.setMandatory(this.getMandatory());
+	clone.setValue(this.getValue());
+	clone.setEnabled(this.getEnabled());
+	clone.setValidator(this.getValidator().clone());
+	clone.setRows(this.getRows());
+	clone.setCols(this.getCols());
+	return clone;
+};
 /** barmatz.net.Encoding **/
-window.barmatz.net.Encoding = function(){};
-
-Object.defineProperties(barmatz.net.Encoding,
-{
-	HTML5: {value: 'text/plain'},
-	FORM: {value: 'application/x-www-form-urlencoded'},
-	FILES: {value: 'multipart/form-data'}
-});
+barmatz.net.Encoding = {
+	HTML5: 'text/plain',
+	FORM: 'application/x-www-form-urlencoded',
+	FILES: 'multipart/form-data'
+};
 /** barmatz.net.Loader **/
-window.barmatz.net.Loader = function()
+barmatz.net.Loader = function()
 {
 	barmatz.events.EventDispatcher.call(this);
 	
 	this.__xhr = null;
 };
 
+barmatz.net.Loader.UNSENT = 'UNSENT';
+barmatz.net.Loader.OPENED = 'OPENED';
+barmatz.net.Loader.HEADERS_RECEIVED = 'HEADERS_RECEIVED';
+barmatz.net.Loader.LOADING = 'LOADING';
+barmatz.net.Loader.DONE = 'DONE';
+barmatz.net.Loader.serialize = function(object, prefix)
+{
+	var result, key, value;
+	
+	barmatz.utils.DataTypes.isNotUndefined(object);
+	
+	result = [];
+	 
+	for(key in object)
+	{
+		value = object[key];
+		key = prefix ? prefix + "[" + key + "]" : key;
+		result.push(typeof value == "object" ? this.serialize(value, key) : encodeURIComponent(key) + "=" + encodeURIComponent(value));
+	}
+	
+	return result.join("&");
+};
 barmatz.net.Loader.prototype = new barmatz.events.EventDispatcher();
 barmatz.net.Loader.prototype.constructor = barmatz.net.Loader;
+barmatz.net.Loader.prototype._xhr = function()
+{
+	if(!this.__xhr)
+		this.__xhr = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject('Microsoft.XMLHTTP');
+		
+	if(!this.__xhr)
+		throw new Error('XMLHttpRequest is not supported');
+	
+	return this.__xhr;
+};
+barmatz.net.Loader.prototype.getState = function()
+{
+	switch(this._xhr().readyState)
+	{
+		case 0:
+			return barmatz.net.Loader.UNSENT;
+			break;
+		case 1:
+			return barmatz.net.Loader.OPENED;
+			break;
+		case 2:
+			return barmatz.net.Loader.HEADERS_RECEIVED;
+			break;
+		case 3:
+			return barmatz.net.Loader.LOADING;
+			break;
+		case 4:
+			return barmatz.net.Loader.DONE;
+			break;
+	}
+};
+barmatz.net.Loader.prototype.abort = function()
+{
+	this._xhr().abort();
+};
+barmatz.net.Loader.prototype.load = function(request)
+{
+	var _this, xhr, url, data, credentials, headers, contentTypeSet, params, i;
+	
+	barmatz.utils.DataTypes.isInstanceOf(request, barmatz.net.Request);
+	
+	_this = this;
+	xhr = this._xhr();
+	url = request.getURL();
+	data = request.getData();
+	credentials = request.getCredentials();
+	headers = request.getHeaders();
 
-Object.defineProperties(barmatz.net.Loader,
-{
-	UNSENT: {value: 'UNSENT'},
-	OPENED: {value: 'OPENED'},
-	HEADERS_RECEIVED: {value: 'HEADERS_RECEIVED'},
-	LOADING: {value: 'LOADING'},
-	DONE: {value: 'DONE'},
-	serialize: {value: function(object)
-	{
-		var params = [], key, value;
-		
-		for(key in object)
+	if(data && request.getMethod() == barmatz.net.Methods.GET)
+		url += (url.indexOf('?') > -1 ? '&' : '?') + barmatz.net.Loader.serialize(data);
+	
+	xhr.addEventListener('readystatechange', onReadyStateChange);
+	
+	params = [request.getMethod(), url, request.getAsync()];
+	
+	if(credentials)
+		params.push(credentials.getUser() || null, credentials.getPassword() || null);
+	
+	xhr.open.apply(xhr, params);
+	
+	if(headers)
+		for(i = 0; i < headers.length; i++)
 		{
-			value = object[key];
-			key = encodeURIComponent(key);
-			
-			if(typeof value == 'object')
-			{
-				if(value instanceof Array)
-					params.push(key + '=' + value.join('&' + key + '='));
-				else
-					params.push(this.serialize(value));
-			}
-			else
-				params.push(key + '=' + encodeURIComponent(value));
+			xhr.setRequestHeader(headers[i].getHeader(), headers[i].getValue());
+			if(headers[i].getHeader().toLowerCase() == 'content-type')
+				contentTypeSet = true;
 		}
-		
-		return params.join('&');
-	}}
-}); 
-Object.defineProperties(barmatz.net.Loader.prototype, 
-{
-	_xhr: {get: function()
+	
+	if(!contentTypeSet)
+		xhr.setRequestHeader('Content-Type', barmatz.net.Encoding.FORM);
+	
+	params = [];
+	
+	if(request.getMethod() == barmatz.net.Methods.POST)
+		params.push(barmatz.net.Loader.serialize(data));
+	
+	xhr.send.apply(xhr, params);
+	
+	function onReadyStateChange(event)
 	{
-		if(!this.__xhr)
-			this.__xhr = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject('Microsoft.XMLHTTP');
+		var type, response;
 		
-		return this.__xhr;
-	}},
-	state: {get: function()
-	{
-		switch(this._xhr.readyState)
+		switch(event.target.readyState)
 		{
 			case 0:
-				return barmatz.net.Loader.UNSENT;
-				break;
+				type = barmatz.events.LoaderEvent.UNSENT;
 			case 1:
-				return barmatz.net.Loader.OPENED;
+				if(!type)
+					type = barmatz.events.LoaderEvent.OPENED;
+				_this.dispatchEvent(new barmatz.events.LoaderEvent(barmatz.events.LoaderEvent.OPENED, request));
 				break;
 			case 2:
-				return barmatz.net.Loader.HEADERS_RECEIVED;
+				_this.dispatchEvent(new barmatz.events.LoaderEvent(barmatz.events.LoaderEvent.HEADERS_RECEIVED, request));
 				break;
 			case 3:
-				return barmatz.net.Loader.LOADING;
+				_this.dispatchEvent(new barmatz.events.LoaderEvent(barmatz.events.LoaderEvent.LOADING, request));
 				break;
 			case 4:
-				return barmatz.net.Loader.DONE;
+				response = new barmatz.net.Response(request.getURL(), xhr.responseText, xhr.responseType || '', xhr.status, xhr.getAllResponseHeaders().split('\n'));
+
+				_this.dispatchEvent(new barmatz.events.LoaderEvent(barmatz.events.LoaderEvent.COMPLETE));
+				
+				if(response.getStatus() == 200)
+					_this.dispatchEvent(new barmatz.events.LoaderEvent(barmatz.events.LoaderEvent.SUCCESS, response));
+				else
+					_this.dispatchEvent(new barmatz.events.LoaderEvent(barmatz.events.LoaderEvent.ERROR, response));
 				break;
 		}
-	}},
-	abort: {value: function()
-	{
-		this._xhr.abort();
-	}},
-	load: {value: function(request)
-	{
-		var _this, url, contentTypeSet, i;
-		
-		barmatz.utils.DataTypes.isNotUndefined(request);
-		barmatz.utils.DataTypes.isInstanceOf(request, barmatz.net.Request);
-		
-		_this = this;
-		url = request.url;
-
-		if(request.data && request.method == barmatz.net.Methods.GET)
-			url += (url.indexOf('?') > -1 ? '&' : '?') + barmatz.net.Loader.serialize(request.data);
-		
-		this._xhr.addEventListener('readystatechange', onReadyStateChange);
-		
-		if(request.credentials)
-			this._xhr.open(request.method, url, request.async, request.credentials.user ? request.credentials.user : null, reqeust.credentials.password ? reqeust.credentials.password : null);
-		else
-			this._xhr.open(request.method, url, request.async);
-		
-		if(request.headers)
-			for(i = 0; i < request.headers.length; i++)
-			{
-				this._xhr.setRequestHeader(request.headers[i].header, request.headers[i].value);
-				if(request.headers[i].header.toLowerCase() == 'content-type')
-					contentTypeSet = true;
-			}
-		
-		if(!contentTypeSet)
-			this._xhr.setRequestHeader('Content-Type', barmatz.net.Encoding.FORM);
-		
-		if(request.method == barmatz.net.Methods.POST)
-			this._xhr.send(barmatz.net.Loader.serialize(request.data));
-		else
-			this._xhr.send();
-		
-		function onReadyStateChange(event)
-		{
-			var type, response;
-			
-			switch(event.target.readyState)
-			{
-				case 0:
-					type = barmatz.events.LoaderEvent.UNSENT;
-				case 1:
-					if(!type)
-						type = barmatz.events.LoaderEvent.OPENED;
-					_this.dispatchEvent(new barmatz.events.LoaderEvent(barmatz.events.LoaderEvent.OPENED, request));
-					break;
-				case 2:
-					_this.dispatchEvent(new barmatz.events.LoaderEvent(barmatz.events.LoaderEvent.HEADERS_RECEIVED, request));
-					break;
-				case 3:
-					_this.dispatchEvent(new barmatz.events.LoaderEvent(barmatz.events.LoaderEvent.LOADING, request));
-					break;
-				case 4:
-					response = new barmatz.net.Response(request.url, _this._xhr.responseText, _this._xhr.responseType || '', _this._xhr.status, _this._xhr.getAllResponseHeaders().split('\n'));
-
-					_this.dispatchEvent(new barmatz.events.LoaderEvent(barmatz.events.LoaderEvent.COMPLETE));
-					
-					if(response.status == 200)
-						_this.dispatchEvent(new barmatz.events.LoaderEvent(barmatz.events.LoaderEvent.SUCCESS, response));
-					else
-						_this.dispatchEvent(new barmatz.events.LoaderEvent(barmatz.events.LoaderEvent.ERROR, response));
-					break;
-			}
-		}
-	}}
-});
+	}
+};
 /** barmatz.net.Methods **/
-window.barmatz.net.Methods = function(){};
-
-Object.defineProperties(barmatz.net.Methods,
-{
-	GET: {value: 'GET'},
-	POST: {value: 'POST'},
-	PUT: {value: 'PUT'},
-	DELETE: {value: 'DELETE'}	
-});
+barmatz.net.Methods = {
+	GET: 'GET',
+	POST: 'POST',
+	PUT: 'PUT',
+	DELETE: 'DELETE'	
+};
 /** barmatz.net.Request */
-window.barmatz.net.Request = function(url)
+barmatz.net.Request = function(url)
 {
 	barmatz.utils.DataTypes.isNotUndefined(url);
 	barmatz.utils.DataTypes.isTypeOf(url, 'string');
@@ -4935,106 +4696,96 @@ window.barmatz.net.Request = function(url)
 	this.set('method', barmatz.net.Methods.GET);
 	this.set('async', true);
 	this.set('data', {});
+	this.set('credentials', null);
+	this.set('headers', []);
 };
 
 barmatz.net.Request.prototype = new barmatz.mvc.Model();
 barmatz.net.Request.prototype.constructor = barmatz.net.Request;
-
-Object.defineProperties(barmatz.net.Request.prototype,
+barmatz.net.Request.prototype.getData = function()
 {
-	data: {get: function()
-	{
-		return this.get('data');
-	}, set: function(value)
-	{
-		this.set('data', value);
-	}},
-	url: {get: function()
-	{
-		return this.get('url');
-	}, set: function(value)
-	{
-		this.set('url', value);
-	}},
-	method: {get: function()
-	{
-		return this.get('method');
-	}, set: function(value)
-	{
-		barmatz.utils.DataTypes.isTypeOf(value, 'string');
-		this.set('method', value);
-	}},
-	async: {get: function()
-	{
-		return this.get('async');
-	}, set: function(value)
-	{
-		barmatz.utils.DataTypes.isTypeOf(value, 'boolean');
-		this.set('async', value);
-	}},
-	credentials: {get: function()
-	{
-		return this.get('credentials');
-	}, set: function(value)
-	{
-		barmatz.utils.DataTypes.isInstanceOf(value, barmatz.net.RequestCredentils);
-		this.set('credentials', value);
-	}},
-	headers: {get: function()
-	{
-		return this.get('headers');
-	}, set: function(value)
-	{
-		barmatz.utils.DataTypes.isInstanceOf(value, Array);
-		this.set('headers', value);
-	}}
-});
+	return this.get('data');
+};
+barmatz.net.Request.prototype.setData = function(value)
+{
+	this.set('data', value);
+};
+barmatz.net.Request.prototype.getURL = function()
+{
+	return this.get('url');
+};
+barmatz.net.Request.prototype.setURL = function(value)
+{
+	this.set('url', value);
+};
+barmatz.net.Request.prototype.getMethod = function()
+{
+	return this.get('method');
+};
+barmatz.net.Request.prototype.setMethod = function(value)
+{
+	barmatz.utils.DataTypes.isTypeOf(value, 'string');
+	this.set('method', value);
+};
+barmatz.net.Request.prototype.getAsync = function()
+{
+	return this.get('async');
+};
+barmatz.net.Request.prototype.setAsync = function(value)
+{
+	barmatz.utils.DataTypes.isTypeOf(value, 'boolean');
+	this.set('async', value);
+};
+barmatz.net.Request.prototype.getCredentials = function()
+{
+	return this.get('credentials');
+};
+barmatz.net.Request.prototype.setCredentails = function(value)
+{
+	barmatz.utils.DataTypes.isInstanceOf(value, barmatz.net.RequestCredentials);
+	this.set('credentials', value);
+};
+barmatz.net.Request.prototype.getHeaders = function()
+{
+	return this.get('headers');
+};
 /** barmatz.net.RequestHeader **/
-window.barmatz.net.RequestHeader = function(header, value)
+barmatz.net.RequestHeader = function(header, value)
 {
-	barmatz.utils.DataTypes.isNotUndefined(header);
-	barmatz.utils.DataTypes.isNotUndefined(value);
 	barmatz.utils.DataTypes.isTypeOf(header, 'string');
 	barmatz.utils.DataTypes.isTypeOf(value, 'string');
 	barmatz.mvc.Model.call(this);
 	this.set('header', header);
 	this.set('value', value);
 };
-
 barmatz.net.RequestHeader.prototype = new barmatz.mvc.Model();
 barmatz.net.RequestHeader.prototype.constructor = barmatz.net.RequestHeader;
-
-Object.defineProperties(barmatz.net.RequestHeader.prototype,
+barmatz.net.RequestHeader.prototype.getHeader = function()
 {
-	header: {get: function()
-	{
-		return this.get('header');
-	}, set: function(value)
-	{
-		barmatz.utils.DataTypes.isTypeOf(value, 'string');
-		this.set('header', value);
-	}},
-	value: {get: function()
-	{
-		return this.get('value');
-	}, set: function(value)
-	{
-		barmatz.utils.DataTypes.isTypeOf(value, 'string');
-		this.set('value', value);
-	}}
-});
+	return this.get('header');
+};
+barmatz.net.RequestHeader.prototype.setHeader = function(value)
+{
+	barmatz.utils.DataTypes.isTypeOf(value, 'string');
+	this.set('header', value);
+};
+barmatz.net.RequestHeader.prototype.getValue = function()
+{
+	return this.get('value');
+};
+barmatz.net.RequestHeader.prototype.setValue = function(value)
+{
+	barmatz.utils.DataTypes.isTypeOf(value, 'string');
+	this.set('value', value);
+};
 /** barmatz.net.Response **/
-window.barmatz.net.Response = function(url, data, type, status, headers)
+barmatz.net.Response = function(url, data, type, status, headers)
 {
-	barmatz.utils.DataTypes.isNotUndefined(url);
-	barmatz.utils.DataTypes.isTypeOf(url, 'string');
 	barmatz.utils.DataTypes.isNotUndefined(data);
-	barmatz.utils.DataTypes.isNotUndefined(type);
+	barmatz.utils.DataTypes.isTypeOf(url, 'string');
 	barmatz.utils.DataTypes.isTypeOf(type, 'string');
-	barmatz.utils.DataTypes.isNotUndefined(status);
 	barmatz.utils.DataTypes.isTypeOf(status, 'number');
-	barmatz.utils.DataTypes.isNotUndefined(headers);
-	barmatz.utils.DataTypes.isInstanceOf(headers, Array);
+	barmatz.utils.DataTypes.isInstanceOf(headers, window.Array);
 	barmatz.mvc.Model.call(this);
 	this.set('url', url);
 	this.set('data', data);
@@ -5042,33 +4793,28 @@ window.barmatz.net.Response = function(url, data, type, status, headers)
 	this.set('status', status);
 	this.set('headers', headers);
 };
-
 barmatz.net.Response.prototype = new barmatz.mvc.Model();
 barmatz.net.Response.prototype.constructor = barmatz.net.Response;
-
-Object.defineProperties(barmatz.net.Response.prototype,
+barmatz.net.Response.prototype.getURL = function()
 {
-	url: {get: function()
-	{
-		return this.get('url');
-	}},
-	data: {get: function()
-	{
-		return this.get('data');
-	}},
-	type: {get: function()
-	{
-		return this.get('type');
-	}},
-	status: {get: function()
-	{
-		return this.get('status');
-	}},
-	headers: {get: function()
-	{
-		return this.get('headers');
-	}}
-});
+	return this.get('url');
+};
+barmatz.net.Response.prototype.getData = function()
+{
+	return this.get('data');
+};
+barmatz.net.Response.prototype.getType = function()
+{
+	return this.get('type');
+};
+barmatz.net.Response.prototype.getStatus = function()
+{
+	return this.get('status');
+};
+barmatz.net.Response.prototype.getHeaders = function()
+{
+	return this.get('headers');
+};
 /** embed **/
 barmatz.forms.embed = function(fingerprint)
 {
@@ -5080,7 +4826,7 @@ barmatz.forms.embed = function(fingerprint)
 	{
 		var containers, i;
 		
-		containers = Array.prototype.slice.call(document.getElementsByName('formContainer')).filter(filterFormContainers);
+		containers = window.Array.prototype.slice.call(document.getElementsByName('formContainer')).filter(filterFormContainers);
 
 		for(i = 0; i < containers.length; i++)
 			embedForm(containers[i]);
@@ -5106,29 +4852,29 @@ barmatz.forms.embed = function(fingerprint)
 
 	function addFormModelListeners(model)
 	{
-		model.addEventListener(barmatz.events.FormModelEvent.LOADING_FORM_COMPLETE, onLoadingFormComplete);
-		model.addEventListener(barmatz.events.FormModelEvent.LOADING_FORM_ERROR, onLoadingFormError);
+		model.addEventListener(barmatz.events.FormEvent.LOADING_FORM_COMPLETE, onLoadingFormComplete);
+		model.addEventListener(barmatz.events.FormEvent.LOADING_FORM_ERROR, onLoadingFormError);
 	}
 	
 	function removeFormModelListeners(model)
 	{
-		model.removeEventListener(barmatz.events.FormModelEvent.LOADING_FORM_COMPLETE, onLoadingFormComplete);
-		model.removeEventListener(barmatz.events.FormModelEvent.LOADING_FORM_ERROR, onLoadingFormError);
+		model.removeEventListener(barmatz.events.FormEvent.LOADING_FORM_COMPLETE, onLoadingFormComplete);
+		model.removeEventListener(barmatz.events.FormEvent.LOADING_FORM_ERROR, onLoadingFormError);
 	}
 	
 	function addFormToContainer(model)
 	{
-		var container, wrapper, field, submitButton, i;
+		var container, wrapper, field, submitButton, stylesheets, i;
 		
 		container = dictionary.get(model);
-		wrapper = barmatz.forms.factories.DOMFactory.createElement('div', 'forms-form-wrapper forms-layout-' + model.layoutId);
+		wrapper = barmatz.forms.factories.DOMFactory.createElement('div', 'forms-form-wrapper forms-layout-' + model.getLayoutId());
 		form = barmatz.forms.factories.DOMFactory.createElement('form');
-		submitButton = barmatz.forms.factories.DOMFactory.createElementWithContent('button', 'forms-form-submit-button', model.submitButtonLabel);
+		submitButton = barmatz.forms.factories.DOMFactory.createElementWithContent('button', 'forms-form-submit-button', model.getSubmitButtonLabel());
 		
 		container.innerHTML = '';
 		container.appendChild(barmatz.forms.factories.DOMFactory.createStylesheet(barmatz.forms.Config.BASE_URL + '/css/form.css'));
 		
-		switch(model.direction)
+		switch(model.getDirection())
 		{
 			default:
 				throw new Error('Unknown direction');
@@ -5140,31 +4886,45 @@ barmatz.forms.embed = function(fingerprint)
 				barmatz.utils.CSS.addClass(wrapper, 'forms-rtl');
 				break;
 		}
+		
+		stylesheets = model.getStylesheets();
 
-		for(i = 0; i < model.stylesheets.length; i++)
-			container.appendChild(barmatz.forms.factories.DOMFactory.createStylesheet(model.stylesheets[i]));
+		for(i = 0; i < stylesheets.length; i++)
+			container.appendChild(barmatz.forms.factories.DOMFactory.createStylesheet(stylesheets[i]));
 		
 		model.forEach(function(item, index, collection)
 		{
 			var field, errorMessage;
 			
 			field = barmatz.forms.factories.DOMFactory.createFormFieldElement(item);
-			field.name = item.name;
 			
-			if(item instanceof barmatz.forms.fields.PhoneFieldModel)
-				field.getElementsByTagName('input')[0].style.width = item.width + 'px';
-			else
-				field.style.width = item.width + 'px';
+			if(!(item instanceof barmatz.forms.fields.HTMLContentModel))
+				field.name = item.getName();
+			
+			if(item instanceof barmatz.forms.fields.FieldModel)
+			{
+				if(item instanceof barmatz.forms.fields.PhoneFieldModel)
+					field.getElementsByTagName('input')[0].style.width = item.getWidth() + 'px';
+				else
+					field.style.width = item.getWidth() + 'px';
+			}
 			
 			errorMessage = barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageElement();
 			
-			form.appendChild(barmatz.forms.factories.DOMFactory.createElementWithContent('div', 'forms-form-item', [
-				barmatz.forms.factories.DOMFactory.createElementWithContent('label', '', item.label),
-				field,
-				barmatz.forms.factories.DOMFactory.createElementWithContent('span', 'forms-form-item-mandatory', item.mandatory ? '*' : ''),
-				 errorMessage
-			]));
-			barmatz.forms.factories.ControllerFactory.createFieldController(item, field, errorMessage);
+			if(item instanceof barmatz.forms.fields.HTMLContentModel)
+			{
+				form.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldElement(item));
+			}
+			else
+			{
+				form.appendChild(barmatz.forms.factories.DOMFactory.createElementWithContent('div', 'forms-form-item', [
+					barmatz.forms.factories.DOMFactory.createElementWithContent('label', '', item.getLabel()),
+				    field,
+				    barmatz.forms.factories.DOMFactory.createElementWithContent('span', 'forms-form-item-mandatory', item.getMandatory() ? '*' : ''),
+				    errorMessage
+				]));
+				barmatz.forms.factories.ControllerFactory.createFieldController(item, field, errorMessage);
+			}
 		});
 		
 		form.appendChild(barmatz.forms.factories.DOMFactory.createElementWithContent('div', 'forms-form-item forms-form-submit', submitButton));
@@ -5176,16 +4936,28 @@ barmatz.forms.embed = function(fingerprint)
 	
 	function onLoadingFormComplete(event)
 	{
-		addFormToContainer(event.target);
-		removeFormModelListeners(event.target);
-		dictionary.remove(event.target);
+		var model;
+		
+		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.FormEvent);
+		
+		model = event.getTarget();
+		
+		addFormToContainer(model);
+		removeFormModelListeners(model);
+		dictionary.remove(model);
 	}
 	
 	function onLoadingFormError(event)
 	{
-		removeFormModelListeners(event.target);
-		dictionary.get(event.target).innerHTML = 'Error loading form';
-		dictionary.remove(event.target);
+		var model
+		
+		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.FormEvent);
+		
+		model = event.getTarget();
+		
+		removeFormModelListeners(model);
+		dictionary.get(model).innerHTML = 'Error loading form';
+		dictionary.remove(model);
 	}
 };
 barmatz.forms.embed();

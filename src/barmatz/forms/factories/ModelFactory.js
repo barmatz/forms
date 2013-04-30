@@ -1,18 +1,13 @@
 /** barmatz.forms.factories.ModelFactory **/
-window.barmatz.forms.factories.ModelFactory = function(){};
-
-Object.defineProperties(barmatz.forms.factories.ModelFactory,
-{
-	createUserModel: {value: function()
+barmatz.forms.factories.ModelFactory = {
+	createUserModel: function()
 	{
 		return new barmatz.forms.users.UserModel();
-	}},
-	createFieldModel: {value: function(type, name)
+	},
+	createFieldModel: function(type, name)
 	{
 		barmatz.utils.DataTypes.isNotUndefined(type);
-		barmatz.utils.DataTypes.isNotUndefined(name);
 		barmatz.utils.DataTypes.isTypeOf(type, 'string');
-		barmatz.utils.DataTypes.isTypeOf(name, 'string');
 		
 		switch(type)
 		{
@@ -50,73 +45,53 @@ Object.defineProperties(barmatz.forms.factories.ModelFactory,
 				return new barmatz.forms.fields.PhoneFieldModel(name);
 				break;
 		}
-	}},
-	createToolboxModel: {value: function()
+	},
+	createToolboxModel: function()
 	{
 		return new barmatz.forms.ui.ToolboxModel();
-	}},
-	createToolboxItemModel: {value: function(type, label, fieldModel)
+	},
+	createToolboxItemModel: function(type, label, fieldModel)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(type);
-		barmatz.utils.DataTypes.isNotUndefined(label);
-		barmatz.utils.DataTypes.isNotUndefined(fieldModel);
-		barmatz.utils.DataTypes.isTypeOf(type, 'string');
-		barmatz.utils.DataTypes.isTypeOf(label, 'string');
-		barmatz.utils.DataTypes.isInstanceOf(fieldModel, barmatz.forms.fields.FormItemModel);
 		return new barmatz.forms.ui.ToolboxItemModel(type, label, fieldModel);
-	}},
-	createCollectionModel: {value: function()
+	},
+	createCollectionModel: function()
 	{
 		return new barmatz.forms.CollectionModel();
-	}},
-	createDropboxItemModel: {value: function(label, value)
+	},
+	createDropboxItemModel: function(label, value)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(label);
-		barmatz.utils.DataTypes.isTypeOf(label, 'string');
 		return new barmatz.forms.fields.DropboxItemModel(label, value);
-	}},
-	createDropboxModel: {value: function(name, items)
+	},
+	createDropboxModel: function(name, items)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(name);
-		barmatz.utils.DataTypes.isTypeOf(name, 'string', true);
-		barmatz.utils.DataTypes.isInstanceOf(items, Array, true);
 		return new barmatz.forms.fields.DropboxModel(name, items);
-	}},
-	createBuilderModel: {value: function()
+	},
+	createBuilderModel: function()
 	{
 		return new barmatz.forms.ui.BuilderModel();
-	}},
-	createMenuModel: {value: function()
+	},
+	createMenuModel: function()
 	{
 		return new barmatz.forms.ui.MenuModel();
-	}},
-	createMenuItemModel: {value: function(label, clickHandler)
+	},
+	createMenuItemModel: function(label, clickHandler)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(label);
-		barmatz.utils.DataTypes.isNotUndefined(clickHandler);
-		barmatz.utils.DataTypes.isTypeOf(label, 'string');
-		barmatz.utils.DataTypes.isTypeOf(clickHandler, 'function');
 		return new barmatz.forms.ui.MenuItemModel(label, clickHandler);
-	}},
-	createFormModel: {value: function()
+	},
+	createFormModel: function()
 	{
 		return new barmatz.forms.FormModel();
-	}},
-	createPanelModel: {value: function(className, content)
+	},
+	createPanelModel: function(className, content)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(className);
-		barmatz.utils.DataTypes.isNotUndefined(content);
-		barmatz.utils.DataTypes.isTypeOf(className, 'string');
-		barmatz.utils.DataTypes.isTypesOrInstances(content, ['string'], [HTMLElement, Array]);
 		return new barmatz.forms.ui.PanelModel(className, content);
-	}},
-	createValidatorModel: {value: function(data)
+	},
+	createValidatorModel: function(data)
 	{
-		barmatz.utils.DataTypes.isTypeOf(data, 'object', true);
 		return new barmatz.forms.fields.ValidatorModel(data);
-	}},
-	createLeadModel: {value: function()
+	},
+	createLeadModel: function()
 	{
 		return new barmatz.forms.LeadModel();
-	}}
-});
+	}
+}

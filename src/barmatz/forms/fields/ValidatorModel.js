@@ -1,5 +1,5 @@
 /** barmatz.forms.fields.ValidatorModel **/
-window.barmatz.forms.fields.ValidatorModel = function(data)
+barmatz.forms.fields.ValidatorModel = function(data)
 {
 	var i;
 	
@@ -16,42 +16,47 @@ window.barmatz.forms.fields.ValidatorModel = function(data)
 			this[i] = data[i];
 	}
 };
-
 barmatz.forms.fields.ValidatorModel.prototype = new barmatz.mvc.Model();
 barmatz.forms.fields.ValidatorModel.prototype.constructor = barmatz.forms.fields.ValidatorModel;
-
-Object.defineProperties(barmatz.forms.fields.ValidatorModel.prototype,
+barmatz.forms.fields.ValidatorModel.prototype.getCode = function()
 {
-	code: {get: function()
-	{
-		return this.get('code');
-	}, set: function(value)
-	{
-		barmatz.utils.DataTypes.isTypeOf(value, 'number');
-		this.set('code', value);
-	}},
-	clone: {value: function()
-	{
-		var object, i;
-		
-		object = new barmatz.forms.fields.ValidatorModel();
-		object.code = this.code;
-		
-		for(i in this)
-			object[i] = this[i];
-		
-		return object;
-	}},
-	toJSON: {value: function()
-	{
-		var object, i;
-		
-		object = {code: this.code};
-		
-		for(i in this)
-			if(typeof this[i] != 'function' && /^[^_]/.test(i))
+	return this.get('code');
+};
+barmatz.forms.fields.ValidatorModel.prototype.setCode = function(value)
+{
+	barmatz.utils.DataTypes.isTypeOf(value, 'number');
+	this.set('code', value);
+};
+barmatz.forms.fields.ValidatorModel.prototype.clone = function()
+{
+	var object, i;
+	
+	object = new barmatz.forms.fields.ValidatorModel();
+	object.setCode(this.getCode());
+	
+	for(i in this)
+		object[i] = this[i];
+	
+	return object;
+};
+barmatz.forms.fields.ValidatorModel.prototype.toJSON = function()
+{
+	var object, key, getter, i;
+	
+	object = {code: this.getCode()};
+	
+	for(i in this)
+		if(typeof this[i] != 'function' && i != '_target' && i != '_listeners')
+		{
+			if(/^_/.test(i))
+			{
+				key = i.replace('_', '');
+				getter = 'get' + barmatz.utils.String.firstLetterToUpperCase(key);
+				object[key] = /^_/.test(i) && this.hasOwnProperty(getter) ? this[getter]() : this[i];
+			}
+			else
 				object[i] = this[i];
-		
-		return object;
-	}}
-});
+		}
+	
+	return object;
+};

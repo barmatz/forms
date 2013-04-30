@@ -1,18 +1,13 @@
 /** barmatz.forms.ui.WorkspaceItemController **/
-window.barmatz.forms.ui.WorkspaceItemController = function(model, labelView, fieldView, mandatoryView, deleteButtonView)
+barmatz.forms.ui.WorkspaceItemController = function(model, labelView, fieldView, mandatoryView, deleteButtonView)
 {
 	var fieldDictionary;
 	
-	barmatz.utils.DataTypes.isNotUndefined(model);
-	barmatz.utils.DataTypes.isNotUndefined(labelView);
-	barmatz.utils.DataTypes.isNotUndefined(fieldView);
-	barmatz.utils.DataTypes.isNotUndefined(mandatoryView);
-	barmatz.utils.DataTypes.isNotUndefined(deleteButtonView);
 	barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FormItemModel);
-	barmatz.utils.DataTypes.isInstanceOf(labelView, HTMLElement);
-	barmatz.utils.DataTypes.isInstanceOf(fieldView, HTMLElement);
-	barmatz.utils.DataTypes.isInstanceOf(mandatoryView, HTMLElement);
-	barmatz.utils.DataTypes.isInstanceOf(deleteButtonView, HTMLElement);
+	barmatz.utils.DataTypes.isInstanceOf(labelView, window.HTMLElement);
+	barmatz.utils.DataTypes.isInstanceOf(fieldView, window.HTMLElement);
+	barmatz.utils.DataTypes.isInstanceOf(mandatoryView, window.HTMLElement);
+	barmatz.utils.DataTypes.isInstanceOf(deleteButtonView, window.HTMLElement);
 	
 	barmatz.mvc.Controller.call(this);
 
@@ -31,27 +26,30 @@ window.barmatz.forms.ui.WorkspaceItemController = function(model, labelView, fie
 	
 	if(model instanceof barmatz.forms.fields.FieldModel)
 	{
-		setViewValue('name', model.name);
-		setViewValue('label', model.label);
-		setViewValue('mandatory', model.mandatory);
-		setViewValue('value', model.value);
-		setViewValue('enabled', model.enabled);
+		setViewValue('name', model.getName());
+		setViewValue('label', model.getLabel());
+		setViewValue('mandatory', model.getMandatory());
+		setViewValue('value', model.getValue());
+		setViewValue('enabled', model.getEnabled());
 	}
 	
 	if(model instanceof barmatz.forms.fields.TextFieldModel)
-		setViewValue('max', model.max);
+		setViewValue('max', model.getMax());
 
 	if(model instanceof barmatz.forms.fields.CheckboxFieldModel)
-		setViewValue('checked', model.checked);
+		setViewValue('checked', model.getChecked());
 	
 	if(model instanceof barmatz.forms.fields.FileFieldModel)
-		setViewValue('accept', model.accept);
+		setViewValue('accept', model.getAccept());
 	
 	if(model instanceof barmatz.forms.fields.TextAreaFieldModel)
-		setViewValue('rows', model.rows);
+	{
+		setViewValue('cols', model.getCols());
+		setViewValue('rows', model.getRows());
+	}
 	
 	if(model instanceof barmatz.forms.fields.HTMLContentModel)
-		setViewValue('content', model.content);
+		setViewValue('content', model.getContent());
 	
 	function setViewValue(key, value)
 	{
@@ -119,8 +117,6 @@ window.barmatz.forms.ui.WorkspaceItemController = function(model, labelView, fie
 	{
 		var view;
 		
-		barmatz.utils.DataTypes.isNotUndefined(model);
-		barmatz.utils.DataTypes.isNotUndefined(index);
 		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.DropboxItemModel);
 		barmatz.utils.DataTypes.isTypeOf(index, 'number');
 		
@@ -131,7 +127,6 @@ window.barmatz.forms.ui.WorkspaceItemController = function(model, labelView, fie
 	
 	function removeItem(model)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(model);
 		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.DropboxItemModel);
 		model.removeEventListener(barmatz.events.ModelEvent.VALUE_CHANGED, onModelItemValueChanged);
 		fieldView.removeChild(fieldDictionary.get(model));
@@ -140,44 +135,44 @@ window.barmatz.forms.ui.WorkspaceItemController = function(model, labelView, fie
 	
 	function onModelValueChanged(event)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(event);
 		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.ModelEvent);
-		setViewValue(event.key, event.value);
+		setViewValue(event.getKey(), event.getValue());
 	}
 	
 	function onModelItemAdded(event)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(event);
 		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.CollectionEvent);
-		addItem(event.item, event.index);
+		addItem(event.getItem(), event.getIndex());
 	}
 
 	function onModelItemRemoved(event) 
 	{
-		barmatz.utils.DataTypes.isNotUndefined(event);
 		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.CollectionEvent);
-		removeItem(event.item);
+		removeItem(event.getItem());
 	}
 	
 	function onModelItemValueChanged(event)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(event);
+		var field, value;
+		
 		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.ModelEvent);
+		
+		field = fieldDictionary.get(event.getTarget());
+		value = event.getValue();
 
-		switch(event.key)
+		switch(event.getKey())
 		{
 			default:
 				throw new Error('Unknown key');
 				break;
 			case 'label':
-				fieldDictionary.get(event.target).innerHTML = event.value;
+				field.innerHTML = value;
 				break;
 			case 'value':
-				fieldDictionary.get(event.target).value = event.value;
+				field.value = value;
 				break;
 		}
 	}
 };
-
 barmatz.forms.ui.WorkspaceItemController.prototype = new barmatz.mvc.Controller();
 barmatz.forms.ui.WorkspaceItemController.prototype.constructor = barmatz.forms.ui.WorkspaceItemController;

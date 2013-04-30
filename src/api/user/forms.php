@@ -2,11 +2,14 @@
 require_once dirname(__FILE__) . '/../api.php';
 require_once dirname(__FILE__) . '/../form/FormModel.php';
 
-isset($_GET['u']) ? getForms() : \api\errors\Errors::notImplemented('Missing variabels');
+if(!session_id())
+	session_start();
+
+isset($_SESSION['userId']) ? getForms() : \api\errors\Errors::unauthorized('Missing data');
 
 function getForms()
 {
 	global $db;
 	$model = new \api\form\FormModel($db);
-	echo json_encode($model->getFormsByUser($_GET['u']));
+	echo json_encode($model->getFormsByUser($_SESSION['userId']));
 }

@@ -1,5 +1,5 @@
 /** barmatz.forms.ui.Leads **/
-window.barmatz.forms.ui.Leads = function()
+barmatz.forms.ui.Leads = function()
 {
 	var userModel, formsListModel, formsListView, leadsListModel, leadsListWrapper;
 	
@@ -30,7 +30,7 @@ window.barmatz.forms.ui.Leads = function()
 	function initController()
 	{
 		barmatz.forms.factories.ControllerFactory.createLeadsController(
-			userModel, formsListModel, formsListView, leadsListModel, leadsListWrapper.wrapper, leadsListWrapper.table, barmatz.forms.factories.DOMFactory.BODY_ELEMENT,
+			userModel, formsListModel, formsListView, leadsListModel, leadsListWrapper.wrapper, leadsListWrapper.table, barmatz.forms.factories.DOMFactory.getBodyElement(),
 			barmatz.forms.factories.DOMFactory.createPanels([
  				barmatz.forms.factories.ModelFactory.createPanelModel('forms-leads-forms-list-panel', formsListView),
  				barmatz.forms.factories.ModelFactory.createPanelModel('forms-leads-list-panel', leadsListWrapper.wrapper)

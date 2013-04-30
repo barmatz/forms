@@ -1,12 +1,11 @@
 /** barmatz.forms.ui.WorkspaceController **/
-window.barmatz.forms.ui.WorkspaceController = function(model, view)
+barmatz.forms.ui.WorkspaceController = function(model, view, dialogContainerView)
 {
 	var selectedItemIndex;
 
-	barmatz.utils.DataTypes.isNotUndefined(model);
-	barmatz.utils.DataTypes.isNotUndefined(view);
-	barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.CollectionModel);
-	barmatz.utils.DataTypes.isInstanceOf(view, HTMLElement);
+	barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.FormModel);
+	barmatz.utils.DataTypes.isInstanceOf(view, window.HTMLElement);
+	barmatz.utils.DataTypes.isInstanceOf(dialogContainerView, window.HTMLElement, true);
 	barmatz.forms.CollectionController.call(this, model, view);
 	
 	model.addEventListener(barmatz.events.ModelEvent.VALUE_CHANGED, onModelValueChanged);
@@ -22,8 +21,6 @@ window.barmatz.forms.ui.WorkspaceController = function(model, view)
 	{
 		var element;
 		
-		barmatz.utils.DataTypes.isNotUndefined(event);
-		barmatz.utils.DataTypes.isNotUndefined(ui);
 		barmatz.utils.DataTypes.isInstanceOf(event, jQuery.Event);
 		barmatz.utils.DataTypes.isInstanceOf(ui, jQuery);
 		
@@ -37,22 +34,19 @@ window.barmatz.forms.ui.WorkspaceController = function(model, view)
 	
 	function getIndexFromSortEvent(element)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(element);
-		barmatz.utils.DataTypes.isInstanceOf(element, HTMLElement);
-		return Array.prototype.slice.call(element.parentElement.childNodes).indexOf(element);
+		barmatz.utils.DataTypes.isInstanceOf(element, window.HTMLElement);
+		return window.Array.prototype.slice.call(element.parentElement.children).indexOf(element);
 	}
 	
 	function openNewFieldDialog(model)
 	{
 		var dialogWrapper;
 		
-		barmatz.utils.DataTypes.isNotUndefined(model);
 		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FieldModel);
 		
-		dialogWrapper = barmatz.forms.factories.DOMFactory.createNewFieldDialogWrapper(model);
-		jQuery(dialogWrapper.dialog).dialog('open');
+		dialogWrapper = barmatz.forms.factories.DOMFactory.createNewFieldDialogWrapper(model, true, dialogContainerView);
 		barmatz.forms.factories.ControllerFactory.createJQueryDialogController(dialogWrapper.dialog);
-		barmatz.forms.factories.ControllerFactory.createNewFieldDialogController(model, dialogWrapper.dialog, dialogWrapper.nameField, dialogWrapper.labelField);
+		barmatz.forms.factories.ControllerFactory.createNewFieldDialogController(model, dialogWrapper.dialog, dialogWrapper.nameField, dialogWrapper.labelField, dialogContainerView);
 	}
 	
 	function onSortingStart(event, ui)
@@ -68,13 +62,12 @@ window.barmatz.forms.ui.WorkspaceController = function(model, view)
 	
 	function onModelValueChanged(event)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(event);
 		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.ModelEvent);
 		
-		switch(event.key)
+		switch(event.getKey())
 		{
 			case 'direction':
-				switch(event.value)
+				switch(event.getValue())
 				{
 					default:
 						throw new Error('Unknown direction');
@@ -94,53 +87,48 @@ window.barmatz.forms.ui.WorkspaceController = function(model, view)
 	
 	function onModelItemAdded(event)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(event);
+		var item;
+		
 		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.CollectionEvent);
+		
+		item = event.getItem();
 		setViewToSortable();
 		
-		if(event.item instanceof barmatz.forms.fields.FieldModel && !event.item.name)
-			openNewFieldDialog(event.item);
+		if(item instanceof barmatz.forms.fields.FieldModel && !item.getName())
+			openNewFieldDialog(item);
 	}
 };
-
 barmatz.forms.ui.WorkspaceController.prototype = new barmatz.forms.CollectionController(null, null);
 barmatz.forms.ui.WorkspaceController.prototype.constructor = barmatz.forms.ui.WorkspaceController;
-
-Object.defineProperties(barmatz.forms.ui.WorkspaceController.prototype,
+barmatz.forms.ui.WorkspaceController.prototype._addItemModelToView = function(model)
 {
-	_addItemModelToView: {value: function(model)
+	barmatz.utils.DataTypes.isInstanceOf(model, barmatz.mvc.Model);
+	barmatz.forms.CollectionController.prototype._addItemModelToView.call(this, model);
+};
+barmatz.forms.ui.WorkspaceController.prototype._createItemViewFromModel = function(model)
+{
+	var _this = this, viewWrapper;
+	
+	barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FormItemModel);
+	viewWrapper = barmatz.forms.factories.DOMFactory.createWorkspaceItemWrapper(model);
+	viewWrapper.deleteButton.addEventListener('click', onDeleteButtonClick);
+	barmatz.forms.factories.ControllerFactory.createWorkspaceItemController(model, viewWrapper.label, viewWrapper.field, viewWrapper.mandatory, viewWrapper.deleteButton);
+	
+	if(model instanceof barmatz.forms.fields.FieldModel)
+		barmatz.forms.factories.ControllerFactory.createFieldController(model, viewWrapper.field);
+	
+	return viewWrapper.wrapper;
+	
+	function onDeleteButtonClick(event)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(model);
-		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.mvc.Model);
-		barmatz.forms.CollectionController.prototype._addItemModelToView.call(this, model);
-	}},
-	_createItemViewFromModel: {value: function(model)
+		barmatz.utils.DataTypes.isInstanceOf(event, MouseEvent);
+		barmatz.forms.factories.ControllerFactory.createJQueryDialogController(barmatz.forms.factories.DOMFactory.createConfirmPromptDialog('Are you sure you want to delete this item?', onDialogConfirm, true));
+		event.stopImmediatePropagation();
+	}
+	
+	function onDialogConfirm(event)
 	{
-		var _this = this, viewWrapper;
-		
-		barmatz.utils.DataTypes.isNotUndefined(model);
-		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FormItemModel);
-		viewWrapper = barmatz.forms.factories.DOMFactory.createWorkspaceItemWrapper(model);
-		viewWrapper.deleteButton.addEventListener('click', onDeleteButtonClick);
-		barmatz.forms.factories.ControllerFactory.createWorkspaceItemController(model, viewWrapper.label, viewWrapper.field, viewWrapper.mandatory, viewWrapper.deleteButton);
-		
-		if(model instanceof barmatz.forms.fields.FieldModel)
-			barmatz.forms.factories.ControllerFactory.createFieldController(model, viewWrapper.field);
-		
-		return viewWrapper.wrapper;
-		
-		function onDeleteButtonClick(event)
-		{
-			barmatz.utils.DataTypes.isNotUndefined(event);
-			barmatz.utils.DataTypes.isInstanceOf(event, MouseEvent);
-			barmatz.forms.factories.ControllerFactory.createJQueryDialogController(barmatz.forms.factories.DOMFactory.createConfirmPromptDialog('Are you sure you want to delete this item?', onDialogConfirm, true));
-			event.stopImmediatePropagation();
-		}
-		
-		function onDialogConfirm(event)
-		{
-			viewWrapper.deleteButton.removeEventListener('click', onDeleteButtonClick);
+		viewWrapper.deleteButton.removeEventListener('click', onDeleteButtonClick);
 			_this._model.removeItem(model);
-		}
-	}}
-});
+	}
+};

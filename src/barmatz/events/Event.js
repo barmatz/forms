@@ -1,40 +1,46 @@
 /** barmatz.events.Event **/
-window.barmatz.events.Event = function(type)
+barmatz.events.Event = function(type)
 {
 	barmatz.utils.DataTypes.isNotUndefined(type);
 	barmatz.utils.DataTypes.isTypeOf(type, 'string', true);
 	this._type = type;
 };
 
-Object.defineProperties(barmatz.events.Event.prototype,
-{
-	target: {get: function()
+barmatz.events.Event.prototype = {
+	getTarget: function()
 	{
 		return this._target;
-	}},
-	type: {get: function()
+	},
+	getType: function()
 	{
 		return this._type;
-	}},
-	clone: {value: function(type)
+	},
+	clone: function()
 	{
-		var event = new barmatz.events.Event(type);
-		event._target = this.target;
+		var event = new barmatz.events.Event(this.getType());
+		event._target = this.getTarget();
 		return event;
-	}},
-	formatToString: {value: function(className)
+	},
+	formatToString: function(className)
 	{
-		var parameters = [], i;
+		var parameters = [], key, i;
 		
-		arguments = Array.prototype.slice.call(arguments);
+		arguments = window.Array.prototype.slice.call(arguments);
 		
 		for(i = 1; i < arguments.length; i++)
-			parameters.push(arguments[i] + '=' + this[arguments[i]]);
+		{
+			key = arguments[i];
+			
+			if(!this.hasOwnProperty(key))
+				key = '_' + key;
+				
+			parameters.push(arguments[i] + '=' + this[key]);
+		}
 		
 		return '[' + className + '(' + parameters.join(', ') + ')]';
-	}},
-	toString: {value: function()
+	},
+	toString: function()
 	{
 		return this.formatToString('Event', 'type');
-	}}
-});
+	}
+};

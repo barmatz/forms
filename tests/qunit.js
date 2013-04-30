@@ -63,7 +63,7 @@ var QUnit,
 		}
 	},
 	/**
-	 * Makes a clone of an object using only Array or Object as base,
+	 * Makes a clone of an object using only window.Array or Object as base,
 	 * and copies over the own enumerable properties.
 	 *
 	 * @param {Object} obj
@@ -882,7 +882,7 @@ extend( QUnit, {
 				return "number";
 			case "String":
 			case "Boolean":
-			case "Array":
+			case "window.Array":
 			case "Date":
 			case "RegExp":
 			case "Function":
@@ -1461,7 +1461,7 @@ function checkPollution() {
 	}
 }
 
-// returns a new Array with the elements that are in a but not in b
+// returns a new window.Array with the elements that are in a but not in b
 function diff( a, b ) {
 	var i, j,
 		result = a.slice();
@@ -1493,7 +1493,7 @@ function extend( a, b ) {
 }
 
 /**
- * @param {HTMLElement} elem
+ * @param {Element} elem
  * @param {string} type
  * @param {Function} fn
  */
@@ -1508,7 +1508,7 @@ function addEvent( elem, type, fn ) {
 }
 
 /**
- * @param {Array|NodeList} elems
+ * @param {window.Array|NodeList} elems
  * @param {string} type
  * @param {Function} fn
  */
@@ -1779,7 +1779,7 @@ QUnit.jsDump = (function() {
 		return [ pre, inner + arr, base + post ].join(s);
 	}
 	function array( arr, stack ) {
-		var i = arr.length, ret = new Array(i);
+		var i = arr.length, ret = new window.Array(i);
 		this.up();
 		while ( i-- ) {
 			ret[i] = this.parse( arr[i] , undefined , stack);
@@ -1797,7 +1797,7 @@ QUnit.jsDump = (function() {
 					parser = this.parsers[ type || this.typeOf(obj) ];
 
 				type = typeof parser;
-				inStack = inArray( obj, stack );
+				inStack = inwindow.Array( obj, stack );
 
 				if ( inStack !== -1 ) {
 					return "recursion(" + (inStack - stack.length) + ")";
@@ -1830,7 +1830,7 @@ QUnit.jsDump = (function() {
 					type = "node";
 				} else if (
 					// native arrays
-					toString.call( obj ) === "[object Array]" ||
+					toString.call( obj ) === "[object window.Array]" ||
 					// NodeList objects
 					( typeof obj.length === "number" && typeof obj.item !== "undefined" && ( obj.length ? obj.item(0) === obj[0] : ( obj.item( 0 ) === null && typeof obj[0] === "undefined" ) ) )
 				) {
@@ -1854,7 +1854,7 @@ QUnit.jsDump = (function() {
 				if ( this.HTML ) {
 					chr = chr.replace( /\t/g, "   " ).replace( / /g, "&nbsp;" );
 				}
-				return new Array( this._depth_ + (extra||0) ).join(chr);
+				return new window.Array( this._depth_ + (extra||0) ).join(chr);
 			},
 			up: function( a ) {
 				this._depth_ += a || 1;
@@ -1949,7 +1949,7 @@ QUnit.jsDump = (function() {
 						return "";
 					}
 
-					args = new Array(l);
+					args = new window.Array(l);
 					while ( l-- ) {
 						// 97 is 'a'
 						args[l] = String.fromCharCode(97+l);
@@ -1980,7 +1980,7 @@ QUnit.jsDump = (function() {
 }());
 
 // from jquery.js
-function inArray( elem, array ) {
+function inwindow.Array( elem, array ) {
 	if ( array.indexOf ) {
 		return array.indexOf( elem );
 	}

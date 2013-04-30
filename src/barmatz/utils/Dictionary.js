@@ -1,13 +1,11 @@
 /** barmatz.utils.Dictionary **/
-window.barmatz.utils.Dictionary = function()
+barmatz.utils.Dictionary = function()
 {
 	this._keys = [];
 	this._values = [];
 };
-
-Object.defineProperties(barmatz.utils.Dictionary.prototype,
-{
-	add: {value: function(key, value)
+barmatz.utils.Dictionary.prototype = {
+	add: function(key, value)
 	{
 		var keyIndex = this._keys.indexOf(key);
 		
@@ -22,8 +20,8 @@ Object.defineProperties(barmatz.utils.Dictionary.prototype,
 			throw new Error('an error has occured');
 		
 		return value;
-	}},
-	remove: {value: function(key)
+	},
+	remove: function(key)
 	{
 		var keyIndex, value;
 		keyIndex = this._keys.indexOf(key);
@@ -31,35 +29,35 @@ Object.defineProperties(barmatz.utils.Dictionary.prototype,
 		this._keys.splice(keyIndex, 1);
 		this._values.splice(keyIndex, 1);
 		return value;
-	}},
-	get: {value: function(key)
+	},
+	get: function(key)
 	{
 		return this._values[this._keys.indexOf(key)];
-	}},
-	getNext: {value: function(key)
+	},
+	getNext: function(key)
 	{
 		return this._values[this._keys.indexOf(key) + 1];
-	}},
-	getPrev: {value: function(key)
+	},
+	getPrev: function(key)
 	{
 		return this._values[this._keys.indexOf(key) - 1];
-	}},
-	reset: {value: function()
+	},
+	reset: function()
 	{
 		this._keys.splice(0, this._keys.length);
 		this._values.splice(0, this._values.length);
-	}},
-	forEach: {value: function(callback)
+	},
+	forEach: function(callback)
 	{
 		var i;
 		for(i = 0; i < this._keys.length; i++)
-			callback(this._values[i], this._keys[i], this._values);
-	}},
-	find: {value: function(value)
+			callback(this._values[i], this._keys[i]);
+	},
+	find: function(value)
 	{
 		if(value === undefined)
 			throw new ReferenceError('expected property value is undefined');
 		
 		return this._keys[this._values.indexOf(value)];
-	}}
-});
+	}
+};

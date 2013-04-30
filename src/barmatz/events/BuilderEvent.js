@@ -1,7 +1,6 @@
 /** barmatz.events.BuilderEvent **/
-window.barmatz.events.BuilderEvent = function(type)
+barmatz.events.BuilderEvent = function(type)
 {
-	barmatz.utils.DataTypes.isNotUndefined(type);
 	barmatz.utils.DataTypes.isTypeOf(type, 'string');
 	barmatz.events.Event.call(this, type);
 	
@@ -23,72 +22,66 @@ window.barmatz.events.BuilderEvent = function(type)
 			break;
 	}
 };
-
+barmatz.events.BuilderEvent.FORM_ITEM_ADDED = 'formItemAdded';
+barmatz.events.BuilderEvent.FORM_ITEM_REMOVED = 'formItemRemoved';
+barmatz.events.BuilderEvent.MENU_ITEM_ADDED = 'menuItemAdded';
+barmatz.events.BuilderEvent.MENU_ITEM_REMOVED = 'menuItemRemoved';
+barmatz.events.BuilderEvent.TOOLBOX_ITEM_ADDED = 'toolboxItemAdded';
+barmatz.events.BuilderEvent.TOOLBOX_ITEM_REMOVED = 'toolboxItemRemoved';
+barmatz.events.BuilderEvent.WORKSPACE_ITEM_ADDED = 'workspaceItemAdded';
+barmatz.events.BuilderEvent.WORKSPACE_ITEM_REMOVED = 'workspaceItemRemoved';
 barmatz.events.BuilderEvent.prototype = new barmatz.events.Event(null);
 barmatz.events.BuilderEvent.prototype.constructor = barmatz.events.BuilderEvent;
-
-Object.defineProperties(barmatz.events.BuilderEvent, 
+barmatz.events.BuilderEvent.prototype.getItem = function()
 {
-	FORM_ITEM_ADDED: {value: 'formItemAdded'},
-	FORM_ITEM_REMOVED: {value: 'formItemRemoved'},
-	MENU_ITEM_ADDED: {value: 'menuItemAdded'},
-	MENU_ITEM_REMOVED: {value: 'menuItemRemoved'},
-	TOOLBOX_ITEM_ADDED: {value: 'toolboxItemAdded'},
-	TOOLBOX_ITEM_REMOVED: {value: 'toolboxItemRemoved'},
-	WORKSPACE_ITEM_ADDED: {value: 'workspaceItemAdded'},
-	WORKSPACE_ITEM_REMOVED: {value: 'workspaceItemRemoved'}
-});
-Object.defineProperties(barmatz.events.BuilderEvent.prototype,
+	return this._item;
+};
+barmatz.events.BuilderEvent.prototype.getIndex = function()
 {
-	item: {get: function()
+	return this._index;
+};
+barmatz.events.BuilderEvent.prototype.clone = function()
+{
+	var event, type;
+	
+	type = this.getType();
+	
+	switch(type)
 	{
-		return this._item;
-	}},
-	index: {get: function()
+		default:
+			event = new barmatz.events.BuilderEvent(type);
+			break;
+		case barmatz.events.BuilderEvent.FORM_ITEM_ADDED:
+		case barmatz.events.BuilderEvent.FORM_ITEM_REMOVE:
+		case barmatz.events.BuilderEvent.MENU_ITEM_ADDED:
+		case barmatz.events.BuilderEvent.MENU_ITEM_REMOVE:
+		case barmatz.events.BuilderEvent.TOOLBOX_ITEM_ADDED:
+		case barmatz.events.BuilderEvent.TOOLBOX_ITEM_REMOVE:
+		case barmatz.events.BuilderEvent.WORKSPACE_ITEM_ADDED:
+		case barmatz.events.BuilderEvent.WORKSPACE_ITEM_REMOVE:
+			event = new barmatz.events.BuilderEvent(type, this.getItem(), this.getIndex());
+			break;
+	}
+	
+	event._target = this.getTarget();
+	return event;
+};
+barmatz.events.BuilderEvent.prototype.toString = function()
+{
+	switch(this.getType())
 	{
-		return this._index;
-	}},
-	clone: {value: function(type)
-	{
-		var event;
-		
-		switch(type)
-		{
-			default:
-				event = new barmatz.events.BuilderEvent(type);
-				break;
-			case barmatz.events.BuilderEvent.FORM_ITEM_ADDED:
-			case barmatz.events.BuilderEvent.FORM_ITEM_REMOVE:
-			case barmatz.events.BuilderEvent.MENU_ITEM_ADDED:
-			case barmatz.events.BuilderEvent.MENU_ITEM_REMOVE:
-			case barmatz.events.BuilderEvent.TOOLBOX_ITEM_ADDED:
-			case barmatz.events.BuilderEvent.TOOLBOX_ITEM_REMOVE:
-			case barmatz.events.BuilderEvent.WORKSPACE_ITEM_ADDED:
-			case barmatz.events.BuilderEvent.WORKSPACE_ITEM_REMOVE:
-				event = new barmatz.events.BuilderEvent(type, this.item, this.index);
-				break;
-		}
-		
-		event._target = this.target;
-		return event;
-	}},
-	toString: {value: function()
-	{
-		switch(type)
-		{
-			default:
-				return this.formatToString('BuilderEvent', 'type');
-				break;
-			case barmatz.events.BuilderEvent.FORM_ITEM_ADDED:
-			case barmatz.events.BuilderEvent.FORM_ITEM_REMOVE:
-			case barmatz.events.BuilderEvent.MENU_ITEM_ADDED:
-			case barmatz.events.BuilderEvent.MENU_ITEM_REMOVE:
-			case barmatz.events.BuilderEvent.TOOLBOX_ITEM_ADDED:
-			case barmatz.events.BuilderEvent.TOOLBOX_ITEM_REMOVE:
-			case barmatz.events.BuilderEvent.WORKSPACE_ITEM_ADDED:
-			case barmatz.events.BuilderEvent.WORKSPACE_ITEM_REMOVE:
-				return this.formatToString('BuilderEvent', 'type', 'item', 'index');
-				break;
-		}
-	}}
-});
+		default:
+			return this.formatToString('BuilderEvent', 'type');
+			break;
+		case barmatz.events.BuilderEvent.FORM_ITEM_ADDED:
+		case barmatz.events.BuilderEvent.FORM_ITEM_REMOVE:
+		case barmatz.events.BuilderEvent.MENU_ITEM_ADDED:
+		case barmatz.events.BuilderEvent.MENU_ITEM_REMOVE:
+		case barmatz.events.BuilderEvent.TOOLBOX_ITEM_ADDED:
+		case barmatz.events.BuilderEvent.TOOLBOX_ITEM_REMOVE:
+		case barmatz.events.BuilderEvent.WORKSPACE_ITEM_ADDED:
+		case barmatz.events.BuilderEvent.WORKSPACE_ITEM_REMOVE:
+			return this.formatToString('BuilderEvent', 'type', 'item', 'index');
+			break;
+	}
+};

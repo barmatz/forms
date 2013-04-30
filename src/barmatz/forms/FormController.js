@@ -1,34 +1,31 @@
 /** barmatz.forms.FormController **/
-window.barmatz.forms.FormController = function(model, formView, submitButtonView)
+barmatz.forms.FormController = function(model, formView, submitButtonView)
 {
 	var submittingForm, loadingDialog;
 
-	barmatz.utils.DataTypes.isNotUndefined(model);
-	barmatz.utils.DataTypes.isNotUndefined(formView);
-	barmatz.utils.DataTypes.isNotUndefined(submitButtonView);
 	barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.FormModel);
 	barmatz.utils.DataTypes.isInstanceOf(formView, HTMLFormElement);
-	barmatz.utils.DataTypes.isInstanceOf(submitButtonView, HTMLElement);
+	barmatz.utils.DataTypes.isInstanceOf(submitButtonView, window.HTMLElement);
 	barmatz.mvc.Controller.call(this);
 	
-	formView.name = model.name;
-	formView.method = model.method;
-	formView.encoding = model.encoding;
+	formView.name = model.getName();
+	formView.method = model.getMethod();
+	formView.encoding = model.getEncoding();
 	formView.setAttribute('onsubmit', 'return false;');
 	formView.addEventListener('submit', onViewSubmit);
 	
 	function addModelListeners()
 	{
-		model.addEventListener(barmatz.events.FormModelEvent.SUBMITTING, onModelSubmitting);
-		model.addEventListener(barmatz.events.FormModelEvent.SUBMITTED, onModelSubmitted);
-		model.addEventListener(barmatz.events.FormModelEvent.SUBMISSION_FAILED, onModelSubmitionFailed);
+		model.addEventListener(barmatz.events.FormEvent.SUBMITTING, onModelSubmitting);
+		model.addEventListener(barmatz.events.FormEvent.SUBMITTED, onModelSubmitted);
+		model.addEventListener(barmatz.events.FormEvent.SUBMISSION_FAILED, onModelSubmitionFailed);
 	}
 	 
 	function removeModelListeners()
 	{
-		model.removeEventListener(barmatz.events.FormModelEvent.SUBMITTING, onModelSubmitting);
-		model.removeEventListener(barmatz.events.FormModelEvent.SUBMITTED, onModelSubmitted);
-		model.removeEventListener(barmatz.events.FormModelEvent.SUBMISSION_FAILED, onModelSubmitionFailed);
+		model.removeEventListener(barmatz.events.FormEvent.SUBMITTING, onModelSubmitting);
+		model.removeEventListener(barmatz.events.FormEvent.SUBMITTED, onModelSubmitted);
+		model.removeEventListener(barmatz.events.FormEvent.SUBMISSION_FAILED, onModelSubmitionFailed);
 	}
 	 
 	function addLoadingDialog()
@@ -41,16 +38,21 @@ window.barmatz.forms.FormController = function(model, formView, submitButtonView
 		barmatz.forms.factories.DOMFactory.destroyLoadingDialog(loadingDialog);
 		loadingDialog = null;
 	}
-	 
-	function onViewSubmit(event)
+	
+	function submit()
 	{
 		if(!submittingForm)
 		{
 			addModelListeners();
 			
-			if(model.isValid)
+			if(model.isValid())
 				model.submit();
 		}
+	}
+	 
+	function onViewSubmit(event)
+	{
+		submit();
 	}
 	 
 	function onModelSubmitting(event)
@@ -76,8 +78,5 @@ window.barmatz.forms.FormController = function(model, formView, submitButtonView
 		removeLoadingDialog();
 	 }
 };
-
 barmatz.forms.FormController.prototype = new barmatz.mvc.Controller();
 barmatz.forms.FormController.prototype.constructor = barmatz.forms.FormController;
-
-Object.defineProperties(barmatz.forms.FormController.prototype, {});

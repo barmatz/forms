@@ -1,144 +1,142 @@
 /** barmatz.net.Loader **/
-window.barmatz.net.Loader = function()
+barmatz.net.Loader = function()
 {
 	barmatz.events.EventDispatcher.call(this);
 	
 	this.__xhr = null;
 };
 
+barmatz.net.Loader.UNSENT = 'UNSENT';
+barmatz.net.Loader.OPENED = 'OPENED';
+barmatz.net.Loader.HEADERS_RECEIVED = 'HEADERS_RECEIVED';
+barmatz.net.Loader.LOADING = 'LOADING';
+barmatz.net.Loader.DONE = 'DONE';
+barmatz.net.Loader.serialize = function(object, prefix)
+{
+	var result, key, value;
+	
+	barmatz.utils.DataTypes.isNotUndefined(object);
+	
+	result = [];
+	 
+	for(key in object)
+	{
+		value = object[key];
+		key = prefix ? prefix + "[" + key + "]" : key;
+		result.push(typeof value == "object" ? this.serialize(value, key) : encodeURIComponent(key) + "=" + encodeURIComponent(value));
+	}
+	
+	return result.join("&");
+};
 barmatz.net.Loader.prototype = new barmatz.events.EventDispatcher();
 barmatz.net.Loader.prototype.constructor = barmatz.net.Loader;
+barmatz.net.Loader.prototype._xhr = function()
+{
+	if(!this.__xhr)
+		this.__xhr = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject('Microsoft.XMLHTTP');
+		
+	if(!this.__xhr)
+		throw new Error('XMLHttpRequest is not supported');
+	
+	return this.__xhr;
+};
+barmatz.net.Loader.prototype.getState = function()
+{
+	switch(this._xhr().readyState)
+	{
+		case 0:
+			return barmatz.net.Loader.UNSENT;
+			break;
+		case 1:
+			return barmatz.net.Loader.OPENED;
+			break;
+		case 2:
+			return barmatz.net.Loader.HEADERS_RECEIVED;
+			break;
+		case 3:
+			return barmatz.net.Loader.LOADING;
+			break;
+		case 4:
+			return barmatz.net.Loader.DONE;
+			break;
+	}
+};
+barmatz.net.Loader.prototype.abort = function()
+{
+	this._xhr().abort();
+};
+barmatz.net.Loader.prototype.load = function(request)
+{
+	var _this, xhr, url, data, credentials, headers, contentTypeSet, params, i;
+	
+	barmatz.utils.DataTypes.isInstanceOf(request, barmatz.net.Request);
+	
+	_this = this;
+	xhr = this._xhr();
+	url = request.getURL();
+	data = request.getData();
+	credentials = request.getCredentials();
+	headers = request.getHeaders();
 
-Object.defineProperties(barmatz.net.Loader,
-{
-	UNSENT: {value: 'UNSENT'},
-	OPENED: {value: 'OPENED'},
-	HEADERS_RECEIVED: {value: 'HEADERS_RECEIVED'},
-	LOADING: {value: 'LOADING'},
-	DONE: {value: 'DONE'},
-	serialize: {value: function(object)
-	{
-		var params = [], key, value;
-		
-		for(key in object)
+	if(data && request.getMethod() == barmatz.net.Methods.GET)
+		url += (url.indexOf('?') > -1 ? '&' : '?') + barmatz.net.Loader.serialize(data);
+	
+	xhr.addEventListener('readystatechange', onReadyStateChange);
+	
+	params = [request.getMethod(), url, request.getAsync()];
+	
+	if(credentials)
+		params.push(credentials.getUser() || null, credentials.getPassword() || null);
+	
+	xhr.open.apply(xhr, params);
+	
+	if(headers)
+		for(i = 0; i < headers.length; i++)
 		{
-			value = object[key];
-			key = encodeURIComponent(key);
-			
-			if(typeof value == 'object')
-			{
-				if(value instanceof Array)
-					params.push(key + '=' + value.join('&' + key + '='));
-				else
-					params.push(this.serialize(value));
-			}
-			else
-				params.push(key + '=' + encodeURIComponent(value));
+			xhr.setRequestHeader(headers[i].getHeader(), headers[i].getValue());
+			if(headers[i].getHeader().toLowerCase() == 'content-type')
+				contentTypeSet = true;
 		}
-		
-		return params.join('&');
-	}}
-}); 
-Object.defineProperties(barmatz.net.Loader.prototype, 
-{
-	_xhr: {get: function()
+	
+	if(!contentTypeSet)
+		xhr.setRequestHeader('Content-Type', barmatz.net.Encoding.FORM);
+	
+	params = [];
+	
+	if(request.getMethod() == barmatz.net.Methods.POST)
+		params.push(barmatz.net.Loader.serialize(data));
+	
+	xhr.send.apply(xhr, params);
+	
+	function onReadyStateChange(event)
 	{
-		if(!this.__xhr)
-			this.__xhr = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject('Microsoft.XMLHTTP');
+		var type, response;
 		
-		return this.__xhr;
-	}},
-	state: {get: function()
-	{
-		switch(this._xhr.readyState)
+		switch(event.target.readyState)
 		{
 			case 0:
-				return barmatz.net.Loader.UNSENT;
-				break;
+				type = barmatz.events.LoaderEvent.UNSENT;
 			case 1:
-				return barmatz.net.Loader.OPENED;
+				if(!type)
+					type = barmatz.events.LoaderEvent.OPENED;
+				_this.dispatchEvent(new barmatz.events.LoaderEvent(barmatz.events.LoaderEvent.OPENED, request));
 				break;
 			case 2:
-				return barmatz.net.Loader.HEADERS_RECEIVED;
+				_this.dispatchEvent(new barmatz.events.LoaderEvent(barmatz.events.LoaderEvent.HEADERS_RECEIVED, request));
 				break;
 			case 3:
-				return barmatz.net.Loader.LOADING;
+				_this.dispatchEvent(new barmatz.events.LoaderEvent(barmatz.events.LoaderEvent.LOADING, request));
 				break;
 			case 4:
-				return barmatz.net.Loader.DONE;
+				response = new barmatz.net.Response(request.getURL(), xhr.responseText, xhr.responseType || '', xhr.status, xhr.getAllResponseHeaders().split('\n'));
+
+				_this.dispatchEvent(new barmatz.events.LoaderEvent(barmatz.events.LoaderEvent.COMPLETE));
+				
+				if(response.getStatus() == 200)
+					_this.dispatchEvent(new barmatz.events.LoaderEvent(barmatz.events.LoaderEvent.SUCCESS, response));
+				else
+					_this.dispatchEvent(new barmatz.events.LoaderEvent(barmatz.events.LoaderEvent.ERROR, response));
 				break;
 		}
-	}},
-	abort: {value: function()
-	{
-		this._xhr.abort();
-	}},
-	load: {value: function(request)
-	{
-		var _this, url, contentTypeSet, i;
-		
-		barmatz.utils.DataTypes.isNotUndefined(request);
-		barmatz.utils.DataTypes.isInstanceOf(request, barmatz.net.Request);
-		
-		_this = this;
-		url = request.url;
-
-		if(request.data && request.method == barmatz.net.Methods.GET)
-			url += (url.indexOf('?') > -1 ? '&' : '?') + barmatz.net.Loader.serialize(request.data);
-		
-		this._xhr.addEventListener('readystatechange', onReadyStateChange);
-		
-		if(request.credentials)
-			this._xhr.open(request.method, url, request.async, request.credentials.user ? request.credentials.user : null, reqeust.credentials.password ? reqeust.credentials.password : null);
-		else
-			this._xhr.open(request.method, url, request.async);
-		
-		if(request.headers)
-			for(i = 0; i < request.headers.length; i++)
-			{
-				this._xhr.setRequestHeader(request.headers[i].header, request.headers[i].value);
-				if(request.headers[i].header.toLowerCase() == 'content-type')
-					contentTypeSet = true;
-			}
-		
-		if(!contentTypeSet)
-			this._xhr.setRequestHeader('Content-Type', barmatz.net.Encoding.FORM);
-		
-		if(request.method == barmatz.net.Methods.POST)
-			this._xhr.send(barmatz.net.Loader.serialize(request.data));
-		else
-			this._xhr.send();
-		
-		function onReadyStateChange(event)
-		{
-			var type, response;
-			
-			switch(event.target.readyState)
-			{
-				case 0:
-					type = barmatz.events.LoaderEvent.UNSENT;
-				case 1:
-					if(!type)
-						type = barmatz.events.LoaderEvent.OPENED;
-					_this.dispatchEvent(new barmatz.events.LoaderEvent(barmatz.events.LoaderEvent.OPENED, request));
-					break;
-				case 2:
-					_this.dispatchEvent(new barmatz.events.LoaderEvent(barmatz.events.LoaderEvent.HEADERS_RECEIVED, request));
-					break;
-				case 3:
-					_this.dispatchEvent(new barmatz.events.LoaderEvent(barmatz.events.LoaderEvent.LOADING, request));
-					break;
-				case 4:
-					response = new barmatz.net.Response(request.url, _this._xhr.responseText, _this._xhr.responseType || '', _this._xhr.status, _this._xhr.getAllResponseHeaders().split('\n'));
-
-					_this.dispatchEvent(new barmatz.events.LoaderEvent(barmatz.events.LoaderEvent.COMPLETE));
-					
-					if(response.status == 200)
-						_this.dispatchEvent(new barmatz.events.LoaderEvent(barmatz.events.LoaderEvent.SUCCESS, response));
-					else
-						_this.dispatchEvent(new barmatz.events.LoaderEvent(barmatz.events.LoaderEvent.ERROR, response));
-					break;
-			}
-		}
-	}}
-});
+	}
+};

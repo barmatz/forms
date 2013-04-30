@@ -1,23 +1,17 @@
 /** barmatz.forms.ui.LeadsController **/
-window.barmatz.forms.ui.LeadsController = function(userModel, formsListModel, formsListView, leadsListModel, leadsListWrapperView, leadsListView, containerView, panelsView)
+barmatz.forms.ui.LeadsController = function(userModel, formsListModel, formsListView, leadsListModel, leadsListWrapperView, leadsListView, containerView, panelsView, dialogContainerView)
 {
 	var formsListDictionary, loadingDialog;
 	
-	barmatz.utils.DataTypes.isNotUndefined(userModel);
-	barmatz.utils.DataTypes.isNotUndefined(formsListModel);
-	barmatz.utils.DataTypes.isNotUndefined(formsListView);
-	barmatz.utils.DataTypes.isNotUndefined(leadsListModel);
-	barmatz.utils.DataTypes.isNotUndefined(leadsListWrapperView);
-	barmatz.utils.DataTypes.isNotUndefined(leadsListView);
-	barmatz.utils.DataTypes.isNotUndefined(containerView);
-	barmatz.utils.DataTypes.isNotUndefined(panelsView);
 	barmatz.utils.DataTypes.isInstanceOf(userModel, barmatz.forms.users.UserModel);
 	barmatz.utils.DataTypes.isInstanceOf(formsListModel, barmatz.forms.CollectionModel);
+	barmatz.utils.DataTypes.isInstanceOf(formsListView, window.HTMLElement);
 	barmatz.utils.DataTypes.isInstanceOf(leadsListModel, barmatz.forms.CollectionModel);
-	barmatz.utils.DataTypes.isInstanceOf(leadsListWrapperView, HTMLElement);
-	barmatz.utils.DataTypes.isInstanceOf(leadsListView, HTMLElement);
-	barmatz.utils.DataTypes.isInstanceOf(containerView, HTMLElement);
-	barmatz.utils.DataTypes.isInstanceOf(panelsView, HTMLElement);
+	barmatz.utils.DataTypes.isInstanceOf(leadsListWrapperView, window.HTMLElement);
+	barmatz.utils.DataTypes.isInstanceOf(leadsListView, window.HTMLElement);
+	barmatz.utils.DataTypes.isInstanceOf(containerView, window.HTMLElement);
+	barmatz.utils.DataTypes.isInstanceOf(panelsView, window.HTMLElement);
+	barmatz.utils.DataTypes.isInstanceOf(dialogContainerView, window.HTMLElement, true);
 	barmatz.mvc.Controller.call(this);
 	
 	formsListDictionary = new barmatz.utils.Dictionary();
@@ -35,19 +29,23 @@ window.barmatz.forms.ui.LeadsController = function(userModel, formsListModel, fo
 	function alertError(message)
 	{
 		barmatz.forms.factories.ControllerFactory.createJQueryDialogController(
-			barmatz.forms.factories.DOMFactory.createAlertPromptDialog('Error', message, true)
+			barmatz.forms.factories.DOMFactory.createAlertPromptDialog('Error', message, true, dialogContainerView)
 		);
 	}
 	
 	function addLoadingDialog()
 	{
-		loadingDialog = barmatz.forms.factories.DOMFactory.createLoadingDialog();
+		if(!loadingDialog)
+			loadingDialog = barmatz.forms.factories.DOMFactory.createLoadingDialog();
 	}
 	 
 	function removeLoadingDialog()
 	{
-		barmatz.forms.factories.DOMFactory.destroyLoadingDialog(loadingDialog);
-		loadingDialog = null;
+		if(loadingDialog)
+		{
+			barmatz.forms.factories.DOMFactory.destroyLoadingDialog(loadingDialog);
+			loadingDialog = null;
+		}
 	}
 	
 	function populateLeadsListView()
@@ -59,7 +57,7 @@ window.barmatz.forms.ui.LeadsController = function(userModel, formsListModel, fo
 	function emptyLeadsListModel()
 	{
 		var i;
-		for(i = leadsListModel.numItems; i > 0; i--)
+		for(i = leadsListModel.getNumItems(); i > 0; i--)
 			leadsListModel.removeItemAt(i - 1);
 	}
 	
@@ -70,7 +68,6 @@ window.barmatz.forms.ui.LeadsController = function(userModel, formsListModel, fo
 	
 	function loadLead(model)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(model);
 		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.FormModel);
 		emptyLeadsListModel();
 		addFormModelListeners(model);
@@ -80,30 +77,28 @@ window.barmatz.forms.ui.LeadsController = function(userModel, formsListModel, fo
 	
 	function addUserModelListeners()
 	{
-		userModel.addEventListener(barmatz.events.UserModelEvent.GET_FORMS_SUCCESS, onUserModelGetFormsSuccess);
-		userModel.addEventListener(barmatz.events.UserModelEvent.GET_FORMS_FAIL, onUserModelGetFormsFail);
+		userModel.addEventListener(barmatz.events.UserEvent.GET_FORMS_SUCCESS, onUserModelGetFormsSuccess);
+		userModel.addEventListener(barmatz.events.UserEvent.GET_FORMS_FAIL, onUserModelGetFormsFail);
 	}
 	
 	function removeUserModelListeners()
 	{
-		userModel.removeEventListener(barmatz.events.UserModelEvent.GET_FORMS_SUCCESS, onUserModelGetFormsSuccess);
-		userModel.removeEventListener(barmatz.events.UserModelEvent.GET_FORMS_FAIL, onUserModelGetFormsFail);
+		userModel.removeEventListener(barmatz.events.UserEvent.GET_FORMS_SUCCESS, onUserModelGetFormsSuccess);
+		userModel.removeEventListener(barmatz.events.UserEvent.GET_FORMS_FAIL, onUserModelGetFormsFail);
 	}
 	
 	function addFormModelListeners(model)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(model);
 		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.FormModel);
-		model.addEventListener(barmatz.events.FormModelEvent.GET_LEADS_SUCCESS, onFormModelGetLeadsSuccess);
-		model.addEventListener(barmatz.events.FormModelEvent.GET_LEADS_FAIL, onFormModelGetLeadsFail);
+		model.addEventListener(barmatz.events.FormEvent.GET_LEADS_SUCCESS, onFormModelGetLeadsSuccess);
+		model.addEventListener(barmatz.events.FormEvent.GET_LEADS_FAIL, onFormModelGetLeadsFail);
 	}
 	
 	function removeFormModelListeners(model)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(model);
 		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.FormModel);
-		model.removeEventListener(barmatz.events.FormModelEvent.GET_LEADS_SUCCESS, onFormModelGetLeadsSuccess);
-		model.removeEventListener(barmatz.events.FormModelEvent.GET_LEADS_FAIL, onFormModelGetLeadsFail);
+		model.removeEventListener(barmatz.events.FormEvent.GET_LEADS_SUCCESS, onFormModelGetLeadsSuccess);
+		model.removeEventListener(barmatz.events.FormEvent.GET_LEADS_FAIL, onFormModelGetLeadsFail);
 	}
 	
 	function onLeadsListModelItemAdded(event)
@@ -113,7 +108,7 @@ window.barmatz.forms.ui.LeadsController = function(userModel, formsListModel, fo
 	
 	function onLeadsListModelItemRemoved(event)
 	{
-		if(leadsListModel.numItems == 0)
+		if(leadsListModel.getNumItems() == 0)
 			emptyLeadsListView();
 	}
 	
@@ -121,41 +116,47 @@ window.barmatz.forms.ui.LeadsController = function(userModel, formsListModel, fo
 	{
 		var element;
 		
-		barmatz.utils.DataTypes.isNotUndefined(event);
 		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.CollectionEvent);
 		
-		element = formsListView.childNodes[event.index];
+		element = formsListView.children[event.getIndex()];
 		
-		formsListDictionary.add(event.item, element);
-		element.addEventListener('click', onFormsListItemClick);
+		formsListDictionary.add(event.getItem(), element);
+		
+		if(element)
+			element.addEventListener('click', onFormsListItemClick);
 	}
 	
 	function onFormsListModelItemRemoved(event)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(event);
+		var item;
+		
 		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.CollectionEvent);
 		
-		formsListDictionary.get(event.item).removeEventListener('click', onFormsListItemClick);
-		formsListDictionary.remove(event.item);
+		item = event.getItem();
+		
+		formsListDictionary.get(item).removeEventListener('click', onFormsListItemClick);
+		formsListDictionary.remove(item);
 	}
 	
 	function onFormsListItemClick(event)
 	{
+		barmatz.utils.DataTypes.isInstanceOf(event, MouseEvent);
 		loadLead(formsListDictionary.find(event.target));
 	}
 	
 	function onUserModelGetFormsSuccess(event)
 	{
-		var i;
+		var forms, i;
 		
-		barmatz.utils.DataTypes.isNotUndefined(event);
-		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.UserModelEvent);
+		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.UserEvent);
 		
 		removeUserModelListeners();
 		removeLoadingDialog();
 		
-		for(i = 0; i < event.forms.length; i++)
-			formsListModel.addItem(event.forms[i]);
+		forms = event.getForms();
+		
+		for(i = 0; i < forms.length; i++)
+			formsListModel.addItem(forms[i]);
 	}
 	
 	function onUserModelGetFormsFail(event)
@@ -167,33 +168,26 @@ window.barmatz.forms.ui.LeadsController = function(userModel, formsListModel, fo
 	
 	function onFormModelGetLeadsSuccess(event)
 	{
-		var model, data, i;
+		var leads, i;
 		
-		barmatz.utils.DataTypes.isNotUndefined(event);
-		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.FormModelEvent);
+		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.FormEvent);
 		
-		removeFormModelListeners(event.target);
+		removeFormModelListeners(event.getTarget());
 		removeLoadingDialog();
 		
-		for(i = 0; i < event.leads.length; i++)
-		{
-			data = event.leads[i];
-			model = barmatz.forms.factories.ModelFactory.createLeadModel();
-			model.created = barmatz.utils.Date.toDate(data.created);
-			model.data = data.data;
-			model.ip = data.ip;
-			model.referer = data.referer;
-			leadsListModel.addItem(model);
-		}
+		leads = event.getLeads();
+		
+		for(i = 0; i < leads.length; i++)
+			leadsListModel.addItem(leads[i]);
 	}
 	
 	function onFormModelGetLeadsFail(event)
 	{
-		removeFormModelListeners(event.target);
+		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.FormEvent);
+		removeFormModelListeners(event.getTarget());
 		removeLoadingDialog();
 		alertError('Error getting leads');
 	}
 };
-
 barmatz.forms.ui.LeadsController.prototype = new barmatz.mvc.Controller();
 barmatz.forms.ui.LeadsController.prototype.constructor = barmatz.forms.ui.LeadsController;

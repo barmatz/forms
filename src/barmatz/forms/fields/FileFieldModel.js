@@ -1,36 +1,29 @@
 /** barmatz.forms.fields.FileFieldModel **/
-window.barmatz.forms.fields.FileFieldModel = function(name)
+barmatz.forms.fields.FileFieldModel = function(name)
 {
-	barmatz.utils.DataTypes.isNotUndefined(name);
 	barmatz.utils.DataTypes.isTypeOf(name, 'string');
-	
 	barmatz.forms.fields.FieldModel.call(this, barmatz.forms.fields.FieldTypes.FILE, name);
-	
 	this.set('accept', []);
 };
-
 barmatz.forms.fields.FileFieldModel.prototype = new barmatz.forms.fields.FieldModel(null, null);
 barmatz.forms.fields.FileFieldModel.prototype.constructor = barmatz.forms.fields.FileFieldModel;
-
-Object.defineProperties(barmatz.forms.fields.FileFieldModel.prototype,
+barmatz.forms.fields.FileFieldModel.prototype.getAccept = function()
 {
-	accept: {get: function()
-	{
-		return this.get('accept');
-	}, set: function(value)
-	{
-		barmatz.utils.DataTypes.isInstanceOf(value, Array);
-		this.set('accept', value);
-	}},
-	clone: {value: function()
-	{
-		var clone = new barmatz.forms.fields.FileFieldModel(this.name);
-		clone.label = this.label;
-		clone.mandatory = this.mandatory;
-		clone.value = this.value;
-		clone.enabled = this.enabled;
-		clone.validator = this.validator.clone();
-		clone.accept = this.accept;
-		return clone;
-	}}
-});
+	return this.get('accept');
+};
+barmatz.forms.fields.FileFieldModel.prototype.setAccept = function(value)
+{
+	barmatz.utils.DataTypes.isInstanceOf(value, window.Array);
+	this.set('accept', value);
+};
+barmatz.forms.fields.FileFieldModel.prototype.clone = function()
+{
+	var clone = new barmatz.forms.fields.FileFieldModel(this.getName());
+	clone.setLabel(this.getLabel());
+	clone.setMandatory(this.getMandatory());
+	clone.setValue(this.getValue());
+	clone.setEnabled(this.getEnabled());
+	clone.setValidator(this.getValidator().clone());
+	clone.setAccept(this.getAccept());
+	return clone;
+};

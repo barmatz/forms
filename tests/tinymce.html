@@ -1,0 +1,36 @@
+<!doctype html>
+<html>
+	<head></head>
+	<body>
+		<textarea id="foo"></textarea>
+		<script src="../libs/tinymce-dev/tinymce.js"></script>
+		<script src="../libs/tinymce-dev/themes/modern/theme.js"></script>
+		<script>
+		var body = document.getElementsByTagName('body')[0];
+			
+		function add()
+		{
+			var element = body.appendChild(document.createElement('textarea'));
+			element.id = 'e' + new Date().getTime();
+			var id = element.id;
+			var settings = {
+				plugins: 'advlist autolink lists link image charmap print preview hr anchor pagebreak ' +
+						 'searchreplace wordcount visualblocks visualchars code fullscreen ' +
+						 'insertdatetime media nonbreaking save table contextmenu directionality ' +
+						 'emoticons template paste',
+				toolbar1: 'insertfile undo redo | styleselect | bold italic | ' +
+						  'alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | ' +
+						  'link image'
+			};
+			var editor = new tinymce.Editor(id, settings, tinymce.EditorManager);
+			editor.on('init', function(event){
+				console.log(event);
+			});
+			editor.render();
+		}
+		
+		add();
+		add();
+		</script>
+	</body>
+</html>

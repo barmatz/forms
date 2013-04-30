@@ -1,13 +1,12 @@
 /** barmatz.events.EventDispatcher **/
-window.barmatz.events.EventDispatcher = function(target)
+barmatz.events.EventDispatcher = function(target)
 {
 	this._target = target || this;
 	this._listeners = {};
 };
 
-Object.defineProperties(barmatz.events.EventDispatcher.prototype, 
-{
-	addEventListener: {value: function(type, listener)
+barmatz.events.EventDispatcher.prototype = {
+	addEventListener: function(type, listener)
 	{
 		barmatz.utils.DataTypes.isTypeOf(type, 'string');
 		barmatz.utils.DataTypes.isTypeOf(listener, 'function');
@@ -16,10 +15,10 @@ Object.defineProperties(barmatz.events.EventDispatcher.prototype,
 			this._listeners[type] = [];
 		
 		this._listeners[type].push(listener);
-	}},
-	dispatchEvent: {value: function(event)
+	},
+	dispatchEvent: function(event)
 	{
-		var i, c;
+		var queue, i, c;
 		
 		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.Event);
 		
@@ -27,20 +26,23 @@ Object.defineProperties(barmatz.events.EventDispatcher.prototype,
 		
 		for(i in this._listeners)
 		{
-			if(i === event.type)
+			if(i === event.getType())
+			{
+				queue = [];
+				
 				for(c = 0; c < this._listeners[i].length; c++)
-				{
-					this._listeners[i][c].call(this, event);
-					if(!this._listeners[i])
-						break;
-				}
+					queue.push(this._listeners[i][c]);
+				
+				for(c = 0; c < queue.length; c++)
+					queue[c].call(this, event);
+			}
 		}
-	}},
-	hasEventListener: {value: function(type)
+	},
+	hasEventListener: function(type)
 	{
 		return this._listeners[type] ? true : false;
-	}},
-	removeEventListener: {value: function(type, listener)
+	},
+	removeEventListener: function(type, listener)
 	{
 		var i;
 		
@@ -53,8 +55,8 @@ Object.defineProperties(barmatz.events.EventDispatcher.prototype,
 			if(this._listeners[type].length == 0)
 				delete this._listeners[type];
 		}
-	}},
-	toJSON: {value: function()
+	},
+	toJSON: function()
 	{
 		var object, i;
 		
@@ -67,5 +69,5 @@ Object.defineProperties(barmatz.events.EventDispatcher.prototype,
 		delete object._listeners;
 		
 		return object;
-	}}
-});
+	}
+};

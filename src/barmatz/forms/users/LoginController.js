@@ -1,18 +1,14 @@
-/** barmatz.forms.users.LogingController **/
-window.barmatz.forms.users.LogingController = function(model, userNameFieldView, passwordFieldView, submitButtonView, errorFieldView)
+/** barmatz.forms.users.LoginController **/
+barmatz.forms.users.LoginController = function(model, userNameFieldView, passwordFieldView, submitButtonView, errorFieldView, dialogContainerView)
 {
 	var errorFieldViewCachedDisplay, loadingView;
 	
-	barmatz.utils.DataTypes.isNotUndefined(model);
-	barmatz.utils.DataTypes.isNotUndefined(userNameFieldView);
-	barmatz.utils.DataTypes.isNotUndefined(passwordFieldView);
-	barmatz.utils.DataTypes.isNotUndefined(submitButtonView);
-	barmatz.utils.DataTypes.isNotUndefined(errorFieldView);
 	barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.users.UserModel);
-	barmatz.utils.DataTypes.isInstanceOf(userNameFieldView, HTMLElement);
-	barmatz.utils.DataTypes.isInstanceOf(passwordFieldView, HTMLElement);
-	barmatz.utils.DataTypes.isInstanceOf(submitButtonView, HTMLElement);
-	barmatz.utils.DataTypes.isInstanceOf(errorFieldView, HTMLElement);
+	barmatz.utils.DataTypes.isInstanceOf(userNameFieldView, HTMLInputElement);
+	barmatz.utils.DataTypes.isInstanceOf(passwordFieldView, HTMLInputElement);
+	barmatz.utils.DataTypes.isInstanceOf(submitButtonView, window.HTMLElement);
+	barmatz.utils.DataTypes.isInstanceOf(errorFieldView, window.HTMLElement);
+	barmatz.utils.DataTypes.isInstanceOf(dialogContainerView, window.HTMLElement, true);
 	barmatz.mvc.Controller.call(this);
 	
 	hideErrorFieldView();
@@ -32,7 +28,7 @@ window.barmatz.forms.users.LogingController = function(model, userNameFieldView,
 	
 	function showLoading()
 	{
-		loadingView = barmatz.forms.factories.DOMFactory.createLoadingDialog();
+		loadingView = barmatz.forms.factories.DOMFactory.createLoadingDialog(dialogContainerView);
 	}
 	
 	function hideLoading()
@@ -43,16 +39,16 @@ window.barmatz.forms.users.LogingController = function(model, userNameFieldView,
 	
 	function waitingForServer()
 	{
-		model.addEventListener(barmatz.events.UserModelEvent.LOGIN_SUCCESS, onModelLoginSuccess);
-		model.addEventListener(barmatz.events.UserModelEvent.LOGIN_FAIL, onModelLoginFail);
+		model.addEventListener(barmatz.events.UserEvent.LOGIN_SUCCESS, onModelLoginSuccess);
+		model.addEventListener(barmatz.events.UserEvent.LOGIN_FAIL, onModelLoginFail);
 		submitButtonView.removeEventListener('click', onSubmitButtonClick);
 		window.removeEventListener('keydown', onKeyDown);
 	}
 	
 	function waitingForInput()
 	{
-		model.removeEventListener(barmatz.events.UserModelEvent.LOGIN_SUCCESS, onModelLoginSuccess);
-		model.removeEventListener(barmatz.events.UserModelEvent.LOGIN_FAIL, onModelLoginFail);
+		model.removeEventListener(barmatz.events.UserEvent.LOGIN_SUCCESS, onModelLoginSuccess);
+		model.removeEventListener(barmatz.events.UserEvent.LOGIN_FAIL, onModelLoginFail);
 		submitButtonView.addEventListener('click', onSubmitButtonClick);
 		window.addEventListener('keydown', onKeyDown);
 	}
@@ -66,7 +62,6 @@ window.barmatz.forms.users.LogingController = function(model, userNameFieldView,
 	
 	function onKeyDown(event)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(event);
 		barmatz.utils.DataTypes.isInstanceOf(event, KeyboardEvent);
 		
 		if(event.keyCode == 13)
@@ -75,17 +70,14 @@ window.barmatz.forms.users.LogingController = function(model, userNameFieldView,
 	
 	function onSubmitButtonClick(event)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(event);
-		barmatz.utils.DataTypes.isInstanceOf(event, MouseEvent);
 		submit();
 	}
 	
 	function onModelLoginSuccess(event)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(event);
-		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.UserModelEvent);
+		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.UserEvent);
 		
-		location.href = event.targetURL;
+		location.href = event.getTargetURL();
 		hideLoading();
 		hideErrorFieldView();
 		waitingForInput();

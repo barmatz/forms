@@ -1,5 +1,5 @@
 /** barmatz.forms.ui.TableOptions **/
-window.barmatz.forms.ui.TableOptions = function()
+barmatz.forms.ui.TableOptions = function()
 {
 	this._headClassName = '';
 	this._headColumns = [];
@@ -12,78 +12,86 @@ window.barmatz.forms.ui.TableOptions = function()
 	this._className = '';
 };
 
-Object.defineProperties(barmatz.forms.ui.TableOptions.prototype, 
-{
-	headClassName: {get: function()
+barmatz.forms.ui.TableOptions.prototype = {
+	getHeadClassName: function()
 	{
 		return this._headClassName;
-	}, set: function(value)
+	},
+	setHeadClassName: function(value)
 	{
 		barmatz.utils.DataTypes.isTypeOf(value, 'string', true);
 		this._headClassName = value;
-	}},
-	headColumns: {get: function()
+	},
+	getHeadColumns: function()
 	{
 		return this._headColumns;
-	}, set: function(value)
+	},
+	setHeadColumns: function(value)
 	{
-		barmatz.utils.DataTypes.isInstanceOf(value, Array, true);
+		barmatz.utils.DataTypes.isInstanceOf(value, window.Array, true);
 		this._headColumns = value;
-	}},
-	headColumnsClassNames: {get: function()
+	},
+	getHeadColumnsClassNames: function()
 	{
 		return this._headColumnsClassNames;
-	}, set: function(value)
+	},
+	setHeadColumnsClassNames: function(value)
 	{
-		barmatz.utils.DataTypes.isInstanceOf(value, Array, true);
+		barmatz.utils.DataTypes.isInstanceOf(value, window.Array, true);
 		this._headColumnsClassNames = value;
-	}},
-	headRowClassName: {get: function()
+	},
+	getHeadRowClassName: function()
 	{
 		return this._headRowClassName;
-	}, set: function(value)
+	},
+	setHeadRowClassName: function(value)
 	{
 		barmatz.utils.DataTypes.isTypeOf(value, 'string', true);
 		this._headRowClassName = value;
-	}},
-	bodyClassName: {get: function()
+	},
+	getBodyClassName: function()
 	{
 		return this._bodyClassName;
-	}, set: function(value)
+	},
+	setBodyClassName: function(value)
 	{
 		barmatz.utils.DataTypes.isTypeOf(value, 'string', true);
 		this._bodyClassName = value;
-	}},
-	bodyColumnsClassNames: {get: function()
+	},
+	getBodyColumnsClassNames: function()
 	{
 		return this._bodyColumnsClassNames;
-	}, set: function(value)
+	},
+	setBodyColumnsClassNames: function(value)
 	{
-		barmatz.utils.DataTypes.isInstanceOf(value, Array, true);
+		barmatz.utils.DataTypes.isInstanceOf(value, window.Array, true);
 		this._bodyColumnsClassNames = value;
-	}},
-	bodyRows: {get: function()
+	},
+	getBodyRows: function()
 	{
 		return this._bodyRows;
-	}, set: function(value)
+	},
+	setBodyRows: function(value)
 	{
-		barmatz.utils.DataTypes.isInstanceOf(value, Array, true);
+		barmatz.utils.DataTypes.isInstanceOf(value, window.Array, true);
 		this._bodyRows = value;
-	}},
-	bodyRowsClassNames: {get: function()
+	},
+	getBodyRowsClassNames: function()
 	{
 		return this._bodyRowsClassNames;
-	}, set: function(value)
+	},
+	setBodyRowsClassNames: function(value)
 	{
-		barmatz.utils.DataTypes.isInstanceOf(value, Array, true);
+		barmatz.utils.DataTypes.isInstanceOf(value, window.Array, true);
 		this._bodyRowsClassNames = value;
-	}},
-	className: {get: function()
+	},
+	getClassName: function()
 	{
 		return this._className;
-	}, set: function(value)
+	},
+	setClassName: function(value)
 	{
 		barmatz.utils.DataTypes.isTypeOf(value, 'string', true);
 		this._className = value;
-	}}
-});
+	}
+};

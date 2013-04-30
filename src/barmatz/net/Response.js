@@ -1,15 +1,11 @@
 /** barmatz.net.Response **/
-window.barmatz.net.Response = function(url, data, type, status, headers)
+barmatz.net.Response = function(url, data, type, status, headers)
 {
-	barmatz.utils.DataTypes.isNotUndefined(url);
-	barmatz.utils.DataTypes.isTypeOf(url, 'string');
 	barmatz.utils.DataTypes.isNotUndefined(data);
-	barmatz.utils.DataTypes.isNotUndefined(type);
+	barmatz.utils.DataTypes.isTypeOf(url, 'string');
 	barmatz.utils.DataTypes.isTypeOf(type, 'string');
-	barmatz.utils.DataTypes.isNotUndefined(status);
 	barmatz.utils.DataTypes.isTypeOf(status, 'number');
-	barmatz.utils.DataTypes.isNotUndefined(headers);
-	barmatz.utils.DataTypes.isInstanceOf(headers, Array);
+	barmatz.utils.DataTypes.isInstanceOf(headers, window.Array);
 	barmatz.mvc.Model.call(this);
 	this.set('url', url);
 	this.set('data', data);
@@ -17,30 +13,25 @@ window.barmatz.net.Response = function(url, data, type, status, headers)
 	this.set('status', status);
 	this.set('headers', headers);
 };
-
 barmatz.net.Response.prototype = new barmatz.mvc.Model();
 barmatz.net.Response.prototype.constructor = barmatz.net.Response;
-
-Object.defineProperties(barmatz.net.Response.prototype,
+barmatz.net.Response.prototype.getURL = function()
 {
-	url: {get: function()
-	{
-		return this.get('url');
-	}},
-	data: {get: function()
-	{
-		return this.get('data');
-	}},
-	type: {get: function()
-	{
-		return this.get('type');
-	}},
-	status: {get: function()
-	{
-		return this.get('status');
-	}},
-	headers: {get: function()
-	{
-		return this.get('headers');
-	}}
-});
+	return this.get('url');
+};
+barmatz.net.Response.prototype.getData = function()
+{
+	return this.get('data');
+};
+barmatz.net.Response.prototype.getType = function()
+{
+	return this.get('type');
+};
+barmatz.net.Response.prototype.getStatus = function()
+{
+	return this.get('status');
+};
+barmatz.net.Response.prototype.getHeaders = function()
+{
+	return this.get('headers');
+};

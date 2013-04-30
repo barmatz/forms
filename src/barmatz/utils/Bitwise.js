@@ -1,14 +1,9 @@
 /** barmatz.utils.Bitwise **/
-window.barmatz.utils.Bitwise = function(){};
-
-Object.defineProperties(barmatz.utils.Bitwise,
-{
-	slice: {value: function(bitA, bitB)
+barmatz.utils.Bitwise = {
+	slice: function(bitA, bitB)
 	{
 		var bitsA, bitsB, index, i;
 		
-		barmatz.utils.DataTypes.isNotUndefined(bitA);
-		barmatz.utils.DataTypes.isNotUndefined(bitB);
 		barmatz.utils.DataTypes.isTypeOf(bitA, 'number');
 		barmatz.utils.DataTypes.isTypeOf(bitB, 'number');
 		
@@ -24,8 +19,8 @@ Object.defineProperties(barmatz.utils.Bitwise,
 		}
 		
 		return this.concat.apply(this, bitsA);
-	}},
-	concat: {value: function()
+	},
+	concat: function()
 	{
 		var result, filterredBits, bits, i;
 		
@@ -45,12 +40,11 @@ Object.defineProperties(barmatz.utils.Bitwise,
 			result += filterredBits[i];
 		
 		return result;
-	}},
-	parseBit: {value: function(bit)
+	},
+	parseBit: function(bit)
 	{
 		var bits, i;
 		
-		barmatz.utils.DataTypes.isNotUndefined(bit);
 		barmatz.utils.DataTypes.isTypeOf(bit, 'number');
 		
 		bits = [];
@@ -60,9 +54,9 @@ Object.defineProperties(barmatz.utils.Bitwise,
 				bits.push(i);
 		
 		return bits;
-	}},
-	contains: {value: function(bitA, bitB)
+	},
+	contains: function(bitA, bitB)
 	{
 		return bitA & bitB ? true : false;
-	}}
-});
+	}
+};

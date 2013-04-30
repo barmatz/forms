@@ -1,5 +1,5 @@
 /** namespaces **/
-window.barmatz = {
+barmatz = {
 	events: {},
 	forms: {
 		factories: {},

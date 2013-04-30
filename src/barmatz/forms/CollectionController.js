@@ -1,10 +1,12 @@
 /** barmatz.forms.CollectionController **/
-window.barmatz.forms.CollectionController = function(model, view)
+barmatz.forms.CollectionController = function(model, view)
 {
 	var _this = this;
 	
-	barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.CollectionModel, true);
-	barmatz.utils.DataTypes.isInstanceOf(view, HTMLElement, true);
+	barmatz.utils.DataTypes.isNotUndefined(model);
+	barmatz.utils.DataTypes.isNotUndefined(view);
+	barmatz.utils.DataTypes.isInstanceOf(model, barmatz.mvc.Model, true);
+	barmatz.utils.DataTypes.isInstanceOf(view, window.HTMLElement, true);
 	barmatz.mvc.Controller.call(this);
 
 	this._model = model;
@@ -22,34 +24,36 @@ window.barmatz.forms.CollectionController = function(model, view)
 	
 	function onModelItemAdded(event)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(event);
 		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.CollectionEvent);
-		_this._addItemModelToView(event.item);
+		_this._addItemModelToView(event.getItem());
 	}
 	
 	function onModelItemRemoved(event)
 	{
-		barmatz.utils.DataTypes.isNotUndefined(event);
+		var index;
+		
 		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.CollectionEvent);
 		
-		if(view.childNodes[event.index])
-			view.removeChild(view.childNodes[event.index]);
+		index = event.getIndex();
+		
+		if(view.children[index])
+			view.removeChild(view.children[index]);
 	}
 };
-
 barmatz.forms.CollectionController.prototype = new barmatz.mvc.Controller();
 barmatz.forms.CollectionController.prototype.constructor = barmatz.forms.CollectionController;
-
-Object.defineProperties(barmatz.forms.CollectionController.prototype,
+barmatz.forms.CollectionController.prototype._addItemModelToView = function(model)
 {
-	_addItemModelToView: {value: function(model)
-	{
-		barmatz.utils.DataTypes.isNotUndefined(model);
-		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.mvc.Model);
-		this._view.appendChild(this._createItemViewFromModel(model));
-	}},
-	_createItemViewFromModel: {value: function(model)
-	{
-		throw new Error('method must be overridden');
-	}}
-});
+	var view;
+	
+	barmatz.utils.DataTypes.isInstanceOf(model, barmatz.mvc.Model);
+	
+	view = this._createItemViewFromModel(model);
+	
+	if(view)
+		this._view.appendChild(view);
+};
+barmatz.forms.CollectionController.prototype._createItemViewFromModel = function(model)
+{
+	throw new Error('method must be overridden');
+};

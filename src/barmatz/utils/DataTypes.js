@@ -1,15 +1,12 @@
 /** barmatz.utils.DataTypes **/
-window.barmatz.utils.DataTypes = function(){};
-
-Object.defineProperties(barmatz.utils.DataTypes, 
-{
-	UNDEFINED_ERROR: {value: 'expected property is undefined'},
-	INVALID_VALUE_ERROR: {value: 'value is not valid'},
-	WRONG_TYPE: {value: 'data type is wrong'},
-	WRONG_INSTANCE: {value: 'instance is wrong object'},
-	WRONG_TYPE_INSTANCE: {value: 'data type is wrong or instance is wrong object'},
-	VALUE_NULL: {value: 'value is null'},
-	_recursiveVlidation: {value: function(value, collection, method, errorMessage, allowNull)
+barmatz.utils.DataTypes = {
+	UNDEFINED_ERROR: 'expected property is undefined',
+	INVALID_VALUE_ERROR: 'value is not valid',
+	WRONG_TYPE: 'data type is wrong',
+	WRONG_INSTANCE: 'instance is wrong object',
+	WRONG_TYPE_INSTANCE: 'data type is wrong or instance is wrong object',
+	VALUE_NULL: 'value is null',
+	_recursiveVlidation: function(value, collection, method, errorMessage, allowNull)
 	{
 		var errors, i;
 
@@ -37,59 +34,59 @@ Object.defineProperties(barmatz.utils.DataTypes,
 				return false;
 		
 		return true;
-	}},
-	_silent: {value: false, writable: true},
-	silent: {get: function()
+	},
+	getSilent: function()
 	{
-		return this._silent;
-	}, set: function(value)
+		return this._silent || false;
+	}, 
+	setSilent: function(value)
 	{
 		this._silent = value;
-	}},
-	applySilent: {value: function(method)
+	},
+	applySilent: function(method)
 	{
 		var returnValue, args;
 		
-		args = Array.prototype.slice.call(arguments, 1, arguments.length);
+		args = window.Array.prototype.slice.call(arguments, 1, arguments.length);
 		
-		this.silent = true;
+		this.setSilent(true);
 		returnValue = this[method].apply(this, args);
-		this.silent = false;
+		this.setSilent(false);
 		
 		return returnValue;
-	}},
-	throwError: {value: function(error, message)
+	},
+	throwError: function(error, message)
 	{
-		if(this.silent)
+		if(this.getSilent())
 			return false;
 		else
 		{
 			throw new error(message);
 			return true;
 		}
-	}},
-	isNotUndefined: {value: function(value)
+	},
+	isNotUndefined: function(value)
 	{
 		if(value === undefined)
 			if(!this.throwError(ReferenceError, this.UNDEFINED_ERROR))
 				return false;
 		return true;
-	}},
-	isValid: {value: function(value)
+	},
+	isValid: function(value)
 	{
 		if(value == null)
 			if(!this.throwError(TypeError, this.INVALID_VALUE_ERROR))
 				return false;
 		return true;
-	}},
-	isAllowNull: {value: function(value)
+	},
+	isAllowNull: function(value)
 	{
-		if(value == null)
+		if(value === null)
 			if(!this.throwError(TypeError, this.VALUE_NULL))
 			return false;
 		return true;
-	}},
-	isTypeOf: {value: function(value, type, allowNull)
+	},
+	isTypeOf: function(value, type, allowNull)
 	{
 		if(!allowNull)
 			this.isValid(value);
@@ -99,13 +96,13 @@ Object.defineProperties(barmatz.utils.DataTypes,
 			if(!this.throwError(TypeError, this.WRONG_TYPE))
 				return false;
 		return true;
-	}},
-	isTypesOf: {value: function(value, types, allowNull)
+	},
+	isTypesOf: function(value, types, allowNull)
 	{
 		this._recursiveVlidation(value, types, this.isTypeOf, this.WRONG_INSTANCE, allowNull);
 		return true;
-	}},
-	isInstanceOf: {value: function(instance, object, allowNull)
+	},
+	isInstanceOf: function(instance, object, allowNull)
 	{
 		if(!allowNull)
 			this.isValid(instance);
@@ -115,13 +112,13 @@ Object.defineProperties(barmatz.utils.DataTypes,
 			if(!this.throwError(TypeError, this.WRONG_INSTANCE))
 				return false;
 		return true;
-	}},
-	isInstancesOf: {value: function(instances, objects, allowNull)
+	},
+	isInstancesOf: function(instances, objects, allowNull)
 	{
 		this._recursiveVlidation(instances, objects, this.isInstanceOf, this.WRONG_INSTANCE, allowNull);
 		return true;
-	}},
-	isTypeOrInstance: {value: function(value, type, object, allowNull)
+	},
+	isTypeOrInstance: function(value, type, object, allowNull)
 	{
 		if(!allowNull)
 			this.isValid(value);
@@ -131,8 +128,8 @@ Object.defineProperties(barmatz.utils.DataTypes,
 			if(!this.throwError(TypeError, this.WRONG_TYPE_INSTANCE))
 				return false;
 		return true;
-	}},
-	isTypesOrInstances: {value: function(value, types, objects, allowNull)
+	},
+	isTypesOrInstances: function(value, types, objects, allowNull)
 	{
 		var isType, isInstance;
 		
@@ -156,5 +153,5 @@ Object.defineProperties(barmatz.utils.DataTypes,
 			if(!this.throwError(TypeError, this.WRONG_TYPE_INSTANCE))
 				return false;
 		return true;
-	}}
-});
+	}
+};

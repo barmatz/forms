@@ -1,16 +1,14 @@
 /** barmatz.forms.fields.FieldTypes **/
-window.barmatz.forms.fields.FieldTypes = function(){};
+barmatz.forms.fields.FieldTypes = {
+	HTML_CONTENT: 'htmlContent',
+	TEXT_AREA: 'textArea',
+	TEXT_FIELD: 'text',
+	DROPBOX: 'dropbox',
+	PASSWORD: 'password',
+	CHECKBOX: 'checkbox',
+	RADIO: 'radio',
+	FILE: 'file',
+	HIDDEN: 'hidden',
+	PHONE: 'phone'
+};
 
-Object.defineProperties(barmatz.forms.fields.FieldTypes,
-{
-	HTML_CONTENT: {value: 'htmlContent'},
-	TEXT_AREA: {value: 'textArea'},
-	TEXT_FIELD: {value: 'textField'},
-	DROPBOX: {value: 'dropbox'},
-	PASSWORD: {value: 'password'},
-	CHECKBOX: {value: 'checkbox'},
-	RADIO: {value: 'radio'},
-	FILE: {value: 'file'},
-	HIDDEN: {value: 'hidden'},
-	PHONE: {value: 'phone'}
-});

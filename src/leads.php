@@ -13,7 +13,6 @@ require_once dirname(__FILE__) . '/api/user/AuthenticationModel.php';
 	<body>
 		<script src="jqueryui/js/jquery-1.9.0.js"></script>
 		<script src="jqueryui/js/jquery-ui-1.10.0.custom.min.js"></script>
-		<script src="js/application.js"></script>
 		<script src="js/leads.js"></script>
 	</body>
 </html>
