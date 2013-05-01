@@ -5635,7 +5635,6 @@ barmatz.forms.fields.FieldController = function(model, fieldView, errorMessageVi
 	model.addEventListener(barmatz.events.FieldEvent.VALID, onModelValid);
 	model.addEventListener(barmatz.events.FieldEvent.INVALID, onModelInvalid);
 	fieldView.addEventListener('focus', onFieldViewFocus);
-	fieldView.addEventListener('keydown', onFieldViewKeyDown);
 	fieldView.addEventListener('change', onFieldViewChange);
 	setModelValue();
 	addDescription();
@@ -5682,9 +5681,6 @@ barmatz.forms.fields.FieldController = function(model, fieldView, errorMessageVi
 			model.validate();
 			settingValue = false;
 		}
-
-		fieldView.addEventListener('keydown', onFieldViewKeyDown);
-		fieldView.removeEventListener('keyup', onFieldViewKeyUp);
 	}
 	
 	function setErrorMessageContent()
@@ -5820,19 +5816,13 @@ barmatz.forms.fields.FieldController = function(model, fieldView, errorMessageVi
 		addDescription();
 	}
 	
-	function onFieldViewKeyDown(event)
-	{
-		fieldView.removeEventListener('keydown', onFieldViewKeyDown);
-		fieldView.addEventListener('keyup', onFieldViewKeyUp);
-	}
-	
 	function onFieldViewChange(event)
 	{
-		setModelValue();
-	}
-	
-	function onFieldViewKeyUp(event)
-	{
+		barmatz.utils.DataTypes.isInstanceOf(event, Event);
+		
+		if(model instanceof barmatz.forms.fields.PhoneFieldModel && event.target.tagName.toLowerCase() == 'select')
+			return;
+			
 		setModelValue();
 	}
 };
