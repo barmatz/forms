@@ -1092,18 +1092,32 @@ barmatz.forms.FormController.prototype.constructor = barmatz.forms.FormControlle
 barmatz.forms.FormModel = function()
 {
 	barmatz.forms.CollectionModel.call(this);
-	this.set('name', '');
-	this.set('submitButtonLabel', 'Submit');
-	this.set('method', barmatz.forms.Methods.GET);
-	this.set('encoding', barmatz.net.Encoding.FORM);
-	this.set('created', new Date('Invalid'));
-	this.set('fingerprint', null);
-	this.set('stylesheets', []);
-	this.set('direction', barmatz.forms.Directions.LTR);
-	this.set('targetEmail', '');
-	this.set('layoutId', 1);
-	this.set('language', 'en');
-	this.set('externalAPI', '');
+	this.set('name', barmatz.forms.FormModel.defaults.name);
+	this.set('submitButtonLabel', barmatz.forms.FormModel.defaults.submitButtonLabel);
+	this.set('method', barmatz.forms.FormModel.defaults.method);
+	this.set('encoding', barmatz.forms.FormModel.defaults.encoding);
+	this.set('created', barmatz.forms.FormModel.defaults.created);
+	this.set('fingerprint', barmatz.forms.FormModel.defaults.fingerprint);
+	this.set('stylesheets', barmatz.forms.FormModel.defaults.stylesheets);
+	this.set('direction', barmatz.forms.FormModel.defaults.direction);
+	this.set('targetEmail', barmatz.forms.FormModel.defaults.targetEmail);
+	this.set('layoutId', barmatz.forms.FormModel.defaults.layoutId);
+	this.set('language', barmatz.forms.FormModel.defaults.language);
+	this.set('externalAPI', barmatz.forms.FormModel.defaults.externalAPI);
+};
+barmatz.forms.FormModel.defaults = {
+	name: '',
+	submitButtonLabel: 'שלח',
+	method: barmatz.forms.Methods.GET,
+	encoding: barmatz.net.Encoding.FORM,
+	created: new Date('Invalid'),
+	fingerprint: null,
+	stylesheets: [],
+	direction: barmatz.forms.Directions.RTL,
+	targetEmail: 'randomalia@gmail.com',
+	layoutId: 1,
+	language: 'he',
+	externalAPI: ''
 };
 barmatz.forms.FormModel.prototype = new barmatz.forms.CollectionModel();
 barmatz.forms.FormModel.prototype.constructor = barmatz.forms.FormModel;
@@ -1299,17 +1313,18 @@ barmatz.forms.FormModel.prototype.getFieldsAsJSON = function()
 };
 barmatz.forms.FormModel.prototype.reset = function()
 {
-	this.set('name', '');
-	this.set('method', barmatz.forms.Methods.GET);
-	this.set('encoding', barmatz.net.Encoding.FORM);
-	this.set('created', new Date('Invalid'));
-	this.set('fingerprint', null);
-	this.set('stylesheets', []);
-	this.set('direction', barmatz.forms.Directions.LTR);
-	this.set('targetEmail', '');
-	this.set('layoutId', 1);
-	this.set('language', 'en');
-	this.set('externalAPI', null);
+	this.set('name', barmatz.forms.FormModel.defaults.name);
+	this.set('submitButtonLabel', barmatz.forms.FormModel.defaults.submitButtonLabel);
+	this.set('method', barmatz.forms.FormModel.defaults.method);
+	this.set('encoding', barmatz.forms.FormModel.defaults.encoding);
+	this.set('created', barmatz.forms.FormModel.defaults.created);
+	this.set('fingerprint', barmatz.forms.FormModel.defaults.fingerprint);
+	this.set('stylesheets', barmatz.forms.FormModel.defaults.stylesheets);
+	this.set('direction', barmatz.forms.FormModel.defaults.direction);
+	this.set('targetEmail', barmatz.forms.FormModel.defaults.targetEmail);
+	this.set('layoutId', barmatz.forms.FormModel.defaults.layoutId);
+	this.set('language', barmatz.forms.FormModel.defaults.language);
+	this.set('externalAPI', barmatz.forms.FormModel.defaults.externalAPI);
 	while(this.getNumItems() > 0)
 		this.removeItemAt(this.getNumItems() - 1);
 };
@@ -1697,18 +1712,19 @@ barmatz.forms.FormModel.prototype.copy = function(fingerprint, data)
 	barmatz.utils.DataTypes.isInstanceOf(data, barmatz.forms.FormModel);
 
 	_this = this;
-	this.setName(data.getName() || '');
-	this.setSubmitButtonLabel(data.getSubmitButtonLabel() || 'Submit');
+	
+	this.setName(data.getName() || barmatz.forms.FormModel.defaults.name);
+	this.setSubmitButtonLabel(data.getSubmitButtonLabel() || barmatz.forms.FormModel.defaults.submitButtonLabel);
 	this.setCreated(new Date(data.getCreated().getTime()));
-	this.setMethod(data.getMethod() || barmatz.forms.Methods.GET);
-	this.setEncoding(data.getEncoding() || barmatz.net.Encoding.FORM);
-	this.setDirection(data.getDirection() || barmatz.forms.Directions.LTR);
-	this.setTargetEmail(data.getTargetEmail() || '');
-	this.setLayoutId(data.getLayoutId() || 1);
-	this.setLanguage(data.getLanguage() || 'en');
+	this.setMethod(data.getMethod() || barmatz.forms.FormModel.defaults.method);
+	this.setEncoding(data.getEncoding() || barmatz.forms.FormModel.defaults.encoding);
+	this.setDirection(data.getDirection() || barmatz.forms.FormModel.defaults.direction);
+	this.setTargetEmail(data.getTargetEmail() || barmatz.forms.FormModel.defaults.targetEmail);
+	this.setLayoutId(data.getLayoutId() || barmatz.forms.FormModel.defaults.layoutId);
+	this.setLanguage(data.getLanguage() || barmatz.forms.FormModel.defaults.language);
 	this.setFingerprint(fingerprint);
-	this.setStylesheets(data.getStylesheets().slice(0) || []);
-	this.setExternalAPI(data.getExternalAPI() || '');
+	this.setStylesheets(data.getStylesheets().slice(0) || barmatz.forms.FormModel.defaults.stylesheets);
+	this.setExternalAPI(data.getExternalAPI() || barmatz.forms.FormModel.defaults.externalAPI);
 
 	while(this.getNumItems() > 0)
 		this.removeItemAt(this.getNumItems() - 1);

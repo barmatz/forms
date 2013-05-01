@@ -33,7 +33,9 @@
 			<fileset dir="${SRC_DIR}/barmatz/events" includes="Event.js"/>
 			<fileset dir="${SRC_DIR}/barmatz/events" includes="EventDispatcher.js ModelEvent.js LoaderEvent.js UserEvent.js CollectionEvent.js FormEvent.js FieldEvent.js"/>
 			<fileset dir="${SRC_DIR}/barmatz/mvc" includes="Model.js Controller.js"/>
-			<fileset dir="${SRC_DIR}/barmatz/forms" includes="CollectionModel.js CollectionController.js Config.js FormModel.js Methods.js Directions.js ContentModel.js TypeModel.js Validator.js"/>
+			<fileset dir="${SRC_DIR}/barmatz/net" includes="Request.js Loader.js Methods.js Encoding.js Response.js"/>
+			<fileset dir="${SRC_DIR}/barmatz/forms" includes="Methods.js Directions.js"/>
+			<fileset dir="${SRC_DIR}/barmatz/forms" includes="CollectionModel.js CollectionController.js Config.js FormModel.js ContentModel.js TypeModel.js Validator.js"/>
 			<fileset dir="${SRC_DIR}/barmatz/forms/ui" includes="DialogController.js"/>
 			<fileset dir="${SRC_DIR}/barmatz/forms/ui" includes="PromptDialogController.js"/>
 			<fileset dir="${SRC_DIR}/barmatz/forms/ui" includes="JQueryPromptDialogController.js"/>
@@ -44,7 +46,6 @@
 			<fileset dir="${SRC_DIR}/barmatz/forms/fields" includes="FieldModel.js FieldController.js ValidatorModel.js"/>
 			<fileset dir="${SRC_DIR}/barmatz/forms/fields" includes="TextFieldModel.js "/>
 			<fileset dir="${SRC_DIR}/barmatz/forms/fields" includes="FieldTypes.js HTMLContentModel.js TextAreaFieldModel.js DropboxModel.js PasswordFieldModel.js CheckboxFieldModel.js RadioFieldModel.js FileFieldModel.js HiddenFieldModel.js PhoneFieldModel.js DropboxItemModel.js FieldValidationOptionsController.js DropboxItemsListController.js DropboxItemsListItemController.js PhonePrefixes.js"/>
-			<fileset dir="${SRC_DIR}/barmatz/net" includes="Request.js Loader.js Methods.js Encoding.js Response.js"/>
 			<fileset dir="${SRC_DIR}" includes="builder.js"/>
 		</concat>
 		<concat destfile="${BIN_DIR}/js/leads.js" fixlastline="yes">

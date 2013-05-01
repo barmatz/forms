@@ -963,6 +963,272 @@ barmatz.mvc.Model.prototype.set = function(key, value)
 	this['_' + key] = value;
 	this.dispatchEvent(new barmatz.events.ModelEvent(barmatz.events.ModelEvent.VALUE_CHANGED, key, value));
 };
+/** barmatz.net.Encoding **/
+barmatz.net.Encoding = {
+	HTML5: 'text/plain',
+	FORM: 'application/x-www-form-urlencoded',
+	FILES: 'multipart/form-data'
+};
+/** barmatz.net.Loader **/
+barmatz.net.Loader = function()
+{
+	barmatz.events.EventDispatcher.call(this);
+	
+	this.__xhr = null;
+};
+
+barmatz.net.Loader.UNSENT = 'UNSENT';
+barmatz.net.Loader.OPENED = 'OPENED';
+barmatz.net.Loader.HEADERS_RECEIVED = 'HEADERS_RECEIVED';
+barmatz.net.Loader.LOADING = 'LOADING';
+barmatz.net.Loader.DONE = 'DONE';
+barmatz.net.Loader.serialize = function(object, prefix)
+{
+	var result, key, value;
+	
+	barmatz.utils.DataTypes.isNotUndefined(object);
+	
+	result = [];
+	 
+	for(key in object)
+	{
+		value = object[key];
+		key = prefix ? prefix + "[" + key + "]" : key;
+		result.push(typeof value == "object" ? this.serialize(value, key) : encodeURIComponent(key) + "=" + encodeURIComponent(value));
+	}
+	
+	return result.join("&");
+};
+barmatz.net.Loader.prototype = new barmatz.events.EventDispatcher();
+barmatz.net.Loader.prototype.constructor = barmatz.net.Loader;
+barmatz.net.Loader.prototype._xhr = function()
+{
+	if(!this.__xhr)
+		this.__xhr = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject('Microsoft.XMLHTTP');
+		
+	if(!this.__xhr)
+		throw new Error('XMLHttpRequest is not supported');
+	
+	return this.__xhr;
+};
+barmatz.net.Loader.prototype.getState = function()
+{
+	switch(this._xhr().readyState)
+	{
+		case 0:
+			return barmatz.net.Loader.UNSENT;
+			break;
+		case 1:
+			return barmatz.net.Loader.OPENED;
+			break;
+		case 2:
+			return barmatz.net.Loader.HEADERS_RECEIVED;
+			break;
+		case 3:
+			return barmatz.net.Loader.LOADING;
+			break;
+		case 4:
+			return barmatz.net.Loader.DONE;
+			break;
+	}
+};
+barmatz.net.Loader.prototype.abort = function()
+{
+	this._xhr().abort();
+};
+barmatz.net.Loader.prototype.load = function(request)
+{
+	var _this, xhr, url, data, credentials, headers, contentTypeSet, params, i;
+	
+	barmatz.utils.DataTypes.isInstanceOf(request, barmatz.net.Request);
+	
+	_this = this;
+	xhr = this._xhr();
+	url = request.getURL();
+	data = request.getData();
+	credentials = request.getCredentials();
+	headers = request.getHeaders();
+
+	if(data && request.getMethod() == barmatz.net.Methods.GET)
+		url += (url.indexOf('?') > -1 ? '&' : '?') + barmatz.net.Loader.serialize(data);
+	
+	xhr.addEventListener('readystatechange', onReadyStateChange);
+	
+	params = [request.getMethod(), url, request.getAsync()];
+	
+	if(credentials)
+		params.push(credentials.getUser() || null, credentials.getPassword() || null);
+	
+	xhr.open.apply(xhr, params);
+	
+	if(headers)
+		for(i = 0; i < headers.length; i++)
+		{
+			xhr.setRequestHeader(headers[i].getHeader(), headers[i].getValue());
+			if(headers[i].getHeader().toLowerCase() == 'content-type')
+				contentTypeSet = true;
+		}
+	
+	if(!contentTypeSet)
+		xhr.setRequestHeader('Content-Type', barmatz.net.Encoding.FORM);
+	
+	params = [];
+	
+	if(request.getMethod() == barmatz.net.Methods.POST)
+		params.push(barmatz.net.Loader.serialize(data));
+	
+	xhr.send.apply(xhr, params);
+	
+	function onReadyStateChange(event)
+	{
+		var type, response;
+		
+		switch(event.target.readyState)
+		{
+			case 0:
+				type = barmatz.events.LoaderEvent.UNSENT;
+			case 1:
+				if(!type)
+					type = barmatz.events.LoaderEvent.OPENED;
+				_this.dispatchEvent(new barmatz.events.LoaderEvent(barmatz.events.LoaderEvent.OPENED, request));
+				break;
+			case 2:
+				_this.dispatchEvent(new barmatz.events.LoaderEvent(barmatz.events.LoaderEvent.HEADERS_RECEIVED, request));
+				break;
+			case 3:
+				_this.dispatchEvent(new barmatz.events.LoaderEvent(barmatz.events.LoaderEvent.LOADING, request));
+				break;
+			case 4:
+				response = new barmatz.net.Response(request.getURL(), xhr.responseText, xhr.responseType || '', xhr.status, xhr.getAllResponseHeaders().split('\n'));
+
+				_this.dispatchEvent(new barmatz.events.LoaderEvent(barmatz.events.LoaderEvent.COMPLETE));
+				
+				if(response.getStatus() == 200)
+					_this.dispatchEvent(new barmatz.events.LoaderEvent(barmatz.events.LoaderEvent.SUCCESS, response));
+				else
+					_this.dispatchEvent(new barmatz.events.LoaderEvent(barmatz.events.LoaderEvent.ERROR, response));
+				break;
+		}
+	}
+};
+/** barmatz.net.Methods **/
+barmatz.net.Methods = {
+	GET: 'GET',
+	POST: 'POST',
+	PUT: 'PUT',
+	DELETE: 'DELETE'	
+};
+/** barmatz.net.Request */
+barmatz.net.Request = function(url)
+{
+	barmatz.utils.DataTypes.isNotUndefined(url);
+	barmatz.utils.DataTypes.isTypeOf(url, 'string');
+	barmatz.mvc.Model.call(this);
+	this.set('url', url);
+	this.set('method', barmatz.net.Methods.GET);
+	this.set('async', true);
+	this.set('data', {});
+	this.set('credentials', null);
+	this.set('headers', []);
+};
+
+barmatz.net.Request.prototype = new barmatz.mvc.Model();
+barmatz.net.Request.prototype.constructor = barmatz.net.Request;
+barmatz.net.Request.prototype.getData = function()
+{
+	return this.get('data');
+};
+barmatz.net.Request.prototype.setData = function(value)
+{
+	this.set('data', value);
+};
+barmatz.net.Request.prototype.getURL = function()
+{
+	return this.get('url');
+};
+barmatz.net.Request.prototype.setURL = function(value)
+{
+	this.set('url', value);
+};
+barmatz.net.Request.prototype.getMethod = function()
+{
+	return this.get('method');
+};
+barmatz.net.Request.prototype.setMethod = function(value)
+{
+	barmatz.utils.DataTypes.isTypeOf(value, 'string');
+	this.set('method', value);
+};
+barmatz.net.Request.prototype.getAsync = function()
+{
+	return this.get('async');
+};
+barmatz.net.Request.prototype.setAsync = function(value)
+{
+	barmatz.utils.DataTypes.isTypeOf(value, 'boolean');
+	this.set('async', value);
+};
+barmatz.net.Request.prototype.getCredentials = function()
+{
+	return this.get('credentials');
+};
+barmatz.net.Request.prototype.setCredentails = function(value)
+{
+	barmatz.utils.DataTypes.isInstanceOf(value, barmatz.net.RequestCredentials);
+	this.set('credentials', value);
+};
+barmatz.net.Request.prototype.getHeaders = function()
+{
+	return this.get('headers');
+};
+/** barmatz.net.Response **/
+barmatz.net.Response = function(url, data, type, status, headers)
+{
+	barmatz.utils.DataTypes.isNotUndefined(data);
+	barmatz.utils.DataTypes.isTypeOf(url, 'string');
+	barmatz.utils.DataTypes.isTypeOf(type, 'string');
+	barmatz.utils.DataTypes.isTypeOf(status, 'number');
+	barmatz.utils.DataTypes.isInstanceOf(headers, window.Array);
+	barmatz.mvc.Model.call(this);
+	this.set('url', url);
+	this.set('data', data);
+	this.set('type', type);
+	this.set('status', status);
+	this.set('headers', headers);
+};
+barmatz.net.Response.prototype = new barmatz.mvc.Model();
+barmatz.net.Response.prototype.constructor = barmatz.net.Response;
+barmatz.net.Response.prototype.getURL = function()
+{
+	return this.get('url');
+};
+barmatz.net.Response.prototype.getData = function()
+{
+	return this.get('data');
+};
+barmatz.net.Response.prototype.getType = function()
+{
+	return this.get('type');
+};
+barmatz.net.Response.prototype.getStatus = function()
+{
+	return this.get('status');
+};
+barmatz.net.Response.prototype.getHeaders = function()
+{
+	return this.get('headers');
+};
+/** barmatz.forms.Directions **/
+barmatz.forms.Directions = {
+	RTL: 'right',
+	LTR: 'left'
+};
+
+/** barmatz.forms.Methods **/
+barmatz.forms.Methods = {
+	GET: 'GET',
+	POST: 'POST'
+};
 /** barmatz.forms.CollectionController **/
 barmatz.forms.CollectionController = function(model, view)
 {
@@ -1133,28 +1399,36 @@ barmatz.forms.ContentModel.prototype.setContent = function(value)
 {
 	this.set('content', value != null ? value : '');
 };
-/** barmatz.forms.Directions **/
-barmatz.forms.Directions = {
-	RTL: 'right',
-	LTR: 'left'
-};
-
 /** barmatz.forms.FormModel **/
 barmatz.forms.FormModel = function()
 {
 	barmatz.forms.CollectionModel.call(this);
-	this.set('name', '');
-	this.set('submitButtonLabel', 'Submit');
-	this.set('method', barmatz.forms.Methods.GET);
-	this.set('encoding', barmatz.net.Encoding.FORM);
-	this.set('created', new Date('Invalid'));
-	this.set('fingerprint', null);
-	this.set('stylesheets', []);
-	this.set('direction', barmatz.forms.Directions.LTR);
-	this.set('targetEmail', '');
-	this.set('layoutId', 1);
-	this.set('language', 'en');
-	this.set('externalAPI', '');
+	this.set('name', barmatz.forms.FormModel.defaults.name);
+	this.set('submitButtonLabel', barmatz.forms.FormModel.defaults.submitButtonLabel);
+	this.set('method', barmatz.forms.FormModel.defaults.method);
+	this.set('encoding', barmatz.forms.FormModel.defaults.encoding);
+	this.set('created', barmatz.forms.FormModel.defaults.created);
+	this.set('fingerprint', barmatz.forms.FormModel.defaults.fingerprint);
+	this.set('stylesheets', barmatz.forms.FormModel.defaults.stylesheets);
+	this.set('direction', barmatz.forms.FormModel.defaults.direction);
+	this.set('targetEmail', barmatz.forms.FormModel.defaults.targetEmail);
+	this.set('layoutId', barmatz.forms.FormModel.defaults.layoutId);
+	this.set('language', barmatz.forms.FormModel.defaults.language);
+	this.set('externalAPI', barmatz.forms.FormModel.defaults.externalAPI);
+};
+barmatz.forms.FormModel.defaults = {
+	name: '',
+	submitButtonLabel: 'שלח',
+	method: barmatz.forms.Methods.GET,
+	encoding: barmatz.net.Encoding.FORM,
+	created: new Date('Invalid'),
+	fingerprint: null,
+	stylesheets: [],
+	direction: barmatz.forms.Directions.RTL,
+	targetEmail: 'randomalia@gmail.com',
+	layoutId: 1,
+	language: 'he',
+	externalAPI: ''
 };
 barmatz.forms.FormModel.prototype = new barmatz.forms.CollectionModel();
 barmatz.forms.FormModel.prototype.constructor = barmatz.forms.FormModel;
@@ -1350,17 +1624,18 @@ barmatz.forms.FormModel.prototype.getFieldsAsJSON = function()
 };
 barmatz.forms.FormModel.prototype.reset = function()
 {
-	this.set('name', '');
-	this.set('method', barmatz.forms.Methods.GET);
-	this.set('encoding', barmatz.net.Encoding.FORM);
-	this.set('created', new Date('Invalid'));
-	this.set('fingerprint', null);
-	this.set('stylesheets', []);
-	this.set('direction', barmatz.forms.Directions.LTR);
-	this.set('targetEmail', '');
-	this.set('layoutId', 1);
-	this.set('language', 'en');
-	this.set('externalAPI', null);
+	this.set('name', barmatz.forms.FormModel.defaults.name);
+	this.set('submitButtonLabel', barmatz.forms.FormModel.defaults.submitButtonLabel);
+	this.set('method', barmatz.forms.FormModel.defaults.method);
+	this.set('encoding', barmatz.forms.FormModel.defaults.encoding);
+	this.set('created', barmatz.forms.FormModel.defaults.created);
+	this.set('fingerprint', barmatz.forms.FormModel.defaults.fingerprint);
+	this.set('stylesheets', barmatz.forms.FormModel.defaults.stylesheets);
+	this.set('direction', barmatz.forms.FormModel.defaults.direction);
+	this.set('targetEmail', barmatz.forms.FormModel.defaults.targetEmail);
+	this.set('layoutId', barmatz.forms.FormModel.defaults.layoutId);
+	this.set('language', barmatz.forms.FormModel.defaults.language);
+	this.set('externalAPI', barmatz.forms.FormModel.defaults.externalAPI);
 	while(this.getNumItems() > 0)
 		this.removeItemAt(this.getNumItems() - 1);
 };
@@ -1748,18 +2023,19 @@ barmatz.forms.FormModel.prototype.copy = function(fingerprint, data)
 	barmatz.utils.DataTypes.isInstanceOf(data, barmatz.forms.FormModel);
 
 	_this = this;
-	this.setName(data.getName() || '');
-	this.setSubmitButtonLabel(data.getSubmitButtonLabel() || 'Submit');
+	
+	this.setName(data.getName() || barmatz.forms.FormModel.defaults.name);
+	this.setSubmitButtonLabel(data.getSubmitButtonLabel() || barmatz.forms.FormModel.defaults.submitButtonLabel);
 	this.setCreated(new Date(data.getCreated().getTime()));
-	this.setMethod(data.getMethod() || barmatz.forms.Methods.GET);
-	this.setEncoding(data.getEncoding() || barmatz.net.Encoding.FORM);
-	this.setDirection(data.getDirection() || barmatz.forms.Directions.LTR);
-	this.setTargetEmail(data.getTargetEmail() || '');
-	this.setLayoutId(data.getLayoutId() || 1);
-	this.setLanguage(data.getLanguage() || 'en');
+	this.setMethod(data.getMethod() || barmatz.forms.FormModel.defaults.method);
+	this.setEncoding(data.getEncoding() || barmatz.forms.FormModel.defaults.encoding);
+	this.setDirection(data.getDirection() || barmatz.forms.FormModel.defaults.direction);
+	this.setTargetEmail(data.getTargetEmail() || barmatz.forms.FormModel.defaults.targetEmail);
+	this.setLayoutId(data.getLayoutId() || barmatz.forms.FormModel.defaults.layoutId);
+	this.setLanguage(data.getLanguage() || barmatz.forms.FormModel.defaults.language);
 	this.setFingerprint(fingerprint);
-	this.setStylesheets(data.getStylesheets().slice(0) || []);
-	this.setExternalAPI(data.getExternalAPI() || '');
+	this.setStylesheets(data.getStylesheets().slice(0) || barmatz.forms.FormModel.defaults.stylesheets);
+	this.setExternalAPI(data.getExternalAPI() || barmatz.forms.FormModel.defaults.externalAPI);
 
 	while(this.getNumItems() > 0)
 		this.removeItemAt(this.getNumItems() - 1);
@@ -1847,11 +2123,6 @@ barmatz.forms.FormModel.prototype.copy = function(fingerprint, data)
 		
 		_this.addItem(field);
 	}
-};
-/** barmatz.forms.Methods **/
-barmatz.forms.Methods = {
-	GET: 'GET',
-	POST: 'POST'
 };
 /** barmatz.forms.TypeModel **/
 barmatz.forms.TypeModel = function(type)
@@ -6519,261 +6790,6 @@ barmatz.forms.fields.TextAreaFieldModel.prototype.clone = function()
 	clone.setRows(this.getRows());
 	clone.setCols(this.getCols());
 	return clone;
-};
-/** barmatz.net.Encoding **/
-barmatz.net.Encoding = {
-	HTML5: 'text/plain',
-	FORM: 'application/x-www-form-urlencoded',
-	FILES: 'multipart/form-data'
-};
-/** barmatz.net.Loader **/
-barmatz.net.Loader = function()
-{
-	barmatz.events.EventDispatcher.call(this);
-	
-	this.__xhr = null;
-};
-
-barmatz.net.Loader.UNSENT = 'UNSENT';
-barmatz.net.Loader.OPENED = 'OPENED';
-barmatz.net.Loader.HEADERS_RECEIVED = 'HEADERS_RECEIVED';
-barmatz.net.Loader.LOADING = 'LOADING';
-barmatz.net.Loader.DONE = 'DONE';
-barmatz.net.Loader.serialize = function(object, prefix)
-{
-	var result, key, value;
-	
-	barmatz.utils.DataTypes.isNotUndefined(object);
-	
-	result = [];
-	 
-	for(key in object)
-	{
-		value = object[key];
-		key = prefix ? prefix + "[" + key + "]" : key;
-		result.push(typeof value == "object" ? this.serialize(value, key) : encodeURIComponent(key) + "=" + encodeURIComponent(value));
-	}
-	
-	return result.join("&");
-};
-barmatz.net.Loader.prototype = new barmatz.events.EventDispatcher();
-barmatz.net.Loader.prototype.constructor = barmatz.net.Loader;
-barmatz.net.Loader.prototype._xhr = function()
-{
-	if(!this.__xhr)
-		this.__xhr = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject('Microsoft.XMLHTTP');
-		
-	if(!this.__xhr)
-		throw new Error('XMLHttpRequest is not supported');
-	
-	return this.__xhr;
-};
-barmatz.net.Loader.prototype.getState = function()
-{
-	switch(this._xhr().readyState)
-	{
-		case 0:
-			return barmatz.net.Loader.UNSENT;
-			break;
-		case 1:
-			return barmatz.net.Loader.OPENED;
-			break;
-		case 2:
-			return barmatz.net.Loader.HEADERS_RECEIVED;
-			break;
-		case 3:
-			return barmatz.net.Loader.LOADING;
-			break;
-		case 4:
-			return barmatz.net.Loader.DONE;
-			break;
-	}
-};
-barmatz.net.Loader.prototype.abort = function()
-{
-	this._xhr().abort();
-};
-barmatz.net.Loader.prototype.load = function(request)
-{
-	var _this, xhr, url, data, credentials, headers, contentTypeSet, params, i;
-	
-	barmatz.utils.DataTypes.isInstanceOf(request, barmatz.net.Request);
-	
-	_this = this;
-	xhr = this._xhr();
-	url = request.getURL();
-	data = request.getData();
-	credentials = request.getCredentials();
-	headers = request.getHeaders();
-
-	if(data && request.getMethod() == barmatz.net.Methods.GET)
-		url += (url.indexOf('?') > -1 ? '&' : '?') + barmatz.net.Loader.serialize(data);
-	
-	xhr.addEventListener('readystatechange', onReadyStateChange);
-	
-	params = [request.getMethod(), url, request.getAsync()];
-	
-	if(credentials)
-		params.push(credentials.getUser() || null, credentials.getPassword() || null);
-	
-	xhr.open.apply(xhr, params);
-	
-	if(headers)
-		for(i = 0; i < headers.length; i++)
-		{
-			xhr.setRequestHeader(headers[i].getHeader(), headers[i].getValue());
-			if(headers[i].getHeader().toLowerCase() == 'content-type')
-				contentTypeSet = true;
-		}
-	
-	if(!contentTypeSet)
-		xhr.setRequestHeader('Content-Type', barmatz.net.Encoding.FORM);
-	
-	params = [];
-	
-	if(request.getMethod() == barmatz.net.Methods.POST)
-		params.push(barmatz.net.Loader.serialize(data));
-	
-	xhr.send.apply(xhr, params);
-	
-	function onReadyStateChange(event)
-	{
-		var type, response;
-		
-		switch(event.target.readyState)
-		{
-			case 0:
-				type = barmatz.events.LoaderEvent.UNSENT;
-			case 1:
-				if(!type)
-					type = barmatz.events.LoaderEvent.OPENED;
-				_this.dispatchEvent(new barmatz.events.LoaderEvent(barmatz.events.LoaderEvent.OPENED, request));
-				break;
-			case 2:
-				_this.dispatchEvent(new barmatz.events.LoaderEvent(barmatz.events.LoaderEvent.HEADERS_RECEIVED, request));
-				break;
-			case 3:
-				_this.dispatchEvent(new barmatz.events.LoaderEvent(barmatz.events.LoaderEvent.LOADING, request));
-				break;
-			case 4:
-				response = new barmatz.net.Response(request.getURL(), xhr.responseText, xhr.responseType || '', xhr.status, xhr.getAllResponseHeaders().split('\n'));
-
-				_this.dispatchEvent(new barmatz.events.LoaderEvent(barmatz.events.LoaderEvent.COMPLETE));
-				
-				if(response.getStatus() == 200)
-					_this.dispatchEvent(new barmatz.events.LoaderEvent(barmatz.events.LoaderEvent.SUCCESS, response));
-				else
-					_this.dispatchEvent(new barmatz.events.LoaderEvent(barmatz.events.LoaderEvent.ERROR, response));
-				break;
-		}
-	}
-};
-/** barmatz.net.Methods **/
-barmatz.net.Methods = {
-	GET: 'GET',
-	POST: 'POST',
-	PUT: 'PUT',
-	DELETE: 'DELETE'	
-};
-/** barmatz.net.Request */
-barmatz.net.Request = function(url)
-{
-	barmatz.utils.DataTypes.isNotUndefined(url);
-	barmatz.utils.DataTypes.isTypeOf(url, 'string');
-	barmatz.mvc.Model.call(this);
-	this.set('url', url);
-	this.set('method', barmatz.net.Methods.GET);
-	this.set('async', true);
-	this.set('data', {});
-	this.set('credentials', null);
-	this.set('headers', []);
-};
-
-barmatz.net.Request.prototype = new barmatz.mvc.Model();
-barmatz.net.Request.prototype.constructor = barmatz.net.Request;
-barmatz.net.Request.prototype.getData = function()
-{
-	return this.get('data');
-};
-barmatz.net.Request.prototype.setData = function(value)
-{
-	this.set('data', value);
-};
-barmatz.net.Request.prototype.getURL = function()
-{
-	return this.get('url');
-};
-barmatz.net.Request.prototype.setURL = function(value)
-{
-	this.set('url', value);
-};
-barmatz.net.Request.prototype.getMethod = function()
-{
-	return this.get('method');
-};
-barmatz.net.Request.prototype.setMethod = function(value)
-{
-	barmatz.utils.DataTypes.isTypeOf(value, 'string');
-	this.set('method', value);
-};
-barmatz.net.Request.prototype.getAsync = function()
-{
-	return this.get('async');
-};
-barmatz.net.Request.prototype.setAsync = function(value)
-{
-	barmatz.utils.DataTypes.isTypeOf(value, 'boolean');
-	this.set('async', value);
-};
-barmatz.net.Request.prototype.getCredentials = function()
-{
-	return this.get('credentials');
-};
-barmatz.net.Request.prototype.setCredentails = function(value)
-{
-	barmatz.utils.DataTypes.isInstanceOf(value, barmatz.net.RequestCredentials);
-	this.set('credentials', value);
-};
-barmatz.net.Request.prototype.getHeaders = function()
-{
-	return this.get('headers');
-};
-/** barmatz.net.Response **/
-barmatz.net.Response = function(url, data, type, status, headers)
-{
-	barmatz.utils.DataTypes.isNotUndefined(data);
-	barmatz.utils.DataTypes.isTypeOf(url, 'string');
-	barmatz.utils.DataTypes.isTypeOf(type, 'string');
-	barmatz.utils.DataTypes.isTypeOf(status, 'number');
-	barmatz.utils.DataTypes.isInstanceOf(headers, window.Array);
-	barmatz.mvc.Model.call(this);
-	this.set('url', url);
-	this.set('data', data);
-	this.set('type', type);
-	this.set('status', status);
-	this.set('headers', headers);
-};
-barmatz.net.Response.prototype = new barmatz.mvc.Model();
-barmatz.net.Response.prototype.constructor = barmatz.net.Response;
-barmatz.net.Response.prototype.getURL = function()
-{
-	return this.get('url');
-};
-barmatz.net.Response.prototype.getData = function()
-{
-	return this.get('data');
-};
-barmatz.net.Response.prototype.getType = function()
-{
-	return this.get('type');
-};
-barmatz.net.Response.prototype.getStatus = function()
-{
-	return this.get('status');
-};
-barmatz.net.Response.prototype.getHeaders = function()
-{
-	return this.get('headers');
 };
 /** builder **/
 new barmatz.forms.ui.Builder();
