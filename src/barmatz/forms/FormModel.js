@@ -458,7 +458,16 @@ barmatz.forms.FormModel.prototype.loadByFingerprint = function(fingerprint)
 	function onLoaderError(event)
 	{
 		removeLoaderListeners();
-		_this.dispatchEvent(new barmatz.events.FormEvent(barmatz.events.FormEvent.LOADING_FORM_ERROR));
+		
+		switch(stage)
+		{
+			case 1:
+				_this.dispatchEvent(new barmatz.events.FormEvent(barmatz.events.FormEvent.LOADING_FORM_ERROR));
+				break;
+			case 2:
+				_this.dispatchEvent(new barmatz.events.FormEvent(barmatz.events.FormEvent.LOADING_FORM_COMPLETE));
+				break;
+		}
 	}
 };
 barmatz.forms.FormModel.prototype.deleteForm = function()

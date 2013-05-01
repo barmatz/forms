@@ -60,7 +60,7 @@
 			<fileset dir="${SRC_DIR}/barmatz/mvc" includes="Model.js Controller.js"/>
 			<fileset dir="${SRC_DIR}/barmatz/net" includes="Encoding.js Request.js RequestHeader.js Methods.js Loader.js Response.js"/>
 			<fileset dir="${SRC_DIR}/barmatz/forms" includes="Methods.js Directions.js"/>
-			<fileset dir="${SRC_DIR}/barmatz/forms" includes="FormModel.js FormController.js CollectionModel.js CollectionController.js TypeModel.js Validator.js Config.js"/>
+			<fileset dir="${SRC_DIR}/barmatz/forms" includes="FormModel.js FormController.js CollectionModel.js CollectionController.js TypeModel.js Validator.js Config.js Language.js"/>
 			<fileset dir="${SRC_DIR}/barmatz/forms/factories" includes="ModelFactory.js DOMFactory.js ControllerFactory.js"/>
 			<fileset dir="${SRC_DIR}/barmatz/forms/fields" includes="FormItemModel.js"/>
 			<fileset dir="${SRC_DIR}/barmatz/forms/fields" includes="FieldModel.js FieldController.js ValidatorModel.js"/>

@@ -544,7 +544,7 @@ barmatz.net.Loader.prototype.constructor = barmatz.net.Loader;
 barmatz.net.Loader.prototype._xhr = function()
 {
 	if(!this.__xhr)
-		this.__xhr = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject('Microsoft.XMLHTTP');
+		this.__xhr = window.XDomainRequest ? new XDomainRequest() : window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject('Microsoft.XMLHTTP');
 		
 	if(!this.__xhr)
 		throw new Error('XMLHttpRequest is not supported');
@@ -592,32 +592,83 @@ barmatz.net.Loader.prototype.load = function(request)
 	if(data && request.getMethod() == barmatz.net.Methods.GET)
 		url += (url.indexOf('?') > -1 ? '&' : '?') + barmatz.net.Loader.serialize(data);
 	
-	xhr.addEventListener('readystatechange', onReadyStateChange);
+	if(xhr instanceof XMLHttpRequest)
+		xhr.addEventListener('readystatechange', onReadyStateChange);
+	else if(xhr instanceof XDomainRequest)
+	{
+		xhr.onerror = onXHRError;
+		xhr.onload = onXHRLoad;
+		xhr.onprogress = onXHRProgress;
+		xhr.ontimeout = onXHRTimeout;
+	}
+		
+	params = [request.getMethod(), url];
 	
-	params = [request.getMethod(), url, request.getAsync()];
+	if(!(xhr instanceof XDomainRequest))
+	{
+		params.push(request.getAsync());
+		if(credentials)
+			params.push(credentials.getUser() || null, credentials.getPassword() || null);
+	}
 	
-	if(credentials)
-		params.push(credentials.getUser() || null, credentials.getPassword() || null);
+	try
+	{
+		xhr.open.apply(xhr, params);
 	
-	xhr.open.apply(xhr, params);
-	
-	if(headers)
-		barmatz.utils.Array.forEach(headers, function(item, index, collection)
+		if(!(xhr instanceof XDomainRequest))
 		{
-			xhr.setRequestHeader(item.getHeader(), item.getValue());
-			if(item.getHeader().toLowerCase() == 'content-type')
-				contentTypeSet = true;
-		});
+			if(headers)
+				barmatz.utils.Array.forEach(headers, function(item, index, collection)
+				{
+					xhr.setRequestHeader(item.getHeader(), item.getValue());
+					if(item.getHeader().toLowerCase() == 'content-type')
+						contentTypeSet = true;
+				});
+			
+			if(!contentTypeSet)
+				xhr.setRequestHeader('Content-Type', barmatz.net.Encoding.FORM);
+		}
+		
+		params = [];
+		
+		if(request.getMethod() == barmatz.net.Methods.POST)
+			params.push(barmatz.net.Loader.serialize(data));
 	
-	if(!contentTypeSet)
-		xhr.setRequestHeader('Content-Type', barmatz.net.Encoding.FORM);
+		xhr.send.apply(xhr, params);
+	}
+	catch(error)
+	{
+		_this.dispatchEvent(new barmatz.events.LoaderEvent(barmatz.events.LoaderEvent.COMPLETE));
+		_this.dispatchEvent(new barmatz.events.LoaderEvent(barmatz.events.LoaderEvent.ERROR, getResponse()));
+	}
 	
-	params = [];
+	function getResponse()
+	{
+		return new barmatz.net.Response(request.getURL(), xhr.responseText, xhr.responseType || xhr.contentType || '', xhr.status || NaN, xhr.getAllResponseHeaders != null ? xhr.getAllResponseHeaders().split('\n') : []);
+	}
 	
-	if(request.getMethod() == barmatz.net.Methods.POST)
-		params.push(barmatz.net.Loader.serialize(data));
+	function onXHRError()
+	{
+		_this.dispatchEvent(new barmatz.events.LoaderEvent(barmatz.events.LoaderEvent.COMPLETE));
+		_this.dispatchEvent(new barmatz.events.LoaderEvent(barmatz.events.LoaderEvent.ERROR, getResponse()));
+	}
 	
-	xhr.send.apply(xhr, params);
+	function onXHRLoad()
+	{
+		_this.dispatchEvent(new barmatz.events.LoaderEvent(barmatz.events.LoaderEvent.SUCCESS, getResponse()));
+		_this.dispatchEvent(new barmatz.events.LoaderEvent(barmatz.events.LoaderEvent.COMPLETE));
+	}
+	
+	function onXHRProgress()
+	{
+		_this.dispatchEvent(new barmatz.events.LoaderEvent(barmatz.events.LoaderEvent.LOADING, request));
+	}
+	
+	function onXHRTimeout()
+	{
+		_this.dispatchEvent(new barmatz.events.LoaderEvent(barmatz.events.LoaderEvent.COMPLETE));
+		_this.dispatchEvent(new barmatz.events.LoaderEvent(barmatz.events.LoaderEvent.ERROR, getResponse()));
+	}
 	
 	function onReadyStateChange(event)
 	{
@@ -639,9 +690,9 @@ barmatz.net.Loader.prototype.load = function(request)
 				_this.dispatchEvent(new barmatz.events.LoaderEvent(barmatz.events.LoaderEvent.LOADING, request));
 				break;
 			case 4:
-				response = new barmatz.net.Response(request.getURL(), xhr.responseText, xhr.responseType || '', xhr.status, xhr.getAllResponseHeaders().split('\n'));
-
 				_this.dispatchEvent(new barmatz.events.LoaderEvent(barmatz.events.LoaderEvent.COMPLETE));
+				
+				response = getResponse();
 				
 				if(response.getStatus() == 200)
 					_this.dispatchEvent(new barmatz.events.LoaderEvent(barmatz.events.LoaderEvent.SUCCESS, response));
