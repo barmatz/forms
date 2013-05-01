@@ -1341,9 +1341,6 @@ barmatz.forms.factories.DOMFactory = {
 		{
 			var key, value;
 			
-			barmatz.utils.DataTypes.isNotUndefined(event);
-			barmatz.utils.DataTypes.isInstanceOf(event, Event);
-			
 			key = 'set' + barmatz.utils.String.firstLetterToUpperCase(event.target.name);
 			value = event.target.value;
 	

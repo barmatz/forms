@@ -30,13 +30,17 @@ barmatz.forms.FormController = function(model, formView, submitButtonView)
 	 
 	function addLoadingDialog()
 	{
-		loadingDialog = barmatz.forms.factories.DOMFactory.createLoadingDialog(formView);
+		if(!loadingDialog)
+			loadingDialog = barmatz.forms.factories.DOMFactory.createLoadingDialog(formView);
 	}
 	 
 	function removeLoadingDialog()
 	{
-		barmatz.forms.factories.DOMFactory.destroyLoadingDialog(loadingDialog);
-		loadingDialog = null;
+		if(loadingDialog)
+		{
+			barmatz.forms.factories.DOMFactory.destroyLoadingDialog(loadingDialog);
+			loadingDialog = null;
+		}
 	}
 	
 	function submit()

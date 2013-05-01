@@ -195,8 +195,6 @@ barmatz.forms.fields.FieldController = function(model, fieldView, errorMessageVi
 	
 	function onFieldViewChange(event)
 	{
-		barmatz.utils.DataTypes.isInstanceOf(event, Event);
-		
 		if(model instanceof barmatz.forms.fields.PhoneFieldModel && event.target.tagName.toLowerCase() == 'select')
 			return;
 			

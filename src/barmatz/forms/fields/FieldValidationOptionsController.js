@@ -99,9 +99,6 @@ barmatz.forms.fields.FieldValidationOptionsController = function(model, views, d
 	function onViewClick(event)
 	{
 		var i;
-		
-		barmatz.utils.DataTypes.isInstanceOf(event, Event);
-		
 		for(i in views)
 			if(views[i] == event.currentTarget)
 				changeModelByView(views[i], parseInt(i));
