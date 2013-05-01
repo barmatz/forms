@@ -56,14 +56,11 @@ barmatz.forms.CollectionModel.prototype.setItemIndex = function(item, index)
 };
 barmatz.forms.CollectionModel.prototype.forEach = function(handler)
 {
-	var items, i;
-	
 	barmatz.utils.DataTypes.isTypeOf(handler, 'function');
-
-	items = this.get('items');
-	
-	for(i = 0; i < items.length; i++)
-		handler(items[i], i, items);
+	barmatz.utils.Array.forEach(this.get('items'), function(item, index, collection)
+	{
+		handler.apply(this, arguments);
+	}, this);
 };
 barmatz.forms.CollectionModel.prototype.find = function(filter)
 {

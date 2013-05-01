@@ -46,12 +46,11 @@ barmatz.utils.CSS = {
 	},
 	verticalAlignChildren: function(element)
 	{
-		var i;
-		
 		barmatz.utils.DataTypes.isInstanceOf(element, window.HTMLElement);
-		
-		for(i = 0; i < element.children.length; i++)
-			this.verticalAlign(element.children[i]);
+		barmatz.utils.Array.forEach(element.children, function(item, index, collection)
+		{
+			this.verticalAlign(item);
+		});
 	},
 	addClass: function(element, className)
 	{

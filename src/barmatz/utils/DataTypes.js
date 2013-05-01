@@ -8,7 +8,7 @@ barmatz.utils.DataTypes = {
 	VALUE_NULL: 'value is null',
 	_recursiveVlidation: function(value, collection, method, errorMessage, allowNull)
 	{
-		var errors, i;
+		var errors;
 
 		if(!allowNull)
 			this.isValid(value);
@@ -16,18 +16,17 @@ barmatz.utils.DataTypes = {
 			return true;
 		
 		errors = 0;
-		
-		for(i = 0; i < collection.length; i++)
+		barmatz.utils.Array.forEach(collection, function(item, index, collection)
 		{
 			try
 			{
-				method.call(this, value, collection[i], allowNull);
+				method.call(this, value, item, allowNull);
 			}
 			catch(error)
 			{
 				errors++;
 			}
-		}
+		}, this);
 		
 		if(errors == collection.length)
 			if(!this.throwError(TypeError, errorMessage))
@@ -47,7 +46,7 @@ barmatz.utils.DataTypes = {
 	{
 		var returnValue, args;
 		
-		args = window.Array.prototype.slice.call(arguments, 1, arguments.length);
+		args = barmatz.utils.Array.toArray(arguments).slice(1, arguments.length);
 		
 		this.setSilent(true);
 		returnValue = this[method].apply(this, args);

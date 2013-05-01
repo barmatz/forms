@@ -3588,11 +3588,11 @@ test('toString', function()
 	model.addItem(item);
 	ok(model.toString());
 });
-test('towindow.Array', function()
+test('toArray', function()
 {
 	model.addItem(item);
 	
-	array = model.towindow.Array();
+	array = model.toArray();
 	
 	ok(array instanceof window.Array);
 	equal(array.length, 1);

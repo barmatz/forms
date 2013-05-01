@@ -67,7 +67,7 @@ barmatz.net.Loader.prototype.abort = function()
 };
 barmatz.net.Loader.prototype.load = function(request)
 {
-	var _this, xhr, url, data, credentials, headers, contentTypeSet, params, i;
+	var _this, xhr, url, data, credentials, headers, contentTypeSet, params;
 	
 	barmatz.utils.DataTypes.isInstanceOf(request, barmatz.net.Request);
 	
@@ -91,12 +91,12 @@ barmatz.net.Loader.prototype.load = function(request)
 	xhr.open.apply(xhr, params);
 	
 	if(headers)
-		for(i = 0; i < headers.length; i++)
+		barmatz.utils.Array.forEach(headers, function(item, index, collection)
 		{
-			xhr.setRequestHeader(headers[i].getHeader(), headers[i].getValue());
-			if(headers[i].getHeader().toLowerCase() == 'content-type')
+			xhr.setRequestHeader(item.getHeader(), item.getValue());
+			if(item.getHeader().toLowerCase() == 'content-type')
 				contentTypeSet = true;
-		}
+		});
 	
 	if(!contentTypeSet)
 		xhr.setRequestHeader('Content-Type', barmatz.net.Encoding.FORM);

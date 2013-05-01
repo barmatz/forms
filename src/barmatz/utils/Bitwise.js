@@ -2,42 +2,41 @@
 barmatz.utils.Bitwise = {
 	slice: function(bitA, bitB)
 	{
-		var bitsA, bitsB, index, i;
+		var bits;
 		
 		barmatz.utils.DataTypes.isTypeOf(bitA, 'number');
 		barmatz.utils.DataTypes.isTypeOf(bitB, 'number');
 		
-		bitsA = this.parseBit(bitA);
-		bitsB = this.parseBit(bitB);
-		
-		for(i = 0; i < bitsB.length; i++)
+		bits = this.parseBit(bitA);
+		barmatz.utils.Array.forEach(this.parseBit(bitB), function(item, index, collection)
 		{
-			index = bitsA.indexOf(bitsB[i]);
+			index = bits.indexOf(item);
 			
 			if(index > -1)
-				bitsA.splice(index, 1);
-		}
+				bits.splice(index, 1);
+		});
 		
-		return this.concat.apply(this, bitsA);
+		return this.concat.apply(this, bits);
 	},
 	concat: function()
 	{
-		var result, filterredBits, bits, i;
+		var result, filterredBits, bits;
 		
 		bits = [];
 		filterredBits = [];
 		result = 0;
-		
-		for(i = 0; i < arguments.length; i++)
-			bits = bits.concat(this.parseBit(arguments[i]));
-		
+		barmatz.utils.Array.forEach(arguments, function(item, index, collection)
+		{
+			bits = bits.concat(this.parseBit(item));
+		}, this);
 		filterredBits = bits.filter(function(a,b,c)
 		{
 			return filterredBits.indexOf(a) >= 0 ? false : filterredBits.push(a) >= 0;
 		});
-		
-		for(i = 0; i < filterredBits.length; i++)
-			result += filterredBits[i];
+		barmatz.utils.Array.forEach(filterredBits, function(item, index, collection)
+		{
+			result += item;
+		});		
 		
 		return result;
 	},
@@ -49,7 +48,7 @@ barmatz.utils.Bitwise = {
 		
 		bits = [];
 		
-		for(i  = 1; i <= bit; i = i << 1)
+		for(i = 1; i <= bit; i = i << 1)
 			if(i & bit)
 				bits.push(i);
 		

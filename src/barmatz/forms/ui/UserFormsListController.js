@@ -32,19 +32,14 @@ barmatz.forms.ui.UserFormsListController = function(formModel, userModel, view, 
 	
 	function setFormsViews(models)
 	{
-		var model, itemView, i;
-		
 		barmatz.utils.DataTypes.isInstanceOf(models, window.Array);
 		barmatz.utils.DOM.removeAllChildren(view);
-		
-		for(i = 0; i < models.length; i++)
+		barmatz.utils.Array.forEach(models, function(item, index, collection)
 		{
-			model = models[i];
-			model.addEventListener(barmatz.events.FormEvent.LOADING_FORM, onFormModelLoadingForm);
-			itemView = view.appendChild(barmatz.forms.factories.DOMFactory.createUserFormsListItem(i));
-			barmatz.forms.factories.ControllerFactory.createUserFormsListItemController(model, itemView, itemView.children[0], itemView.children[1], itemView.children[2]);
-		}
-		
+			var itemView = view.appendChild(barmatz.forms.factories.DOMFactory.createUserFormsListItem(index));
+			item.addEventListener(barmatz.events.FormEvent.LOADING_FORM, onFormModelLoadingForm);
+			barmatz.forms.factories.ControllerFactory.createUserFormsListItemController(item, itemView, itemView.children[0], itemView.children[1], itemView.children[2]);
+		});
 		jQuery(dialogView).dialog('close').dialog('open');
 	}
 	

@@ -94,7 +94,7 @@ barmatz.forms.fields.FieldModel.prototype.setWidth = function(value)
 };
 barmatz.forms.fields.FieldModel.prototype.validate = function()
 {
-	var errors, code, bits, value, i;
+	var errors, code, bits, value;
 	
 	errors = 0;
 	
@@ -108,13 +108,13 @@ barmatz.forms.fields.FieldModel.prototype.validate = function()
 	{
 		bits = barmatz.utils.Bitwise.parseBit(code);
 		value = this.getValue();
-		
-		for(i = 0; i < bits.length; i++)
-			switch(bits[i])
+		barmatz.utils.Array.forEach(bits, function(item, index, collection)
+		{
+			switch(item)
 			{
 				default:
 					throw new Error('Unknown validation code');
-					break;
+				break;
 				case barmatz.forms.Validator.NONE:
 					break;
 				case barmatz.forms.Validator.NOT_EMPTY:
@@ -162,6 +162,7 @@ barmatz.forms.fields.FieldModel.prototype.validate = function()
 						errors = barmatz.utils.Bitwise.concat(errors, barmatz.forms.Validator.NOT_DIGITS);
 					break;
 			}
+		}, this);
 	}
 	
 	if(errors > 0)

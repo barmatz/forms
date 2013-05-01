@@ -103,7 +103,7 @@ barmatz.forms.fields.DropboxModel.prototype.find = function(filter)
 };
 barmatz.forms.fields.DropboxModel.prototype.clone = function()
 {
-	var clone = new barmatz.forms.fields.DropboxModel(this.getName(), this.get('items').towindow.Array());
+	var clone = new barmatz.forms.fields.DropboxModel(this.getName(), this.get('items').toArray());
 	clone.setLabel(this.getLabel());
 	clone.setMandatory(this.getMandatory());
 	clone.setValue(this.getValue());

@@ -125,18 +125,17 @@ barmatz.forms.fields.FieldController = function(model, fieldView, errorMessageVi
 	
 	function onModelInvalid(event)
 	{
-		var errors, validator, i;
+		var validator;
 		
 		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.FieldEvent);
 		
 		if(errorMessageView)
 		{
-			errors = barmatz.utils.Bitwise.parseBit(event.getErrors());
 			errorMessageView.innerHTML = '';
 			validator = model.getValidator();
-			
-			for(i = 0; i < errors.length; i++)
-				switch(errors[i])
+			barmatz.utils.Array.forEach(barmatz.utils.Bitwise.parseBit(event.getErrors()), function(item, index, collection)
+			{
+				switch(item)
 				{
 					default:
 						throw new Error('Unknown error code');
@@ -177,6 +176,7 @@ barmatz.forms.fields.FieldController = function(model, fieldView, errorMessageVi
 						errorMessageView.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageItemElement(barmatz.forms.Language.form.field.errors.noDigits));
 						break;
 				}
+			});
 			
 			if(isErrorMessageHidden())
 				showErrorMessage();

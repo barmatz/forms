@@ -49,9 +49,10 @@ barmatz.utils.Dictionary.prototype = {
 	},
 	forEach: function(callback)
 	{
-		var i;
-		for(i = 0; i < this._keys.length; i++)
-			callback(this._values[i], this._keys[i]);
+		barmatz.utils.Array.forEach(this._keys, function(item, index, collection)
+		{
+			callback(this._values[index], this._keys[index]);
+		}, this);
 	},
 	find: function(value)
 	{

@@ -6,11 +6,9 @@ barmatz.forms.fields.PhonePrefixes = [
 ];
 barmatz.forms.fields.PhonePrefixes.forEach = function(callback)
 {
-	var i;
-	
-	barmatz.utils.DataTypes.isNotUndefined(callback);
 	barmatz.utils.DataTypes.isTypeOf(callback, 'function');
-	
-	for(i = 0; i < this.length; i++)
-		callback(this[i]);
+	barmatz.utils.Array.forEach(this, function(item, index, collection)
+	{
+		callback(item);
+	});
 };

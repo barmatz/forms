@@ -194,13 +194,13 @@ barmatz.forms.ui.BuilderController = function(formModel, userModel, containerVie
 	function onToolboxItemViewClick(event)
 	{
 		barmatz.utils.DataTypes.isInstanceOf(event, MouseEvent);
-		formModel.addItem(toolboxModel.getItemAt(window.Array.prototype.slice.call(toolboxView.children).indexOf(event.target)).getFieldModel().clone());
+		formModel.addItem(toolboxModel.getItemAt(barmatz.utils.Array.toArray(toolboxView.children).indexOf(event.target)).getFieldModel().clone());
 	}
 	
 	function onWorkspaceViewItemClick(event)
 	{
 		barmatz.utils.DataTypes.isInstanceOf(event, MouseEvent);
-		propertiesController.setModel(formModel.getItemAt(window.Array.prototype.slice.call(workspaceView.children).indexOf(event.currentTarget)));
+		propertiesController.setModel(formModel.getItemAt(barmatz.utils.Array.toArray(workspaceView.children).indexOf(event.currentTarget)));
 	}
 	
 	function onFormModelDeleting(event) 

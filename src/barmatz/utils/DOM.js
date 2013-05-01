@@ -26,14 +26,15 @@ barmatz.utils.DOM = {
 	},
 	sort: function(element, compareFunction)
 	{
-		var children, i;
+		var children;
 
 		barmatz.utils.DataTypes.isInstanceOf(element, window.HTMLElement);
 		barmatz.utils.DataTypes.isTypeOf(compareFunction, 'function');
 		
-		children = window.Array.prototype.slice.call(element.children).sort(compareFunction);
-		
-		for(i = 0; i < children.length; i++)
-			element.appendChild(children[i]);
+		children = barmatz.utils.Array.toArray(element.children).sort(compareFunction);
+		barmatz.utils.Array.forEach(children, function(item, index, collection)
+		{
+			element.appendChild(item);
+		});
 	}
 };

@@ -35,7 +35,7 @@ barmatz.forms.ui.WorkspaceController = function(model, view, dialogContainerView
 	function getIndexFromSortEvent(element)
 	{
 		barmatz.utils.DataTypes.isInstanceOf(element, window.HTMLElement);
-		return window.Array.prototype.slice.call(element.parentElement.children).indexOf(element);
+		return barmatz.utils.Array.toArray(element.parentElement.children).indexOf(element);
 	}
 	
 	function openNewFieldDialog(model)

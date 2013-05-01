@@ -18,7 +18,7 @@ barmatz.events.EventDispatcher.prototype = {
 	},
 	dispatchEvent: function(event)
 	{
-		var queue, i, c;
+		var queue, i;
 		
 		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.Event);
 		
@@ -30,11 +30,14 @@ barmatz.events.EventDispatcher.prototype = {
 			{
 				queue = [];
 				
-				for(c = 0; c < this._listeners[i].length; c++)
-					queue.push(this._listeners[i][c]);
-				
-				for(c = 0; c < queue.length; c++)
-					queue[c].call(this, event);
+				barmatz.utils.Array.forEach(this._listeners[i], function(item, index, collection)
+				{
+					queue.push(item);
+				});
+				barmatz.utils.Array.forEach(queue, function(item, index, collection)
+				{
+					item.call(this, event);
+				}, this);				
 			}
 		}
 	},
@@ -44,13 +47,13 @@ barmatz.events.EventDispatcher.prototype = {
 	},
 	removeEventListener: function(type, listener)
 	{
-		var i;
-		
 		if(this._listeners[type])
 		{
-			for(i = 0; i < this._listeners[type].length; i++)
-				if(this._listeners[type][i] === listener)
-					this._listeners[type].splice(i, 1);
+			barmatz.utils.Array.forEach(this._listeners[type], function(item, index, collection)
+			{
+				if(item === listener)
+					collection.splice(index, 1);
+			}, this);
 			
 			if(this._listeners[type].length == 0)
 				delete this._listeners[type];

@@ -16,7 +16,7 @@
 	<target name="build" depends="init">
 		<concat destfile="${BIN_DIR}/js/login.js" fixlastline="yes">
 			<fileset dir="${SRC_DIR}" includes="namespaces.js"/>
-			<fileset dir="${SRC_DIR}/barmatz/utils" includes="DataTypes.js"/>
+			<fileset dir="${SRC_DIR}/barmatz/utils" includes="Array.js DataTypes.js"/>
 			<fileset dir="${SRC_DIR}/barmatz/events" includes="Event.js"/>
 			<fileset dir="${SRC_DIR}/barmatz/events" includes="EventDispatcher.js ModelEvent.js UserEvent.js LoaderEvent.js"/>
 			<fileset dir="${SRC_DIR}/barmatz/mvc" includes="Model.js Controller.js"/>
@@ -29,7 +29,7 @@
 		</concat>
 		<concat destfile="${BIN_DIR}/js/builder.js" fixlastline="yes">
 			<fileset dir="${SRC_DIR}" includes="namespaces.js"/>
-			<fileset dir="${SRC_DIR}/barmatz/utils" includes="DataTypes.js CSS.js DOM.js Date.js String.js Bitwise.js Dictionary.js"/>
+			<fileset dir="${SRC_DIR}/barmatz/utils" includes="Array.js DataTypes.js CSS.js DOM.js Date.js String.js Bitwise.js Dictionary.js"/>
 			<fileset dir="${SRC_DIR}/barmatz/events" includes="Event.js"/>
 			<fileset dir="${SRC_DIR}/barmatz/events" includes="EventDispatcher.js ModelEvent.js LoaderEvent.js UserEvent.js CollectionEvent.js FormEvent.js FieldEvent.js"/>
 			<fileset dir="${SRC_DIR}/barmatz/mvc" includes="Model.js Controller.js"/>
@@ -54,17 +54,18 @@
 		</concat>
 		<concat destfile="${BIN_DIR}/js/embed.js" fixlastline="yes">
 			<fileset dir="${SRC_DIR}" includes="namespaces.js"/>
-			<fileset dir="${SRC_DIR}/barmatz/utils" includes="Bitwise.js DataTypes.js Dictionary.js CSS.js Date.js"/>
+			<fileset dir="${SRC_DIR}/barmatz/utils" includes="Array.js Bitwise.js DataTypes.js Dictionary.js CSS.js Date.js"/>
 			<fileset dir="${SRC_DIR}/barmatz/events" includes="Event.js"/>
 			<fileset dir="${SRC_DIR}/barmatz/events" includes="EventDispatcher.js ModelEvent.js FormEvent.js FieldEvent.js LoaderEvent.js CollectionEvent.js"/>
 			<fileset dir="${SRC_DIR}/barmatz/mvc" includes="Model.js Controller.js"/>
-			<fileset dir="${SRC_DIR}/barmatz/forms" includes="FormModel.js FormController.js CollectionModel.js CollectionController.js Methods.js TypeModel.js Validator.js Directions.js Config.js"/>
+			<fileset dir="${SRC_DIR}/barmatz/net" includes="Encoding.js Request.js RequestHeader.js Methods.js Loader.js Response.js"/>
+			<fileset dir="${SRC_DIR}/barmatz/forms" includes="Methods.js Directions.js"/>
+			<fileset dir="${SRC_DIR}/barmatz/forms" includes="FormModel.js FormController.js CollectionModel.js CollectionController.js TypeModel.js Validator.js Config.js"/>
 			<fileset dir="${SRC_DIR}/barmatz/forms/factories" includes="ModelFactory.js DOMFactory.js ControllerFactory.js"/>
 			<fileset dir="${SRC_DIR}/barmatz/forms/fields" includes="FormItemModel.js"/>
 			<fileset dir="${SRC_DIR}/barmatz/forms/fields" includes="FieldModel.js FieldController.js ValidatorModel.js"/>
 			<fileset dir="${SRC_DIR}/barmatz/forms/fields" includes="TextFieldModel.js "/>
 			<fileset dir="${SRC_DIR}/barmatz/forms/fields" includes="FieldTypes.js HTMLContentModel.js TextAreaFieldModel.js DropboxModel.js PasswordFieldModel.js CheckboxFieldModel.js RadioFieldModel.js FileFieldModel.js HiddenFieldModel.js PhoneFieldModel.js DropboxItemModel.js FieldValidationOptionsController.js DropboxItemsListController.js DropboxItemsListItemController.js PhonePrefixes.js"/>
-			<fileset dir="${SRC_DIR}/barmatz/net" includes="Encoding.js Request.js RequestHeader.js Methods.js Loader.js Response.js"/>
 			<fileset dir="${SRC_DIR}" includes="embed.js"/>
 		</concat>
 		<concat destfile="${BIN_DIR}/css/main.css" fixlastline="yes">

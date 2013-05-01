@@ -114,18 +114,15 @@ barmatz.forms.users.UserModel.prototype.getForms = function()
 	
 	function parseFormsData(data)
 	{
-		var form, i;
-		
 		barmatz.utils.DataTypes.isInstanceOf(data, window.Array);
-		
-		for(i = 0; i < data.length; i++)
+		barmatz.utils.Array.forEach(data, function(item, index, collection)
 		{
-			form = barmatz.forms.factories.ModelFactory.createFormModel();
-			form.setCreated(barmatz.utils.Date.toDate(data[i].created));
-			form.setFingerprint(data[i].fingerprint);
-			form.setName(data[i].name);
-			data[i] = form;
-		}
+			var form = barmatz.forms.factories.ModelFactory.createFormModel();
+			form.setCreated(barmatz.utils.Date.toDate(item.created));
+			form.setFingerprint(item.fingerprint);
+			form.setName(item.name);
+			collection[index] = form;
+		});
 	}
 	
 	function onLoadUserDataSucces(event)

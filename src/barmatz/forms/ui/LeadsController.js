@@ -146,17 +146,13 @@ barmatz.forms.ui.LeadsController = function(userModel, formsListModel, formsList
 	
 	function onUserModelGetFormsSuccess(event)
 	{
-		var forms, i;
-		
 		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.UserEvent);
-		
 		removeUserModelListeners();
 		removeLoadingDialog();
-		
-		forms = event.getForms();
-		
-		for(i = 0; i < forms.length; i++)
-			formsListModel.addItem(forms[i]);
+		barmatz.utils.Array.forEach(event.getForms(), function(item, index, collection)
+		{
+			formsListModel.addItem(item);
+		});
 	}
 	
 	function onUserModelGetFormsFail(event)
@@ -168,17 +164,13 @@ barmatz.forms.ui.LeadsController = function(userModel, formsListModel, formsList
 	
 	function onFormModelGetLeadsSuccess(event)
 	{
-		var leads, i;
-		
 		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.FormEvent);
-		
 		removeFormModelListeners(event.getTarget());
 		removeLoadingDialog();
-		
-		leads = event.getLeads();
-		
-		for(i = 0; i < leads.length; i++)
-			leadsListModel.addItem(leads[i]);
+		barmatz.utils.Array.forEach(event.getLeads(), function(item, index, collection)
+		{
+			leadsListModel.addItem(item);
+		});
 	}
 	
 	function onFormModelGetLeadsFail(event)

@@ -11,6 +11,26 @@ barmatz = {
 	net: {},
 	utils: {}
 };
+/** barmatz.utils.Array **/
+barmatz.utils.Array = {
+	toArray: function(object)
+	{
+		var array = [];
+		
+		this.forEach(object, function(item, index, collection)
+		{
+			array[index] = item;
+		});
+		
+		return array;
+	},
+	forEach: function(array, callback, thisObject)
+	{
+		var i;
+		for(i = 0; i < array.length; i++)
+			callback.call(thisObject || this, array[i], i, array);
+	}
+};
 /** barmatz.utils.DataTypes **/
 barmatz.utils.DataTypes = {
 	UNDEFINED_ERROR: 'expected property is undefined',
@@ -21,7 +41,7 @@ barmatz.utils.DataTypes = {
 	VALUE_NULL: 'value is null',
 	_recursiveVlidation: function(value, collection, method, errorMessage, allowNull)
 	{
-		var errors, i;
+		var errors;
 
 		if(!allowNull)
 			this.isValid(value);
@@ -29,18 +49,17 @@ barmatz.utils.DataTypes = {
 			return true;
 		
 		errors = 0;
-		
-		for(i = 0; i < collection.length; i++)
+		barmatz.utils.Array.forEach(collection, function(item, index, collection)
 		{
 			try
 			{
-				method.call(this, value, collection[i], allowNull);
+				method.call(this, value, item, allowNull);
 			}
 			catch(error)
 			{
 				errors++;
 			}
-		}
+		}, this);
 		
 		if(errors == collection.length)
 			if(!this.throwError(TypeError, errorMessage))
@@ -60,7 +79,7 @@ barmatz.utils.DataTypes = {
 	{
 		var returnValue, args;
 		
-		args = window.Array.prototype.slice.call(arguments, 1, arguments.length);
+		args = barmatz.utils.Array.toArray(arguments).slice(1, arguments.length);
 		
 		this.setSilent(true);
 		returnValue = this[method].apply(this, args);
@@ -195,7 +214,7 @@ barmatz.events.Event.prototype = {
 	{
 		var parameters = [], key, i;
 		
-		arguments = window.Array.prototype.slice.call(arguments);
+		arguments = barmatz.utils.Array.toArray(arguments);
 		
 		for(i = 1; i < arguments.length; i++)
 		{
@@ -234,7 +253,7 @@ barmatz.events.EventDispatcher.prototype = {
 	},
 	dispatchEvent: function(event)
 	{
-		var queue, i, c;
+		var queue, i;
 		
 		barmatz.utils.DataTypes.isInstanceOf(event, barmatz.events.Event);
 		
@@ -246,11 +265,14 @@ barmatz.events.EventDispatcher.prototype = {
 			{
 				queue = [];
 				
-				for(c = 0; c < this._listeners[i].length; c++)
-					queue.push(this._listeners[i][c]);
-				
-				for(c = 0; c < queue.length; c++)
-					queue[c].call(this, event);
+				barmatz.utils.Array.forEach(this._listeners[i], function(item, index, collection)
+				{
+					queue.push(item);
+				});
+				barmatz.utils.Array.forEach(queue, function(item, index, collection)
+				{
+					item.call(this, event);
+				}, this);				
 			}
 		}
 	},
@@ -260,13 +282,13 @@ barmatz.events.EventDispatcher.prototype = {
 	},
 	removeEventListener: function(type, listener)
 	{
-		var i;
-		
 		if(this._listeners[type])
 		{
-			for(i = 0; i < this._listeners[type].length; i++)
-				if(this._listeners[type][i] === listener)
-					this._listeners[type].splice(i, 1);
+			barmatz.utils.Array.forEach(this._listeners[type], function(item, index, collection)
+			{
+				if(item === listener)
+					collection.splice(index, 1);
+			}, this);
 			
 			if(this._listeners[type].length == 0)
 				delete this._listeners[type];
@@ -556,7 +578,7 @@ barmatz.net.Loader.prototype.abort = function()
 };
 barmatz.net.Loader.prototype.load = function(request)
 {
-	var _this, xhr, url, data, credentials, headers, contentTypeSet, params, i;
+	var _this, xhr, url, data, credentials, headers, contentTypeSet, params;
 	
 	barmatz.utils.DataTypes.isInstanceOf(request, barmatz.net.Request);
 	
@@ -580,12 +602,12 @@ barmatz.net.Loader.prototype.load = function(request)
 	xhr.open.apply(xhr, params);
 	
 	if(headers)
-		for(i = 0; i < headers.length; i++)
+		barmatz.utils.Array.forEach(headers, function(item, index, collection)
 		{
-			xhr.setRequestHeader(headers[i].getHeader(), headers[i].getValue());
-			if(headers[i].getHeader().toLowerCase() == 'content-type')
+			xhr.setRequestHeader(item.getHeader(), item.getValue());
+			if(item.getHeader().toLowerCase() == 'content-type')
 				contentTypeSet = true;
-		}
+		});
 	
 	if(!contentTypeSet)
 		xhr.setRequestHeader('Content-Type', barmatz.net.Encoding.FORM);
@@ -794,14 +816,11 @@ barmatz.forms.CollectionModel.prototype.setItemIndex = function(item, index)
 };
 barmatz.forms.CollectionModel.prototype.forEach = function(handler)
 {
-	var items, i;
-	
 	barmatz.utils.DataTypes.isTypeOf(handler, 'function');
-
-	items = this.get('items');
-	
-	for(i = 0; i < items.length; i++)
-		handler(items[i], i, items);
+	barmatz.utils.Array.forEach(this.get('items'), function(item, index, collection)
+	{
+		handler.apply(this, arguments);
+	}, this);
 };
 barmatz.forms.CollectionModel.prototype.find = function(filter)
 {
@@ -964,8 +983,6 @@ barmatz.forms.factories.DOMFactory = {
 		
 		function addContent(content, parent, wrapperTag)
 		{
-			var i;
-			
 			if(barmatz.utils.DataTypes.applySilent('isTypeOf', content, 'string'))
 			{
 				if(wrapperTag)
@@ -977,8 +994,10 @@ barmatz.forms.factories.DOMFactory = {
 				parent.appendChild(appendChildWrapper != null ? appendChildWrapper(content) : content);
 			else if(barmatz.utils.DataTypes.applySilent('isInstanceOf', content, window.Array))
 			{
-				for(i = 0; i < content.length; i++)
-					addContent(content[i], parent, 'span');
+				barmatz.utils.Array.forEach(content, function(item, index, collection)
+				{
+					addContent(item, parent, 'span');
+				});
 			}
 		}
 	},
@@ -1362,7 +1381,7 @@ barmatz.forms.factories.DOMFactory = {
 	},
 	createPropertiesItemFieldWrapper: function(type, name, label, value, changeHandler)
 	{
-		var content, field, i;
+		var content, field;
 		
 		barmatz.utils.DataTypes.isTypeOf(type, 'string');
 		barmatz.utils.DataTypes.isTypeOf(name, 'string');
@@ -1393,9 +1412,10 @@ barmatz.forms.factories.DOMFactory = {
 				break;
 			case 'array':
 				field = this.createElement('select');
-				
-				for(i = 0; i < value.length; i++)
-					field.appendChild(this.createElement('option')).innerHTML = value[i];
+				barmatz.utils.Array.forEach(value, function(item, index, collection)
+				{
+					field.appendChild(this.createElement('option')).innerHTML = item;
+				});
 				break;
 			case 'boolean':
 				field = this.createDropboxElement(barmatz.forms.factories.ModelFactory.createDropboxModel(name, [
@@ -1623,19 +1643,16 @@ barmatz.forms.factories.DOMFactory = {
 	{
 		var options, model, i; 
 		
-		barmatz.utils.DataTypes.isNotUndefined(panels);
 		barmatz.utils.DataTypes.isInstanceOf(panels, window.Array);
 		
 		options = new barmatz.forms.ui.TableOptions();
 		options.setClassName('forms-wrapper');
 		options.getBodyRows().push([]);
-		
-		for(i = 0; i < panels.length; i++)
+		barmatz.utils.Array.forEach(panels, function(item, index, collection)
 		{
-			model = panels[i];
-			options.getBodyRows()[0].push(model.getContent());
-			options.getBodyColumnsClassNames().push(model.getClassName());
-		}
+			options.getBodyRows()[0].push(item.getContent());
+			options.getBodyColumnsClassNames().push(item.getClassName());
+		});
 		
 		return this.createTable(options);
 	},
@@ -1868,20 +1885,21 @@ barmatz.forms.factories.DOMFactory = {
 		
 		function getBodyRows()
 		{
-			var rows = [], bodyRows, bodyRowsClassNames, i;
+			var rows = [], bodyRowsClassNames;
 			
-			bodyRows = options.getBodyRows();
 			bodyRowsClassNames = options.getBodyRowsClassNames();
 			
-			for(i = 0; i < bodyRows.length; i++)
-				rows.push(_this.createTableRow(bodyRows[i], options.getBodyColumnsClassNames(), bodyRowsClassNames[i % bodyRowsClassNames.length]));
+			barmatz.utils.Array.forEach(options.getBodyRows(), function(item, index, collection)
+			{
+				rows.push(_this.createTableRow(item, options.getBodyColumnsClassNames(), bodyRowsClassNames[index % bodyRowsClassNames.length]));
+			});
 			
 			return rows;
 		}
 	},
 	createTableRow: function(content, contentClassNames, className, isHead)
 	{
-		var columns, i;
+		var columns;
 		
 		barmatz.utils.DataTypes.isInstanceOf(content, window.Array);
 		barmatz.utils.DataTypes.isInstanceOf(contentClassNames, window.Array, true);
@@ -1890,8 +1908,10 @@ barmatz.forms.factories.DOMFactory = {
 		
 		columns = [];
 		
-		for(i = 0; i < content.length; i++)
-			columns.push(this.createTableColumn(content[i], contentClassNames ? contentClassNames[i % contentClassNames.length] : null, isHead)); 
+		barmatz.utils.Array.forEach(content, function(item, index, collection)
+		{
+			columns.push(this.createTableColumn(item, contentClassNames ? contentClassNames[index % contentClassNames.length] : null, isHead)); 
+		}, this);
 		
 		return this.createElementWithContent('tr', className, columns);
 	},
@@ -2019,7 +2039,7 @@ barmatz.forms.factories.DOMFactory = {
 	},
 	createFieldValidationOptionsWrapper: function(model)
 	{
-		var wrapper, options, fieldValidatorWrapper, bits, i;
+		var wrapper, options, fieldValidatorWrapper, bits;
 		
 		barmatz.utils.DataTypes.isNotUndefined(model);
 		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FieldModel);
@@ -2027,13 +2047,12 @@ barmatz.forms.factories.DOMFactory = {
 		wrapper = this.createElement('div');
 		bits = barmatz.utils.Bitwise.parseBit(model.getAvailableValidators());
 		options = {};
-		
-		for(i = 0; i < bits.length; i++)
+		barmatz.utils.Array.forEach(bits, function(item, index, collection)
 		{
-			fieldValidatorWrapper = this.createFieldValidatorWrapper(bits[i]);
-			options[bits[i]] = fieldValidatorWrapper.checkbox;
+			fieldValidatorWrapper = this.createFieldValidatorWrapper(item);
+			options[item] = fieldValidatorWrapper.checkbox;
 			wrapper.appendChild(fieldValidatorWrapper.wrapper);
-		}
+		}, this);
 		
 		barmatz.utils.DOM.sort(wrapper, function(elementA, elementB)
 		{
@@ -2634,18 +2653,15 @@ barmatz.forms.users.UserModel.prototype.getForms = function()
 	
 	function parseFormsData(data)
 	{
-		var form, i;
-		
 		barmatz.utils.DataTypes.isInstanceOf(data, window.Array);
-		
-		for(i = 0; i < data.length; i++)
+		barmatz.utils.Array.forEach(data, function(item, index, collection)
 		{
-			form = barmatz.forms.factories.ModelFactory.createFormModel();
-			form.setCreated(barmatz.utils.Date.toDate(data[i].created));
-			form.setFingerprint(data[i].fingerprint);
-			form.setName(data[i].name);
-			data[i] = form;
-		}
+			var form = barmatz.forms.factories.ModelFactory.createFormModel();
+			form.setCreated(barmatz.utils.Date.toDate(item.created));
+			form.setFingerprint(item.fingerprint);
+			form.setName(item.name);
+			collection[index] = form;
+		});
 	}
 	
 	function onLoadUserDataSucces(event)

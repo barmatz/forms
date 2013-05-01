@@ -190,20 +190,18 @@ barmatz.forms.ui.BuilderModel.prototype.setWorkspaceViewItemClickHandler = funct
 	
 	function addOrRemoveClickHandlerFromItems(action)
 	{
-		var element, handler, i;
+		var handler;
 		
 		barmatz.utils.DataTypes.isTypeOf(action, 'string');
-		
-		for(i = 0; i < _this.get('workspaceViewWrapper').workspace.children.length; i++)
+		barmatz.utils.Array.forEach(_this.get('workspaceViewWrapper').workspace.children, function(item, index, collection)
 		{
-			element = _this.get('workspaceViewWrapper').workspace.children[i];
 			handler = action == 'add' ? _this.getWorkspaceViewItemClickHandler() : null;
 			
 			if(handler != null)
-				element.addEventListener('click', handler);
-			else if(element.hasEventListener('click'))
-				element.removeEventListener('click', handler);
-		}
+				item.addEventListener('click', handler);
+			else if(item.hasEventListener('click'))
+				item.removeEventListener('click', handler);
+		});
 	}
 };
 barmatz.forms.ui.BuilderModel.prototype.getPropertiesControllerModel = function()
@@ -246,7 +244,7 @@ barmatz.forms.ui.BuilderModel.prototype.getFormModelItemAt = function(index)
 barmatz.forms.ui.BuilderModel.prototype.getIndexOfView = function(view)
 {
 	barmatz.utils.DataTypes.isInstanceOf(view, window.HTMLElement);
-	return view.parentElement ? window.Array.prototype.slice.call(view.parentElement.children).indexOf(view) : 0;
+	return view.parentElement ? barmatz.utils.Array.toArray(view.parentElement.children).indexOf(view) : 0;
 };
 barmatz.forms.ui.BuilderModel.prototype.getFieldModelFromToolboxModelAt = function(index)
 {

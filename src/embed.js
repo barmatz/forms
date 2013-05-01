@@ -7,12 +7,11 @@ barmatz.forms.embed = function(fingerprint)
 	
 	function getContainers()
 	{
-		var containers, i;
-		
-		containers = window.Array.prototype.slice.call(document.getElementsByName('formContainer')).filter(filterFormContainers);
-
-		for(i = 0; i < containers.length; i++)
-			embedForm(containers[i]);
+		var containers = barmatz.utils.Array.toArray(document.getElementsByName('formContainer')).filter(filterFormContainers);
+		barmatz.utils.Array.forEach(containers, function(item, index, collection)
+		{
+			embedForm(item);
+		});
 	}
 	
 	function filterFormContainers(element)
@@ -47,7 +46,7 @@ barmatz.forms.embed = function(fingerprint)
 	
 	function addFormToContainer(model)
 	{
-		var container, wrapper, field, submitButton, stylesheets, i;
+		var container, wrapper, field, submitButton;
 		
 		container = dictionary.get(model);
 		wrapper = barmatz.forms.factories.DOMFactory.createElement('div', 'forms-form-wrapper forms-layout-' + model.getLayoutId());
@@ -70,10 +69,10 @@ barmatz.forms.embed = function(fingerprint)
 				break;
 		}
 		
-		stylesheets = model.getStylesheets();
-
-		for(i = 0; i < stylesheets.length; i++)
-			container.appendChild(barmatz.forms.factories.DOMFactory.createStylesheet(stylesheets[i]));
+		barmatz.utils.Array.forEach(model.getStylesheets(), function(item, index, collection)
+		{
+			container.appendChild(barmatz.forms.factories.DOMFactory.createStylesheet(item));
+		});
 		
 		model.forEach(function(item, index, collection)
 		{

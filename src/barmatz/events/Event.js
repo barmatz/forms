@@ -25,7 +25,7 @@ barmatz.events.Event.prototype = {
 	{
 		var parameters = [], key, i;
 		
-		arguments = window.Array.prototype.slice.call(arguments);
+		arguments = barmatz.utils.Array.toArray(arguments);
 		
 		for(i = 1; i < arguments.length; i++)
 		{

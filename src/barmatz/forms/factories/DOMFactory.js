@@ -52,8 +52,6 @@ barmatz.forms.factories.DOMFactory = {
 		
 		function addContent(content, parent, wrapperTag)
 		{
-			var i;
-			
 			if(barmatz.utils.DataTypes.applySilent('isTypeOf', content, 'string'))
 			{
 				if(wrapperTag)
@@ -65,8 +63,10 @@ barmatz.forms.factories.DOMFactory = {
 				parent.appendChild(appendChildWrapper != null ? appendChildWrapper(content) : content);
 			else if(barmatz.utils.DataTypes.applySilent('isInstanceOf', content, window.Array))
 			{
-				for(i = 0; i < content.length; i++)
-					addContent(content[i], parent, 'span');
+				barmatz.utils.Array.forEach(content, function(item, index, collection)
+				{
+					addContent(item, parent, 'span');
+				});
 			}
 		}
 	},
@@ -450,7 +450,7 @@ barmatz.forms.factories.DOMFactory = {
 	},
 	createPropertiesItemFieldWrapper: function(type, name, label, value, changeHandler)
 	{
-		var content, field, i;
+		var content, field;
 		
 		barmatz.utils.DataTypes.isTypeOf(type, 'string');
 		barmatz.utils.DataTypes.isTypeOf(name, 'string');
@@ -481,9 +481,10 @@ barmatz.forms.factories.DOMFactory = {
 				break;
 			case 'array':
 				field = this.createElement('select');
-				
-				for(i = 0; i < value.length; i++)
-					field.appendChild(this.createElement('option')).innerHTML = value[i];
+				barmatz.utils.Array.forEach(value, function(item, index, collection)
+				{
+					field.appendChild(this.createElement('option')).innerHTML = item;
+				});
 				break;
 			case 'boolean':
 				field = this.createDropboxElement(barmatz.forms.factories.ModelFactory.createDropboxModel(name, [
@@ -711,19 +712,16 @@ barmatz.forms.factories.DOMFactory = {
 	{
 		var options, model, i; 
 		
-		barmatz.utils.DataTypes.isNotUndefined(panels);
 		barmatz.utils.DataTypes.isInstanceOf(panels, window.Array);
 		
 		options = new barmatz.forms.ui.TableOptions();
 		options.setClassName('forms-wrapper');
 		options.getBodyRows().push([]);
-		
-		for(i = 0; i < panels.length; i++)
+		barmatz.utils.Array.forEach(panels, function(item, index, collection)
 		{
-			model = panels[i];
-			options.getBodyRows()[0].push(model.getContent());
-			options.getBodyColumnsClassNames().push(model.getClassName());
-		}
+			options.getBodyRows()[0].push(item.getContent());
+			options.getBodyColumnsClassNames().push(item.getClassName());
+		});
 		
 		return this.createTable(options);
 	},
@@ -956,20 +954,21 @@ barmatz.forms.factories.DOMFactory = {
 		
 		function getBodyRows()
 		{
-			var rows = [], bodyRows, bodyRowsClassNames, i;
+			var rows = [], bodyRowsClassNames;
 			
-			bodyRows = options.getBodyRows();
 			bodyRowsClassNames = options.getBodyRowsClassNames();
 			
-			for(i = 0; i < bodyRows.length; i++)
-				rows.push(_this.createTableRow(bodyRows[i], options.getBodyColumnsClassNames(), bodyRowsClassNames[i % bodyRowsClassNames.length]));
+			barmatz.utils.Array.forEach(options.getBodyRows(), function(item, index, collection)
+			{
+				rows.push(_this.createTableRow(item, options.getBodyColumnsClassNames(), bodyRowsClassNames[index % bodyRowsClassNames.length]));
+			});
 			
 			return rows;
 		}
 	},
 	createTableRow: function(content, contentClassNames, className, isHead)
 	{
-		var columns, i;
+		var columns;
 		
 		barmatz.utils.DataTypes.isInstanceOf(content, window.Array);
 		barmatz.utils.DataTypes.isInstanceOf(contentClassNames, window.Array, true);
@@ -978,8 +977,10 @@ barmatz.forms.factories.DOMFactory = {
 		
 		columns = [];
 		
-		for(i = 0; i < content.length; i++)
-			columns.push(this.createTableColumn(content[i], contentClassNames ? contentClassNames[i % contentClassNames.length] : null, isHead)); 
+		barmatz.utils.Array.forEach(content, function(item, index, collection)
+		{
+			columns.push(this.createTableColumn(item, contentClassNames ? contentClassNames[index % contentClassNames.length] : null, isHead)); 
+		}, this);
 		
 		return this.createElementWithContent('tr', className, columns);
 	},
@@ -1107,7 +1108,7 @@ barmatz.forms.factories.DOMFactory = {
 	},
 	createFieldValidationOptionsWrapper: function(model)
 	{
-		var wrapper, options, fieldValidatorWrapper, bits, i;
+		var wrapper, options, fieldValidatorWrapper, bits;
 		
 		barmatz.utils.DataTypes.isNotUndefined(model);
 		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FieldModel);
@@ -1115,13 +1116,12 @@ barmatz.forms.factories.DOMFactory = {
 		wrapper = this.createElement('div');
 		bits = barmatz.utils.Bitwise.parseBit(model.getAvailableValidators());
 		options = {};
-		
-		for(i = 0; i < bits.length; i++)
+		barmatz.utils.Array.forEach(bits, function(item, index, collection)
 		{
-			fieldValidatorWrapper = this.createFieldValidatorWrapper(bits[i]);
-			options[bits[i]] = fieldValidatorWrapper.checkbox;
+			fieldValidatorWrapper = this.createFieldValidatorWrapper(item);
+			options[item] = fieldValidatorWrapper.checkbox;
 			wrapper.appendChild(fieldValidatorWrapper.wrapper);
-		}
+		}, this);
 		
 		barmatz.utils.DOM.sort(wrapper, function(elementA, elementB)
 		{

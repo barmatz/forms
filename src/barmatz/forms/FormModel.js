@@ -361,7 +361,7 @@ barmatz.forms.FormModel.prototype.loadByFingerprint = function(fingerprint)
 	
 	function objectToFormModel(data)
 	{
-		var model, fieldModel, fieldData, itemData, i, c;
+		var model, fieldModel;
 		
 		barmatz.utils.DataTypes.isTypeOf(data, 'object');
 		
@@ -377,53 +377,48 @@ barmatz.forms.FormModel.prototype.loadByFingerprint = function(fingerprint)
 		model.setSubmitButtonLabel(data.submitButtonLabel);
 		model.setTargetEmail(data.email);
 		model.setExternalAPI(data.externalAPI || '');
-
-		for(i = 0; i < data.fields.length; i++)
+		barmatz.utils.Array.forEach(data.fields, function(item, index, collection)
 		{
-			fieldData = data.fields[i];
-			fieldModel = barmatz.forms.factories.ModelFactory.createFieldModel(fieldData.type, fieldData.name);
+			fieldModel = barmatz.forms.factories.ModelFactory.createFieldModel(item.type, item.name);
 			
 			if(fieldModel instanceof barmatz.forms.fields.FieldModel)
 			{
-				fieldModel.setLabel(fieldData.label || '');
-				fieldModel.setMandatory(fieldData.mandatory || false);
-				fieldModel.setEnabled(fieldData.enabled || true);
-				fieldModel.setValidator(barmatz.forms.factories.ModelFactory.createValidatorModel(fieldData.validator));
-				fieldModel.setWidth(fieldData.width || NaN);
+				fieldModel.setLabel(item.label || '');
+				fieldModel.setMandatory(item.mandatory || false);
+				fieldModel.setEnabled(item.enabled || true);
+				fieldModel.setValidator(barmatz.forms.factories.ModelFactory.createValidatorModel(item.validator));
+				fieldModel.setWidth(item.width || NaN);
 			}
 			
 			if(fieldModel instanceof barmatz.forms.fields.FileFieldModel)
-				fieldModel.setAccept(fieldData.accept || []);
-
+				fieldModel.setAccept(item.accept || []);
+			
 			if(fieldModel instanceof barmatz.forms.fields.TextFieldModel)
 			{
-				fieldModel.setMax(fieldData.max || NaN);
-				fieldModel.setDescription(fieldData.description || '');
+				fieldModel.setMax(item.max || NaN);
+				fieldModel.setDescription(item.description || '');
 			}
 			
 			if(fieldModel instanceof barmatz.forms.fields.TextAreaFieldModel)
 			{
-				fieldModel.setRows(fieldData.rows || 2);
-				fieldModel.setCols(fieldData.cols || 20);
+				fieldModel.setRows(item.rows || 2);
+				fieldModel.setCols(item.cols || 20);
 			}
 			
 			if(fieldModel instanceof barmatz.forms.fields.CheckboxFieldModel)
-				fieldModel.setChecked(fieldData.checked || false);
+				fieldModel.setChecked(item.checked || false);
 			
 			if(fieldModel instanceof barmatz.forms.fields.DropboxModel)
-			{
-				for(c = 0; c < fieldData.items.length; c++)
+				barmatz.utils.Array.forEach(item.items, function(item, index, collection)
 				{
-					itemData = fieldData.items[c];
-					fieldModel.addItem(new barmatz.forms.fields.DropboxItemModel(itemData.label || '', itemData.value || ''))
-				}
-			}
+					fieldModel.addItem(new barmatz.forms.fields.DropboxItemModel(item.label || '', item.value || ''))
+				});
 			
 			if(fieldModel instanceof barmatz.forms.fields.HTMLContentModel)
-				fieldModel.setContent(fieldData.content || '');
-
+				fieldModel.setContent(item.content || '');
+			
 			model.addItem(fieldModel);
-		}
+		});
 		
 		return model;
 	}
