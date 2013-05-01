@@ -51,7 +51,7 @@ class LeadModel extends \api\database\DatabaseTableModel
 			foreach($data as $key=>$value)
 				$tableData .= "<tr><td style=\"font-weight: bold\">$key</td><td>$value</td></tr>";
 			
-			mail(
+			$success = mail(
 				$formData->email, 
 				"New lead from \"{$formData->name}\"", 
 				"<div>
@@ -65,6 +65,47 @@ class LeadModel extends \api\database\DatabaseTableModel
 				"Mime-Version: 1.0" . "\r\n" .
 				"Content-Type: text/html; charset=utf-8"
 			);
+
+			if(!$success)
+				\api\errors\Errors::internalServerError('Error in sending email');
+		}
+	}
+	
+	public function sendToExternalService($formFingerprint, $data)
+	{
+		$formModel = new FormModel($this->db);
+		$formData = $formModel->getFormByFingerprint($formFingerprint);
+		
+		if($formData->externalAPI)
+		{
+			$data = json_decode($this->decodeString($data));
+			$params = array();
+
+			foreach($data as $key=>$value)
+				$params[] = "$key=>$value";
+			
+			$queryString = implode('&', $params);
+			$ch = curl_init();
+			
+			switch($formData->method)
+			{
+				default:
+					\api\errors\Errors::internalServerError('Unknown form method');
+					break;
+				case 'GET':
+					curl_setopt($ch, CURLOPT_URL, $formData->externalAPI . "?$queryString");
+					break;
+				case 'POST':
+					curl_setopt($ch, CURLOPT_POST, count($params));
+					curl_setopt($ch, CURLOPT_POSTFIELDS, $queryString);
+					break;
+			}
+			
+			$success = curl_exec($ch);
+			curl_close($ch);
+			
+			if(!$success)
+				\api\errors\Errors::internalServerError('Error in sending to external API');
 		}
 	}
 	

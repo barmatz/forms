@@ -284,6 +284,7 @@ barmatz.forms.ui.BuilderController = function(formModel, userModel, containerVie
 			formModel.setTargetEmail(wrapper.targetEmailField.value);
 			formModel.setLayoutId(parseInt(wrapper.layoutIdField.value));
 			formModel.setLanguage(wrapper.languageField.value);
+			formModel.setExternalAPI(wrapper.externalAPIField.value);
 		}
 	}
 	

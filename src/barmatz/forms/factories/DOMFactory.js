@@ -1046,6 +1046,9 @@ barmatz.forms.factories.DOMFactory = {
 		returnValue.encodingField = createDropbox('Encoding', 'formEncoding', [barmatz.net.Encoding.FORM, barmatz.net.Encoding.FILES]);
 		returnValue.encodingField.value = model.getEncoding();
 		
+		returnValue.externalAPIField = createField('External API');
+		returnValue.externalAPIField.value = model.getExternalAPI() || '';
+		
 		returnValue.wrapper = this.createTable(options); 
 		
 		return returnValue;

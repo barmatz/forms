@@ -13,6 +13,7 @@ barmatz.forms.FormModel = function()
 	this.set('targetEmail', '');
 	this.set('layoutId', 1);
 	this.set('language', 'en');
+	this.set('externalAPI', '');
 };
 barmatz.forms.FormModel.prototype = new barmatz.forms.CollectionModel();
 barmatz.forms.FormModel.prototype.constructor = barmatz.forms.FormModel;
@@ -117,6 +118,15 @@ barmatz.forms.FormModel.prototype.setLanguage = function(value)
 	barmatz.utils.DataTypes.isTypeOf(value, 'string');
 	this.set('language', value);
 };
+barmatz.forms.FormModel.prototype.getExternalAPI = function()
+{
+	return this.get('externalAPI');
+};
+barmatz.forms.FormModel.prototype.setExternalAPI = function(value)
+{
+	barmatz.utils.DataTypes.isTypeOf(value, 'string');
+	this.set('externalAPI', value);
+};
 barmatz.forms.FormModel.prototype.addItem = function(item)
 {
 	barmatz.utils.DataTypes.isInstanceOf(item, barmatz.forms.fields.FormItemModel);
@@ -144,22 +154,9 @@ barmatz.forms.FormModel.prototype.setItemIndex = function(item, index)
 	barmatz.utils.DataTypes.isTypeOf(index, 'number');
 	return barmatz.forms.CollectionModel.prototype.setItemIndex.call(this, item, index);
 };
-barmatz.forms.FormModel.prototype.toJSON = function()
+barmatz.forms.FormModel.prototype.getFieldsAsJSON = function()
 {
-	var object = {
-		name: this.getName(), 
-		submitButtonLabel: this.getSubmitButtonLabel(), 
-		method: this.getMethod(), 
-		encoding: this.getEncoding(), 
-		created: this.getCreated().valueOf(), 
-		fingerprint: this.getFingerprint(), 
-		stylesheets: this.getStylesheets(), 
-		direction: this.getDirection(), 
-		targetEmail: this.getTargetEmail(), 
-		layoutId: this.getLayoutId(), 
-		language: this.getLanguage(), 
-		fields: []
-	};
+	var json = [];
 	
 	this.forEach(function(item, index, collection)
 	{
@@ -205,10 +202,10 @@ barmatz.forms.FormModel.prototype.toJSON = function()
 		if(item instanceof barmatz.forms.fields.HTMLContentModel)
 			field.content = item.getContent();
 		
-		object.fields.push(field);
+		json.push(field);
 	});
 	
-	return JSON.stringify(object);
+	return JSON.stringify(json);
 };
 barmatz.forms.FormModel.prototype.reset = function()
 {
@@ -222,6 +219,7 @@ barmatz.forms.FormModel.prototype.reset = function()
 	this.set('targetEmail', '');
 	this.set('layoutId', 1);
 	this.set('language', 'en');
+	this.set('externalAPI', null);
 	while(this.getNumItems() > 0)
 		this.removeItemAt(this.getNumItems() - 1);
 };
@@ -235,7 +233,20 @@ barmatz.forms.FormModel.prototype.save = function(model)
 
 	request = new barmatz.net.Request(barmatz.forms.Config.BASE_URL + '/api/form/save.php');
 	request.setMethod(barmatz.net.Methods.POST);
-	request.setData({f: this.getFingerprint() || null, n: this.getName(), e: this.getTargetEmail(), d: this.toJSON()});
+	request.setData({
+		fin: this.getFingerprint() || null,
+		nam: this.getName(),
+		fie: this.getFieldsAsJSON(),
+		ema: this.getTargetEmail(),
+		ext: this.getExternalAPI(),
+		sub: this.getSubmitButtonLabel(),
+		met: this.getMethod(),
+		enc: this.getEncoding(),
+		sty: JSON.stringify(this.getStylesheets()),
+		dir: this.getDirection(),
+		lay: this.getLayoutId(),
+		lan: this.getLanguage()
+	});
 	loader = new barmatz.net.Loader();
 	addLoaderListeners();
 	loader.load(request);
@@ -344,12 +355,13 @@ barmatz.forms.FormModel.prototype.loadByFingerprint = function(fingerprint)
 		model.setDirection(data.direction);
 		model.setEncoding(data.encoding);
 		model.setLanguage(data.language);
-		model.setLayoutId(data.layoutId);
+		model.setLayoutId(parseFloat(data.layoutId));
 		model.setMethod(data.method);
 		model.setName(data.name);
 		model.setStylesheets(data.stylesheets);
 		model.setSubmitButtonLabel(data.submitButtonLabel);
-		model.setTargetEmail(data.targetEmail);
+		model.setTargetEmail(data.email);
+		model.setExternalAPI(data.externalAPI || '');
 
 		for(i = 0; i < data.fields.length; i++)
 		{
@@ -422,8 +434,7 @@ barmatz.forms.FormModel.prototype.loadByFingerprint = function(fingerprint)
 		switch(stage)
 		{
 			case 1:
-				data.data.created = data.created;
-				_this.copy(data.fingerprint, objectToFormModel(data.data));
+				_this.copy(data.fingerprint, objectToFormModel(data));
 				loadLanguage();
 				break;
 			case 2:
@@ -607,6 +618,7 @@ barmatz.forms.FormModel.prototype.copy = function(fingerprint, data)
 	this.setLanguage(data.getLanguage() || 'en');
 	this.setFingerprint(fingerprint);
 	this.setStylesheets(data.getStylesheets().slice(0) || []);
+	this.setExternalAPI(data.getExternalAPI() || '');
 
 	while(this.getNumItems() > 0)
 		this.removeItemAt(this.getNumItems() - 1);

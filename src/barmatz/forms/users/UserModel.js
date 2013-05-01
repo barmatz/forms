@@ -263,7 +263,7 @@ barmatz.forms.users.UserModel.prototype.login = function(username, password)
 		
 		try
 		{
-			data = JSON.parse(event.response.data);
+			data = JSON.parse(event.getResponse().getData());
 		}
 		catch(error)
 		{

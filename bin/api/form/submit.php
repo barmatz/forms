@@ -10,4 +10,5 @@ function processForm()
 	$model = new \api\form\LeadModel($db);
 	$model->insert($_REQUEST['f'], $_REQUEST['d']);
 	$model->email($_REQUEST['f'], $_REQUEST['d']);
+	$model->sendToExternalService($_REQUEST['f'], $_REQUEST['d']);
 }

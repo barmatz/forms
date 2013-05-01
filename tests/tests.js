@@ -1232,6 +1232,7 @@ test('createFormPropertiesWrapper', function()
 	model.setStylesheets([]);
 	model.setMethod(barmatz.forms.Methods.GET);
 	model.setEncoding(barmatz.net.Encoding.FORM);
+	model.setExternalAPI('myexternalapi');
 	
 	element = barmatz.forms.factories.DOMFactory.createFormPropertiesWrapper(model);
 	
@@ -1244,6 +1245,7 @@ test('createFormPropertiesWrapper', function()
 	equal(element.stylesheetsField.value, model.getStylesheets());
 	equal(element.methodField.value, model.getMethod());
 	equal(element.encodingField.value, model.getEncoding());
+	equal(element.externalAPIField.value, model.getExternalAPI());
 	ok(element.wrapper);
 });
 test('createFieldValidationOptionsDialogWrapper', function()
@@ -3778,6 +3780,16 @@ test('setLanguage', function()
 	value = 'mylang';
 	model.setLanguage(value);
 	equal(value, model.getLanguage());
+});
+test('getExternalAPI', function()
+{
+	equal(null, model.getExternalAPI());
+});
+test('setExternalAPI', function()
+{
+	value = 'myexternalapi';
+	model.setExternalAPI(value);
+	equal(value, model.getExternalAPI());
 });
 test('addItem', function()
 {
