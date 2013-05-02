@@ -3,6 +3,7 @@
 .forms-form-wrapper { display: inline-block; position: relative; }
 .forms-form-wrapper select { width: auto; }
 .forms-form-wrapper .loading-image { background-color: rgba(255, 255, 255, .7) !important; }
+.forms-form-wrapper input, .forms-form-wrapper textarea, .forms-form-wrapper select { font-size: 1em; height: 2em; border: 1px solid #CCC; color: #000; background: #FFF; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; }
 .forms-form-item { display: block; }
 .forms-layout-1 .forms-form-item label { width: 5em; display: inline-block; }
 .forms-layout-2 .forms-form-item label { display: block; }
@@ -12,6 +13,6 @@
 .forms-rtl .forms-form-item-error-message-item { margin-right: 5em; }
 .forms-ltr .forms-form-submit { text-align: right; }
 .forms-rtl .forms-form-submit { text-align: left; }
-.forms-phone-field { direction: ltr !important; }
+.forms-phone-field { display: inline-block; direction: ltr !important; }
 .forms-empty-field { color: #BBB; }
 .loading-image { position: absolute; top: 0; left: 0; min-width: 126px; min-height: 22px; width: 100%; height: 100%; background: rgba(0,0,0,.3) url(images/ajax-loader.gif) 50% 50% no-repeat; }

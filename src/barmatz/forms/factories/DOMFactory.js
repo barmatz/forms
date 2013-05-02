@@ -225,7 +225,7 @@ barmatz.forms.factories.DOMFactory = {
 					return 'select';
 					break;
 				case barmatz.forms.fields.FieldTypes.PHONE:
-					return 'span';
+					return 'div';
 					break;
 			}
 		}

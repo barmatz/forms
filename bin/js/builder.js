@@ -1076,7 +1076,7 @@ barmatz.net.Loader.prototype.load = function(request)
 	
 	if(xhr instanceof XMLHttpRequest)
 		xhr.addEventListener('readystatechange', onReadyStateChange);
-	else if(xhr instanceof XDomainRequest)
+	else if(isXDomainRequest())
 	{
 		xhr.onerror = onXHRError;
 		xhr.onload = onXHRLoad;
@@ -1086,7 +1086,7 @@ barmatz.net.Loader.prototype.load = function(request)
 		
 	params = [request.getMethod(), url];
 	
-	if(!(xhr instanceof XDomainRequest))
+	if(isXDomainRequest())
 	{
 		params.push(request.getAsync());
 		if(credentials)
@@ -1097,7 +1097,7 @@ barmatz.net.Loader.prototype.load = function(request)
 	{
 		xhr.open.apply(xhr, params);
 	
-		if(!(xhr instanceof XDomainRequest))
+		if(!isXDomainRequest())
 		{
 			if(headers)
 				barmatz.utils.Array.forEach(headers, function(item, index, collection)
@@ -1122,6 +1122,11 @@ barmatz.net.Loader.prototype.load = function(request)
 	{
 		_this.dispatchEvent(new barmatz.events.LoaderEvent(barmatz.events.LoaderEvent.COMPLETE));
 		_this.dispatchEvent(new barmatz.events.LoaderEvent(barmatz.events.LoaderEvent.ERROR, getResponse()));
+	}
+	
+	function isXDomainRequest()
+	{
+		return window.XDomainRequest && xhr instanceof XDomainRequest;
 	}
 	
 	function getResponse()
@@ -4197,7 +4202,7 @@ barmatz.forms.factories.DOMFactory = {
 					return 'select';
 					break;
 				case barmatz.forms.fields.FieldTypes.PHONE:
-					return 'span';
+					return 'div';
 					break;
 			}
 		}
@@ -5683,7 +5688,7 @@ barmatz.forms.fields.FieldController = function(model, fieldView, errorMessageVi
 	var settingValue, cachedErrorMessageVisibility, valueIsDescription;
 	
 	barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FieldModel);
-	barmatz.utils.DataTypes.isInstancesOf(fieldView, [HTMLInputElement, HTMLTextAreaElement, HTMLSelectElement, HTMLSpanElement]);
+	barmatz.utils.DataTypes.isInstancesOf(fieldView, [HTMLInputElement, HTMLTextAreaElement, HTMLSelectElement, HTMLDivElement]);
 	barmatz.utils.DataTypes.isInstanceOf(errorMessageView, window.HTMLElement, true);
 	barmatz.mvc.Controller.call(this);
 	

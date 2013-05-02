@@ -24,6 +24,7 @@ html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abb
 .forms-form-wrapper { display: inline-block; position: relative; }
 .forms-form-wrapper select { width: auto; }
 .forms-form-wrapper .loading-image { background-color: rgba(255, 255, 255, .7) !important; }
+.forms-form-wrapper input, .forms-form-wrapper textarea, .forms-form-wrapper select { font-size: 1em; height: 2em; border: 1px solid #CCC; color: #000; background: #FFF; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; }
 .forms-form-item { display: block; }
 .forms-layout-1 .forms-form-item label { width: 5em; display: inline-block; }
 .forms-layout-2 .forms-form-item label { display: block; }
@@ -33,7 +34,7 @@ html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abb
 .forms-rtl .forms-form-item-error-message-item { margin-right: 5em; }
 .forms-ltr .forms-form-submit { text-align: right; }
 .forms-rtl .forms-form-submit { text-align: left; }
-.forms-phone-field { direction: ltr !important; }
+.forms-phone-field { display: inline-block; direction: ltr !important; }
 .forms-empty-field { color: #BBB; }
 .forms-leads-forms-list-panel { background: #E9E9E9; width: 150px; }
 .forms-leads-forms-list-item { padding: .3em .4em; cursor: pointer; }

@@ -4,7 +4,7 @@ barmatz.forms.fields.FieldController = function(model, fieldView, errorMessageVi
 	var settingValue, cachedErrorMessageVisibility, valueIsDescription;
 	
 	barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FieldModel);
-	barmatz.utils.DataTypes.isInstancesOf(fieldView, [HTMLInputElement, HTMLTextAreaElement, HTMLSelectElement, HTMLSpanElement]);
+	barmatz.utils.DataTypes.isInstancesOf(fieldView, [HTMLInputElement, HTMLTextAreaElement, HTMLSelectElement, HTMLDivElement]);
 	barmatz.utils.DataTypes.isInstanceOf(errorMessageView, window.HTMLElement, true);
 	barmatz.mvc.Controller.call(this);
 	
