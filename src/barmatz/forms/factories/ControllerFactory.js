@@ -16,10 +16,6 @@ barmatz.forms.factories.ControllerFactory = {
 	{
 		return new barmatz.forms.ui.PropertiesController(view);
 	},
-	createBuilderController: function(formModel, userModel, containerView, panelsView, formNameView, saveStatusView, menuModel, menuView, toolboxModel, toolboxView, workspaceView, propertiesController, dialogContainerView)
-	{
-		return new barmatz.forms.ui.BuilderController(formModel, userModel, containerView, panelsView, formNameView, saveStatusView, menuModel, menuView, toolboxModel, toolboxView, workspaceView, propertiesController, dialogContainerView);
-	},
 	createWorkspaceItemController: function(model, labelView, fieldView, mandatoryView, deleteButtonView)
 	{
 		return new barmatz.forms.ui.WorkspaceItemController(model, labelView, fieldView, mandatoryView, deleteButtonView);
@@ -75,5 +71,29 @@ barmatz.forms.factories.ControllerFactory = {
 	createLeadsFormsListController: function(model, view)
 	{
 		return new barmatz.forms.ui.LeadsFormsListController(model, view);
+	},
+	createContentController: function(model, view)
+	{
+		return new barmatz.forms.ui.ContentController(model, view);
+	},
+	createBuilderMenuController: function(formModel, userModel, newButtonView, saveButtonView, saveAsButtonView, loadButtonView, renameButtonView, exportButtonView, deleteButtonView, propertiesButtonView, logoutButtonView, dialogContainerView)
+	{
+		return new barmatz.forms.ui.BuilderMenuController(formModel, userModel, newButtonView, saveButtonView, saveAsButtonView, loadButtonView, renameButtonView, exportButtonView, deleteButtonView, propertiesButtonView, logoutButtonView, dialogContainerView);
+	},
+	createBuilderToolboxController: function(formModel, toolboxModel, toolboxView)
+	{
+		return new barmatz.forms.ui.BuilderToolboxController(formModel, toolboxModel, toolboxView);
+	},
+	createBuilderWorkspaceController: function(builderPageModel, formModel, formNameView, formSaveStatusView, itemsView, dialogContainerView)
+	{
+		return new barmatz.forms.ui.BuilderWorkspaceController(builderPageModel, formModel, formNameView, formSaveStatusView, itemsView, dialogContainerView)
+	},
+	createBuilderPropertiesController: function(builderPageModel, view)
+	{
+		return new barmatz.forms.ui.BuilderPropertiesController(builderPageModel, view);
+	},
+	createBuilderPageController: function(builderPageModel, formModel)
+	{
+		return new barmatz.forms.ui.BuilderPageController(builderPageModel, formModel);
 	}
 }

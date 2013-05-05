@@ -35,12 +35,13 @@
 			<fileset dir="${SRC_DIR}/barmatz/mvc" includes="Model.js Controller.js"/>
 			<fileset dir="${SRC_DIR}/barmatz/net" includes="Request.js Loader.js Methods.js Encoding.js Response.js"/>
 			<fileset dir="${SRC_DIR}/barmatz/forms" includes="Methods.js Directions.js"/>
-			<fileset dir="${SRC_DIR}/barmatz/forms" includes="CollectionModel.js CollectionController.js Config.js FormModel.js ContentModel.js TypeModel.js Validator.js"/>
-			<fileset dir="${SRC_DIR}/barmatz/forms/ui" includes="DialogController.js"/>
-			<fileset dir="${SRC_DIR}/barmatz/forms/ui" includes="PromptDialogController.js"/>
-			<fileset dir="${SRC_DIR}/barmatz/forms/ui" includes="JQueryPromptDialogController.js"/>
-			<fileset dir="${SRC_DIR}/barmatz/forms/ui" includes="Builder.js BuilderController.js MenuModel.js MenuController.js ToolboxModel.js ToolboxController.js WorkspaceController.js PropertiesController.js PanelModel.js TableOptions.js MenuItemModel.js ToolboxItemModel.js JQueryDialogController.js UserFormsListController.js UserFormsListItemController.js WorkspaceItemController.js NewFieldDialogController.js"/>
+			<fileset dir="${SRC_DIR}/barmatz/forms" includes="CollectionModel.js CollectionController.js Config.js FormModel.js TypeModel.js Validator.js"/>
+			<fileset dir="${SRC_DIR}/barmatz/forms/ui" includes="MenuModel.js MenuController.js "/>
 			<fileset dir="${SRC_DIR}/barmatz/forms/factories" includes="ModelFactory.js DOMFactory.js ControllerFactory.js"/>
+			<fileset dir="${SRC_DIR}/barmatz/forms/ui" includes="DialogController.js ContentModel.js ContentController.js"/>
+			<fileset dir="${SRC_DIR}/barmatz/forms/ui" includes="PromptDialogController.js Page.js"/>
+			<fileset dir="${SRC_DIR}/barmatz/forms/ui" includes="JQueryPromptDialogController.js WorkspaceController.js PropertiesController.js"/>
+			<fileset dir="${SRC_DIR}/barmatz/forms/ui" includes="BuilderPage.js BuilderPageModel.js BuilderPageController.js BuilderMenuController.js BuilderToolboxController.js BuilderWorkspaceController.js BuilderPropertiesController.js ContentModel.js ToolboxModel.js ToolboxController.js PanelModel.js TableOptions.js MenuItemModel.js ToolboxItemModel.js JQueryDialogController.js UserFormsListController.js UserFormsListItemController.js WorkspaceItemController.js NewFieldDialogController.js"/>
 			<fileset dir="${SRC_DIR}/barmatz/forms/users" includes="UserModel.js"/>
 			<fileset dir="${SRC_DIR}/barmatz/forms/fields" includes="FormItemModel.js"/>
 			<fileset dir="${SRC_DIR}/barmatz/forms/fields" includes="FieldModel.js FieldController.js ValidatorModel.js"/>

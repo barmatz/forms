@@ -1,10 +1,14 @@
 /** barmatz.forms.ui.PropertiesController **/
 barmatz.forms.ui.PropertiesController = function(view)
 {
-	barmatz.utils.DataTypes.isInstanceOf(view, window.HTMLElement);
+	barmatz.utils.DataTypes.isInstanceOf(view, window.HTMLElement, true);
 	barmatz.mvc.Controller.call(this);
-	this._view = view;
-	this.setModel(null);
+	
+	if(view)
+	{
+		this._view = view;
+		this.setModel(null);
+	}
 };
 barmatz.forms.ui.PropertiesController.prototype = new barmatz.mvc.Controller();
 barmatz.forms.ui.PropertiesController.prototype.constructor = barmatz.forms.ui.PropertiesController;
@@ -24,7 +28,7 @@ barmatz.forms.ui.PropertiesController.prototype.setModel = function(value)
 		this._model.removeEventListener(barmatz.events.ModelEvent.VALUE_CHANGED, onModelValueChanged);
 	
 	this._model = value;
-	this._view.innerHTML = '';
+	barmatz.forms.factories.DOMFactory.clearElement(this._view);
 	
 	if(this._model)
 	{

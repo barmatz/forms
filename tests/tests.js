@@ -360,9 +360,9 @@ test('createPropertiesController', function()
 	);
 	ok(controller);
 });
-test('createBuilderController', function()
+test('createBuilderPageController', function()
 {
-	controller = barmatz.forms.factories.ControllerFactory.createBuilderController(
+	controller = barmatz.forms.factories.ControllerFactory.createBuilderPageController(
 		new barmatz.forms.FormModel(),
 		new barmatz.forms.users.UserModel(),
 		document.createElement('div'),
@@ -529,6 +529,38 @@ test('createStylesheet', function()
 	element = barmatz.forms.factories.DOMFactory.createStylesheet(href);
 	equal(href, element.getAttribute('href'));
 });
+test('addContent', function()
+{
+	element = barmatz.forms.factories.DOMFactory.createElement('div');
+	
+	content = 'mycontent';
+	barmatz.forms.factories.DOMFactory.addContent(content, element);
+	equal(element.innerHTML, content);
+	barmatz.forms.factories.DOMFactory.clearElement(element);
+
+	content = ['mycontent1', 'mycontent2'];
+	barmatz.forms.factories.DOMFactory.addContent(content, element);
+	equal(element.innerHTML, content.join(''));
+	barmatz.forms.factories.DOMFactory.clearElement(element);
+	
+	content = document.createElement('div');
+	barmatz.forms.factories.DOMFactory.addContent(content, element);
+	strictEqual(element.children[0], content);
+	barmatz.forms.factories.DOMFactory.clearElement(element);
+	
+	content = [document.createElement('div'), document.createElement('div')];
+	barmatz.forms.factories.DOMFactory.addContent(content, element);
+	strictEqual(element.children[0], content[0]);
+	strictEqual(element.children[1], content[1]);
+	barmatz.forms.factories.DOMFactory.clearElement(element);
+});
+test('clearElement', function()
+{
+	element = barmatz.forms.factories.DOMFactory.createElement('div');
+	barmatz.forms.factories.DOMFactory.addContent('mycontent', element);
+	barmatz.forms.factories.DOMFactory.clearElement(element);
+	equal(element.innerHTML, '');
+});
 test('createElement', function()
 {
 	tagName = 'DIV';
@@ -636,7 +668,7 @@ test('createFormFieldElement', function()
 				equal('SELECT', element.tagName);
 				break;
 			case barmatz.forms.fields.FieldTypes.PHONE:
-				equal('SPAN', element.tagName);
+				equal('DIV', element.tagName);
 				equal(1, element.getElementsByTagName('input').length);
 				equal(1, element.getElementsByTagName('select').length);
 				break;
@@ -1228,7 +1260,7 @@ test('createFormPropertiesWrapper', function()
 	model.setTargetEmail('mytargetemail');
 	model.setDirection(barmatz.forms.Directions.LTR);
 	model.setLanguage('en');
-	model.setLayoutId(0);
+	model.setLayoutId(1);
 	model.setStylesheets([]);
 	model.setMethod(barmatz.forms.Methods.GET);
 	model.setEncoding(barmatz.net.Encoding.FORM);
@@ -1428,9 +1460,9 @@ test('createDropboxModel', function()
 	equal(name, model.getName());
 	equal(items.length, model.getNumItems());
 });
-test('createBuilderModel', function()
+test('createBuilderPageModel', function()
 {
-	model = barmatz.forms.factories.ModelFactory.createBuilderModel();
+	model = barmatz.forms.factories.ModelFactory.createBuilderPageModel();
 	ok(model);
 });
 test('createMenuModel', function()
@@ -2296,7 +2328,7 @@ test('clone', function()
 	deepEqual(model.getMax(), clone.getMax());
 	equal(model.getDescription(), clone.getDescription());
 });
-module('barmatz.forms.ui.BuilderController', {
+module('barmatz.forms.ui.BuilderPageController', {
 	setup: function()
 	{
 		formModel = new barmatz.forms.FormModel(); 
@@ -2311,7 +2343,7 @@ module('barmatz.forms.ui.BuilderController', {
 		toolboxView = document.createElement('div');
 		workspaceView = document.createElement('div');
 		propertiesController = new barmatz.forms.ui.PropertiesController(document.createElement('div'));
-		builder = new barmatz.forms.ui.BuilderController(formModel, userModel, containerView, panelsView, formNameView, saveStatusView, menuModel, menuView, toolboxModel, toolboxView, workspaceView, propertiesController, document.getElementById('qunit-fixture'));
+		builder = new barmatz.forms.ui.BuilderPageController(formModel, userModel, containerView, panelsView, formNameView, saveStatusView, menuModel, menuView, toolboxModel, toolboxView, workspaceView, propertiesController, document.getElementById('qunit-fixture'));
 	},
 	teardown: function()
 	{
@@ -2362,10 +2394,10 @@ test('conctructor', function()
 	equal(toolboxModel.getNumItems(), 7);
 	equal(containerView.children.length, 2);
 });
-module('barmatz.forms.ui.BuilderModel', {
+module('barmatz.forms.ui.BuilderPageModel', {
 	setup: function()
 	{
-		model = new barmatz.forms.ui.BuilderModel(document.createElement('qunit-fixture'));
+		model = new barmatz.forms.ui.BuilderPageModel(document.createElement('qunit-fixture'));
 	},
 	teardown: function()
 	{
@@ -2541,7 +2573,7 @@ module('barmatz.forms.ui.CollectionDialogController', {
 });
 test('_createItemViewFromModel', function()
 {
-	contentModel = new barmatz.forms.ContentModel();
+	contentModel = new barmatz.forms.ui.ContentModel();
 	contentModel.setContent(['col1']);
 	equal(contentModel.getContent().length, controller._createItemViewFromModel(contentModel).children.length);
 });
@@ -3598,10 +3630,10 @@ test('toArray', function()
 	equal(array.length, 1);
 	strictEqual(item, array[0]);
 });
-module('barmatz.forms.ContentModel', {
+module('barmatz.forms.ui.ContentModel', {
 	setup: function()
 	{
-		model = new barmatz.forms.ContentModel();
+		model = new barmatz.forms.ui.ContentModel();
 	},
 	teardown: function()
 	{

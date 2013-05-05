@@ -1,25 +1,25 @@
 /** barmatz.forms.Language **/
 barmatz.forms.Language = {
 	form: {
-		loading: 'loading...',
+		loading: 'טוען...',
 		submit: {
-			label: 'Submit',
-			success: 'Your form has been submitted',
-			error: 'An error has occured! Click to try again'
+			label: 'שלח',
+			success: 'הטופס נשלח בהצלחה',
+			error: 'שגיאה בשליחה! נסה שנית'
 		},
 		field: {
 			errors: {
-				emptyValue: 'value is empty',
-				invalidValue: 'invalid value',
-				invalidEmail: 'invalid email address',
-				invalidPhone: 'invalid phone number',
-				minimumLength: 'value must be ${1} characters minimum',
-				maximumLength: 'value must be ${1} characters maximum',
-				exactLength: 'value must be exactly ${1} characters',
-				greaterThan: 'value must be greater than ${1}',
-				lesserThan: 'value must be lesser than ${1}',
-				digitsOnly: 'only digits are allowed',
-				noDigits: 'cannot contain digits'
+				emptyValue: 'השדה ריק',
+				invalidValue: 'ערך לא נכון',
+				invalidEmail: 'כתובת דוא&quot;ל לא נכונה',
+				invalidPhone: 'מספר טלפון לא תקין',
+				minimumLength: 'הערך חייב להיות מינימום ${1} תווים',
+				maximumLength: 'הערך חיים להיות מקסימום ${1} תווים',
+				exactLength: 'הערך חיים להיות בדיוק ${1} תווים',
+				greaterThan: 'הערך חייב להיות גדול מ-${1}',
+				lesserThan: 'הערך חייב להיות קטן מ-${1}',
+				digitsOnly: 'הערך יכול להכיל רק מספרים',
+				noDigits: 'ערך אינו יכול להכיל מספרים'
 			}
 		}
 	}

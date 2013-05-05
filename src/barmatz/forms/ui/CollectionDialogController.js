@@ -9,6 +9,6 @@ barmatz.forms.ui.CollectionDialogController.prototype = new barmatz.forms.Collec
 barmatz.forms.ui.CollectionDialogController.prototype.constructor = barmatz.forms.ui.CollectionDialogController;
 barmatz.forms.ui.CollectionDialogController.prototype._createItemViewFromModel = function(model)
 {
-	barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.ContentModel);
+	barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.ui.ContentModel);
 	return barmatz.forms.factories.DOMFactory.createTableRow([model.getContent()]);
 };

@@ -19,6 +19,26 @@ barmatz.forms.factories.DOMFactory = {
 		link.href = href;
 		return link;
 	},
+	addContent: function(content, container)
+	{
+		barmatz.utils.DataTypes.isTypesOrInstances(content, ['string'], [window.HTMLElement, window.Array]);
+		barmatz.utils.DataTypes.isInstanceOf(container, window.HTMLElement);
+		
+		if(typeof content == 'string')
+			container.innerHTML += content;
+		else if(content instanceof window.HTMLElement)
+			container.appendChild(content);
+		else if(content instanceof window.Array)
+			barmatz.utils.Array.forEach(content, function(item, index, collection)
+			{
+				this.addContent(item, container);
+			}, this);
+	},
+	clearElement: function(element)
+	{
+		barmatz.utils.DataTypes.isInstanceOf(element, window.HTMLElement);
+		element.innerHTML = '';
+	},
 	createElement: function(tagName, className)
 	{
 		var element;
@@ -46,29 +66,9 @@ barmatz.forms.factories.DOMFactory = {
 		
 		_this = this;
 		element = this.createElement(tagName, className);
-		addContent(content, element);
+		this.addContent(content, element);
 		
 		return element;
-		
-		function addContent(content, parent, wrapperTag)
-		{
-			if(barmatz.utils.DataTypes.applySilent('isTypeOf', content, 'string'))
-			{
-				if(wrapperTag)
-					parent.appendChild(_this.createElementWithContent(wrapperTag, '', content));
-				else
-					parent.innerHTML = content;
-			}
-			else if(barmatz.utils.DataTypes.applySilent('isInstanceOf', content, window.HTMLElement))
-				parent.appendChild(appendChildWrapper != null ? appendChildWrapper(content) : content);
-			else if(barmatz.utils.DataTypes.applySilent('isInstanceOf', content, window.Array))
-			{
-				barmatz.utils.Array.forEach(content, function(item, index, collection)
-				{
-					addContent(item, parent, 'span');
-				});
-			}
-		}
 	},
 	createButton: function(label, clickHandler, className)
 	{

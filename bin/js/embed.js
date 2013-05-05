@@ -1365,7 +1365,7 @@ barmatz.forms.CollectionModel.prototype.toArray = function()
 
 /** barmatz.forms.Config **/
 barmatz.forms.Config = {
-	BASE_URL: 'http://www.quiz.co.il'
+	BASE_URL: 'http://localhost:8080/clients/ofirvardi/forms/'
 };
 
 /** barmatz.forms.FormController **/
@@ -2186,25 +2186,25 @@ barmatz.forms.FormModel.prototype.copy = function(fingerprint, data)
 /** barmatz.forms.Language **/
 barmatz.forms.Language = {
 	form: {
-		loading: 'loading...',
+		loading: 'טוען...',
 		submit: {
-			label: 'Submit',
-			success: 'Your form has been submitted',
-			error: 'An error has occured! Click to try again'
+			label: 'שלח',
+			success: 'הטופס נשלח בהצלחה',
+			error: 'שגיאה בשליחה! נסה שנית'
 		},
 		field: {
 			errors: {
-				emptyValue: 'value is empty',
-				invalidValue: 'invalid value',
-				invalidEmail: 'invalid email address',
-				invalidPhone: 'invalid phone number',
-				minimumLength: 'value must be ${1} characters minimum',
-				maximumLength: 'value must be ${1} characters maximum',
-				exactLength: 'value must be exactly ${1} characters',
-				greaterThan: 'value must be greater than ${1}',
-				lesserThan: 'value must be lesser than ${1}',
-				digitsOnly: 'only digits are allowed',
-				noDigits: 'cannot contain digits'
+				emptyValue: 'השדה ריק',
+				invalidValue: 'ערך לא נכון',
+				invalidEmail: 'כתובת דוא&quot;ל לא נכונה',
+				invalidPhone: 'מספר טלפון לא תקין',
+				minimumLength: 'הערך חייב להיות מינימום ${1} תווים',
+				maximumLength: 'הערך חיים להיות מקסימום ${1} תווים',
+				exactLength: 'הערך חיים להיות בדיוק ${1} תווים',
+				greaterThan: 'הערך חייב להיות גדול מ-${1}',
+				lesserThan: 'הערך חייב להיות קטן מ-${1}',
+				digitsOnly: 'הערך יכול להכיל רק מספרים',
+				noDigits: 'ערך אינו יכול להכיל מספרים'
 			}
 		}
 	}
@@ -2322,10 +2322,6 @@ barmatz.forms.factories.ControllerFactory = {
 	{
 		return new barmatz.forms.ui.PropertiesController(view);
 	},
-	createBuilderController: function(formModel, userModel, containerView, panelsView, formNameView, saveStatusView, menuModel, menuView, toolboxModel, toolboxView, workspaceView, propertiesController, dialogContainerView)
-	{
-		return new barmatz.forms.ui.BuilderController(formModel, userModel, containerView, panelsView, formNameView, saveStatusView, menuModel, menuView, toolboxModel, toolboxView, workspaceView, propertiesController, dialogContainerView);
-	},
 	createWorkspaceItemController: function(model, labelView, fieldView, mandatoryView, deleteButtonView)
 	{
 		return new barmatz.forms.ui.WorkspaceItemController(model, labelView, fieldView, mandatoryView, deleteButtonView);
@@ -2381,6 +2377,30 @@ barmatz.forms.factories.ControllerFactory = {
 	createLeadsFormsListController: function(model, view)
 	{
 		return new barmatz.forms.ui.LeadsFormsListController(model, view);
+	},
+	createContentController: function(model, view)
+	{
+		return new barmatz.forms.ui.ContentController(model, view);
+	},
+	createBuilderMenuController: function(formModel, userModel, newButtonView, saveButtonView, saveAsButtonView, loadButtonView, renameButtonView, exportButtonView, deleteButtonView, propertiesButtonView, logoutButtonView, dialogContainerView)
+	{
+		return new barmatz.forms.ui.BuilderMenuController(formModel, userModel, newButtonView, saveButtonView, saveAsButtonView, loadButtonView, renameButtonView, exportButtonView, deleteButtonView, propertiesButtonView, logoutButtonView, dialogContainerView);
+	},
+	createBuilderToolboxController: function(formModel, toolboxModel, toolboxView)
+	{
+		return new barmatz.forms.ui.BuilderToolboxController(formModel, toolboxModel, toolboxView);
+	},
+	createBuilderWorkspaceController: function(builderPageModel, formModel, formNameView, formSaveStatusView, itemsView, dialogContainerView)
+	{
+		return new barmatz.forms.ui.BuilderWorkspaceController(builderPageModel, formModel, formNameView, formSaveStatusView, itemsView, dialogContainerView)
+	},
+	createBuilderPropertiesController: function(builderPageModel, view)
+	{
+		return new barmatz.forms.ui.BuilderPropertiesController(builderPageModel, view);
+	},
+	createBuilderPageController: function(builderPageModel, formModel)
+	{
+		return new barmatz.forms.ui.BuilderPageController(builderPageModel, formModel);
 	}
 }
 /** barmatz.forms.factories.DOMFactory **/
@@ -2403,6 +2423,26 @@ barmatz.forms.factories.DOMFactory = {
 		link.type = 'text/css';
 		link.href = href;
 		return link;
+	},
+	addContent: function(content, container)
+	{
+		barmatz.utils.DataTypes.isTypesOrInstances(content, ['string'], [window.HTMLElement, window.Array]);
+		barmatz.utils.DataTypes.isInstanceOf(container, window.HTMLElement);
+		
+		if(typeof content == 'string')
+			container.innerHTML += content;
+		else if(content instanceof window.HTMLElement)
+			container.appendChild(content);
+		else if(content instanceof window.Array)
+			barmatz.utils.Array.forEach(content, function(item, index, collection)
+			{
+				this.addContent(item, container);
+			}, this);
+	},
+	clearElement: function(element)
+	{
+		barmatz.utils.DataTypes.isInstanceOf(element, window.HTMLElement);
+		element.innerHTML = '';
 	},
 	createElement: function(tagName, className)
 	{
@@ -2431,29 +2471,9 @@ barmatz.forms.factories.DOMFactory = {
 		
 		_this = this;
 		element = this.createElement(tagName, className);
-		addContent(content, element);
+		this.addContent(content, element);
 		
 		return element;
-		
-		function addContent(content, parent, wrapperTag)
-		{
-			if(barmatz.utils.DataTypes.applySilent('isTypeOf', content, 'string'))
-			{
-				if(wrapperTag)
-					parent.appendChild(_this.createElementWithContent(wrapperTag, '', content));
-				else
-					parent.innerHTML = content;
-			}
-			else if(barmatz.utils.DataTypes.applySilent('isInstanceOf', content, window.HTMLElement))
-				parent.appendChild(appendChildWrapper != null ? appendChildWrapper(content) : content);
-			else if(barmatz.utils.DataTypes.applySilent('isInstanceOf', content, window.Array))
-			{
-				barmatz.utils.Array.forEach(content, function(item, index, collection)
-				{
-					addContent(item, parent, 'span');
-				});
-			}
-		}
 	},
 	createButton: function(label, clickHandler, className)
 	{
@@ -3737,9 +3757,9 @@ barmatz.forms.factories.ModelFactory = {
 	{
 		return new barmatz.forms.fields.DropboxModel(name, items);
 	},
-	createBuilderModel: function()
+	createBuilderPageModel: function()
 	{
-		return new barmatz.forms.ui.BuilderModel();
+		return new barmatz.forms.ui.BuilderPageModel();
 	},
 	createMenuModel: function()
 	{
@@ -3764,6 +3784,10 @@ barmatz.forms.factories.ModelFactory = {
 	createLeadModel: function()
 	{
 		return new barmatz.forms.LeadModel();
+	},
+	createContentModel: function()
+	{
+		return new barmatz.forms.ui.ContentModel();
 	}
 }
 /** barmatz.forms.fields.FormItemModel **/
@@ -3889,7 +3913,7 @@ barmatz.forms.fields.FieldController = function(model, fieldView, errorMessageVi
 	function onModelValid(event)
 	{
 		if(errorMessageView)
-			errorMessageView.innerHTML = '';
+			barmatz.forms.factories.DOMFactory.clearElement(errorMessageView);
 		
 		if(!isErrorMessageHidden())
 			hideErrorMessage();
@@ -3903,7 +3927,7 @@ barmatz.forms.fields.FieldController = function(model, fieldView, errorMessageVi
 		
 		if(errorMessageView)
 		{
-			errorMessageView.innerHTML = '';
+			barmatz.forms.factories.DOMFactory.clearElement(errorMessageView);
 			validator = model.getValidator();
 			barmatz.utils.Array.forEach(barmatz.utils.Bitwise.parseBit(event.getErrors()), function(item, index, collection)
 			{
@@ -4989,7 +5013,7 @@ barmatz.forms.embed = function(fingerprint)
 		form = barmatz.forms.factories.DOMFactory.createElement('form');
 		submitButton = barmatz.forms.factories.DOMFactory.createElementWithContent('button', 'forms-form-submit-button', model.getSubmitButtonLabel());
 		
-		container.innerHTML = '';
+		barmatz.forms.factories.DOMFactory.clearElement(container);
 		container.appendChild(barmatz.forms.factories.DOMFactory.createStylesheet(barmatz.forms.Config.BASE_URL + '/css/form.css'));
 		
 		switch(model.getDirection())

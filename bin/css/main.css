@@ -24,7 +24,7 @@ html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abb
 .forms-form-wrapper { display: inline-block; position: relative; }
 .forms-form-wrapper select { width: auto; }
 .forms-form-wrapper .loading-image { background-color: rgba(255, 255, 255, .7) !important; }
-.forms-form-wrapper input, .forms-form-wrapper textarea, .forms-form-wrapper select { font-size: 1em; height: 2em; border: 1px solid #CCC; color: #000; background: #FFF; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; }
+.forms-form-wrapper input, .forms-form-wrapper textarea, .forms-form-wrapper select { font-size: 1em; min-height: 1.5em; border: 1px solid #CCC; color: #000; background: #FFF; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; }
 .forms-form-item { display: block; }
 .forms-layout-1 .forms-form-item label { width: 5em; display: inline-block; }
 .forms-layout-2 .forms-form-item label { display: block; }
@@ -63,6 +63,7 @@ label { font-weight: bold; }
 .forms-rtl .forms-list-actions { text-align: left; }
 .forms-menu { height: 2em; padding: .4em; background: #404040; }
 .forms-menu .ui-menu { position: absolute; top: .4em; min-width: 150px; min-height: 1.3em; }
+.forms-page { width: 100%; height: 100%; }
 .forms-properties-panel { background: #E9E9E9; width: 232px; }
 .forms-properties-panel .forms-filler { font-size: 1em; }
 .forms-properties-panel .forms-filler, .forms-properties-panel .forms-header { text-align: center;  color: rgba(0,0,0,.2); }

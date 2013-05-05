@@ -50,8 +50,8 @@ barmatz.forms.ui.LeadsController = function(userModel, formsListModel, formsList
 	
 	function populateLeadsListView()
 	{
-		leadsListWrapperView.innerHTML = '';
-		leadsListWrapperView.appendChild(leadsListView);
+		barmatz.forms.factories.DOMFactory.clearElement(leadsListWrapperView);
+		barmatz.forms.factories.DOMFactory.addContent(leadsListView, leadsListWrapperView);
 	}
 	
 	function emptyLeadsListModel()

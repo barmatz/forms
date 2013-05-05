@@ -1797,7 +1797,7 @@ QUnit.jsDump = (function() {
 					parser = this.parsers[ type || this.typeOf(obj) ];
 
 				type = typeof parser;
-				inStack = inwindow.Array( obj, stack );
+				inStack = inArray( obj, stack );
 
 				if ( inStack !== -1 ) {
 					return "recursion(" + (inStack - stack.length) + ")";
@@ -1980,7 +1980,7 @@ QUnit.jsDump = (function() {
 }());
 
 // from jquery.js
-function inwindow.Array( elem, array ) {
+function inArray( elem, array ) {
 	if ( array.indexOf ) {
 		return array.indexOf( elem );
 	}

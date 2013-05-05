@@ -113,7 +113,7 @@ barmatz.forms.fields.FieldController = function(model, fieldView, errorMessageVi
 	function onModelValid(event)
 	{
 		if(errorMessageView)
-			errorMessageView.innerHTML = '';
+			barmatz.forms.factories.DOMFactory.clearElement(errorMessageView);
 		
 		if(!isErrorMessageHidden())
 			hideErrorMessage();
@@ -127,7 +127,7 @@ barmatz.forms.fields.FieldController = function(model, fieldView, errorMessageVi
 		
 		if(errorMessageView)
 		{
-			errorMessageView.innerHTML = '';
+			barmatz.forms.factories.DOMFactory.clearElement(errorMessageView);
 			validator = model.getValidator();
 			barmatz.utils.Array.forEach(barmatz.utils.Bitwise.parseBit(event.getErrors()), function(item, index, collection)
 			{

@@ -3,14 +3,19 @@ barmatz.forms.ui.WorkspaceController = function(model, view, dialogContainerView
 {
 	var selectedItemIndex;
 
-	barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.FormModel);
-	barmatz.utils.DataTypes.isInstanceOf(view, window.HTMLElement);
+	barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.FormModel, true);
+	barmatz.utils.DataTypes.isInstanceOf(view, window.HTMLElement, true);
 	barmatz.utils.DataTypes.isInstanceOf(dialogContainerView, window.HTMLElement, true);
 	barmatz.forms.CollectionController.call(this, model, view);
 	
-	model.addEventListener(barmatz.events.ModelEvent.VALUE_CHANGED, onModelValueChanged);
-	model.addEventListener(barmatz.events.CollectionEvent.ITEM_ADDED, onModelItemAdded);
-	setViewToSortable();
+	if(model)
+	{
+		model.addEventListener(barmatz.events.ModelEvent.VALUE_CHANGED, onModelValueChanged);
+		model.addEventListener(barmatz.events.CollectionEvent.ITEM_ADDED, onModelItemAdded);
+	}
+	
+	if(view)
+		setViewToSortable();
 	
 	function setViewToSortable()
 	{

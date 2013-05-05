@@ -1,2 +1,2 @@
 /** builder **/
-new barmatz.forms.ui.Builder();
+new barmatz.forms.ui.BuilderPage();

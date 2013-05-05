@@ -53,7 +53,7 @@ barmatz.forms.embed = function(fingerprint)
 		form = barmatz.forms.factories.DOMFactory.createElement('form');
 		submitButton = barmatz.forms.factories.DOMFactory.createElementWithContent('button', 'forms-form-submit-button', model.getSubmitButtonLabel());
 		
-		container.innerHTML = '';
+		barmatz.forms.factories.DOMFactory.clearElement(container);
 		container.appendChild(barmatz.forms.factories.DOMFactory.createStylesheet(barmatz.forms.Config.BASE_URL + '/css/form.css'));
 		
 		switch(model.getDirection())

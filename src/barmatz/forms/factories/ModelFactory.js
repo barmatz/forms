@@ -66,9 +66,9 @@ barmatz.forms.factories.ModelFactory = {
 	{
 		return new barmatz.forms.fields.DropboxModel(name, items);
 	},
-	createBuilderModel: function()
+	createBuilderPageModel: function()
 	{
-		return new barmatz.forms.ui.BuilderModel();
+		return new barmatz.forms.ui.BuilderPageModel();
 	},
 	createMenuModel: function()
 	{
@@ -93,5 +93,9 @@ barmatz.forms.factories.ModelFactory = {
 	createLeadModel: function()
 	{
 		return new barmatz.forms.LeadModel();
+	},
+	createContentModel: function()
+	{
+		return new barmatz.forms.ui.ContentModel();
 	}
 }

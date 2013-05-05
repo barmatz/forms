@@ -3,7 +3,7 @@
 .forms-form-wrapper { display: inline-block; position: relative; }
 .forms-form-wrapper select { width: auto; }
 .forms-form-wrapper .loading-image { background-color: rgba(255, 255, 255, .7) !important; }
-.forms-form-wrapper input, .forms-form-wrapper textarea, .forms-form-wrapper select { font-size: 1em; height: 2em; border: 1px solid #CCC; color: #000; background: #FFF; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; }
+.forms-form-wrapper input, .forms-form-wrapper textarea, .forms-form-wrapper select { font-size: 1em; min-height: 1.5em; border: 1px solid #CCC; color: #000; background: #FFF; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; }
 .forms-form-item { display: block; }
 .forms-layout-1 .forms-form-item label { width: 5em; display: inline-block; }
 .forms-layout-2 .forms-form-item label { display: block; }
