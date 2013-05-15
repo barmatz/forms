@@ -127,6 +127,7 @@ barmatz.net.Loader.prototype.load = function(request)
 	}
 	catch(error)
 	{
+		console.error(error.stack);
 		_this.dispatchEvent(new barmatz.events.LoaderEvent(barmatz.events.LoaderEvent.COMPLETE));
 		_this.dispatchEvent(new barmatz.events.LoaderEvent(barmatz.events.LoaderEvent.ERROR, getResponse()));
 	}

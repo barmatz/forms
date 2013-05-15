@@ -48,6 +48,7 @@
 			<fileset dir="${SRC_DIR}/barmatz/forms/ui" includes="BuilderMenuController.js BuilderToolboxController.js BuilderWorkspaceController.js BuilderPropertiesController.js ContentModel.js ToolboxModel.js ToolboxController.js PanelModel.js TableOptions.js MenuItemModel.js ToolboxItemModel.js UserFormsListController.js UserFormsListItemController.js WorkspaceItemController.js NewFieldDialogController.js"/>
 			<fileset dir="${SRC_DIR}/barmatz/forms/users" includes="UserModel.js"/>
 			<fileset dir="${SRC_DIR}/barmatz/forms/fields" includes="FormItemModel.js"/>
+			<fileset dir="${SRC_DIR}/barmatz/forms/fields" includes="AbstractFieldModel.js"/>
 			<fileset dir="${SRC_DIR}/barmatz/forms/fields" includes="FieldModel.js FieldController.js ValidatorModel.js"/>
 			<fileset dir="${SRC_DIR}/barmatz/forms/fields" includes="TextFieldModel.js "/>
 			<fileset dir="${SRC_DIR}/barmatz/forms/fields" includes="FieldTypes.js HTMLContentModel.js TextAreaFieldModel.js DropboxModel.js PasswordFieldModel.js CheckboxFieldModel.js RadioFieldModel.js FileFieldModel.js HiddenFieldModel.js PhoneFieldModel.js DropboxItemModel.js FieldValidationOptionsController.js DropboxItemsListController.js DropboxItemsListItemController.js PhonePrefixes.js"/>
@@ -66,6 +67,7 @@
 			<fileset dir="${SRC_DIR}/barmatz/forms/ui/pages" includes="Page.js PageModel.js PageController.js UsersPage.js UsersPageModel.js UsersPageController.js"/>
 			<fileset dir="${SRC_DIR}/barmatz/forms/ui" includes="MenuModel.js MenuController.js MenuItemModel.js ContentModel.js ContentController.js UsersMenuController.js"/>
 			<fileset dir="${SRC_DIR}/barmatz/forms/fields" includes="FormItemModel.js"/>
+			<fileset dir="${SRC_DIR}/barmatz/forms/fields" includes="AbstractFieldModel.js"/>
 			<fileset dir="${SRC_DIR}/barmatz/forms/fields" includes="FieldModel.js FieldController.js ValidatorModel.js"/>
 			<fileset dir="${SRC_DIR}/barmatz/forms/fields" includes="TextFieldModel.js"/>
 			<fileset dir="${SRC_DIR}/barmatz/forms/fields" includes="FieldTypes.js PhoneFieldModel.js CheckboxFieldModel.js FileFieldModel.js TextAreaFieldModel.js DropboxModel.js HTMLContentModel.js PasswordFieldModel.js"/>
@@ -87,6 +89,7 @@
 			<fileset dir="${SRC_DIR}/barmatz/forms" includes="FormModel.js FormController.js CollectionModel.js CollectionController.js TypeModel.js Validator.js Config.js Language.js"/>
 			<fileset dir="${SRC_DIR}/barmatz/forms/factories" includes="ModelFactory.js DOMFactory.js ControllerFactory.js"/>
 			<fileset dir="${SRC_DIR}/barmatz/forms/fields" includes="FormItemModel.js"/>
+			<fileset dir="${SRC_DIR}/barmatz/forms/fields" includes="AbstractFieldModel.js"/>
 			<fileset dir="${SRC_DIR}/barmatz/forms/fields" includes="FieldModel.js FieldController.js ValidatorModel.js"/>
 			<fileset dir="${SRC_DIR}/barmatz/forms/fields" includes="TextFieldModel.js "/>
 			<fileset dir="${SRC_DIR}/barmatz/forms/fields" includes="FieldTypes.js HTMLContentModel.js TextAreaFieldModel.js DropboxModel.js PasswordFieldModel.js CheckboxFieldModel.js RadioFieldModel.js FileFieldModel.js HiddenFieldModel.js PhoneFieldModel.js DropboxItemModel.js FieldValidationOptionsController.js DropboxItemsListController.js DropboxItemsListItemController.js PhonePrefixes.js"/>

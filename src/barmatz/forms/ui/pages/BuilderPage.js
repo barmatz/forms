@@ -87,7 +87,8 @@ barmatz.forms.ui.pages.BuilderPage = function(container)
 				[barmatz.forms.fields.FieldTypes.CHECKBOX, 'Checkbox field'],
 				//[barmatz.forms.fields.FieldTypes.RADIO, 'Radio field'],
 				[barmatz.forms.fields.FieldTypes.DROPBOX, 'Dropbox field'],
-				[barmatz.forms.fields.FieldTypes.PHONE, 'Phone field']
+				[barmatz.forms.fields.FieldTypes.PHONE, 'Phone field'],
+				[barmatz.forms.fields.FieldTypes.HIDDEN, 'Hidden field']
 			], 
 			function(item, index, collection)
 			{

@@ -192,9 +192,14 @@ barmatz.forms.FormModel.prototype.getFieldsAsJSON = function()
 	{
 		var field = {type: item.getType()};
 		
+		if(item instanceof barmatz.forms.fields.AbstractFieldModel)
+			field.name = item.getName();
+		
+		if(item instanceof barmatz.forms.fields.HiddenFieldModel)
+			field.value = item.getValue();
+			
 		if(item instanceof barmatz.forms.fields.FieldModel)
 		{
-			field.name = item.getName();
 			field.label = item.getLabel();
 			field.mandatory = item.getMandatory();
 			field.enabled = item.getEnabled();
@@ -310,6 +315,7 @@ barmatz.forms.FormModel.prototype.save = function(model)
 		}
 		catch(error)
 		{
+			console.error(error.stack);
 			return;
 		}
 			
@@ -381,8 +387,8 @@ barmatz.forms.FormModel.prototype.loadByFingerprint = function(fingerprint)
 		model.setExternalAPI(data.externalAPI || '');
 		barmatz.utils.Array.forEach(data.fields, function(item, index, collection)
 		{
-			fieldModel = barmatz.forms.factories.ModelFactory.createFormFieldModel(item.type, item.name);
-			
+			fieldModel = barmatz.forms.factories.ModelFactory.createFormFieldModel(item.type, item.name || '');
+				
 			if(fieldModel instanceof barmatz.forms.fields.FieldModel)
 			{
 				fieldModel.setLabel(item.label || '');
@@ -391,6 +397,9 @@ barmatz.forms.FormModel.prototype.loadByFingerprint = function(fingerprint)
 				fieldModel.setValidator(barmatz.forms.factories.ModelFactory.createValidatorModel(item.validator));
 				fieldModel.setWidth(item.width || NaN);
 			}
+			
+			if(fieldModel instanceof barmatz.forms.fields.HiddenFieldModel)
+				fieldModel.setValue(item.value || '');
 			
 			if(fieldModel instanceof barmatz.forms.fields.FileFieldModel)
 				fieldModel.setAccept(item.accept || []);
@@ -441,6 +450,7 @@ barmatz.forms.FormModel.prototype.loadByFingerprint = function(fingerprint)
 		}
 		catch(error)
 		{
+			console.error(error.stack);
 			onLoaderError(event);
 			return;
 		}
@@ -501,7 +511,7 @@ barmatz.forms.FormModel.prototype.isValid = function()
 	
 	this.forEach(function(item, index, collection)
 	{
-		if(!(item instanceof barmatz.forms.fields.HTMLContentModel) && !item.validate())
+		if(item instanceof barmatz.forms.fields.FieldModel && !item.validate())
 			invalidFields++;
 	});
 	
@@ -635,7 +645,7 @@ barmatz.forms.FormModel.prototype.copy = function(fingerprint, data)
 	{
 		var field, name, dataItem, i;
 
-		barmatz.utils.DataTypes.isInstancesOf(model, [barmatz.forms.fields.FieldModel, barmatz.forms.fields.HTMLContentModel]);
+		barmatz.utils.DataTypes.isInstancesOf(model, [barmatz.forms.fields.AbstractFieldModel, barmatz.forms.fields.HTMLContentModel]);
 		
 		if(!(model instanceof barmatz.forms.fields.HTMLContentModel))
 			name = model.getName();
@@ -680,6 +690,9 @@ barmatz.forms.FormModel.prototype.copy = function(fingerprint, data)
 		if(field instanceof barmatz.forms.fields.HTMLContentModel)
 			field.setContent(model.getContent() || '');
 
+		if(field instanceof barmatz.forms.fields.HiddenFieldModel)
+			field.setValue(model.getValue() || '');
+			
 		if(field instanceof barmatz.forms.fields.FieldModel)
 		{
 			field.setLabel(model.getLabel() || '');
@@ -744,6 +757,7 @@ barmatz.forms.FormModel.prototype.loadLanguage = function()
 		}
 		catch(error)
 		{
+			console.error(error.stack);
 			return;
 		}
 	}

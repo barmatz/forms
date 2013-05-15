@@ -1,10 +1,10 @@
 /** barmatz.forms.ui.NewFieldDialogController **/
 barmatz.forms.ui.NewFieldDialogController = function(model, view, nameFieldView, labelFieldView, dialogContainerView)
 {
-	barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FieldModel);
+	barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.AbstractFieldModel);
 	barmatz.utils.DataTypes.isInstanceOf(view, window.HTMLElement);
 	barmatz.utils.DataTypes.isInstanceOf(nameFieldView, HTMLInputElement);
-	barmatz.utils.DataTypes.isInstanceOf(labelFieldView, HTMLInputElement);
+	barmatz.utils.DataTypes.isInstanceOf(labelFieldView, HTMLInputElement, true);
 	barmatz.forms.ui.jquery.JQueryPromptDialogController.call(this, model, view, dialogContainerView);
 	
 	this._nameFieldView = nameFieldView;
@@ -27,7 +27,10 @@ barmatz.forms.ui.NewFieldDialogController.prototype._submitDialog = function(dia
 		}
 
 		this._model.setName(this._nameFieldView.value);
-		this._model.setLabel(this._labelFieldView.value);
+		
+		if(this._labelFieldView)
+			this._model.setLabel(this._labelFieldView.value);
+		
 		barmatz.forms.factories.DOMFactory.destroyDialog(this._view);
 	}
 	else if(!this._errorDialog)

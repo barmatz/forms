@@ -179,9 +179,9 @@ barmatz.forms.factories.DOMFactory = {
 			errorMessage = _this.createFormFieldErrorMessageElement();
 			
 			if(item instanceof barmatz.forms.fields.HTMLContentModel)
-			{
 				wrapper.form.appendChild(_this.createFormFieldElement(item));
-			}
+			else if(item instanceof barmatz.forms.fields.HiddenFieldModel)
+				wrapper.form.appendChild(field);
 			else
 			{
 				wrapper.form.appendChild(_this.createElementWithContent('div', 'forms-form-item', [
@@ -399,6 +399,13 @@ barmatz.forms.factories.DOMFactory = {
 		mandatory = this.createElementWithContent('span', 'forms-form-item-mandatory', isFieldModel && model.getMandatory() ? '*' : '');
 		deleteButton = this.createDeleteButton();
 		
+		if(model instanceof barmatz.forms.fields.HiddenFieldModel)
+		{
+			field.type = 'text';
+			field.disabled = true;
+			barmatz.utils.CSS.addClass(field, 'opacity-quarter');
+		}
+		
 		addToWrapper('forms-workspace-item-grip', grip);
 		addToWrapper('forms-workspace-item-label', label);
 		addToWrapper('forms-workspace-item-field', [field, mandatory]);
@@ -416,7 +423,7 @@ barmatz.forms.factories.DOMFactory = {
 	},
 	createPropertiesItemWarpper: function(model)
 	{
-		var _this, returnWrapper, wrapper;
+		var _this, returnWrapper;
 		
 		barmatz.utils.DataTypes.isNotUndefined(model);
 		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FormItemModel);
@@ -424,14 +431,17 @@ barmatz.forms.factories.DOMFactory = {
 		_this = this;
 		returnWrapper = {};
 		
-		wrapper = this.createElement('div');
-		wrapper.appendChild(this.createElementWithContent('h2', 'forms-header', barmatz.utils.String.firstLetterToUpperCase(model.getType()) + ' field'));
+		returnWrapper.wrapper = this.createElement('div');
+		returnWrapper.wrapper.appendChild(this.createElementWithContent('h2', 'forms-header', barmatz.utils.String.firstLetterToUpperCase(model.getType()) + ' field'));
 		
-		returnWrapper.wrapper = wrapper;
+		if(model instanceof barmatz.forms.fields.AbstractFieldModel)
+			returnWrapper.nameField = addFieldToWrapper('string', 'name', 'name', model.getName());
+		
+		if(model instanceof barmatz.forms.fields.HiddenFieldModel)
+			returnWrapper.valueField = addFieldToWrapper('string', 'value', 'value', model.getValue());
 		
 		if(model instanceof barmatz.forms.fields.FieldModel)
 		{
-			returnWrapper.nameField = addFieldToWrapper('string', 'name', 'name', model.getName());
 			returnWrapper.labelField = addFieldToWrapper('string', 'label', 'label', model.getLabel());
 			returnWrapper.mandatoryField = addFieldToWrapper('boolean', 'mandatory', 'mandatory', model.getMandatory());
 			returnWrapper.enabledField = addFieldToWrapper('boolean', 'enabled', 'enabled', model.getEnabled());
@@ -479,7 +489,7 @@ barmatz.forms.factories.DOMFactory = {
 			barmatz.utils.DataTypes.isTypeOf(label, 'string');
 	
 			fieldWrapper = _this.createPropertiesItemFieldWrapper(type, name, label, value, onFieldValueChange);
-			wrapper.appendChild(fieldWrapper.wrapper);
+			returnWrapper.wrapper.appendChild(fieldWrapper.wrapper);
 			return fieldWrapper.field;
 		}
 		
@@ -612,27 +622,32 @@ barmatz.forms.factories.DOMFactory = {
 		var _this, dialog, nameField, labelField, wrapper, form, formTableOptions;
 	
 		barmatz.utils.DataTypes.isNotUndefined(model);
-		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FieldModel);
+		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.AbstractFieldModel);
 		barmatz.utils.DataTypes.isTypeOf(open, 'boolean', true);
 		barmatz.utils.DataTypes.isInstanceOf(container, window.HTMLElement, true);
 		
 		_this = this;
-		nameField = getField(model.getName());
-		labelField = getField(model.getLabel());
-		
+		wrapper = {};
+		wrapper.nameField = getField(model.getName());
 		formTableOptions = new barmatz.forms.ui.DataTableOptions();
-		formTableOptions.getBodyRows().push(getRowContent('Name', nameField), getRowContent('Label', labelField));
+		formTableOptions.getBodyRows().push(getRowContent('Name', wrapper.nameField));
+		
+		if(model.hasOwnProperty('getLabel'))
+		{
+			wrapper.labelField = getField(model.getLabel());
+			formTableOptions.getBodyRows().push(getRowContent('Label', wrapper.labelField));
+		}
 		
 		form = this.createTable(formTableOptions);
-		wrapper = this.createElementWithContent('div', '', form);
-		dialog = this.createDialog('New Field', wrapper, open, container);
+		wrapper.wrapper = this.createElementWithContent('div', '', form);
+		wrapper.dialog = this.createDialog('New Field', wrapper.wrapper, open, container);
 		
 		jQuery(dialog).dialog({
 			closeOnEscape: false,
 			dialogClass: 'forms-dialog-prompt'
 		});
 		
-		return {dialog: dialog, nameField: nameField, labelField: labelField};
+		return wrapper;
 		
 		function getRowContent(label, field)
 		{
@@ -1272,6 +1287,47 @@ barmatz.forms.factories.DOMFactory = {
 		barmatz.utils.DataTypes.isNotUndefined(message);
 		barmatz.utils.DataTypes.isTypeOf(message, 'string');
 		return this.createElementWithContent('li', 'forms-form-item-error-message-item', message);
+	},
+	createHiddenValueDialogWrapper: function(fieldName, value, confirmHandler, open, container)
+	{
+		var _this, dialog, wrapper, valueField, specialValuesDropboxModel, specialValuesDropboxElement;
+		
+		barmatz.utils.DataTypes.isTypeOf(fieldName, 'string');
+		barmatz.utils.DataTypes.isTypeOf(value, 'string');
+		barmatz.utils.DataTypes.isTypeOf(confirmHandler, 'function');
+		
+		_this = this;
+
+		valueField = this.createElement('input');
+		valueField.value = value;
+		
+		wrapper = this.createElement('div');
+		wrapper.appendChild(this.createElementWithContent('label', '', 'Value'));
+		wrapper.appendChild(valueField);
+		wrapper.appendChild(this.createButton('Special values', onSpecialValuesButtonClick));
+		
+		dialog = this.createPromptDialog('Hidden value for field ' + fieldName, wrapper, confirmHandler, open, container);
+		jQuery(dialog).dialog({width: '395px'});
+		
+		return {dialog: dialog, valueField: valueField};
+		
+		function onSpecialValuesButtonClick(event)
+		{
+			if(!specialValuesDropboxModel)
+				specialValuesDropboxModel = barmatz.forms.factories.ModelFactory.createDropboxModel('specialValues', [
+	  				barmatz.forms.factories.ModelFactory.createDropboxItemModel('Page referer', '${page_ref}')
+	  			]);
+			
+			if(!specialValuesDropboxElement)
+				specialValuesDropboxElement = _this.createDropboxElement(specialValuesDropboxModel);
+			
+			_this.createPromptDialog('Special values', specialValuesDropboxElement, onSpecialValueConfirmed, true, container);
+		}
+		
+		function onSpecialValueConfirmed(event)
+		{
+			valueField.value = specialValuesDropboxElement.value;
+		}
 	},
 	createHTMLContentEditorDialogWrapper: function(content, confirmHandler, open, container, initHandler)
 	{

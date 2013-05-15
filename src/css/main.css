@@ -11,3 +11,5 @@ label { font-weight: bold; }
 .forms-clickable-td td { cursor: pointer; }
 .forms-ltr .forms-list-actions { text-align: right; }
 .forms-rtl .forms-list-actions { text-align: left; }
+.opacity-half { opacity: .5; filter: alpha(opacity=.5); }
+.opacity-quarter { opacity: .25; filter: alpha(opacity=.25); }

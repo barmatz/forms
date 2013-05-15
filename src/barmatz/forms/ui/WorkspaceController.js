@@ -34,7 +34,6 @@ barmatz.forms.ui.WorkspaceController = function(model, view, dialogContainerView
 		});
 		
 		return ui;
-		
 	}
 	
 	function getIndexFromSortEvent(element)
@@ -47,7 +46,7 @@ barmatz.forms.ui.WorkspaceController = function(model, view, dialogContainerView
 	{
 		var dialogWrapper;
 		
-		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FieldModel);
+		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.AbstractFieldModel);
 		
 		dialogWrapper = barmatz.forms.factories.DOMFactory.createNewFieldDialogWrapper(model, true, dialogContainerView);
 		barmatz.forms.factories.ControllerFactory.createJQueryDialogController(dialogWrapper.dialog);
@@ -99,7 +98,7 @@ barmatz.forms.ui.WorkspaceController = function(model, view, dialogContainerView
 		item = event.getItem();
 		setViewToSortable();
 		
-		if(item instanceof barmatz.forms.fields.FieldModel && !item.getName())
+		if(item instanceof barmatz.forms.fields.AbstractFieldModel && !item.getName())
 			openNewFieldDialog(item);
 	}
 };

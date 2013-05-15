@@ -24,12 +24,16 @@ barmatz.forms.ui.WorkspaceItemController = function(model, labelView, fieldView,
 		});
 	}
 	
-	if(model instanceof barmatz.forms.fields.FieldModel)
+	if(model instanceof barmatz.forms.fields.AbstractFieldModel)
 	{
 		setViewValue('name', model.getName());
+		setViewValue('value', model.getValue());
+	}
+
+	if(model instanceof barmatz.forms.fields.FieldModel)
+	{
 		setViewValue('label', model.getLabel());
 		setViewValue('mandatory', model.getMandatory());
-		setViewValue('value', model.getValue());
 		setViewValue('enabled', model.getEnabled());
 	}
 	

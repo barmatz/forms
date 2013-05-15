@@ -152,6 +152,7 @@ barmatz.forms.users.UserModel.prototype.getForms = function()
 		}
 		catch(error)
 		{
+			console.error(error.stack);
 			onLoadFormsDataError(event);
 			return;
 		}
@@ -204,6 +205,7 @@ barmatz.forms.users.UserModel.prototype.getData = function()
 		}
 		catch(error)
 		{
+			console.error(error.stack);
 			onLoaderError(event);
 			return;
 		}
@@ -265,6 +267,7 @@ barmatz.forms.users.UserModel.prototype.login = function(username, password)
 		}
 		catch(error)
 		{
+			console.error(error.stack);
 			onLoaderError(event);
 			return;
 		}

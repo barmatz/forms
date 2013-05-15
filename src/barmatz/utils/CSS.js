@@ -59,6 +59,8 @@ barmatz.utils.CSS = {
 		
 		if(element.className.indexOf(className) == -1)
 			element.className += ' ' + className;
+		
+		element.className = element.className.replace(/^\s*|\s*$/, '');
 	},
 	removeClass: function(element, className)
 	{

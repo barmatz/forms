@@ -18,7 +18,10 @@ barmatz.forms.ui.jquery.JQueryDialogController = function(view)
 			if($view.dialog('isOpen'))
 				$view.dialog('close').dialog('open');
 		}
-		catch(error){}
+		catch(error)
+		{
+			console.error(error.stack);
+		}
 	}
 };
 barmatz.forms.ui.jquery.JQueryDialogController.prototype = new barmatz.mvc.Controller();

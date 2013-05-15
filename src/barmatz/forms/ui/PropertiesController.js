@@ -47,6 +47,9 @@ barmatz.forms.ui.PropertiesController.prototype.setModel = function(value)
 			itemsWrapper.editContentButton.addEventListener('click', onItemsWrapperEditContentButtonClick);
 		}
 		
+		if(this._model instanceof barmatz.forms.fields.HiddenFieldModel)
+			itemsWrapper.valueField.addEventListener('click', onHiddenValueFieldClick);
+		
 		this._model.addEventListener(barmatz.events.ModelEvent.VALUE_CHANGED, onModelValueChanged);
 		this._view.appendChild(itemsWrapper.wrapper);
 	}
@@ -55,16 +58,26 @@ barmatz.forms.ui.PropertiesController.prototype.setModel = function(value)
 	
 	function openHTMLContentEditor()
 	{
-		dialogWrapper = barmatz.forms.factories.DOMFactory.createHTMLContentEditorDialogWrapper(_this._model.getContent(), onEditContentConfrim);
+		dialogWrapper = barmatz.forms.factories.DOMFactory.createHTMLContentEditorDialogWrapper(_this._model.getContent(), onEditContentConfrims);
 		barmatz.forms.factories.ControllerFactory.createJQueryDialogController(dialogWrapper.dialog);
+	}
+	
+	function onHiddenValueFieldClick(event)
+	{
+		dialogWrapper = barmatz.forms.factories.DOMFactory.createHiddenValueDialogWrapper(_this._model.getName(), _this._model.getValue(), onHiddenValueConfirm);
+		barmatz.forms.factories.ControllerFactory.createJQueryDialogController(dialogWrapper.dialog);
+	}
+	
+	function onHiddenValueConfirm(event)
+	{
+		_this._model.setValue(dialogWrapper.valueField.value);
 	}
 	
 	function onItemsWrapperValidationOptionsButtonClick(event)
 	{
-		model = _this._model;
-		dialogWrapper = barmatz.forms.factories.DOMFactory.createFieldValidationOptionsDialogWrapper(model);
+		dialogWrapper = barmatz.forms.factories.DOMFactory.createFieldValidationOptionsDialogWrapper(_this._model);
 		barmatz.forms.factories.ControllerFactory.createJQueryDialogController(dialogWrapper.dialog);
-		barmatz.forms.factories.ControllerFactory.createFieldValidationOptionsController(model, dialogWrapper.options);
+		barmatz.forms.factories.ControllerFactory.createFieldValidationOptionsController(_this._model, dialogWrapper.options);
 	}
 	
 	function onItemsWrapperEditItemsButtonClick(event)

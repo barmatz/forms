@@ -193,6 +193,8 @@ barmatz.utils.CSS = {
 		
 		if(element.className.indexOf(className) == -1)
 			element.className += ' ' + className;
+		
+		element.className = element.className.replace(/^\s*|\s*$/, '');
 	},
 	removeClass: function(element, className)
 	{
@@ -1185,6 +1187,7 @@ barmatz.net.Loader.prototype.load = function(request)
 	}
 	catch(error)
 	{
+		console.error(error.stack);
 		_this.dispatchEvent(new barmatz.events.LoaderEvent(barmatz.events.LoaderEvent.COMPLETE));
 		_this.dispatchEvent(new barmatz.events.LoaderEvent(barmatz.events.LoaderEvent.ERROR, getResponse()));
 	}
@@ -1565,7 +1568,7 @@ barmatz.forms.CollectionModel.prototype.toArray = function()
 
 /** barmatz.forms.Config **/
 barmatz.forms.Config = {
-	BASE_URL: 'http://localhost:8080/clients/ofirvardi/forms/'
+	BASE_URL: 'http://www.quiz.co.il'
 };
 
 /** barmatz.forms.FormModel **/
@@ -1762,9 +1765,14 @@ barmatz.forms.FormModel.prototype.getFieldsAsJSON = function()
 	{
 		var field = {type: item.getType()};
 		
+		if(item instanceof barmatz.forms.fields.AbstractFieldModel)
+			field.name = item.getName();
+		
+		if(item instanceof barmatz.forms.fields.HiddenFieldModel)
+			field.value = item.getValue();
+			
 		if(item instanceof barmatz.forms.fields.FieldModel)
 		{
-			field.name = item.getName();
 			field.label = item.getLabel();
 			field.mandatory = item.getMandatory();
 			field.enabled = item.getEnabled();
@@ -1880,6 +1888,7 @@ barmatz.forms.FormModel.prototype.save = function(model)
 		}
 		catch(error)
 		{
+			console.error(error.stack);
 			return;
 		}
 			
@@ -1951,8 +1960,8 @@ barmatz.forms.FormModel.prototype.loadByFingerprint = function(fingerprint)
 		model.setExternalAPI(data.externalAPI || '');
 		barmatz.utils.Array.forEach(data.fields, function(item, index, collection)
 		{
-			fieldModel = barmatz.forms.factories.ModelFactory.createFormFieldModel(item.type, item.name);
-			
+			fieldModel = barmatz.forms.factories.ModelFactory.createFormFieldModel(item.type, item.name || '');
+				
 			if(fieldModel instanceof barmatz.forms.fields.FieldModel)
 			{
 				fieldModel.setLabel(item.label || '');
@@ -1961,6 +1970,9 @@ barmatz.forms.FormModel.prototype.loadByFingerprint = function(fingerprint)
 				fieldModel.setValidator(barmatz.forms.factories.ModelFactory.createValidatorModel(item.validator));
 				fieldModel.setWidth(item.width || NaN);
 			}
+			
+			if(fieldModel instanceof barmatz.forms.fields.HiddenFieldModel)
+				fieldModel.setValue(item.value || '');
 			
 			if(fieldModel instanceof barmatz.forms.fields.FileFieldModel)
 				fieldModel.setAccept(item.accept || []);
@@ -2011,6 +2023,7 @@ barmatz.forms.FormModel.prototype.loadByFingerprint = function(fingerprint)
 		}
 		catch(error)
 		{
+			console.error(error.stack);
 			onLoaderError(event);
 			return;
 		}
@@ -2071,7 +2084,7 @@ barmatz.forms.FormModel.prototype.isValid = function()
 	
 	this.forEach(function(item, index, collection)
 	{
-		if(!(item instanceof barmatz.forms.fields.HTMLContentModel) && !item.validate())
+		if(item instanceof barmatz.forms.fields.FieldModel && !item.validate())
 			invalidFields++;
 	});
 	
@@ -2205,7 +2218,7 @@ barmatz.forms.FormModel.prototype.copy = function(fingerprint, data)
 	{
 		var field, name, dataItem, i;
 
-		barmatz.utils.DataTypes.isInstancesOf(model, [barmatz.forms.fields.FieldModel, barmatz.forms.fields.HTMLContentModel]);
+		barmatz.utils.DataTypes.isInstancesOf(model, [barmatz.forms.fields.AbstractFieldModel, barmatz.forms.fields.HTMLContentModel]);
 		
 		if(!(model instanceof barmatz.forms.fields.HTMLContentModel))
 			name = model.getName();
@@ -2250,6 +2263,9 @@ barmatz.forms.FormModel.prototype.copy = function(fingerprint, data)
 		if(field instanceof barmatz.forms.fields.HTMLContentModel)
 			field.setContent(model.getContent() || '');
 
+		if(field instanceof barmatz.forms.fields.HiddenFieldModel)
+			field.setValue(model.getValue() || '');
+			
 		if(field instanceof barmatz.forms.fields.FieldModel)
 		{
 			field.setLabel(model.getLabel() || '');
@@ -2314,6 +2330,7 @@ barmatz.forms.FormModel.prototype.loadLanguage = function()
 		}
 		catch(error)
 		{
+			console.error(error.stack);
 			return;
 		}
 	}
@@ -2867,9 +2884,9 @@ barmatz.forms.factories.DOMFactory = {
 			errorMessage = _this.createFormFieldErrorMessageElement();
 			
 			if(item instanceof barmatz.forms.fields.HTMLContentModel)
-			{
 				wrapper.form.appendChild(_this.createFormFieldElement(item));
-			}
+			else if(item instanceof barmatz.forms.fields.HiddenFieldModel)
+				wrapper.form.appendChild(field);
 			else
 			{
 				wrapper.form.appendChild(_this.createElementWithContent('div', 'forms-form-item', [
@@ -3087,6 +3104,13 @@ barmatz.forms.factories.DOMFactory = {
 		mandatory = this.createElementWithContent('span', 'forms-form-item-mandatory', isFieldModel && model.getMandatory() ? '*' : '');
 		deleteButton = this.createDeleteButton();
 		
+		if(model instanceof barmatz.forms.fields.HiddenFieldModel)
+		{
+			field.type = 'text';
+			field.disabled = true;
+			barmatz.utils.CSS.addClass(field, 'opacity-quarter');
+		}
+		
 		addToWrapper('forms-workspace-item-grip', grip);
 		addToWrapper('forms-workspace-item-label', label);
 		addToWrapper('forms-workspace-item-field', [field, mandatory]);
@@ -3104,7 +3128,7 @@ barmatz.forms.factories.DOMFactory = {
 	},
 	createPropertiesItemWarpper: function(model)
 	{
-		var _this, returnWrapper, wrapper;
+		var _this, returnWrapper;
 		
 		barmatz.utils.DataTypes.isNotUndefined(model);
 		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FormItemModel);
@@ -3112,14 +3136,17 @@ barmatz.forms.factories.DOMFactory = {
 		_this = this;
 		returnWrapper = {};
 		
-		wrapper = this.createElement('div');
-		wrapper.appendChild(this.createElementWithContent('h2', 'forms-header', barmatz.utils.String.firstLetterToUpperCase(model.getType()) + ' field'));
+		returnWrapper.wrapper = this.createElement('div');
+		returnWrapper.wrapper.appendChild(this.createElementWithContent('h2', 'forms-header', barmatz.utils.String.firstLetterToUpperCase(model.getType()) + ' field'));
 		
-		returnWrapper.wrapper = wrapper;
+		if(model instanceof barmatz.forms.fields.AbstractFieldModel)
+			returnWrapper.nameField = addFieldToWrapper('string', 'name', 'name', model.getName());
+		
+		if(model instanceof barmatz.forms.fields.HiddenFieldModel)
+			returnWrapper.valueField = addFieldToWrapper('string', 'value', 'value', model.getValue());
 		
 		if(model instanceof barmatz.forms.fields.FieldModel)
 		{
-			returnWrapper.nameField = addFieldToWrapper('string', 'name', 'name', model.getName());
 			returnWrapper.labelField = addFieldToWrapper('string', 'label', 'label', model.getLabel());
 			returnWrapper.mandatoryField = addFieldToWrapper('boolean', 'mandatory', 'mandatory', model.getMandatory());
 			returnWrapper.enabledField = addFieldToWrapper('boolean', 'enabled', 'enabled', model.getEnabled());
@@ -3167,7 +3194,7 @@ barmatz.forms.factories.DOMFactory = {
 			barmatz.utils.DataTypes.isTypeOf(label, 'string');
 	
 			fieldWrapper = _this.createPropertiesItemFieldWrapper(type, name, label, value, onFieldValueChange);
-			wrapper.appendChild(fieldWrapper.wrapper);
+			returnWrapper.wrapper.appendChild(fieldWrapper.wrapper);
 			return fieldWrapper.field;
 		}
 		
@@ -3300,27 +3327,32 @@ barmatz.forms.factories.DOMFactory = {
 		var _this, dialog, nameField, labelField, wrapper, form, formTableOptions;
 	
 		barmatz.utils.DataTypes.isNotUndefined(model);
-		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FieldModel);
+		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.AbstractFieldModel);
 		barmatz.utils.DataTypes.isTypeOf(open, 'boolean', true);
 		barmatz.utils.DataTypes.isInstanceOf(container, window.HTMLElement, true);
 		
 		_this = this;
-		nameField = getField(model.getName());
-		labelField = getField(model.getLabel());
-		
+		wrapper = {};
+		wrapper.nameField = getField(model.getName());
 		formTableOptions = new barmatz.forms.ui.DataTableOptions();
-		formTableOptions.getBodyRows().push(getRowContent('Name', nameField), getRowContent('Label', labelField));
+		formTableOptions.getBodyRows().push(getRowContent('Name', wrapper.nameField));
+		
+		if(model.hasOwnProperty('getLabel'))
+		{
+			wrapper.labelField = getField(model.getLabel());
+			formTableOptions.getBodyRows().push(getRowContent('Label', wrapper.labelField));
+		}
 		
 		form = this.createTable(formTableOptions);
-		wrapper = this.createElementWithContent('div', '', form);
-		dialog = this.createDialog('New Field', wrapper, open, container);
+		wrapper.wrapper = this.createElementWithContent('div', '', form);
+		wrapper.dialog = this.createDialog('New Field', wrapper.wrapper, open, container);
 		
 		jQuery(dialog).dialog({
 			closeOnEscape: false,
 			dialogClass: 'forms-dialog-prompt'
 		});
 		
-		return {dialog: dialog, nameField: nameField, labelField: labelField};
+		return wrapper;
 		
 		function getRowContent(label, field)
 		{
@@ -3961,6 +3993,47 @@ barmatz.forms.factories.DOMFactory = {
 		barmatz.utils.DataTypes.isTypeOf(message, 'string');
 		return this.createElementWithContent('li', 'forms-form-item-error-message-item', message);
 	},
+	createHiddenValueDialogWrapper: function(fieldName, value, confirmHandler, open, container)
+	{
+		var _this, dialog, wrapper, valueField, specialValuesDropboxModel, specialValuesDropboxElement;
+		
+		barmatz.utils.DataTypes.isTypeOf(fieldName, 'string');
+		barmatz.utils.DataTypes.isTypeOf(value, 'string');
+		barmatz.utils.DataTypes.isTypeOf(confirmHandler, 'function');
+		
+		_this = this;
+
+		valueField = this.createElement('input');
+		valueField.value = value;
+		
+		wrapper = this.createElement('div');
+		wrapper.appendChild(this.createElementWithContent('label', '', 'Value'));
+		wrapper.appendChild(valueField);
+		wrapper.appendChild(this.createButton('Special values', onSpecialValuesButtonClick));
+		
+		dialog = this.createPromptDialog('Hidden value for field ' + fieldName, wrapper, confirmHandler, open, container);
+		jQuery(dialog).dialog({width: '395px'});
+		
+		return {dialog: dialog, valueField: valueField};
+		
+		function onSpecialValuesButtonClick(event)
+		{
+			if(!specialValuesDropboxModel)
+				specialValuesDropboxModel = barmatz.forms.factories.ModelFactory.createDropboxModel('specialValues', [
+	  				barmatz.forms.factories.ModelFactory.createDropboxItemModel('Page referer', '${page_ref}')
+	  			]);
+			
+			if(!specialValuesDropboxElement)
+				specialValuesDropboxElement = _this.createDropboxElement(specialValuesDropboxModel);
+			
+			_this.createPromptDialog('Special values', specialValuesDropboxElement, onSpecialValueConfirmed, true, container);
+		}
+		
+		function onSpecialValueConfirmed(event)
+		{
+			valueField.value = specialValuesDropboxElement.value;
+		}
+	},
 	createHTMLContentEditorDialogWrapper: function(content, confirmHandler, open, container, initHandler)
 	{
 		var wrapper, dialog, editor;
@@ -4382,7 +4455,8 @@ barmatz.forms.ui.pages.BuilderPage = function(container)
 				[barmatz.forms.fields.FieldTypes.CHECKBOX, 'Checkbox field'],
 				//[barmatz.forms.fields.FieldTypes.RADIO, 'Radio field'],
 				[barmatz.forms.fields.FieldTypes.DROPBOX, 'Dropbox field'],
-				[barmatz.forms.fields.FieldTypes.PHONE, 'Phone field']
+				[barmatz.forms.fields.FieldTypes.PHONE, 'Phone field'],
+				[barmatz.forms.fields.FieldTypes.HIDDEN, 'Hidden field']
 			], 
 			function(item, index, collection)
 			{
@@ -4490,7 +4564,10 @@ barmatz.forms.ui.jquery.JQueryDialogController = function(view)
 			if($view.dialog('isOpen'))
 				$view.dialog('close').dialog('open');
 		}
-		catch(error){}
+		catch(error)
+		{
+			console.error(error.stack);
+		}
 	}
 };
 barmatz.forms.ui.jquery.JQueryDialogController.prototype = new barmatz.mvc.Controller();
@@ -4579,6 +4656,9 @@ barmatz.forms.ui.PropertiesController.prototype.setModel = function(value)
 			itemsWrapper.editContentButton.addEventListener('click', onItemsWrapperEditContentButtonClick);
 		}
 		
+		if(this._model instanceof barmatz.forms.fields.HiddenFieldModel)
+			itemsWrapper.valueField.addEventListener('click', onHiddenValueFieldClick);
+		
 		this._model.addEventListener(barmatz.events.ModelEvent.VALUE_CHANGED, onModelValueChanged);
 		this._view.appendChild(itemsWrapper.wrapper);
 	}
@@ -4587,16 +4667,26 @@ barmatz.forms.ui.PropertiesController.prototype.setModel = function(value)
 	
 	function openHTMLContentEditor()
 	{
-		dialogWrapper = barmatz.forms.factories.DOMFactory.createHTMLContentEditorDialogWrapper(_this._model.getContent(), onEditContentConfrim);
+		dialogWrapper = barmatz.forms.factories.DOMFactory.createHTMLContentEditorDialogWrapper(_this._model.getContent(), onEditContentConfrims);
 		barmatz.forms.factories.ControllerFactory.createJQueryDialogController(dialogWrapper.dialog);
+	}
+	
+	function onHiddenValueFieldClick(event)
+	{
+		dialogWrapper = barmatz.forms.factories.DOMFactory.createHiddenValueDialogWrapper(_this._model.getName(), _this._model.getValue(), onHiddenValueConfirm);
+		barmatz.forms.factories.ControllerFactory.createJQueryDialogController(dialogWrapper.dialog);
+	}
+	
+	function onHiddenValueConfirm(event)
+	{
+		_this._model.setValue(dialogWrapper.valueField.value);
 	}
 	
 	function onItemsWrapperValidationOptionsButtonClick(event)
 	{
-		model = _this._model;
-		dialogWrapper = barmatz.forms.factories.DOMFactory.createFieldValidationOptionsDialogWrapper(model);
+		dialogWrapper = barmatz.forms.factories.DOMFactory.createFieldValidationOptionsDialogWrapper(_this._model);
 		barmatz.forms.factories.ControllerFactory.createJQueryDialogController(dialogWrapper.dialog);
-		barmatz.forms.factories.ControllerFactory.createFieldValidationOptionsController(model, dialogWrapper.options);
+		barmatz.forms.factories.ControllerFactory.createFieldValidationOptionsController(_this._model, dialogWrapper.options);
 	}
 	
 	function onItemsWrapperEditItemsButtonClick(event)
@@ -4710,7 +4800,6 @@ barmatz.forms.ui.WorkspaceController = function(model, view, dialogContainerView
 		});
 		
 		return ui;
-		
 	}
 	
 	function getIndexFromSortEvent(element)
@@ -4723,7 +4812,7 @@ barmatz.forms.ui.WorkspaceController = function(model, view, dialogContainerView
 	{
 		var dialogWrapper;
 		
-		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FieldModel);
+		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.AbstractFieldModel);
 		
 		dialogWrapper = barmatz.forms.factories.DOMFactory.createNewFieldDialogWrapper(model, true, dialogContainerView);
 		barmatz.forms.factories.ControllerFactory.createJQueryDialogController(dialogWrapper.dialog);
@@ -4775,7 +4864,7 @@ barmatz.forms.ui.WorkspaceController = function(model, view, dialogContainerView
 		item = event.getItem();
 		setViewToSortable();
 		
-		if(item instanceof barmatz.forms.fields.FieldModel && !item.getName())
+		if(item instanceof barmatz.forms.fields.AbstractFieldModel && !item.getName())
 			openNewFieldDialog(item);
 	}
 };
@@ -5241,10 +5330,10 @@ barmatz.forms.ui.MenuItemModel.prototype.setClickHandler = function(value)
 /** barmatz.forms.ui.NewFieldDialogController **/
 barmatz.forms.ui.NewFieldDialogController = function(model, view, nameFieldView, labelFieldView, dialogContainerView)
 {
-	barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FieldModel);
+	barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.AbstractFieldModel);
 	barmatz.utils.DataTypes.isInstanceOf(view, window.HTMLElement);
 	barmatz.utils.DataTypes.isInstanceOf(nameFieldView, HTMLInputElement);
-	barmatz.utils.DataTypes.isInstanceOf(labelFieldView, HTMLInputElement);
+	barmatz.utils.DataTypes.isInstanceOf(labelFieldView, HTMLInputElement, true);
 	barmatz.forms.ui.jquery.JQueryPromptDialogController.call(this, model, view, dialogContainerView);
 	
 	this._nameFieldView = nameFieldView;
@@ -5267,7 +5356,10 @@ barmatz.forms.ui.NewFieldDialogController.prototype._submitDialog = function(dia
 		}
 
 		this._model.setName(this._nameFieldView.value);
-		this._model.setLabel(this._labelFieldView.value);
+		
+		if(this._labelFieldView)
+			this._model.setLabel(this._labelFieldView.value);
+		
 		barmatz.forms.factories.DOMFactory.destroyDialog(this._view);
 	}
 	else if(!this._errorDialog)
@@ -5726,12 +5818,16 @@ barmatz.forms.ui.WorkspaceItemController = function(model, labelView, fieldView,
 		});
 	}
 	
-	if(model instanceof barmatz.forms.fields.FieldModel)
+	if(model instanceof barmatz.forms.fields.AbstractFieldModel)
 	{
 		setViewValue('name', model.getName());
+		setViewValue('value', model.getValue());
+	}
+
+	if(model instanceof barmatz.forms.fields.FieldModel)
+	{
 		setViewValue('label', model.getLabel());
 		setViewValue('mandatory', model.getMandatory());
-		setViewValue('value', model.getValue());
 		setViewValue('enabled', model.getEnabled());
 	}
 	
@@ -6032,6 +6128,7 @@ barmatz.forms.users.UserModel.prototype.getForms = function()
 		}
 		catch(error)
 		{
+			console.error(error.stack);
 			onLoadFormsDataError(event);
 			return;
 		}
@@ -6084,6 +6181,7 @@ barmatz.forms.users.UserModel.prototype.getData = function()
 		}
 		catch(error)
 		{
+			console.error(error.stack);
 			onLoaderError(event);
 			return;
 		}
@@ -6145,6 +6243,7 @@ barmatz.forms.users.UserModel.prototype.login = function(username, password)
 		}
 		catch(error)
 		{
+			console.error(error.stack);
 			onLoaderError(event);
 			return;
 		}
@@ -6203,6 +6302,42 @@ barmatz.forms.fields.FormItemModel = function(type)
 };
 barmatz.forms.fields.FormItemModel.prototype = new barmatz.forms.TypeModel(null);
 barmatz.forms.fields.FormItemModel.prototype.constructor = barmatz.forms.fields.FormItemModel;
+/** barmatz.forms.fields.AbstractFieldModel **/
+barmatz.forms.fields.AbstractFieldModel = function(type, name)
+{
+	barmatz.utils.DataTypes.isNotUndefined(type);
+	barmatz.utils.DataTypes.isNotUndefined(name);
+	barmatz.utils.DataTypes.isTypeOf(type, 'string', true);
+	barmatz.utils.DataTypes.isTypeOf(name, 'string', true);
+	barmatz.forms.fields.FormItemModel.call(this, type);
+	this.set('name', name);
+	this.set('value', '');
+};
+barmatz.forms.fields.AbstractFieldModel.prototype = new barmatz.forms.fields.FormItemModel(null);
+barmatz.forms.fields.AbstractFieldModel.prototype.constructor = barmatz.forms.fields.AbstractFieldModel;
+barmatz.forms.fields.AbstractFieldModel.prototype.getName = function()
+{
+	return this.get('name');
+};
+barmatz.forms.fields.AbstractFieldModel.prototype.setName = function(value)
+{
+	barmatz.utils.DataTypes.isTypeOf(value, 'string');
+	this.set('name', value);
+};
+barmatz.forms.fields.AbstractFieldModel.prototype.getValue = function()
+{
+	return this.get('value');
+};
+barmatz.forms.fields.AbstractFieldModel.prototype.setValue = function(value)
+{
+	this.set('value', value);
+};
+barmatz.forms.fields.AbstractFieldModel.prototype.clone = function()
+{
+	var clone = new barmatz.forms.fields.AbstractFieldModel(this.getType(), this.getName());
+	clone.setValue(this.getValue());
+	return clone;
+};
 /** barmatz.forms.fields.FieldController **/
 barmatz.forms.fields.FieldController = function(model, fieldView, errorMessageView)
 {
@@ -6415,27 +6550,16 @@ barmatz.forms.fields.FieldModel = function(type, name)
 	barmatz.utils.DataTypes.isNotUndefined(name);
 	barmatz.utils.DataTypes.isTypeOf(type, 'string', true);
 	barmatz.utils.DataTypes.isTypeOf(name, 'string', true);
-	barmatz.forms.fields.FormItemModel.call(this, type);
-	this.set('name', name);
+	barmatz.forms.fields.AbstractFieldModel.call(this, type, name);
 	this.set('label', '');
 	this.set('mandatory', false);
-	this.set('value', '');
 	this.set('enabled', true);
 	this.set('validator', barmatz.forms.factories.ModelFactory.createValidatorModel());
 	this.set('width', NaN);
 };
 
-barmatz.forms.fields.FieldModel.prototype = new barmatz.forms.fields.FormItemModel(null);
+barmatz.forms.fields.FieldModel.prototype = new barmatz.forms.fields.AbstractFieldModel(null, null);
 barmatz.forms.fields.FieldModel.prototype.constructor = barmatz.forms.fields.FieldModel;
-barmatz.forms.fields.FieldModel.prototype.getName = function()
-{
-	return this.get('name');
-};
-barmatz.forms.fields.FieldModel.prototype.setName = function(value)
-{
-	barmatz.utils.DataTypes.isTypeOf(value, 'string');
-	this.set('name', value);
-};
 barmatz.forms.fields.FieldModel.prototype.getLabel = function()
 {
 	return this.get('label');
@@ -6453,14 +6577,6 @@ barmatz.forms.fields.FieldModel.prototype.setMandatory = function(value)
 {
 	barmatz.utils.DataTypes.isTypeOf(value, 'boolean');
 	this.set('mandatory', value);
-};
-barmatz.forms.fields.FieldModel.prototype.getValue = function()
-{
-	return this.get('value');
-};
-barmatz.forms.fields.FieldModel.prototype.setValue = function(value)
-{
-	this.set('value', value);
 };
 barmatz.forms.fields.FieldModel.prototype.getEnabled = function()
 {
@@ -6634,8 +6750,8 @@ barmatz.forms.fields.ValidatorModel.prototype.getErrorMessage = function()
 },
 barmatz.forms.fields.ValidatorModel.prototype.setErrorMessage = function(value)
 {
-	barmatz.utils.DataTypes.isTypeOf(value, 'string');
-	this.set('errorMessage', value);
+	barmatz.utils.DataTypes.isTypeOf(value, 'string', true);
+	this.set('errorMessage', value || null);
 },
 barmatz.forms.fields.ValidatorModel.prototype.clone = function()
 {
@@ -7211,18 +7327,14 @@ barmatz.forms.fields.HTMLContentModel.prototype.clone = function()
 barmatz.forms.fields.HiddenFieldModel = function(name)
 {
 	barmatz.utils.DataTypes.isTypeOf(name, 'string');
-	barmatz.forms.fields.FieldModel.call(this, barmatz.forms.fields.FieldTypes.HIDDEN, name);
+	barmatz.forms.fields.AbstractFieldModel.call(this, barmatz.forms.fields.FieldTypes.HIDDEN, name);
 };
-barmatz.forms.fields.HiddenFieldModel.prototype = new barmatz.forms.fields.FieldModel(null, null);
+barmatz.forms.fields.HiddenFieldModel.prototype = new barmatz.forms.fields.AbstractFieldModel(null, null);
 barmatz.forms.fields.HiddenFieldModel.prototype.constructor = barmatz.forms.fields.HiddenFieldModel;
 barmatz.forms.fields.HiddenFieldModel.prototype.clone = function()
 {
 	var clone = new barmatz.forms.fields.HiddenFieldModel(this.getName());
-	clone.setLabel(this.getLabel());
-	clone.setMandatory(this.getMandatory());
 	clone.setValue(this.getValue());
-	clone.setEnabled(this.getEnabled());
-	clone.setValidator(this.getValidator().clone());
 	return clone;
 };
 /** barmatz.forms.fields.PasswordFieldModel **/

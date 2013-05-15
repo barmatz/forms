@@ -27,7 +27,7 @@ class LeadModel extends \api\database\DatabaseTableModel
 	protected function doInsert($formFingerprint, $data)
 	{
 		$formModelTableName = FormModel::getName();
-		$referer = isset($_SERVER['HTTP_REFERER']) ? $this->encodeString($_SERVER['HTTP_REFERER']) : 'Unknown';
+		$referer = $this->getReferer();
 		
 		if($this->query("insert into `{$this->name}`(`form`, `data`, `useragent`, `referer`, `ip`) values((select id from `$formModelTableName` where fingerprint='$formFingerprint'), '{$this->encodeString($data)}', '{$this->encodeString($_SERVER['HTTP_USER_AGENT'])}', '$referer', '{$this->encodeString($_SERVER['REMOTE_ADDR'])}')"))
 			return true;
@@ -36,6 +36,23 @@ class LeadModel extends \api\database\DatabaseTableModel
 			print_r("insert into `{$this->name}`(`form`, `data`, `useragent`, `referer`, `ip`) values((select id from `$formModelTableName` where fingerprint='$formFingerprint'), '{$this->encodeString($data)}', '{$this->encodeString($_SERVER['HTTP_USER_AGENT'])}', '$referer', '{$this->encodeString($_SERVER['REMOTE_ADDR'])}')") . PHP_EOL;
 			\api\errors\Errors::internalServerError('Cannot insert data.');
 		}
+	}
+	
+	protected function getReferer()
+	{
+		return isset($_SERVER['HTTP_REFERER']) ? $this->encodeString($_SERVER['HTTP_REFERER']) : 'Unknown';
+	}
+	
+	protected function parseValue($value)
+	{
+		switch($value)
+		{
+			case '${page_ref}':
+				$value = $this->getReferer();
+				break;
+		}
+		
+		return $value;
 	}
 	
 	public function email($formFingerprint, $data)
@@ -51,7 +68,7 @@ class LeadModel extends \api\database\DatabaseTableModel
 			$tableData = "";
 			
 			foreach($data as $key=>$value)
-				$tableData .= "<tr><td style=\"font-weight: bold\">$key</td><td>$value</td></tr>";
+				$tableData .= "<tr><td style=\"font-weight: bold\">$key</td><td>{$this->parseValue($value)}</td></tr>";
 			
 			$success = mail(
 				$formData->email, 
@@ -85,7 +102,7 @@ class LeadModel extends \api\database\DatabaseTableModel
 			$params = array();
 
 			foreach($data as $key=>$value)
-				$params[] = "$key=>$value";
+				$params[] = "$key=>{$this->parseValue($value)}";
 			
 			$queryString = implode('&', $params);
 			$ch = curl_init();

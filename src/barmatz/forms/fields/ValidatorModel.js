@@ -34,8 +34,8 @@ barmatz.forms.fields.ValidatorModel.prototype.getErrorMessage = function()
 },
 barmatz.forms.fields.ValidatorModel.prototype.setErrorMessage = function(value)
 {
-	barmatz.utils.DataTypes.isTypeOf(value, 'string');
-	this.set('errorMessage', value);
+	barmatz.utils.DataTypes.isTypeOf(value, 'string', true);
+	this.set('errorMessage', value || null);
 },
 barmatz.forms.fields.ValidatorModel.prototype.clone = function()
 {

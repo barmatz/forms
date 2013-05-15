@@ -5,27 +5,16 @@ barmatz.forms.fields.FieldModel = function(type, name)
 	barmatz.utils.DataTypes.isNotUndefined(name);
 	barmatz.utils.DataTypes.isTypeOf(type, 'string', true);
 	barmatz.utils.DataTypes.isTypeOf(name, 'string', true);
-	barmatz.forms.fields.FormItemModel.call(this, type);
-	this.set('name', name);
+	barmatz.forms.fields.AbstractFieldModel.call(this, type, name);
 	this.set('label', '');
 	this.set('mandatory', false);
-	this.set('value', '');
 	this.set('enabled', true);
 	this.set('validator', barmatz.forms.factories.ModelFactory.createValidatorModel());
 	this.set('width', NaN);
 };
 
-barmatz.forms.fields.FieldModel.prototype = new barmatz.forms.fields.FormItemModel(null);
+barmatz.forms.fields.FieldModel.prototype = new barmatz.forms.fields.AbstractFieldModel(null, null);
 barmatz.forms.fields.FieldModel.prototype.constructor = barmatz.forms.fields.FieldModel;
-barmatz.forms.fields.FieldModel.prototype.getName = function()
-{
-	return this.get('name');
-};
-barmatz.forms.fields.FieldModel.prototype.setName = function(value)
-{
-	barmatz.utils.DataTypes.isTypeOf(value, 'string');
-	this.set('name', value);
-};
 barmatz.forms.fields.FieldModel.prototype.getLabel = function()
 {
 	return this.get('label');
@@ -43,14 +32,6 @@ barmatz.forms.fields.FieldModel.prototype.setMandatory = function(value)
 {
 	barmatz.utils.DataTypes.isTypeOf(value, 'boolean');
 	this.set('mandatory', value);
-};
-barmatz.forms.fields.FieldModel.prototype.getValue = function()
-{
-	return this.get('value');
-};
-barmatz.forms.fields.FieldModel.prototype.setValue = function(value)
-{
-	this.set('value', value);
 };
 barmatz.forms.fields.FieldModel.prototype.getEnabled = function()
 {
