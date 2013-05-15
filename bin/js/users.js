@@ -1043,40 +1043,9 @@ barmatz.net.Loader.prototype.load = function(request)
 		var url, data, type, status, headers;
 		
 		url = request.getURL();
-		
-		try
-		{
-			data = xhr.responseText;
-		}
-		catch(error)
-		{
-			data = null;
-		}
-		
-		try
-		{
-			type = xhr.responseType;
-		}
-		catch(error)
-		{
-			try
-			{
-				type = xhr.contentType;
-			}
-			catch(error)
-			{
-				type = '';
-			}
-		}
-		
-		try
-		{
-			status = xhr.status;
-		}
-		catch(error)
-		{
-			status = NaN;
-		}
+		data = xhr.responseText || null;
+		type = xhr.responseType || xhr.contentType || '';
+		status = xhr.status || NaN;
 		
 		try
 		{
@@ -1283,7 +1252,7 @@ barmatz.net.Response.prototype.getHeaders = function()
 };
 /** barmatz.forms.Config **/
 barmatz.forms.Config = {
-	BASE_URL: 'http://www.quiz.co.il'
+	BASE_URL: 'http://localhost:8080/clients/ofirvardi/forms'
 };
 
 /** barmatz.forms.Directions **/
@@ -1299,21 +1268,21 @@ barmatz.forms.Language = {
 		submit: {
 			label: 'שלח',
 			success: 'הטופס נשלח בהצלחה',
-			error: 'שגיאה בשליחה! נסה שנית'
+			error: 'שגי�?ה בשליחה! נסה שנית'
 		},
 		field: {
 			errors: {
 				emptyValue: 'השדה ריק',
-				invalidValue: 'ערך לא נכון',
-				invalidEmail: 'כתובת דוא&quot;ל לא נכונה',
-				invalidPhone: 'מספר טלפון לא תקין',
-				minimumLength: 'הערך חייב להיות מינימום ${1} תווים',
-				maximumLength: 'הערך חיים להיות מקסימום ${1} תווים',
-				exactLength: 'הערך חיים להיות בדיוק ${1} תווים',
+				invalidValue: 'ערך ל�? נכון',
+				invalidEmail: 'כתובת דו�?&quot;ל ל�? נכונה',
+				invalidPhone: 'מספר טלפון ל�? תקין',
+				minimumLength: 'הערך חייב להיות מינימו�? ${1} תווי�?',
+				maximumLength: 'הערך חיי�? להיות מקסימו�? ${1} תווי�?',
+				exactLength: 'הערך חיי�? להיות בדיוק ${1} תווי�?',
 				greaterThan: 'הערך חייב להיות גדול מ-${1}',
 				lesserThan: 'הערך חייב להיות קטן מ-${1}',
-				digitsOnly: 'הערך יכול להכיל רק מספרים',
-				noDigits: 'ערך אינו יכול להכיל מספרים'
+				digitsOnly: 'הערך יכול להכיל רק מספרי�?',
+				noDigits: 'ערך �?ינו יכול להכיל מספרי�?'
 			}
 		}
 	}
@@ -3851,6 +3820,8 @@ barmatz.forms.factories.DOMFactory = {
 		
 		function onSpecialValuesButtonClick(event)
 		{
+			var dialog;
+			
 			if(!specialValuesDropboxModel)
 				specialValuesDropboxModel = barmatz.forms.factories.ModelFactory.createDropboxModel('specialValues', [
 	  				barmatz.forms.factories.ModelFactory.createDropboxItemModel('Page referer', '${page_ref}')
@@ -3859,7 +3830,9 @@ barmatz.forms.factories.DOMFactory = {
 			if(!specialValuesDropboxElement)
 				specialValuesDropboxElement = _this.createDropboxElement(specialValuesDropboxModel);
 			
-			_this.createPromptDialog('Special values', specialValuesDropboxElement, onSpecialValueConfirmed, true, container);
+			dialog = _this.createPromptDialog('Special values', specialValuesDropboxElement, onSpecialValueConfirmed, true, container);
+			jQuery(dialog).dialog({width: '170px'});
+			barmatz.forms.factories.ControllerFactory.createJQueryDialogController(dialog);
 		}
 		
 		function onSpecialValueConfirmed(event)

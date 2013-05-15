@@ -142,40 +142,9 @@ barmatz.net.Loader.prototype.load = function(request)
 		var url, data, type, status, headers;
 		
 		url = request.getURL();
-		
-		try
-		{
-			data = xhr.responseText;
-		}
-		catch(error)
-		{
-			data = null;
-		}
-		
-		try
-		{
-			type = xhr.responseType;
-		}
-		catch(error)
-		{
-			try
-			{
-				type = xhr.contentType;
-			}
-			catch(error)
-			{
-				type = '';
-			}
-		}
-		
-		try
-		{
-			status = xhr.status;
-		}
-		catch(error)
-		{
-			status = NaN;
-		}
+		data = xhr.responseText || null;
+		type = xhr.responseType || xhr.contentType || '';
+		status = xhr.status || NaN;
 		
 		try
 		{

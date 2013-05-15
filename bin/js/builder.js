@@ -1202,40 +1202,9 @@ barmatz.net.Loader.prototype.load = function(request)
 		var url, data, type, status, headers;
 		
 		url = request.getURL();
-		
-		try
-		{
-			data = xhr.responseText;
-		}
-		catch(error)
-		{
-			data = null;
-		}
-		
-		try
-		{
-			type = xhr.responseType;
-		}
-		catch(error)
-		{
-			try
-			{
-				type = xhr.contentType;
-			}
-			catch(error)
-			{
-				type = '';
-			}
-		}
-		
-		try
-		{
-			status = xhr.status;
-		}
-		catch(error)
-		{
-			status = NaN;
-		}
+		data = xhr.responseText || null;
+		type = xhr.responseType || xhr.contentType || '';
+		status = xhr.status || NaN;
 		
 		try
 		{
@@ -1568,7 +1537,7 @@ barmatz.forms.CollectionModel.prototype.toArray = function()
 
 /** barmatz.forms.Config **/
 barmatz.forms.Config = {
-	BASE_URL: 'http://www.quiz.co.il'
+	BASE_URL: 'http://localhost:8080/clients/ofirvardi/forms'
 };
 
 /** barmatz.forms.FormModel **/
@@ -4018,6 +3987,8 @@ barmatz.forms.factories.DOMFactory = {
 		
 		function onSpecialValuesButtonClick(event)
 		{
+			var dialog;
+			
 			if(!specialValuesDropboxModel)
 				specialValuesDropboxModel = barmatz.forms.factories.ModelFactory.createDropboxModel('specialValues', [
 	  				barmatz.forms.factories.ModelFactory.createDropboxItemModel('Page referer', '${page_ref}')
@@ -4026,7 +3997,9 @@ barmatz.forms.factories.DOMFactory = {
 			if(!specialValuesDropboxElement)
 				specialValuesDropboxElement = _this.createDropboxElement(specialValuesDropboxModel);
 			
-			_this.createPromptDialog('Special values', specialValuesDropboxElement, onSpecialValueConfirmed, true, container);
+			dialog = _this.createPromptDialog('Special values', specialValuesDropboxElement, onSpecialValueConfirmed, true, container);
+			jQuery(dialog).dialog({width: '170px'});
+			barmatz.forms.factories.ControllerFactory.createJQueryDialogController(dialog);
 		}
 		
 		function onSpecialValueConfirmed(event)

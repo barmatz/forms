@@ -1313,6 +1313,8 @@ barmatz.forms.factories.DOMFactory = {
 		
 		function onSpecialValuesButtonClick(event)
 		{
+			var dialog;
+			
 			if(!specialValuesDropboxModel)
 				specialValuesDropboxModel = barmatz.forms.factories.ModelFactory.createDropboxModel('specialValues', [
 	  				barmatz.forms.factories.ModelFactory.createDropboxItemModel('Page referer', '${page_ref}')
@@ -1321,7 +1323,9 @@ barmatz.forms.factories.DOMFactory = {
 			if(!specialValuesDropboxElement)
 				specialValuesDropboxElement = _this.createDropboxElement(specialValuesDropboxModel);
 			
-			_this.createPromptDialog('Special values', specialValuesDropboxElement, onSpecialValueConfirmed, true, container);
+			dialog = _this.createPromptDialog('Special values', specialValuesDropboxElement, onSpecialValueConfirmed, true, container);
+			jQuery(dialog).dialog({width: '170px'});
+			barmatz.forms.factories.ControllerFactory.createJQueryDialogController(dialog);
 		}
 		
 		function onSpecialValueConfirmed(event)
