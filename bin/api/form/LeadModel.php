@@ -27,11 +27,13 @@ class LeadModel extends \api\database\DatabaseTableModel
 	protected function doInsert($formFingerprint, $data)
 	{
 		$formModelTableName = FormModel::getName();
-		if($this->query("insert into `{$this->name}`(`form`, `data`, `useragent`, `referer`, `ip`) values((select id from `$formModelTableName` where fingerprint='$formFingerprint'), '{$this->encodeString($data)}', '{$this->encodeString($_SERVER['HTTP_USER_AGENT'])}', '{$this->encodeString($_SERVER['HTTP_REFERER'])}', '{$this->encodeString($_SERVER['REMOTE_ADDR'])}')"))
+		$referer = isset($_SERVER['HTTP_REFERER']) ? $this->encodeString($_SERVER['HTTP_REFERER']) : 'Unknown';
+		
+		if($this->query("insert into `{$this->name}`(`form`, `data`, `useragent`, `referer`, `ip`) values((select id from `$formModelTableName` where fingerprint='$formFingerprint'), '{$this->encodeString($data)}', '{$this->encodeString($_SERVER['HTTP_USER_AGENT'])}', '$referer', '{$this->encodeString($_SERVER['REMOTE_ADDR'])}')"))
 			return true;
 		else
 		{
-			print_r("insert into `{$this->name}`(`form`, `data`, `useragent`, `referer`, `ip`) values((select id from `$formModelTableName` where fingerprint='$formFingerprint'), '{$this->encodeString($data)}', '{$this->encodeString($_SERVER['HTTP_USER_AGENT'])}', '{$this->encodeString($_SERVER['HTTP_REFERER'])}', '{$this->encodeString($_SERVER['REMOTE_ADDR'])}')") . PHP_EOL;
+			print_r("insert into `{$this->name}`(`form`, `data`, `useragent`, `referer`, `ip`) values((select id from `$formModelTableName` where fingerprint='$formFingerprint'), '{$this->encodeString($data)}', '{$this->encodeString($_SERVER['HTTP_USER_AGENT'])}', '$referer', '{$this->encodeString($_SERVER['REMOTE_ADDR'])}')") . PHP_EOL;
 			\api\errors\Errors::internalServerError('Cannot insert data.');
 		}
 	}
@@ -75,8 +77,9 @@ class LeadModel extends \api\database\DatabaseTableModel
 	{
 		$formModel = new FormModel($this->db);
 		$formData = $formModel->getFormByFingerprint($formFingerprint);
+		$url = $formData->externalAPI; 
 		
-		if($formData->externalAPI)
+		if($url)
 		{
 			$data = json_decode($this->decodeString($data));
 			$params = array();
@@ -86,24 +89,26 @@ class LeadModel extends \api\database\DatabaseTableModel
 			
 			$queryString = implode('&', $params);
 			$ch = curl_init();
-			
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
 			switch($formData->method)
 			{
 				default:
 					\api\errors\Errors::internalServerError('Unknown form method');
 					break;
 				case 'GET':
-					curl_setopt($ch, CURLOPT_URL, $formData->externalAPI . "?$queryString");
+					curl_setopt($ch, CURLOPT_URL, $url . (strstr($url, '?') ? '&' : '?') . $queryString);
 					break;
 				case 'POST':
-					curl_setopt($ch, CURLOPT_POST, count($params));
+					curl_setopt($ch, CURLOPT_URL, $url);
+					curl_setopt($ch, CURLOPT_POST, true);
 					curl_setopt($ch, CURLOPT_POSTFIELDS, $queryString);
 					break;
 			}
 			
 			$success = curl_exec($ch);
 			curl_close($ch);
-			
+
 			if(!$success)
 				\api\errors\Errors::internalServerError('Error in sending to external API');
 		}

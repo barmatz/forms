@@ -1,31 +1,42 @@
-/** barmatz.forms.ui.BuilderPage **/
-barmatz.forms.ui.BuilderPage = function(container)
+/** barmatz.forms.ui.pages.BuilderPage **/
+barmatz.forms.ui.pages.BuilderPage = function(container)
 {
-	var _this, builderPageModel, formModel, userModel;
+	var _this, pageModel, formModel, userModel;
 	
 	barmatz.utils.DataTypes.isInstanceOf(container, window.HTMLElement, true);
 	
 	if(!container)
 		container = barmatz.forms.factories.DOMFactory.getBodyElement();
 	
-	barmatz.forms.ui.Page.call(this, container);
+	barmatz.forms.ui.pages.Page.call(this, container);
 	
 	_this = this;
 	
 	initModels();
-	initPanels();
+	initUI();
 	initController();
 	
 	function initModels()
 	{
-		initBuilderPageModel();
+		initPageModel();
 		initFormModel();
 		initUserModel();
 	}
 	
-	function initBuilderPageModel()
+	function initUI()
 	{
-		builderPageModel = barmatz.forms.factories.ModelFactory.createBuilderPageModel();
+		initMenu();
+		initPanels();
+	}
+	
+	function initController()
+	{
+		barmatz.forms.factories.ControllerFactory.createBuilderPageController(pageModel, formModel);
+	}
+	
+	function initPageModel()
+	{
+		pageModel = barmatz.forms.factories.ModelFactory.createBuilderPageModel();
 	}
 	
 	function initFormModel()
@@ -62,11 +73,6 @@ barmatz.forms.ui.BuilderPage = function(container)
         ]));
 	}
 	
-	function initController()
-	{
-		barmatz.forms.factories.ControllerFactory.createBuilderPageController(builderPageModel, formModel);
-	}
-	
 	function getToolbox()
 	{
 		var model, view;
@@ -85,7 +91,7 @@ barmatz.forms.ui.BuilderPage = function(container)
 			], 
 			function(item, index, collection)
 			{
-				model.addItem(barmatz.forms.factories.ModelFactory.createToolboxItemModel(item[0], item[1], barmatz.forms.factories.ModelFactory.createFieldModel(item[0], '')));
+				model.addItem(barmatz.forms.factories.ModelFactory.createToolboxItemModel(item[0], item[1], barmatz.forms.factories.ModelFactory.createFormFieldModel(item[0], '')));
 			}
 		);
 		barmatz.forms.factories.ControllerFactory.createToolboxController(model, view);
@@ -96,16 +102,16 @@ barmatz.forms.ui.BuilderPage = function(container)
 	function getWorkspace()
 	{
 		var wrapper = barmatz.forms.factories.DOMFactory.createWorkspaceWrapper();
-		barmatz.forms.factories.ControllerFactory.createBuilderWorkspaceController(builderPageModel, formModel, wrapper.formName, wrapper.saveStatus, wrapper.workspace, container);
+		barmatz.forms.factories.ControllerFactory.createBuilderWorkspaceController(pageModel, formModel, wrapper.formName, wrapper.saveStatus, wrapper.workspace, container);
 		return wrapper.wrapper;
 	}
 	
 	function getProperties()
 	{
 		var view = barmatz.forms.factories.DOMFactory.createProperties();
-		barmatz.forms.factories.ControllerFactory.createBuilderPropertiesController(builderPageModel, view);
+		barmatz.forms.factories.ControllerFactory.createBuilderPropertiesController(pageModel, view);
 		return view;
 	}
 };
-barmatz.forms.ui.BuilderPage.prototype = new barmatz.forms.ui.Page(); 
-barmatz.forms.ui.BuilderPage.prototype.constructor = barmatz.forms.ui.BuilderPage; 
+barmatz.forms.ui.pages.BuilderPage.prototype = new barmatz.forms.ui.pages.Page(); 
+barmatz.forms.ui.pages.BuilderPage.prototype.constructor = barmatz.forms.ui.pages.BuilderPage; 

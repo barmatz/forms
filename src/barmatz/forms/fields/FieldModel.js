@@ -122,7 +122,7 @@ barmatz.forms.fields.FieldModel.prototype.validate = function()
 						errors = barmatz.utils.Bitwise.concat(errors, barmatz.forms.Validator.NOT_EMPTY);
 					break;
 				case barmatz.forms.Validator.EQUALS:
-					if(!barmatz.forms.Validator.equals(value, this.getValidator().equals))
+					if(!barmatz.forms.Validator.equals(value, typeof this.getValidator().equals == 'function' ? this.getValidator().equals() : this.getValidator().equals))
 						errors = barmatz.utils.Bitwise.concat(errors, barmatz.forms.Validator.EQUALS);
 					break;
 				case barmatz.forms.Validator.VALID_EMAIL:

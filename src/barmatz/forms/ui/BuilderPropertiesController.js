@@ -3,7 +3,7 @@ barmatz.forms.ui.BuilderPropertiesController = function(builderPageModel, view)
 {
 	var _this;
 	
-	barmatz.utils.DataTypes.isInstanceOf(builderPageModel, barmatz.forms.ui.BuilderPageModel);
+	barmatz.utils.DataTypes.isInstanceOf(builderPageModel, barmatz.forms.ui.pages.BuilderPageModel);
 	barmatz.utils.DataTypes.isInstanceOf(view, window.HTMLElement);
 	barmatz.forms.ui.PropertiesController.call(this, view);
 	

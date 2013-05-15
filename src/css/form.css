@@ -3,12 +3,12 @@
 .forms-form-wrapper .loading-image { background-color: rgba(255, 255, 255, .7) !important; }
 .forms-form-wrapper input, .forms-form-wrapper textarea, .forms-form-wrapper select { font-size: 1em; min-height: 1.5em; border: 1px solid #CCC; color: #000; background: #FFF; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; }
 .forms-form-item { display: block; }
-.forms-layout-1 .forms-form-item label { width: 5em; display: inline-block; }
+.forms-layout-1 .forms-form-item label { width: 6em; display: inline-block; }
 .forms-layout-2 .forms-form-item label { display: block; }
 .forms-form-item-mandatory { color: #F00; font-weight: bold; top: .5em; }
 .forms-form-item-error-message { min-height: 1.3em; font-weight: bold; color: #F00; margin: 0; padding: 0; }
-.forms-ltr .forms-form-item-error-message-item { margin-left: 5em; }
-.forms-rtl .forms-form-item-error-message-item { margin-right: 5em; }
+.forms-ltr .forms-form-item-error-message-item { margin-left: 6em; }
+.forms-rtl .forms-form-item-error-message-item { margin-right: 6em; }
 .forms-ltr .forms-form-submit { text-align: right; }
 .forms-rtl .forms-form-submit { text-align: left; }
 .forms-phone-field { display: inline-block; direction: ltr !important; }

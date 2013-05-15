@@ -1,5 +1,5 @@
-/** barmatz.forms.ui.Page **/
-barmatz.forms.ui.Page = function(container)
+/** barmatz.forms.ui.pages.Page **/
+barmatz.forms.ui.pages.Page = function(container)
 {
 	var _this;
 	
@@ -15,6 +15,7 @@ barmatz.forms.ui.Page = function(container)
 	{
 		initMenu();
 		initContent();
+		barmatz.forms.factories.ControllerFactory.createPageController(this._contentView);
 	}
 	
 	function initMenu()
@@ -28,8 +29,8 @@ barmatz.forms.ui.Page = function(container)
 	
 	function initContent()
 	{
-		_this.contentModel = barmatz.forms.factories.ModelFactory.createContentModel();
+		_this._contentModel = barmatz.forms.factories.ModelFactory.createContentModel();
 		_this._contentView = container.appendChild(barmatz.forms.factories.DOMFactory.createElement('div', 'forms-page'));
-		barmatz.forms.factories.ControllerFactory.createContentController(_this.contentModel, _this._contentView);
+		barmatz.forms.factories.ControllerFactory.createContentController(_this._contentModel, _this._contentView);
 	}
 };

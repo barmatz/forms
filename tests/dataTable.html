@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>barmatz.forms.ui.DataTable object test</title>
+		<link rel="stylesheet" type="text/css" href="../libs/jqueryui/css/ui-darkness/jquery-ui.min.css"/>
+		<style>
+			.table-ui { width: 300px; }
+			.table-ui table { width: 100%; }
+			.table-ui table td, .table-ui table th { border: 1px solid; }
+			.table-ui-nav { display: inline-block; float: right; }
+		</style>
+	</head>
+	<body>
+		<script src="../src/namespaces.js"></script>
+		<script src="../src/barmatz/utils/DataTypes.js"></script>
+		<script src="../src/barmatz/utils/Array.js"></script>
+		<script src="../src/barmatz/events/Event.js"></script>
+		<script src="../src/barmatz/events/ModelEvent.js"></script>
+		<script src="../src/barmatz/events/LoaderEvent.js"></script>
+		<script src="../src/barmatz/events/EventDispatcher.js"></script>
+		<script src="../src/barmatz/mvc/Model.js"></script>
+		<script src="../src/barmatz/mvc/Controller.js"></script>
+		<script src="../src/barmatz/net/Methods.js"></script>
+		<script src="../src/barmatz/net/Encoding.js"></script>
+		<script src="../src/barmatz/net/Request.js"></script>
+		<script src="../src/barmatz/net/Response.js"></script>
+		<script src="../src/barmatz/net/Loader.js"></script>
+		<script src="../src/barmatz/forms/factories/ModelFactory.js"></script>
+		<script src="../src/barmatz/forms/factories/DOMFactory.js"></script>
+		<script src="../src/barmatz/forms/factories/ControllerFactory.js"></script>
+		<script src="../src/barmatz/forms/ui/DataTableModel.js"></script>
+		<script src="../src/barmatz/forms/ui/DataTableController.js"></script>
+		<script src="../src/barmatz/forms/ui/DataTable.js"></script>
+		<script src="../src/barmatz/forms/ui/AbstractDataTableDecorator.js"></script>
+		<script src="../src/barmatz/forms/ui/DataTableUIDecorator.js"></script>
+		<script src="../src/barmatz/forms/ui/DataTableUIDecoratorController.js"></script>
+		<script src="../src/barmatz/forms/ui/RemoteDataTableDecorator.js"></script>
+		<script src="../libs/jqueryui/js/jquery-1.9.0.js"></script>
+		<script src="../libs/jqueryui/js/jquery-ui-1.10.0.custom.min.js"></script>
+		<script>
+			table = new barmatz.forms.ui.RemoteDataTableDecorator(new barmatz.forms.ui.DataTableUIDecorator(new barmatz.forms.ui.DataTable()));
+			table.setHeaders(['one', 'two', 'three']);
+			table.setData([
+				[1,2,3],               
+				[4,5,6],               
+				[7,8,9]               
+			]);
+			barmatz.forms.factories.DOMFactory.getBodyElement().appendChild(table.getElement());
+		</script>
+	</body>
+</html>

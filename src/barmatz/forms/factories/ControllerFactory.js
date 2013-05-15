@@ -58,7 +58,7 @@ barmatz.forms.factories.ControllerFactory = {
 	},
 	createJQueryDialogController: function(view)
 	{
-		return new barmatz.forms.ui.JQueryDialogController(view);
+		return new barmatz.forms.ui.jquery.JQueryDialogController(view);
 	},
 	createLeadsController: function(userModel, formsListModel, formsListView, leadsListModel, leadsListWrapperView, leadsListView, containerView, panelsView, dialogContainerView)
 	{
@@ -94,6 +94,26 @@ barmatz.forms.factories.ControllerFactory = {
 	},
 	createBuilderPageController: function(builderPageModel, formModel)
 	{
-		return new barmatz.forms.ui.BuilderPageController(builderPageModel, formModel);
+		return new barmatz.forms.ui.pages.BuilderPageController(builderPageModel, formModel);
+	},
+	createPageController: function(contentView)
+	{
+		return new barmatz.forms.ui.pages.PageController(contentView);
+	},
+	createUsersMenuController: function(pageModel, newButtonView, findButtonView, allButtonView)
+	{
+		return new barmatz.forms.ui.UsersMenuController(pageModel, newButtonView, findButtonView, allButtonView);
+	},
+	createUsersPageController: function(pageModel, contentModel, newUserView, findUserView, allUsersView)
+	{
+		return new barmatz.forms.ui.pages.UsersPageController(pageModel, contentModel, newUserView, findUserView, allUsersView);
+	},
+	createTableController: function(model, tableView, headView, bodyView)
+	{
+		return new barmatz.forms.ui.DataTableController(model, tableView, headView, bodyView);
+	},
+	createTableUIDecoratorController: function(table, prevButtonView, nextButtonView, itemsPerPageView, currentPageView)
+	{
+		return new barmatz.forms.ui.DataTableUIDecoratorController(table, prevButtonView, nextButtonView, itemsPerPageView, currentPageView);
 	}
 }

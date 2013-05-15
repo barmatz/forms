@@ -138,7 +138,54 @@ barmatz.net.Loader.prototype.load = function(request)
 	
 	function getResponse()
 	{
-		return new barmatz.net.Response(request.getURL(), xhr.responseText, xhr.responseType || xhr.contentType || '', xhr.status || NaN, xhr.getAllResponseHeaders != null ? xhr.getAllResponseHeaders().split('\n') : []);
+		var url, data, type, status, headers;
+		
+		url = request.getURL();
+		
+		try
+		{
+			data = xhr.responseText;
+		}
+		catch(error)
+		{
+			data = null;
+		}
+		
+		try
+		{
+			type = xhr.responseType;
+		}
+		catch(error)
+		{
+			try
+			{
+				type = xhr.contentType;
+			}
+			catch(error)
+			{
+				type = '';
+			}
+		}
+		
+		try
+		{
+			status = xhr.status;
+		}
+		catch(error)
+		{
+			status = NaN;
+		}
+		
+		try
+		{
+			headers = xhr.getAllResponseHeaders().split('\n');
+		}
+		catch(error)
+		{
+			headers = [];
+		}
+		
+		return new barmatz.net.Response(url, data, type, status, headers);
 	}
 	
 	function onXHRError()

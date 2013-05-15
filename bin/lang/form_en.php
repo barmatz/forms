@@ -7,7 +7,7 @@ echo json_encode(array(
 		'loading'=>'loading...',
 		'submit'=>array(
 			'label'=>'Submit',
-			'success'=>'Your forms has been submitted',
+			'success'=>'Your form has been submitted',
 			'error'=>'An error has occured! Click to try again'
 		),
 		'field'=>array(

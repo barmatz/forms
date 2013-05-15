@@ -4,7 +4,7 @@ barmatz.forms.factories.ModelFactory = {
 	{
 		return new barmatz.forms.users.UserModel();
 	},
-	createFieldModel: function(type, name)
+	createFormFieldModel: function(type, name)
 	{
 		barmatz.utils.DataTypes.isNotUndefined(type);
 		barmatz.utils.DataTypes.isTypeOf(type, 'string');
@@ -68,7 +68,7 @@ barmatz.forms.factories.ModelFactory = {
 	},
 	createBuilderPageModel: function()
 	{
-		return new barmatz.forms.ui.BuilderPageModel();
+		return new barmatz.forms.ui.pages.BuilderPageModel();
 	},
 	createMenuModel: function()
 	{
@@ -97,5 +97,13 @@ barmatz.forms.factories.ModelFactory = {
 	createContentModel: function()
 	{
 		return new barmatz.forms.ui.ContentModel();
+	},
+	createUsersPageModel: function()
+	{
+		return new barmatz.forms.ui.pages.UsersPageModel();
+	},
+	createTableModel: function()
+	{
+		return new barmatz.forms.ui.DataTableModel();
 	}
 }

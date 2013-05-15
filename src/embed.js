@@ -7,7 +7,7 @@ barmatz.forms.embed = function(fingerprint)
 	
 	function getContainers()
 	{
-		var containers = barmatz.utils.Array.toArray(document.getElementsByName('formContainer')).filter(filterFormContainers);
+		var containers = barmatz.utils.Array.filter(barmatz.utils.Array.toArray(document.getElementsByName('formContainer')), filterFormContainers);
 		barmatz.utils.Array.forEach(containers, function(item, index, collection)
 		{
 			embedForm(item);
@@ -46,74 +46,13 @@ barmatz.forms.embed = function(fingerprint)
 	
 	function addFormToContainer(model)
 	{
-		var container, wrapper, field, submitButton;
+		var container, wrapper;
 		
 		container = dictionary.get(model);
-		wrapper = barmatz.forms.factories.DOMFactory.createElement('div', 'forms-form-wrapper forms-layout-' + model.getLayoutId());
-		form = barmatz.forms.factories.DOMFactory.createElement('form');
-		submitButton = barmatz.forms.factories.DOMFactory.createElementWithContent('button', 'forms-form-submit-button', model.getSubmitButtonLabel());
-		
+		wrapper = barmatz.forms.factories.DOMFactory.createFormWrapper(model);
 		barmatz.forms.factories.DOMFactory.clearElement(container);
-		container.appendChild(barmatz.forms.factories.DOMFactory.createStylesheet(barmatz.forms.Config.BASE_URL + '/css/form.css'));
-		
-		switch(model.getDirection())
-		{
-			default:
-				throw new Error('Unknown direction');
-				break;
-			case barmatz.forms.Directions.LTR:
-				barmatz.utils.CSS.addClass(wrapper, 'forms-ltr');
-				break;
-			case barmatz.forms.Directions.RTL:
-				barmatz.utils.CSS.addClass(wrapper, 'forms-rtl');
-				break;
-		}
-		
-		barmatz.utils.Array.forEach(model.getStylesheets(), function(item, index, collection)
-		{
-			container.appendChild(barmatz.forms.factories.DOMFactory.createStylesheet(item));
-		});
-		
-		model.forEach(function(item, index, collection)
-		{
-			var field, errorMessage;
-			
-			field = barmatz.forms.factories.DOMFactory.createFormFieldElement(item);
-			
-			if(!(item instanceof barmatz.forms.fields.HTMLContentModel))
-				field.name = item.getName();
-			
-			if(item instanceof barmatz.forms.fields.FieldModel)
-			{
-				if(item instanceof barmatz.forms.fields.PhoneFieldModel)
-					field.getElementsByTagName('input')[0].style.width = item.getWidth() + 'px';
-				else
-					field.style.width = item.getWidth() + 'px';
-			}
-			
-			errorMessage = barmatz.forms.factories.DOMFactory.createFormFieldErrorMessageElement();
-			
-			if(item instanceof barmatz.forms.fields.HTMLContentModel)
-			{
-				form.appendChild(barmatz.forms.factories.DOMFactory.createFormFieldElement(item));
-			}
-			else
-			{
-				form.appendChild(barmatz.forms.factories.DOMFactory.createElementWithContent('div', 'forms-form-item', [
-					barmatz.forms.factories.DOMFactory.createElementWithContent('label', '', item.getLabel()),
-				    field,
-				    barmatz.forms.factories.DOMFactory.createElementWithContent('span', 'forms-form-item-mandatory', item.getMandatory() ? '*' : ''),
-				    errorMessage
-				]));
-				barmatz.forms.factories.ControllerFactory.createFieldController(item, field, errorMessage);
-			}
-		});
-		
-		form.appendChild(barmatz.forms.factories.DOMFactory.createElementWithContent('div', 'forms-form-item forms-form-submit', submitButton));
-		wrapper.appendChild(form);
-		container.appendChild(wrapper);
-		
-		barmatz.forms.factories.ControllerFactory.createFormController(model, form, submitButton);
+		container.appendChild(wrapper.container);
+		barmatz.forms.factories.ControllerFactory.createFormController(model, wrapper.form, wrapper.submitButton);
 	}
 	
 	function onLoadingFormComplete(event)

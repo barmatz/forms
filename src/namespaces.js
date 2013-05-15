@@ -4,7 +4,10 @@ barmatz = {
 	forms: {
 		factories: {},
 		fields: {},
-		ui: {},
+		ui: {
+			jquery: {},
+			pages: {}
+		},
 		users: {}
 	},
 	mvc: {},

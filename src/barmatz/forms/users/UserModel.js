@@ -4,6 +4,7 @@ barmatz.forms.users.UserModel = function()
 	barmatz.forms.CollectionModel.call(this);
 	this.set('id', null);
 	this.set('username', null);
+	this.set('firstName', null);
 	this.set('lastName', null);
 	this.set('created', null);
 	this.set('active', false);

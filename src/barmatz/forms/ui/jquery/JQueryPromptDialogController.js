@@ -1,5 +1,5 @@
-/** barmatz.forms.ui.JQueryPromptDialogController **/
-barmatz.forms.ui.JQueryPromptDialogController = function(model, view, dialogContainerView)
+/** barmatz.forms.ui.jquery.JQueryPromptDialogController **/
+barmatz.forms.ui.jquery.JQueryPromptDialogController = function(model, view, dialogContainerView)
 {
 	var _this = this;
 	
@@ -31,5 +31,5 @@ barmatz.forms.ui.JQueryPromptDialogController = function(model, view, dialogCont
 			_this._submitDialog(dialogContainerView);
 	}
 };
-barmatz.forms.ui.JQueryPromptDialogController.prototype = new barmatz.forms.ui.PromptDialogController(null, null);
-barmatz.forms.ui.JQueryPromptDialogController.prototype.constructor = barmatz.forms.ui.JQueryPromptDialogController;
+barmatz.forms.ui.jquery.JQueryPromptDialogController.prototype = new barmatz.forms.ui.PromptDialogController(null, null);
+barmatz.forms.ui.jquery.JQueryPromptDialogController.prototype.constructor = barmatz.forms.ui.jquery.JQueryPromptDialogController;

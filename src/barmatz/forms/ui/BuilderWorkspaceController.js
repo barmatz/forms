@@ -3,7 +3,7 @@ barmatz.forms.ui.BuilderWorkspaceController = function(builderPageModel, formMod
 {
 	var loadingDialog;
 	
-	barmatz.utils.DataTypes.isInstanceOf(builderPageModel, barmatz.forms.ui.BuilderPageModel);
+	barmatz.utils.DataTypes.isInstanceOf(builderPageModel, barmatz.forms.ui.pages.BuilderPageModel);
 	barmatz.utils.DataTypes.isInstanceOf(formModel, barmatz.forms.FormModel);
 	barmatz.utils.DataTypes.isInstanceOf(itemsView, window.HTMLElement);
 	barmatz.utils.DataTypes.isInstanceOf(formNameView, window.HTMLElement);
@@ -45,6 +45,14 @@ barmatz.forms.ui.BuilderWorkspaceController = function(builderPageModel, formMod
 			barmatz.forms.factories.DOMFactory.destroyLoadingDialog(loadingDialog);
 			loadingDialog = null;
 		}
+	}
+	
+	function removeLoadingViewWithMessage(title, message)
+	{
+		barmatz.utils.DataTypes.isTypeOf(title, 'string');
+		barmatz.utils.DataTypes.isTypeOf(message, 'string');
+		removeLoadingView();
+		barmatz.forms.factories.ControllerFactory.createJQueryDialogController(barmatz.forms.factories.DOMFactory.createAlertPromptDialog(title, message, true, dialogContainerView));
 	}
 	
 	function onFormModelValueChanged(event)

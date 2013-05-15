@@ -7,7 +7,7 @@ barmatz.net.Request = function(url)
 	this.set('url', url);
 	this.set('method', barmatz.net.Methods.GET);
 	this.set('async', true);
-	this.set('data', {});
+	this.set('data', null);
 	this.set('credentials', null);
 	this.set('headers', []);
 };

@@ -1,5 +1,5 @@
-/** barmatz.forms.ui.JQueryDialogController **/
-barmatz.forms.ui.JQueryDialogController = function(view)
+/** barmatz.forms.ui.jquery.JQueryDialogController **/
+barmatz.forms.ui.jquery.JQueryDialogController = function(view)
 {
 	barmatz.utils.DataTypes.isInstanceOf(view, window.HTMLElement);
 	
@@ -21,5 +21,5 @@ barmatz.forms.ui.JQueryDialogController = function(view)
 		catch(error){}
 	}
 };
-barmatz.forms.ui.JQueryDialogController.prototype = new barmatz.mvc.Controller();
-barmatz.forms.ui.JQueryDialogController.prototype.constructor = barmatz.forms.ui.JQueryDialogController;
+barmatz.forms.ui.jquery.JQueryDialogController.prototype = new barmatz.mvc.Controller();
+barmatz.forms.ui.jquery.JQueryDialogController.prototype.constructor = barmatz.forms.ui.jquery.JQueryDialogController;

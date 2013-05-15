@@ -25,6 +25,7 @@ class FormModel extends \api\database\DatabaseTableModel
 			'`name` char(255) default null',
 			'`fields` text default null',
 			'`email` char(255) default null',
+			'`internal_api` char(255) default null',
 			'`external_api` char(255) default null',
 			'`submit_button_label` char(255) default "Submit"',
 			'`method` char(10) default null',
@@ -41,7 +42,7 @@ class FormModel extends \api\database\DatabaseTableModel
 		return base64_encode(mysql_fetch_object($this->query("show index from forms"))->Cardinality . 1 . mysql_fetch_object($this->query("select now() as a"))->a);
 	}
 	
-	protected function doInsert($userId, $name, $fields, $email, $externalAPI, $submitButtonLabel, $method, $encoding, $stylesheets, $direction, $layoutId, $language)
+	protected function doInsert($userId, $name, $fields, $email, $internalAPI, $externalAPI, $submitButtonLabel, $method, $encoding, $stylesheets, $direction, $layoutId, $language)
 	{
 		$params = array(
 			'user' => $userId,
@@ -49,6 +50,7 @@ class FormModel extends \api\database\DatabaseTableModel
 			'name' => '"' . $this->encodeString($name) . '"',
 			'fields' => '"' . $this->encodeString($fields) . '"',
 			'email' => '"' . $this->encodeString($email) . '"',
+			'internal_api' => '"' . $this->encodeString($internalAPI) . '"',
 			'external_api' => '"' . $this->encodeString($externalAPI) . '"',
 			'submit_button_label' => '"' . $this->encodeString($submitButtonLabel) . '"',
 			'method' => '"' . $this->encodeString($method) . '"',
@@ -74,12 +76,13 @@ class FormModel extends \api\database\DatabaseTableModel
 			\api\errors\Errors::internalServerError('Cannot insert data.');
 	}
 	
-	protected function doUpdate($fingerprint, $name, $fields, $email, $externalAPI, $submitButtonLabel, $method, $encoding, $stylesheets, $direction, $layoutId, $language)
+	protected function doUpdate($fingerprint, $name, $fields, $email, $internalAPI, $externalAPI, $submitButtonLabel, $method, $encoding, $stylesheets, $direction, $layoutId, $language)
 	{
 		$params = array(
 			'name' => '"' . $this->encodeString($name) . '"',
 			'fields' => '"' . $this->encodeString($fields) . '"',
 			'email' => '"' . $this->encodeString($email) . '"',
+			'internal_api' => '"' . $this->encodeString($internalAPI) . '"',
 			'external_api' => '"' . $this->encodeString($externalAPI) . '"',
 			'submit_button_label' => '"' . $this->encodeString($submitButtonLabel) . '"',
 			'method' => '"' . $this->encodeString($method) . '"',
@@ -106,6 +109,7 @@ class FormModel extends \api\database\DatabaseTableModel
 		$result->name = $this->decodeString($result->name);
 		$result->fields = json_decode($this->decodeString($result->fields));
 		$result->email = $this->decodeString($result->email);
+		$result->internalAPI = $this->decodeString($result->internal_api);
 		$result->externalAPI = $this->decodeString($result->external_api);
 		$result->submitButtonLabel = $this->decodeString($result->submit_button_label);
 		$result->method = $this->decodeString($result->method);

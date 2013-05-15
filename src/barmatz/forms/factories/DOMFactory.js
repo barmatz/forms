@@ -21,18 +21,18 @@ barmatz.forms.factories.DOMFactory = {
 	},
 	addContent: function(content, container)
 	{
-		barmatz.utils.DataTypes.isTypesOrInstances(content, ['string'], [window.HTMLElement, window.Array]);
+		barmatz.utils.DataTypes.isNotUndefined(content);
 		barmatz.utils.DataTypes.isInstanceOf(container, window.HTMLElement);
 		
-		if(typeof content == 'string')
-			container.innerHTML += content;
-		else if(content instanceof window.HTMLElement)
+		if(content instanceof window.HTMLElement)
 			container.appendChild(content);
 		else if(content instanceof window.Array)
 			barmatz.utils.Array.forEach(content, function(item, index, collection)
 			{
 				this.addContent(item, container);
 			}, this);
+		else
+			container.innerHTML += content.toString();
 	},
 	clearElement: function(element)
 	{
@@ -58,10 +58,9 @@ barmatz.forms.factories.DOMFactory = {
 	{
 		var _this, element;
 		
-		barmatz.utils.DataTypes.isNotUndefined(tagName);
 		barmatz.utils.DataTypes.isTypeOf(tagName, 'string');
 		barmatz.utils.DataTypes.isTypeOf(className, 'string', true);
-		barmatz.utils.DataTypes.isTypesOrInstances(content, ['string'], [window.HTMLElement, window.Array]);
+		barmatz.utils.DataTypes.isNotUndefined(content);
 		barmatz.utils.DataTypes.isTypeOf(appendChildWrapper, 'function', true);
 		
 		_this = this;
@@ -83,9 +82,14 @@ barmatz.forms.factories.DOMFactory = {
 		if(clickHandler != null)
 			button.addEventListener('click', clickHandler);
 		
-		jQuery(button).button();
+		this.formatButton(button);
 		
 		return button;
+	},
+	formatButton: function(button)
+	{
+		barmatz.utils.DataTypes.isInstanceOf(button, window.HTMLElement);
+		jQuery(button).button();
 	},
 	createDropboxElement: function(model, selectedIndex)
 	{
@@ -121,11 +125,83 @@ barmatz.forms.factories.DOMFactory = {
 		
 		return item;
 	},
+	createFormWrapper: function(model)
+	{
+		var _this, wrapper;
+		
+		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.FormModel);
+		
+		_this = this;
+		wrapper = {
+			form: barmatz.forms.factories.DOMFactory.createElement('form'),
+			submitButton: barmatz.forms.factories.DOMFactory.createElementWithContent('button', 'forms-form-submit-button', model.getSubmitButtonLabel()),
+			container: barmatz.forms.factories.DOMFactory.createElement('div', 'forms-form-wrapper forms-layout-' + model.getLayoutId())
+		};
+
+		wrapper.container.appendChild(this.createStylesheet(barmatz.forms.Config.BASE_URL + '/css/form.css'));
+
+		barmatz.utils.Array.forEach(model.getStylesheets(), function(item, index, collection)
+		{
+			wrapper.container.appendChild(_this.createStylesheet(item));
+		});
+
+		
+		switch(model.getDirection())
+		{
+			default:
+				throw new Error('Unknown direction');
+				break;
+			case barmatz.forms.Directions.LTR:
+				barmatz.utils.CSS.addClass(wrapper.container, 'forms-ltr');
+				break;
+			case barmatz.forms.Directions.RTL:
+				barmatz.utils.CSS.addClass(wrapper.container, 'forms-rtl');
+				break;
+		}
+		
+		model.forEach(function(item, index, collection)
+		{
+			var field, errorMessage;
+			
+			field = _this.createFormFieldElement(item);
+			
+			if(!(item instanceof barmatz.forms.fields.HTMLContentModel))
+				field.name = item.getName();
+			
+			if(item instanceof barmatz.forms.fields.FieldModel)
+			{
+				if(item instanceof barmatz.forms.fields.PhoneFieldModel)
+					field.getElementsByTagName('input')[0].style.width = item.getWidth() + 'px';
+				else
+					field.style.width = item.getWidth() + 'px';
+			}
+			
+			errorMessage = _this.createFormFieldErrorMessageElement();
+			
+			if(item instanceof barmatz.forms.fields.HTMLContentModel)
+			{
+				wrapper.form.appendChild(_this.createFormFieldElement(item));
+			}
+			else
+			{
+				wrapper.form.appendChild(_this.createElementWithContent('div', 'forms-form-item', [
+					_this.createElementWithContent('label', '', item.getLabel()), field,
+				    _this.createElementWithContent('span', 'forms-form-item-mandatory', item.getMandatory() ? '*' : ''), errorMessage
+				]));
+				barmatz.forms.factories.ControllerFactory.createFieldController(item, field, errorMessage);
+			}
+		});
+
+		wrapper.form.appendChild(this.createElementWithContent('div', 'forms-form-item forms-form-submit', wrapper.submitButton));
+		wrapper.container.appendChild(wrapper.form);
+		
+		return wrapper;
+		
+	},
 	createFormFieldElement: function(model)
 	{
 		var _this, field, type;
 		
-		barmatz.utils.DataTypes.isNotUndefined(model);
 		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.fields.FormItemModel);
 		
 		_this = this;
@@ -544,7 +620,7 @@ barmatz.forms.factories.DOMFactory = {
 		nameField = getField(model.getName());
 		labelField = getField(model.getLabel());
 		
-		formTableOptions = new barmatz.forms.ui.TableOptions();
+		formTableOptions = new barmatz.forms.ui.DataTableOptions();
 		formTableOptions.getBodyRows().push(getRowContent('Name', nameField), getRowContent('Label', labelField));
 		
 		form = this.createTable(formTableOptions);
@@ -711,7 +787,7 @@ barmatz.forms.factories.DOMFactory = {
 		
 		barmatz.utils.DataTypes.isInstanceOf(panels, window.Array);
 		
-		options = new barmatz.forms.ui.TableOptions();
+		options = new barmatz.forms.ui.DataTableOptions();
 		options.setClassName('forms-wrapper');
 		options.getBodyRows().push([]);
 		barmatz.utils.Array.forEach(panels, function(item, index, collection)
@@ -795,7 +871,7 @@ barmatz.forms.factories.DOMFactory = {
 		barmatz.utils.DataTypes.isInstanceOf(container, window.HTMLElement, true);
 		
 		_this = this;
-		wrapperOptions = new barmatz.forms.ui.TableOptions();
+		wrapperOptions = new barmatz.forms.ui.DataTableOptions();
 		userNameField = addField('username', 'User', 'text');
 		passwordField = addField('password', 'Password', 'password');
 		wrapper = this.createTable(wrapperOptions);
@@ -849,7 +925,7 @@ barmatz.forms.factories.DOMFactory = {
 	},
 	createUserFormsList: function()
 	{
-		var options = new barmatz.forms.ui.TableOptions();
+		var options = new barmatz.forms.ui.DataTableOptions();
 		options.getHeadColumns().push('Name');
 		options.getHeadColumns().push('Created');
 		options.getHeadColumns().push('Fingerprint');
@@ -875,7 +951,7 @@ barmatz.forms.factories.DOMFactory = {
 	},
 	createDropboxItemsList: function()
 	{
-		var options = new barmatz.forms.ui.TableOptions();
+		var options = new barmatz.forms.ui.DataTableOptions();
 		options.getHeadColumns().push('Key', 'Value', '');
 		return this.createTable(options);
 	},
@@ -892,7 +968,7 @@ barmatz.forms.factories.DOMFactory = {
 		barmatz.utils.DataTypes.isInstanceOf(container, window.HTMLElement, true);
 		
 		_this = this;
-		options = new barmatz.forms.ui.TableOptions();
+		options = new barmatz.forms.ui.DataTableOptions();
 		labelField = addRow('label', label || '');
 		valueField = addRow('Value', value || '');
 		return this.createPromptDialog(labelField != null ? 'Edit item' : 'New item', this.createTable(options), onConfirm, open, container);
@@ -936,7 +1012,7 @@ barmatz.forms.factories.DOMFactory = {
 	{
 		var _this, headColumns, content;
 		
-		barmatz.utils.DataTypes.isInstanceOf(options, barmatz.forms.ui.TableOptions);
+		barmatz.utils.DataTypes.isInstanceOf(options, barmatz.forms.ui.DataTableOptions);
 		
 		_this = this;
 		headColumns = options.getHeadColumns();
@@ -983,7 +1059,7 @@ barmatz.forms.factories.DOMFactory = {
 	},
 	createTableColumn: function(content, className, isHead)
 	{
-		barmatz.utils.DataTypes.isTypesOrInstances(content, ['string'], [window.HTMLElement, window.Array]);
+		barmatz.utils.DataTypes.isNotUndefined(content);
 		barmatz.utils.DataTypes.isTypeOf(className, 'string', true);
 		barmatz.utils.DataTypes.isTypeOf(isHead, 'boolean', true);
 		return this.createElementWithContent(isHead ? 'th' : 'td', className, content);
@@ -1014,7 +1090,7 @@ barmatz.forms.factories.DOMFactory = {
 		barmatz.utils.DataTypes.isInstanceOf(model, barmatz.forms.FormModel);
 	
 		_this = this;
-		options = new barmatz.forms.ui.TableOptions();
+		options = new barmatz.forms.ui.DataTableOptions();
 		returnValue = {};
 		
 		returnValue.nameField = createField('Name');
@@ -1269,7 +1345,7 @@ barmatz.forms.factories.DOMFactory = {
 	{
 		var options, table;
 		
-		options = new barmatz.forms.ui.TableOptions();
+		options = new barmatz.forms.ui.DataTableOptions();
 		options.setHeadRowClassName('forms-leads-list-head');
 		options.getHeadColumns().push('Received', 'Referer', 'IP');
 		

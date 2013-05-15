@@ -5,13 +5,13 @@ barmatz.forms.ui.NewFieldDialogController = function(model, view, nameFieldView,
 	barmatz.utils.DataTypes.isInstanceOf(view, window.HTMLElement);
 	barmatz.utils.DataTypes.isInstanceOf(nameFieldView, HTMLInputElement);
 	barmatz.utils.DataTypes.isInstanceOf(labelFieldView, HTMLInputElement);
-	barmatz.forms.ui.JQueryPromptDialogController.call(this, model, view, dialogContainerView);
+	barmatz.forms.ui.jquery.JQueryPromptDialogController.call(this, model, view, dialogContainerView);
 	
 	this._nameFieldView = nameFieldView;
 	this._labelFieldView = labelFieldView;
 	this._errorDialog = null;
 };
-barmatz.forms.ui.NewFieldDialogController.prototype = new barmatz.forms.ui.JQueryPromptDialogController(null, null);
+barmatz.forms.ui.NewFieldDialogController.prototype = new barmatz.forms.ui.jquery.JQueryPromptDialogController(null, null);
 barmatz.forms.ui.NewFieldDialogController.prototype.constructor = barmatz.forms.ui.NewFieldDialogController;
 barmatz.forms.ui.NewFieldDialogController.prototype._submitDialog = function(dialogContainerView)
 {

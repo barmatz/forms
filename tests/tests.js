@@ -1166,7 +1166,7 @@ test('createTable', function()
 	bodyColumnsClassNames = ['mybodycol1classname', 'mybodycol2classname'];
 	className = 'myclassname';
 	
-	options = new barmatz.forms.ui.TableOptions();
+	options = new barmatz.forms.ui.DataTableOptions();
 	options.setHeadClassName(headClassName);
 	options.setHeadColumns(headColumns);
 	options.setHeadColumnsClassNames(headColumnsClassNames);
@@ -1417,7 +1417,7 @@ test('createUserModel', function()
 	
 	for(i = 0; i < types.length; i++)
 	{
-		model = barmatz.forms.factories.ModelFactory.createFieldModel(types[i], name);
+		model = barmatz.forms.factories.ModelFactory.createFormFieldModel(types[i], name);
 		equal(types[i], model.getType());
 		
 		if(!(model instanceof barmatz.forms.fields.HTMLContentModel))
@@ -2328,7 +2328,7 @@ test('clone', function()
 	deepEqual(model.getMax(), clone.getMax());
 	equal(model.getDescription(), clone.getDescription());
 });
-module('barmatz.forms.ui.BuilderPageController', {
+module('barmatz.forms.ui.pages.BuilderPageController', {
 	setup: function()
 	{
 		formModel = new barmatz.forms.FormModel(); 
@@ -2343,7 +2343,7 @@ module('barmatz.forms.ui.BuilderPageController', {
 		toolboxView = document.createElement('div');
 		workspaceView = document.createElement('div');
 		propertiesController = new barmatz.forms.ui.PropertiesController(document.createElement('div'));
-		builder = new barmatz.forms.ui.BuilderPageController(formModel, userModel, containerView, panelsView, formNameView, saveStatusView, menuModel, menuView, toolboxModel, toolboxView, workspaceView, propertiesController, document.getElementById('qunit-fixture'));
+		builder = new barmatz.forms.ui.pages.BuilderPageController(formModel, userModel, containerView, panelsView, formNameView, saveStatusView, menuModel, menuView, toolboxModel, toolboxView, workspaceView, propertiesController, document.getElementById('qunit-fixture'));
 	},
 	teardown: function()
 	{
@@ -2394,10 +2394,10 @@ test('conctructor', function()
 	equal(toolboxModel.getNumItems(), 7);
 	equal(containerView.children.length, 2);
 });
-module('barmatz.forms.ui.BuilderPageModel', {
+module('barmatz.forms.ui.pages.BuilderPageModel', {
 	setup: function()
 	{
-		model = new barmatz.forms.ui.BuilderPageModel(document.createElement('qunit-fixture'));
+		model = new barmatz.forms.ui.pages.BuilderPageModel(document.createElement('qunit-fixture'));
 	},
 	teardown: function()
 	{
@@ -2906,10 +2906,10 @@ test('setModel', function()
 	controller.setModel(model);
 	equal(1, view.children.length);
 });
-module('barmatz.forms.ui.TableOptions', {
+module('barmatz.forms.ui.DataTableOptions', {
 	setup: function()
 	{
-		options = new barmatz.forms.ui.TableOptions();
+		options = new barmatz.forms.ui.DataTableOptions();
 	},
 	teardown: function ()
 	{

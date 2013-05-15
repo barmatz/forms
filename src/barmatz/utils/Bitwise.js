@@ -29,7 +29,7 @@ barmatz.utils.Bitwise = {
 		{
 			bits = bits.concat(this.parseBit(item));
 		}, this);
-		filterredBits = bits.filter(function(a,b,c)
+		filterredBits = barmatz.utils.Array.filter(bits, function(a,b,c)
 		{
 			return filterredBits.indexOf(a) >= 0 ? false : filterredBits.push(a) >= 0;
 		});

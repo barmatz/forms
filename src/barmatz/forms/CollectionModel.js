@@ -64,9 +64,8 @@ barmatz.forms.CollectionModel.prototype.forEach = function(handler)
 };
 barmatz.forms.CollectionModel.prototype.find = function(filter)
 {
-	
 	barmatz.utils.DataTypes.isTypeOf(filter, 'function');
-	return this.get('items').filter(filter);
+	return barmatz.utils.Array.filter(this.get('items'), filter);
 };
 barmatz.forms.CollectionModel.prototype.toString = function()
 {

@@ -1,5 +1,5 @@
-/** barmatz.forms.ui.TableOptions **/
-barmatz.forms.ui.TableOptions = function()
+/** barmatz.forms.ui.DataTableOptions **/
+barmatz.forms.ui.DataTableOptions = function()
 {
 	this._headClassName = '';
 	this._headColumns = [];
@@ -12,7 +12,7 @@ barmatz.forms.ui.TableOptions = function()
 	this._className = '';
 };
 
-barmatz.forms.ui.TableOptions.prototype = {
+barmatz.forms.ui.DataTableOptions.prototype = {
 	getHeadClassName: function()
 	{
 		return this._headClassName;
