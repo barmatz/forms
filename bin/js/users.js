@@ -4730,7 +4730,7 @@ barmatz.forms.fields.FieldController = function(model, fieldView, errorMessageVi
 	
 	function onFieldViewChange(event)
 	{
-		if(model instanceof barmatz.forms.fields.PhoneFieldModel && event.target.tagName.toLowerCase() == 'select')
+		if(model instanceof barmatz.forms.fields.PhoneFieldModel && !model.getValue() && event.target.tagName.toLowerCase() == 'select')
 			return;
 			
 		setModelValue();
